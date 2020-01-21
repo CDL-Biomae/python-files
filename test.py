@@ -1,3 +1,11 @@
-import query
+from query import Query
 
-print(query.query_function("city", "agency","100" ))
+New_Query = Query(column="city", table="agency")
+
+print(New_Query)
+
+New_Query.setLimit(100)
+print(New_Query)
+
+New_Query.setLimit()
+print(New_Query)
