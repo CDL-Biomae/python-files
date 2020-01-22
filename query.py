@@ -3,21 +3,41 @@ from mysql.connector import errorcode
 
 class Query:
   
-  def __init__(self, table=None, column="*", limit=None):
+  def __init__(self, table=None, column="*", limit=None,filter=None, interval=None):
     if column==None :
       self.column = "*"
     else :
       self.setColumn(column)
+    self.filter = self.setFilter(filter)
     self.table = table
     self.limit = limit
+    self.interval = interval
   
   def __str__(self) :
-    if self.limit==None :
+    if self.limit==None and self.interval==None and self.filter==None :
       return "SELECT {} FROM {}".format(
       self.column, self.table)
-    else :
+    elif self.limit!=None and self.interval==None and self.filter==None :
       return "SELECT {} FROM {} LIMIT {}".format(
       self.column, self.table, self.limit)
+    elif self.limit==None and self.interval!=None and self.filter ==None :
+      return "SELECT {} FROM {} WHERE {} BETWEEN {} AND {}".format(
+      self.column, self.table, self.interval[0], self.interval[1], self.interval[2])
+    elif self.limit!=None and self.interval!=None and self.filter ==None :
+      return "SELECT {} FROM {} WHERE {} BETWEEN {} AND {} LIMIT {}".format(
+      self.column, self.table, self.interval[0], self.interval[1], self.interval[2], self.limit)
+    elif self.limit==None and self.interval==None and self.filter != None :
+      return "SELECT {} FROM {} WHERE {}".format(
+      self.column, self.table, self.filter)
+    elif self.limit==None and self.interval!=None and self.filter != None :
+      return "SELECT {} FROM {} WHERE {} AND {} BETWEEN {} AND {}".format(
+      self.column, self.table, self.filter, self.interval[0], self.interval[1], self.interval[2])
+    elif self.limit!=None and self.interval==None and self.filter != None :
+      return "SELECT {} FROM {} WHERE {} LIMIT {}".format(
+      self.column, self.table, self.filter, self.limit)
+    elif self.limit!=None and self.interval!=None and self.filter != None :
+      return "SELECT {} FROM {} WHERE {} WHERE {} BETWEEN {} AND {} LIMIT {}".format(
+      self.column, self.table, self.filter, self.interval[0], self.interval[1], self.interval[2], self.limit)
 
   def getTable(self):
     return self.table
@@ -41,6 +61,23 @@ class Query:
   
   def setLimit(self, limit=None):
     self.limit=limit
+
+  def getInterval(self):
+    return self.interval
+  
+  def setInterval(self, interval=None):
+    self.interval=interval
+
+  def getFilter(self):
+    return self.filter
+  
+  def setFilter(self, filter=None):
+    if(len(filter)>=0 and isinstance(filter, list)):
+      self.filter=filter[0]
+      for element in filter[1:] :
+        self.filter+=" AND "+element
+    else : 
+      self.filter=filter
 
   def execute(self) :
     if self.table==None :
