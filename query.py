@@ -45,7 +45,6 @@ class Query:
   
   def setDistinct(self, distinct):
     self.distinct=distinct
-    self.setColumn()
     
   def getColumn(self):
     return self.column

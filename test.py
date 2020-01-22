@@ -1,5 +1,5 @@
 from query import Query
 
-New_Query = Query(column="t0",table="measurepoint", filter=["temperature_max=20","conductivity_min=100"])
+New_Query = Query(column=["city",], table="agency", distinct=True)
 
-print(New_Query.execute())
+print(New_Query)
