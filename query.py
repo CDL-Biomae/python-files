@@ -3,47 +3,49 @@ from mysql.connector import errorcode
 
 class Query:
   
-  def __init__(self, table=None, column="*", limit=None,filtre=None, interval=None):
+  def __init__(self, table=None, column="*", limit=None, group=None, filtre=None, interval=None, distinct=False):
+    self.distinct = distinct
     if column==None :
       self.column = "*"
     else :
       self.setColumn(column)
     self.setFiltre(filtre)
+    self.group = group
     self.table = table
     self.limit = limit
     self.interval = interval
   
   def __str__(self) :
-    if self.limit==None and self.interval==None and self.filtre==None :
-      return "SELECT {} FROM {}".format(
-      self.column, self.table)
-    elif self.limit!=None and self.interval==None and self.filtre==None :
-      return "SELECT {} FROM {} LIMIT {}".format(
-      self.column, self.table, self.limit)
-    elif self.limit==None and self.interval!=None and self.filtre ==None :
-      return "SELECT {} FROM {} WHERE {} BETWEEN {} AND {}".format(
-      self.column, self.table, self.interval[0], self.interval[1], self.interval[2])
-    elif self.limit!=None and self.interval!=None and self.filtre ==None :
-      return "SELECT {} FROM {} WHERE {} BETWEEN {} AND {} LIMIT {}".format(
-      self.column, self.table, self.interval[0], self.interval[1], self.interval[2], self.limit)
-    elif self.limit==None and self.interval==None and self.filtre != None :
-      return "SELECT {} FROM {} WHERE {}".format(
-      self.column, self.table, self.filtre)
-    elif self.limit==None and self.interval!=None and self.filtre != None :
-      return "SELECT {} FROM {} WHERE {} AND {} BETWEEN {} AND {}".format(
-      self.column, self.table, self.filtre, self.interval[0], self.interval[1], self.interval[2])
-    elif self.limit!=None and self.interval==None and self.filtre != None :
-      return "SELECT {} FROM {} WHERE {} LIMIT {}".format(
-      self.column, self.table, self.filtre, self.limit)
-    elif self.limit!=None and self.interval!=None and self.filtre != None :
-      return "SELECT {} FROM {} WHERE {} WHERE {} BETWEEN {} AND {} LIMIT {}".format(
-      self.column, self.table, self.filtre, self.interval[0], self.interval[1], self.interval[2], self.limit)
-
+    SQL_request = "SELECT "
+    SQL_request += "DISTINCT "*self.distinct+self.column+" FROM "+self.table
+    
+    if(self.filtre or self.interval) :
+      SQL_request +=" WHERE "
+      if(self.filtre and self.interval) :
+        SQL_request += self.filtre + " AND " + self.interval[0] + " BETWEEN " + self.interval[1] + " AND " + self.interval[2]
+      elif(self.filtre) :
+        SQL_request += self.filtre
+      else :
+        SQL_request += self.interval[0] + " BETWEEN " + self.interval[1] + " AND " + self.interval[2]
+    if(self.group):
+      SQL_request += " GROUP BY " + self.group
+    if(self.limit):
+      SQL_request += " LIMIT "+self.limit
+    
+    return SQL_request
+      
   def getTable(self):
     return self.table
   
   def setTable(self, table):
     self.table=table
+
+  def getDistinct(self):
+    return self.distinct
+  
+  def setDistinct(self, distinct):
+    self.distinct=distinct
+    self.setColumn()
     
   def getColumn(self):
     return self.column
@@ -62,17 +64,22 @@ class Query:
   def setLimit(self, limit=None):
     self.limit=limit
 
+  def getGroup(self):
+    return self.group
+  
+  def setGroup(self, group=None):
+    self.group=group
+
   def getInterval(self):
     return self.interval
   
   def setInterval(self, interval=None):
     self.interval=interval
-
   def getFiltre(self):
     return self.filtre
   
   def setFiltre(self, filtre=None):
-    if(len(filtre)>=0 and isinstance(filtre, list)):
+    if(filtre!=None and len(filtre)>=0 and isinstance(filtre, list)):
       self.filtre=filtre[0]
       for element in filtre[1:] :
         self.filtre+=" AND "+element
