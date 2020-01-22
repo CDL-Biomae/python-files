@@ -1,0 +1,692 @@
+Sub Contexte_et_Conditions_expo()
+'
+' Contexte_et_Conditions_expo Macro
+' Macro pour les 3 premiers onglets/tableaux
+'
+ Application.ScreenUpdating = False
+    Application.DisplayStatusBar = False
+    
+    
+    
+    Dim I1 As String, I2 As String, I3 As String, I4 As String, I5 As String, I6 As String
+    Dim M As String
+    Dim T1 As String, T2 As String, T3 As String, T4 As String, T5 As String, T6 As String
+    Dim C1 As String, C2 As String, C3 As String
+    Dim R2 As String, R3 As String
+    Dim V1 As Integer, V2 As Integer, V3 As Integer, V4 As Integer, V5 As Integer, V6 As Integer
+            
+    'Onglets Import
+    I1 = "Liste des points de mesure"
+    I2 = "Conditions d'exposition"
+    I3 = "Températures brutes"
+    I4 = "Biotests Tox"
+    I5 = "Biotests Chimie"
+    I6 = "Traçabilité échantillons"
+    
+  
+    'Onglets Tables
+    T1 = "Contexte d'études"
+    T2 = "Contexte d'études 2"
+    T3 = "Conditions d'expo"
+    T4 = "Reporting chimie"
+    T5 = "Chimie"
+    T6 = "Tox"
+    
+    'Onglets Référentiels
+    R2 = "r2"
+    R3 = "r3"
+    
+    'Onglets Calcul
+    C1 = "Calcul température"
+    C2 = "Température repro"
+    C3 = "Calcul toxicité"
+   
+    'B = "Rapport expérimentation"
+  
+  Dim X As Integer
+    X = InputBox("Combien de stations : ", "Nombre de stations")
+    
+    
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+''''''CONTEXTE''''''
+'Onglet Contexte d'études 1
+
+    For V2 = 1 To (X - 1)
+    
+    Sheets(T1).Select
+    Range(Rows(5), Rows(6)).Copy
+    Range(Rows(2 * V2 + 5), Rows(2 * V2 + 6)).Select
+    ActiveSheet.Paste
+    
+    Sheets(T1).Cells(2 * V2 + 5, 2).Value = Sheets(I1).Cells(6 * V2 + 2, 1).Value 'Numéro de site
+    Sheets(T1).Cells(2 * V2 + 5, 3).Value = Sheets(I1).Cells(6 * V2 + 2, 3).Value  'Station de mesure
+    Sheets(T1).Cells(2 * V2 + 5, 4).Value = "0" & Sheets(I1).Cells(6 * V2 + 2, 4).Value      'Code agence
+    Sheets(T1).Cells(2 * V2 + 5, 5).Value = Sheets(I1).Cells(6 * V2 + 2, 5).Value        'type de réseau
+    Sheets(T1).Cells(2 * V2 + 5, 6).Value = Sheets(I1).Cells(6 * V2 + 2, 6).Value        'Her
+    Sheets(T1).Cells(2 * V2 + 5, 7).Value = Sheets(I1).Cells(6 * V2 + 2, 8).Value        'Masse eau
+    Sheets(T1).Cells(2 * V2 + 5, 8).Value = Sheets(I1).Cells(6 * V2 + 2, 9).Value        'Adresse
+    Sheets(T1).Cells(2 * V2 + 5, 9).Value = Sheets(I1).Cells(6 * V2 + 2, 10).Value & ", " & Sheets(I1).Cells(6 * V2 + 3, 10).Value     'Coordonnées réf Lat/Long
+    Sheets(T1).Cells(2 * V2 + 6, 9).Value = Sheets(I1).Cells(6 * V2 + 4, 10).Value & "," & Sheets(I1).Cells(6 * V2 + 5, 10).Value   'Coordonnées réf L93
+    Sheets(T1).Cells(2 * V2 + 5, 10).Value = Sheets(I1).Cells(6 * V2 + 2, 11).Value & ", " & Sheets(I1).Cells(6 * V2 + 3, 11).Value        'Coordonnées réelles
+    
+    Next V2
+    
+    'Onglet Contexte d'études 2
+
+For V2 = 1 To (X - 1)
+    
+    Sheets(T2).Select
+    Rows(3).Copy
+    Rows(V2 + 3).Select
+    ActiveSheet.Paste
+    
+    Sheets(T2).Cells(V2 + 3, 2).Value = Right(Left(Sheets(I1).Cells(6 * V2 + 2, 2).Value, 10), 2) 'Numéro de campagne
+    Sheets(T2).Cells(V2 + 3, 3).Value = Sheets(I1).Cells(6 * V2 + 2, 1).Value 'Numéro de site
+    Sheets(T2).Cells(V2 + 3, 4).Value = Sheets(I1).Cells(6 * V2 + 2, 3).Value  'Station de mesure
+    Sheets(T2).Cells(V2 + 3, 5).Value = "0" & Sheets(I1).Cells(6 * V2 + 2, 4).Value      'Code agence
+    Sheets(T2).Cells(V2 + 3, 6).Value = Sheets(I1).Cells(6 * V2 + 2, 12).Value        'J0
+    Sheets(T2).Cells(V2 + 3, 7).Value = Sheets(I1).Cells(6 * V2 + 3, 12).Value        'J7
+    Sheets(T2).Cells(V2 + 3, 8).Value = Sheets(I1).Cells(6 * V2 + 5, 12).Value        'JN
+    Sheets(T2).Cells(V2 + 3, 10).Value = Sheets(I1).Cells(6 * V2 + 4, 12).Value      'J21
+    
+    Next V2
+    
+    'Calcul température : mise en forme des autres points de mesure
+    
+    For V6 = 1 To (X - 1)
+    
+    Sheets(C1).Select
+    Range(Columns(2), Columns(7)).Copy  'Copie des colonnes 2 à 7 relatives au point de mesure 1
+    Range(Columns(6 * V6 + 2), Columns(6 * V6 + 7)).Select
+    ActiveSheet.Paste
+    
+    Sheets(C1).Cells(1, 6 * V6 + 2).Value = Sheets(I1).Cells(6 * V6 + 2, 2).Value 'Rajout du nom du point de mesure
+    Sheets(C1).Cells(4, 6 * V6 + 2).Value = Sheets(I4).Cells(12, V6 + 2).Value 'Rajout des dates clés (Transp)
+    Sheets(C1).Cells(5, 6 * V6 + 2).Value = Sheets(I4).Cells(13, V6 + 2).Value 'Rajout des dates clés (Récup alim)
+    Sheets(C1).Cells(6, 6 * V6 + 2).Value = Sheets(I4).Cells(10, V6 + 2).Value 'Rajout des dates clés (Lancement)
+    Sheets(C1).Cells(7, 6 * V6 + 2).Value = Sheets(I4).Cells(90, V6 + 2).Value 'Rajout des dates clés (récup repro)
+    Sheets(C1).Cells(8, 6 * V6 + 2).Value = Sheets(I4).Cells(92, V6 + 2).Value 'Rajout des dates clés (arrêt repro)
+    Sheets(C1).Cells(9, 6 * V6 + 2).Value = Sheets(I5).Cells(8, V6 + 4).Value 'Rajout des dates clés (récup repro)
+    Sheets(C1).Cells(10, 6 * V6 + 2).Value = Sheets(I5).Cells(9, V6 + 4).Value 'Rajout des dates clés (récup repro)
+    Next V6
+    
+    
+    'Onglet Conditions d'expo
+    
+    For V2 = 1 To (X - 1)
+    
+    Sheets(T3).Select
+    Rows(7).Copy
+    Rows(V2 + 7).Select
+    ActiveSheet.Paste
+    
+    Sheets(T3).Cells(V2 + 7, 2).Value = Sheets(I1).Cells(6 * V2 + 2, 1).Value 'Numéro de site
+    Sheets(T3).Cells(V2 + 7, 3).Value = Sheets(I1).Cells(6 * V2 + 2, 3).Value 'Station de mesure
+    Sheets(T3).Cells(V2 + 7, 4).Value = "0" & Sheets(I1).Cells(6 * V2 + 2, 4).Value     'Code agence
+    
+        'Min temp
+        If WorksheetFunction.Min(Sheets(C1).Cells(6, 6 * V2 + 5).Value, Sheets(C1).Cells(6, 6 * V2 + 7).Value) = 0 Then
+        Sheets(T3).Cells(V2 + 7, 6).Value = WorksheetFunction.Max(Sheets(C1).Cells(6, 6 * V2 + 5).Value, Sheets(C1).Cells(6, 6 * V2 + 7).Value)
+        Else
+        Sheets(T3).Cells(V2 + 7, 6).Value = WorksheetFunction.Min(Sheets(C1).Cells(6, 6 * V2 + 5).Value, Sheets(C1).Cells(6, 6 * V2 + 7).Value)
+        End If
+        If Sheets(T3).Cells(V2 + 7, 6).Value = "0" Then
+        Sheets(T3).Cells(V2 + 7, 6).Value = "NA"
+        End If
+        
+        'Moyenne temp
+        If Sheets(C1).Cells(10, 6 * V2 + 2).Value - Sheets(C1).Cells(9, 6 * V2 + 2).Value > Sheets(C1).Cells(7, 6 * V2 + 2).Value - Sheets(C1).Cells(4, 6 * V2 + 2).Value Then
+            If IsError(Sheets(C1).Cells(4, 6 * V2 + 5).Value) = False Then
+            Sheets(T3).Cells(V2 + 7, 7).Value = Sheets(C1).Cells(4, 6 * V2 + 5).Value
+            Else
+            If IsError(Sheets(C1).Cells(4, 6 * V2 + 7).Value) = False Then
+            Sheets(T3).Cells(V2 + 7, 7).Value = Sheets(C1).Cells(4, 6 * V2 + 7).Value
+            Else
+            Sheets(T3).Cells(V2 + 7, 7).Value = "NA"
+            End If
+            End If
+        Else
+            If IsError(Sheets(C1).Cells(4, 6 * V2 + 7).Value) = False Then
+            Sheets(T3).Cells(V2 + 7, 7).Value = Sheets(C1).Cells(4, 6 * V2 + 7).Value
+            Else
+            If IsError(Sheets(C1).Cells(4, 6 * V2 + 5).Value) = False Then
+            Sheets(T3).Cells(V2 + 7, 7).Value = Sheets(C1).Cells(4, 6 * V2 + 5).Value
+            Else
+            Sheets(T3).Cells(V2 + 7, 7).Value = "NA"
+            End If
+            End If
+        End If
+    
+        'Max temp
+        Sheets(T3).Cells(V2 + 7, 8).Value = WorksheetFunction.Max(Sheets(C1).Cells(8, 6 * V2 + 5).Value, Sheets(C1).Cells(8, 6 * V2 + 7).Value)
+        If Sheets(T3).Cells(V2 + 7, 8).Value = "0" Then
+        Sheets(T3).Cells(V2 + 7, 8).Value = "NA"
+        End If
+    
+    Sheets(T3).Cells(V2 + 7, 9).Value = Sheets(I2).Cells(6, V2 + 3).Value   'Conductivité J0
+    Sheets(T3).Cells(V2 + 7, 10).Value = Sheets(I2).Cells(7, V2 + 3).Value  'Conductivité J7
+    Sheets(T3).Cells(V2 + 7, 11).Value = Sheets(I2).Cells(8, V2 + 3).Value 'Conductivité JN
+    Sheets(T3).Cells(V2 + 7, 12).Value = Sheets(I2).Cells(9, V2 + 3).Value 'Conductivité J21
+    Sheets(T3).Cells(V2 + 7, 13).Value = Sheets(I2).Cells(18, V2 + 3).Value  'pH J0
+    Sheets(T3).Cells(V2 + 7, 14).Value = Sheets(I2).Cells(19, V2 + 3).Value  'pH J7
+    Sheets(T3).Cells(V2 + 7, 15).Value = Sheets(I2).Cells(20, V2 + 3).Value  'pH JN
+    Sheets(T3).Cells(V2 + 7, 16).Value = Sheets(I2).Cells(21, V2 + 3).Value  'pH J21
+    Sheets(T3).Cells(V2 + 7, 17).Value = Sheets(I2).Cells(10, V2 + 3).Value  'oxygène J0
+    Sheets(T3).Cells(V2 + 7, 18).Value = Sheets(I2).Cells(11, V2 + 3).Value 'oxygène J7
+    Sheets(T3).Cells(V2 + 7, 19).Value = Sheets(I2).Cells(12, V2 + 3).Value 'oxygène JN
+    Sheets(T3).Cells(V2 + 7, 20).Value = Sheets(I2).Cells(13, V2 + 3).Value 'oxygène J21
+
+    Next V2
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+ Application.CutCopyMode = False
+    
+    Application.ScreenUpdating = True
+    Application.DisplayStatusBar = True
+    
+End Sub
+Sub Tableaux_Chimie()
+'
+' Tableaux_chimie Macro
+' Remplissage du reporting et transformation des tableaux de chimie
+'
+Application.ScreenUpdating = False
+    Application.DisplayStatusBar = False
+    
+    Dim I1 As String, I2 As String, I3 As String, I4 As String, I5 As String, I6 As String
+    Dim M As String
+    Dim T1 As String, T2 As String, T3 As String, T4 As String, T5 As String, T6 As String
+    Dim C1 As String, C2 As String, C3 As String
+    Dim R2 As String, R3 As String
+    Dim V1 As Integer, V2 As Integer, V3 As Integer, V4 As Integer, V5 As Integer, V6 As Integer
+            
+    'Onglets Import
+    I1 = "Liste des points de mesure"
+    I2 = "Conditions d'exposition"
+    I3 = "Températures brutes"
+    I4 = "Biotests Tox"
+    I5 = "Biotests Chimie"
+    I6 = "Traçabilité échantillons"
+    
+    'Onglets Tables
+    T1 = "Contexte d'études"
+    T2 = "Contexte d'études 2"
+    T3 = "Conditions d'expo"
+    T4 = "Reporting chimie"
+    T5 = "Chimie"
+    T6 = "Tox"
+    
+    'Onglets Référentiels
+    R2 = "r2"
+    R3 = "r3"
+    
+    'Onglets Calcul
+    C1 = "Calcul température"
+    C2 = "Température repro"
+    C3 = "Calcul toxicité"
+   
+    'B = "Rapport expérimentation"
+   
+   Dim X As Integer
+    X = InputBox("Combien de stations : ", "Nombre de stations")
+    
+'
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+'''''CHIMIE'''''''
+'
+
+    
+'Onglet Chimie : modification et remplissage de la table
+
+    For V2 = 1 To X
+    
+    Sheets(T5).Select
+    Rows(12).Copy
+    Rows(V2 + 12).Select
+    ActiveSheet.Paste
+    
+    Sheets(T5).Cells(12 + V2, 6).Value = V2 + 3     'Donne le numéro de colonne à rechercher la valeur de chimie correspondante --> Valeur cachée dans le rapport
+      
+    Sheets(T5).Cells(12 + V2, 3).Value = Sheets(I1).Cells(6 * V2 + 2, 1).Value  'Numéro de site
+    If Sheets(I1).Cells(6 * V2 + 2, 3).Value <> "" Then
+    Sheets(T5).Cells(12 + V2, 4).Value = Sheets(I1).Cells(6 * V2 + 2, 3).Value
+    Else: Sheets(T5).Cells(12 + V2, 4).Value = Sheets(I5).Cells(1, 4 + V2).Value
+    End If
+    Sheets(T5).Cells(12 + V2, 5).Value = "0" & Sheets(I1).Cells(6 * V2 + 2, 4).Value      'Code agence
+    Sheets(T5).Cells(12 + V2, 2).Value = Right(Left(Sheets(I5).Cells(34, 4 + V2).Value, 11), 8)     'T0 associé
+    
+    Next V2
+    
+    For V3 = 1 To X
+    Sheets(T5).Cells(12 + V3, 987).Value = Sheets(I5).Cells(32, 4 + V3).Value - Sheets(I5).Cells(31, 4 + V3).Value  'Poids frais métaux
+    If Sheets(I5).Cells(33, 4 + V3).Value = "" Then
+    Sheets(T5).Cells(12 + V3, 988).Value = "ND"
+    Else
+    Sheets(T5).Cells(12 + V3, 988).Value = (Sheets(I5).Cells(32, 4 + V3).Value - Sheets(I5).Cells(31, 4 + V3).Value) / Sheets(I5).Cells(33, 4 + V3).Value 'Poids frais par individu
+    End If
+    Sheets(T5).Cells(12 + V3, 990).Value = Sheets(I6).Cells(8, 2 + V3).Value - Sheets(I6).Cells(7, 2 + V3).Value 'Poids frais orga
+    If Sheets(I5).Cells(11, 4 + V3) = "" Then
+    Sheets(T5).Cells(12 + V3, 994).Value = "0"
+    Else
+    Sheets(T5).Cells(12 + V3, 994).Value = WorksheetFunction.Sum(Range(Sheets(I5).Cells(11, 4 + V3), Sheets(I5).Cells(30, 4 + V3))) / WorksheetFunction.Count(Range(Sheets(I5).Cells(11, 4 + V3), Sheets(I5).Cells(30, 4 + V3))) / 30
+    End If
+    Next V3
+    
+   
+'Coloration des cases en fonction de la NQE (uniquement NQE biote crustacés)
+    
+    V4 = 12
+    Do Until IsEmpty(Sheets(T5).Cells(V4, 7))
+    
+    For V5 = 7 To 22
+    If IsEmpty(Sheets(T5).Cells(V4, V5).Value) Then
+    Sheets(T5).Cells(V4, V5).Interior.Color = RGB(255, 255, 255)
+    Else
+
+    If Sheets(T5).Cells(V4, V5).Text Like "<*" Then
+    Sheets(T5).Cells(V4, V5).Interior.Color = RGB(28, 134, 238)
+    Else
+    If Sheets(T5).Cells(V4, V5).Value = "NI" Then
+    Sheets(T5).Cells(V4, V5).Interior.Color = RGB(190, 190, 190)
+    Else
+    If Sheets(T5).Cells(V4, V5).Value = "ND" Then
+    Sheets(T5).Cells(V4, V5).Interior.Color = RGB(255, 255, 255)
+    Else
+        If Sheets(T5).Cells(V4, V5).Value > Sheets(T5).Cells(4, V5).Value Then
+        Sheets(T5).Cells(V4, V5).Interior.Color = RGB(190, 0, 0)
+        Else
+            If Sheets(T5).Cells(V4, V5).Value <= Sheets(T5).Cells(4, V5).Value Then
+            Sheets(T5).Cells(V4, V5).Interior.Color = RGB(28, 134, 238)
+            End If
+        End If
+    End If
+    End If
+End If
+End If
+    Next V5
+V4 = V4 + 1
+Loop
+
+'Coloration des cases en fonction des seuils 7j gradués Métaux
+      
+    Dim range1 As String, range2 As String, range3 As String
+    range1 = "B3:P500"
+    range2 = "B3:B500"
+          
+    V4 = 12
+    Do Until IsEmpty(Sheets(T5).Cells(V4, 7))
+    
+    For V5 = 85 To 121
+    If IsEmpty(Sheets(T5).Cells(V4, V5).Value) Then
+    Sheets(T5).Cells(V4, V5).Interior.Color = RGB(255, 255, 255)
+    Else
+
+    If Sheets(T5).Cells(V4, V5).Text Like "<*" Then
+    Sheets(T5).Cells(V4, V5).Interior.Color = RGB(28, 134, 238)
+    Else
+        If Sheets(T5).Cells(V4, V5).Value = "NI" Then
+        Sheets(T5).Cells(V4, V5).Interior.Color = RGB(190, 190, 190)
+        Else
+            If Sheets(T5).Cells(V4, V5).Value = "ND" Then
+            Sheets(T5).Cells(V4, V5).Interior.Color = RGB(255, 255, 255)
+            Else
+                If Sheets(T5).Cells(V4, V5).Value <= Application.Index(Sheets(R3).Range(range1), Application.Match(Sheets(T5).Cells(11, V5 + 1).Value, Sheets(R3).Range(range2), 0), 4) Then
+                Sheets(T5).Cells(V4, V5).Interior.Color = RGB(28, 134, 238)
+                Else
+                    If Sheets(T5).Cells(V4, V5).Value > Application.Index(Sheets(R3).Range(range1), Application.Match(Sheets(T5).Cells(11, V5 + 1).Value, Sheets(R3).Range(range2), 0), 4) And Sheets(T5).Cells(V4, V5).Value <= Application.Index(Sheets(R3).Range(range1), Application.Match(Sheets(T5).Cells(11, V5 + 1).Value, Sheets(R3).Range(range2), 0), 5) Then
+                    Sheets(T5).Cells(V4, V5).Interior.Color = RGB(110, 175, 70)
+                    Else
+                        If Sheets(T5).Cells(V4, V5).Value > Application.Index(Sheets(R3).Range(range1), Application.Match(Sheets(T5).Cells(11, V5 + 1).Value, Sheets(R3).Range(range2), 0), 5) And Sheets(T5).Cells(V4, V5).Value <= Application.Index(Sheets(R3).Range(range1), Application.Match(Sheets(T5).Cells(11, V5 + 1).Value, Sheets(R3).Range(range2), 0), 6) Then
+                        Sheets(T5).Cells(V4, V5).Interior.Color = RGB(235, 216, 51)
+                        Else
+                           If Sheets(T5).Cells(V4, V5).Value > Application.Index(Sheets(R3).Range(range1), Application.Match(Sheets(T5).Cells(11, V5 + 1).Value, Sheets(R3).Range(range2), 0), 6) And Sheets(T5).Cells(V4, V5).Value <= Application.Index(Sheets(R3).Range(range1), Application.Match(Sheets(T5).Cells(11, V5 + 1).Value, Sheets(R3).Range(range2), 0), 7) Then
+                           Sheets(T5).Cells(V4, V5).Interior.Color = RGB(235, 125, 50)
+                           Else
+                            If Sheets(T5).Cells(V4, V5).Value > Application.Index(Sheets(R3).Range(range1), Application.Match(Sheets(T5).Cells(11, V5 + 1).Value, Sheets(R3).Range(range2), 0), 7) Then
+                            Sheets(T5).Cells(V4, V5).Interior.Color = RGB(190, 0, 0)
+                            Else
+                            End If
+                          End If
+                        End If
+                    End If
+                End If
+            End If
+        End If
+    End If
+    End If
+    Next V5
+V4 = V4 + 1
+Loop
+
+'Coloration des cases en fonction des seuils 7j Organiques
+    
+    V4 = 12
+    Do Until IsEmpty(Sheets(T5).Cells(V4, 7))
+    
+    For V5 = 129 To 200
+    If IsEmpty(Sheets(T5).Cells(V4, V5).Value) Then
+    Sheets(T5).Cells(V4, V5).Interior.Color = RGB(255, 255, 255)
+    Else
+
+    If Sheets(T5).Cells(V4, V5).Text Like "<*" Then
+    Sheets(T5).Cells(V4, V5).Interior.Color = RGB(28, 134, 238)
+    Else
+    If Sheets(T5).Cells(V4, V5).Value = "NI" Then
+    Sheets(T5).Cells(V4, V5).Interior.Color = RGB(190, 190, 190)
+    Else
+    If Sheets(T5).Cells(V4, V5).Value = "ND" Then
+    Sheets(T5).Cells(V4, V5).Interior.Color = RGB(255, 255, 255)
+    Else
+        If Sheets(T5).Cells(V4, V5).Value > Sheets(T5).Cells(4, V5).Value Then
+        Sheets(T5).Cells(V4, V5).Interior.Color = RGB(190, 0, 0)
+        Else
+            If Sheets(T5).Cells(V4, V5).Value <= Sheets(T5).Cells(4, V5).Value Then
+            Sheets(T5).Cells(V4, V5).Interior.Color = RGB(28, 134, 238)
+            End If
+        End If
+    End If
+    End If
+End If
+End If
+    Next V5
+V4 = V4 + 1
+Loop
+
+'Coloration des cases en fonction des seuils 21j gradués Métaux
+    
+    V4 = 12
+    Do Until IsEmpty(Sheets(T5).Cells(V4, 7))
+    
+    For V5 = 207 To 247
+    If IsEmpty(Sheets(T5).Cells(V4, V5).Value) Then
+    Sheets(T5).Cells(V4, V5).Interior.Color = RGB(255, 255, 255)
+    Else
+
+    If Sheets(T5).Cells(V4, V5).Text Like "<*" Then
+    Sheets(T5).Cells(V4, V5).Interior.Color = RGB(28, 134, 238)
+    Else
+        If Sheets(T5).Cells(V4, V5).Value = "NI" Then
+        Sheets(T5).Cells(V4, V5).Interior.Color = RGB(190, 190, 190)
+        Else
+            If Sheets(T5).Cells(V4, V5).Value = "ND" Then
+            Sheets(T5).Cells(V4, V5).Interior.Color = RGB(255, 255, 255)
+            Else
+                If Sheets(T5).Cells(V4, V5).Value <= Application.Index(Sheets(R3).Range(range1), Application.Match(Sheets(T5).Cells(11, V5 + 1).Value, Sheets(R3).Range(range2), 0), 8) Then
+                Sheets(T5).Cells(V4, V5).Interior.Color = RGB(28, 134, 238)
+                Else
+                    If Sheets(T5).Cells(V4, V5).Value > Application.Index(Sheets(R3).Range(range1), Application.Match(Sheets(T5).Cells(11, V5 + 1).Value, Sheets(R3).Range(range2), 0), 8) And Sheets(T5).Cells(V4, V5).Value <= Application.Index(Sheets(R3).Range(range1), Application.Match(Sheets(T5).Cells(11, V5 + 1).Value, Sheets(R3).Range(range2), 0), 9) Then
+                    Sheets(T5).Cells(V4, V5).Interior.Color = RGB(110, 175, 70)
+                    Else
+                        If Sheets(T5).Cells(V4, V5).Value > Application.Index(Sheets(R3).Range(range1), Application.Match(Sheets(T5).Cells(11, V5 + 1).Value, Sheets(R3).Range(range2), 0), 9) And Sheets(T5).Cells(V4, V5).Value <= Application.Index(Sheets(R3).Range(range1), Application.Match(Sheets(T5).Cells(11, V5 + 1).Value, Sheets(R3).Range(range2), 0), 10) Then
+                        Sheets(T5).Cells(V4, V5).Interior.Color = RGB(235, 216, 51)
+                        Else
+                           If Sheets(T5).Cells(V4, V5).Value > Application.Index(Sheets(R3).Range(range1), Application.Match(Sheets(T5).Cells(11, V5 + 1).Value, Sheets(R3).Range(range2), 0), 10) And Sheets(T5).Cells(V4, V5).Value <= Application.Index(Sheets(R3).Range(range1), Application.Match(Sheets(T5).Cells(11, V5 + 1).Value, Sheets(R3).Range(range2), 0), 11) Then
+                           Sheets(T5).Cells(V4, V5).Interior.Color = RGB(235, 125, 50)
+                           Else
+                            If Sheets(T5).Cells(V4, V5).Value > Application.Index(Sheets(R3).Range(range1), Application.Match(Sheets(T5).Cells(11, V5 + 1).Value, Sheets(R3).Range(range2), 0), 11) Then
+                            Sheets(T5).Cells(V4, V5).Interior.Color = RGB(190, 0, 0)
+                            Else
+                            End If
+                          End If
+                        End If
+                    End If
+                End If
+            End If
+        End If
+    End If
+    End If
+    Next V5
+V4 = V4 + 1
+Loop
+          
+'Coloration des cases en fonction des seuils 21j gradués organiques
+    
+    V4 = 12
+    Do Until IsEmpty(Sheets(T5).Cells(V4, 7))
+    
+    For V5 = 255 To 295
+    If IsEmpty(Sheets(T5).Cells(V4, V5).Value) Then
+    Sheets(T5).Cells(V4, V5).Interior.Color = RGB(255, 255, 255)
+    Else
+
+    If Sheets(T5).Cells(V4, V5).Text Like "<*" Then
+    Sheets(T5).Cells(V4, V5).Interior.Color = RGB(28, 134, 238)
+    Else
+        If Sheets(T5).Cells(V4, V5).Value = "NI" Then
+        Sheets(T5).Cells(V4, V5).Interior.Color = RGB(190, 190, 190)
+        Else
+            If Sheets(T5).Cells(V4, V5).Value = "ND" Then
+            Sheets(T5).Cells(V4, V5).Interior.Color = RGB(255, 255, 255)
+            Else
+                If Sheets(T5).Cells(V4, V5).Value <= Application.Index(Sheets(R3).Range(range1), Application.Match(Sheets(T5).Cells(11, V5 + 1).Value, Sheets(R3).Range(range2), 0), 8) Then
+                Sheets(T5).Cells(V4, V5).Interior.Color = RGB(28, 134, 238)
+                Else
+                    If Sheets(T5).Cells(V4, V5).Value > Application.Index(Sheets(R3).Range(range1), Application.Match(Sheets(T5).Cells(11, V5 + 1).Value, Sheets(R3).Range(range2), 0), 8) And Sheets(T5).Cells(V4, V5).Value <= Application.Index(Sheets(R3).Range(range1), Application.Match(Sheets(T5).Cells(11, V5 + 1).Value, Sheets(R3).Range(range2), 0), 9) Then
+                    Sheets(T5).Cells(V4, V5).Interior.Color = RGB(110, 175, 70)
+                    Else
+                        If Sheets(T5).Cells(V4, V5).Value > Application.Index(Sheets(R3).Range(range1), Application.Match(Sheets(T5).Cells(11, V5 + 1).Value, Sheets(R3).Range(range2), 0), 9) And Sheets(T5).Cells(V4, V5).Value <= Application.Index(Sheets(R3).Range(range1), Application.Match(Sheets(T5).Cells(11, V5 + 1).Value, Sheets(R3).Range(range2), 0), 10) Then
+                        Sheets(T5).Cells(V4, V5).Interior.Color = RGB(235, 216, 51)
+                        Else
+                           If Sheets(T5).Cells(V4, V5).Value > Application.Index(Sheets(R3).Range(range1), Application.Match(Sheets(T5).Cells(11, V5 + 1).Value, Sheets(R3).Range(range2), 0), 10) And Sheets(T5).Cells(V4, V5).Value <= Application.Index(Sheets(R3).Range(range1), Application.Match(Sheets(T5).Cells(11, V5 + 1).Value, Sheets(R3).Range(range2), 0), 11) Then
+                           Sheets(T5).Cells(V4, V5).Interior.Color = RGB(235, 125, 50)
+                           Else
+                            If Sheets(T5).Cells(V4, V5).Value > Application.Index(Sheets(R3).Range(range1), Application.Match(Sheets(T5).Cells(11, V5 + 1).Value, Sheets(R3).Range(range2), 0), 11) Then
+                            Sheets(T5).Cells(V4, V5).Interior.Color = RGB(190, 0, 0)
+                            Else
+                            End If
+                          End If
+                        End If
+                    End If
+                End If
+            End If
+        End If
+    End If
+    End If
+    Next V5
+V4 = V4 + 1
+Loop
+
+'Coloration des cases en fonction des seuils 21j Organiques non gradués
+    
+    V4 = 12
+    Do Until IsEmpty(Sheets(T5).Cells(V4, 7))
+    
+    For V5 = 297 To 318
+    If IsEmpty(Sheets(T5).Cells(V4, V5).Value) Then
+    Sheets(T5).Cells(V4, V5).Interior.Color = RGB(255, 255, 255)
+    Else
+
+    If Sheets(T5).Cells(V4, V5).Text Like "<*" Then
+    Sheets(T5).Cells(V4, V5).Interior.Color = RGB(28, 134, 238)
+    Else
+    If Sheets(T5).Cells(V4, V5).Value = "NI" Then
+    Sheets(T5).Cells(V4, V5).Interior.Color = RGB(190, 190, 190)
+    Else
+    If Sheets(T5).Cells(V4, V5).Value = "ND" Then
+    Sheets(T5).Cells(V4, V5).Interior.Color = RGB(255, 255, 255)
+    Else
+        If Sheets(T5).Cells(V4, V5).Value > Sheets(T5).Cells(4, V5).Value Then
+        Sheets(T5).Cells(V4, V5).Interior.Color = RGB(190, 0, 0)
+        Else
+            If Sheets(T5).Cells(V4, V5).Value <= Sheets(T5).Cells(4, V5).Value Then
+            Sheets(T5).Cells(V4, V5).Interior.Color = RGB(28, 134, 238)
+            End If
+        End If
+    End If
+    End If
+End If
+End If
+    Next V5
+V4 = V4 + 1
+Loop
+
+'Affichage d'un message si le T0 dépasse le seuil
+
+
+
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+    Application.CutCopyMode = False
+    
+    Application.ScreenUpdating = True
+    Application.DisplayStatusBar = True
+    
+End Sub
+Sub Tableaux_Tox()
+'
+' Tableaux_Tox Macro
+' Modifications des tableaux de toxicité
+'
+
+    Application.ScreenUpdating = False
+    Application.DisplayStatusBar = False
+    
+    Dim I1 As String, I2 As String, I3 As String, I4 As String, I5 As String, I6 As String
+    Dim M As String
+    Dim T1 As String, T2 As String, T3 As String, T4 As String, T5 As String, T6 As String
+    Dim C1 As String, C2 As String, C3 As String
+    Dim R2 As String, R3 As String
+    Dim V1 As Integer, V2 As Integer, V3 As Integer, V4 As Integer, V5 As Integer, V6 As Integer
+            
+    'Onglets Import
+    I1 = "Liste des points de mesure"
+    I2 = "Conditions d'exposition"
+    I3 = "Températures brutes"
+    I4 = "Biotests Tox"
+    I5 = "Biotests Chimie"
+    I6 = "Traçabilité échantillons"
+    
+    M = "Macros"
+    
+    'Onglets Tables
+    T1 = "Contexte d'études"
+    T2 = "Contexte d'études 2"
+    T3 = "Conditions d'expo"
+    T4 = "Reporting chimie"
+    T5 = "Chimie"
+    T6 = "Tox"
+    
+    'Onglets Référentiels
+    R2 = "r2"
+    R3 = "r3"
+    
+    'Onglets Calcul
+    C1 = "Calcul température"
+    C2 = "Température repro"
+    C3 = "Calcul toxicité"
+   
+    Dim X As Integer
+    X = InputBox("Combien de stations : ", "Nombre de stations")
+    
+    '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+''''''TOX'''''''
+'Calcul température : mise en forme des autres points de mesure
+    
+    For V6 = 1 To (X - 1)
+    
+    Sheets(C1).Select
+    Range(Columns(2), Columns(7)).Copy  'Copie des colonnes 2 à 7 relatives au point de mesure 1
+    Range(Columns(6 * V6 + 2), Columns(6 * V6 + 7)).Select
+    ActiveSheet.Paste
+    
+    Sheets(C1).Cells(1, 6 * V6 + 2).Value = Sheets(I1).Cells(6 * V6 + 2, 2).Value 'Rajout du nom du point de mesure
+    Sheets(C1).Cells(4, 6 * V6 + 2).Value = Sheets(I4).Cells(12, V6 + 2).Value 'Rajout des dates clés (Transp)
+    Sheets(C1).Cells(5, 6 * V6 + 2).Value = Sheets(I4).Cells(13, V6 + 2).Value 'Rajout des dates clés (Récup alim)
+    Sheets(C1).Cells(6, 6 * V6 + 2).Value = Sheets(I4).Cells(10, V6 + 2).Value 'Rajout des dates clés (Lancement)
+    Sheets(C1).Cells(7, 6 * V6 + 2).Value = Sheets(I4).Cells(90, V6 + 2).Value 'Rajout des dates clés (récup repro)
+    Sheets(C1).Cells(8, 6 * V6 + 2).Value = Sheets(I4).Cells(92, V6 + 2).Value 'Rajout des dates clés (arrêt repro)
+    Sheets(C1).Cells(9, 6 * V6 + 2).Value = Sheets(I5).Cells(8, V6 + 4).Value 'Rajout des dates clés (récup repro)
+    Sheets(C1).Cells(10, 6 * V6 + 2).Value = Sheets(I5).Cells(9, V6 + 4).Value 'Rajout des dates clés (récup repro)
+    
+'Température repro
+    
+    Sheets(C2).Select
+    Columns(1).Copy
+    Columns(6 * V6 + 1).Select
+    ActiveSheet.Paste
+    Sheets(C2).Cells(1, 6 * V6 + 1).Value = Sheets(I1).Cells(1, 6 * V6 + 1).Value
+    Columns(6 * V6 + 1).Cut
+    Columns(V6 + 1).Select
+    ActiveSheet.Paste
+    
+'Onglet Calcul toxicité (modif de l'onglet)
+    
+    Sheets(C3).Select
+    Columns(2).Copy
+    Columns(V6 + 2).Select
+    ActiveSheet.Paste
+    
+'Calcul température moyenne alim
+    
+    Sheets(C3).Cells(68, V6 + 2).Value = Sheets(C1).Cells(4, (6 * V6 + 3)).Value
+    Sheets(C3).Cells(69, V6 + 2).Value = Sheets(C1).Cells(6, (6 * V6 + 3)).Value
+    Sheets(C3).Cells(70, V6 + 2).Value = Sheets(C1).Cells(8, (6 * V6 + 3)).Value
+
+'Onglet Tox : modification
+
+    Sheets(T6).Select
+    Rows(6).Copy
+    Rows(V6 + 6).Select
+    ActiveSheet.Paste
+   
+    Sheets(T6).Cells(6 + V6, 2).Value = Sheets(I1).Cells(6 * V6 + 2, 1).Value  'Numéro de site
+    Sheets(T6).Cells(6 + V6, 3).Value = Sheets(I1).Cells(6 * V6 + 2, 3).Value  'Station de mesure
+    Sheets(T6).Cells(6 + V6, 4).Value = "0" & Sheets(I1).Cells(6 * V6 + 2, 4).Value      'Code agence
+    
+    
+    Sheets(T6).Cells(6 + V6, 6).Value = Application.WorksheetFunction.Round(Sheets(C3).Cells(5, V6 + 2).Value, 0) 'Survie 7j arrondi à l'unité
+   If Sheets(C3).Cells(81, V6 + 2).Value = "NA" Then
+   Sheets(T6).Cells(6 + V6, 7).Value = "NA"
+   Else
+    Sheets(T6).Cells(6 + V6, 7).Value = Application.WorksheetFunction.Round(Sheets(C3).Cells(81, V6 + 2).Value, 1) 'Alimentation arrondi au dizième (INHIBITION = SIGNE -)
+    End If
+    
+    If Not WorksheetFunction.Average(Sheets(I4).Cells(69, V6 + 2).Value, Sheets(I4).Cells(70, V6 + 2).Value, Sheets(I4).Cells(71, V6 + 2).Value, Sheets(I4).Cells(72, V6 + 2).Value, Sheets(I4).Cells(73, V6 + 2).Value) = 0 Then
+    Sheets(T6).Cells(6 + V6, 8).Value = Application.WorksheetFunction.Round(Sheets(C3).Cells(108, V6 + 2).Value, 1) 'Neurotoxicité arrondi au dizième
+    Else
+    Sheets(T6).Cells(6 + V6, 8).Value = "NA"
+    End If
+    
+    If Not Sheets(I4).Cells(97, V6 + 2).Value = "" Then
+    Sheets(T6).Cells(6 + V6, 10).Value = ((WorksheetFunction.Average(Sheets(I4).Cells(94, V6 + 2).Value, Sheets(I4).Cells(95, V6 + 2).Value, Sheets(I4).Cells(96, V6 + 2).Value, Sheets(I4).Cells(97, V6 + 2).Value)) / Sheets(I4).Cells(98, V6 + 2).Value) * 100 'Survie femelles arrondi à l'unité
+    Else
+    Sheets(T6).Cells(6 + V6, 10).Value = "NA"
+    End If
+    
+    If WorksheetFunction.Sum(Sheets(I4).Cells(94, V6 + 2), Sheets(I4).Cells(95, V6 + 2), Sheets(I4).Cells(96, V6 + 2), Sheets(I4).Cells(97, V6 + 2)) < 10 Then
+    Sheets(T6).Cells(6 + V6, 11).Value = "NA"
+    Sheets(T6).Cells(6 + V6, 12).Value = "NA"
+    Sheets(T6).Cells(6 + V6, 13).Value = "NA"
+    Sheets(T6).Cells(6 + V6, 14).Value = "NA"
+    Sheets(T6).Cells(6 + V6, 15).Value = "NA"
+    Sheets(T6).Cells(6 + V6, 16).Value = "NA"
+    Sheets(T6).Cells(6 + V6, 17).Value = "NA"
+        
+    Else
+    Sheets(T6).Cells(6 + V6, 11).Value = Sheets(I4).Cells(90, V6 + 2).Value - Sheets(I4).Cells(89, V6 + 2).Value 'Nb jours expo
+    Sheets(T6).Cells(6 + V6, 12).Value = Sheets(C3).Cells(153, V6 + 2).Value 'n fécondité
+    Sheets(T6).Cells(6 + V6, 13).Value = Sheets(C3).Cells(152, V6 + 2).Value 'Fécondité
+    Sheets(T6).Cells(6 + V6, 14).Value = Sheets(C3).Cells(117, V6 + 2).Value 'n cycle de mue
+    Sheets(T6).Cells(6 + V6, 15).Value = Application.WorksheetFunction.Round(Sheets(C3).Cells(119, V6 + 2).Value, 0) & "% (" & Application.WorksheetFunction.Round(Sheets(C3).Cells(122, V6 + 2).Value, 0) & "%)" 'Cycle de mue arrondi
+    If Sheets(T6).Cells(6 + V6, 10).Value = "NA" Then
+    Sheets(T6).Cells(6 + V6, 16).Value = "NA"
+    Else
+    Sheets(T6).Cells(6 + V6, 16).Value = Sheets(C3).Cells(194, V6 + 2).Value 'n PE
+    End If
+    If Sheets(C3).Cells(177, V6 + 2).Value = "Conforme" Then
+    Sheets(T6).Cells(6 + V6, 17).Value = "NA"
+    Else
+    Sheets(T6).Cells(6 + V6, 17).Value = Sheets(C3).Cells(193, V6 + 2).Value 'PE
+    End If
+    End If
+    Next V6
+    
+  
+    
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+    
+     Application.CutCopyMode = False
+    
+    Application.ScreenUpdating = True
+    Application.DisplayStatusBar = True
+    
+'
+End Sub
