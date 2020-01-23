@@ -17,6 +17,7 @@ Query is an object to make SQL request to database and return the result as an a
 - 'group' to regroup by one particular value (string)
 - 'filtre' (egality/inegality or list of that)
 - 'interval' (variable, start, end)
-- 'distinct' if you only the different outputs without any duplicate (boolean)  
+- 'distinct' if you only the different outputs without any duplicate (boolean)
+- 'script' if you just want to write the real SQL script  
 
 Example : Query("agency", "city", "2") is an object with the two first 'city' values from the table 'agency'. (SELECT city FROM agency LIMIT 2 )
