@@ -20,4 +20,4 @@ Query is an object to make SQL request to database and return the result as an a
 - 'distinct' if you only the different outputs without any duplicate (boolean)
 - 'script' if you just want to write the real SQL script  
 
-Example : Query("agency", "city", "2") is an object with the two first 'city' values from the table 'agency'. (SELECT city FROM agency LIMIT 2 )
+Example : Query("agency", "city", "2") is an object with the two first 'city' values from the table 'agency'. (SQL script : SELECT city FROM agency LIMIT 2 )
