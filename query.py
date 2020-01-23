@@ -1,3 +1,4 @@
+import env
 import mysql.connector
 from mysql.connector import errorcode
 
@@ -89,8 +90,8 @@ class Query:
     if self.table==None :
       return "Table argument is missing"
     try:
-      connection = mysql.connector.connect(user='cdl', password='Centrale_Digital_Lab',
-                                    host='192.168.1.61',
+      connection = mysql.connector.connect(user=env.DATABASE_USER, password=env.DATABASE_PASSWORD,
+                                    host=env.DATABASE_IP,
                                     database='biomae')
       
       cursor = connection.cursor()
