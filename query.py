@@ -4,13 +4,14 @@ from mysql.connector import errorcode
 
 class Query:
   
-  def __init__(self, table=None, column="*", limit=None, group=None, filtre=None, interval=None, distinct=False, script=None):
+  def __init__(self, table=None, column="*", limit=None, group=None, filtre=None, interval=None, distinct=False, script=None, rows=None):
     self.distinct = distinct
     if column==None :
       self.column = "*"
     else :
       self.setColumn(column)
     self.script = script
+    self.rows = rows
     self.setFiltre(filtre)
     self.group = group
     self.table = table
@@ -50,6 +51,12 @@ class Query:
   
   def setDistinct(self, distinct):
     self.distinct=distinct
+
+  def getRows(self):
+    return self.rows
+  
+  def setRows(self, rows):
+    self.rows=rows
     
   def getColumn(self):
     return self.column
@@ -130,5 +137,33 @@ class Query:
     connection.close()
     
     return output
+  
+  def executemany(self) :
+    if self.script!=None and self.rows==None :
+      return "Rows argument is missing"
+    if self.script==None  :
+      return "Script argument is missing"
+    try:
+      connection = mysql.connector.connect(user=env.DATABASE_USER, password=env.DATABASE_PASSWORD,
+                                    host=env.DATABASE_IP,
+                                    database='biomae')
+      
+      cursor = connection.cursor()
+        
+      query = (self.__str__())
+      cursor.executemany(query, self.rows)
+      connection.commit()
+
+      print(cursor.rowcount, "was inserted.")
+
+    except mysql.connector.Error as err:
+      if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
+        print("Something is wrong with your user name or password")
+      elif err.errno == errorcode.ER_BAD_DB_ERROR:
+        print("Database does not exist")
+      else:
+        print(err)
+
+    return None
 
     
