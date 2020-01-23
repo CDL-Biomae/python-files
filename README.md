@@ -18,3 +18,5 @@ Query is an object to make SQL request to database and return the result as an a
 - 'filtre' (egality/inegality or list of that)
 - 'interval' (variable, start, end)
 - 'distinct' if you only the different outputs without any duplicate (boolean)  
+
+Example : Query("agency", "city", "2") is an object with the two first 'city' values from the table 'agency'. (SELECT city FROM agency LIMIT 2 )
