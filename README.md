@@ -4,6 +4,8 @@ You have to install mySQL connector with this command :
 ```
 pip install mysql-connector-python
 ```
+Be sure to have the env.py file before lauch any programm
+
 
 ## Query
 
