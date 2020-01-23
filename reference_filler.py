@@ -12,14 +12,15 @@ r2_constant_table.execute()
 SQL_request = "INSERT INTO r2_constant (id, nature, name, value) VALUES (%s, %s, %s, %s)"
 values = []
 
-# All alimentation constants
 for i in range(14) :
-  values.append((i+1,"alimentation",str(sheet.cell_value(4+i, 13)),sheet.cell_value(4+i, 14)))
+  if(sheet.cell_value(4+i, 14)):
+    values.append((i+1,"alimentation",str(sheet.cell_value(4+i, 13)),sheet.cell_value(4+i, 14)))
 
 for i in range(6) :
   values.append((i+15,"AChE",str(sheet.cell_value(20+i, 13)),sheet.cell_value(20+i, 14)))
-for i in range(20) :
-  values.append((i+21,"Repro",str(sheet.cell_value(28+i, 13)),sheet.cell_value(28+i, 14)))
+for i in range(21) :
+  if(sheet.cell_value(28+i, 14)):
+    values.append((i+21,"Repro",str(sheet.cell_value(28+i, 13)),sheet.cell_value(28+i, 14)))
 
 r2_constant_table.setScript(SQL_request)
 r2_constant_table.setRows(values)
