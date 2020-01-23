@@ -4,12 +4,13 @@ from mysql.connector import errorcode
 
 class Query:
   
-  def __init__(self, table=None, column="*", limit=None, group=None, filtre=None, interval=None, distinct=False):
+  def __init__(self, table=None, column="*", limit=None, group=None, filtre=None, interval=None, distinct=False, script=None):
     self.distinct = distinct
     if column==None :
       self.column = "*"
     else :
       self.setColumn(column)
+    self.script = script
     self.setFiltre(filtre)
     self.group = group
     self.table = table
@@ -17,24 +18,27 @@ class Query:
     self.interval = interval
   
   def __str__(self) :
-    SQL_request = "SELECT "
-    SQL_request += "DISTINCT "*self.distinct+self.column+" FROM "+self.table
-    
-    if(self.filtre or self.interval) :
-      SQL_request +=" WHERE "
-      if(self.filtre and self.interval) :
-        SQL_request += self.filtre + " AND " + self.interval[0] + " BETWEEN " + self.interval[1] + " AND " + self.interval[2]
-      elif(self.filtre) :
-        SQL_request += self.filtre
-      else :
-        SQL_request += self.interval[0] + " BETWEEN " + self.interval[1] + " AND " + self.interval[2]
-    if(self.group):
-      SQL_request += " GROUP BY " + self.group
-    if(self.limit):
-      SQL_request += " LIMIT "+self.limit
-    
-    return SQL_request
+    if(self.script==None):
+      SQL_request = "SELECT "
+      SQL_request += "DISTINCT "*self.distinct+self.column+" FROM "+self.table
       
+      if(self.filtre or self.interval) :
+        SQL_request +=" WHERE "
+        if(self.filtre and self.interval) :
+          SQL_request += self.filtre + " AND " + self.interval[0] + " BETWEEN " + self.interval[1] + " AND " + self.interval[2]
+        elif(self.filtre) :
+          SQL_request += self.filtre
+        else :
+          SQL_request += self.interval[0] + " BETWEEN " + self.interval[1] + " AND " + self.interval[2]
+      if(self.group):
+        SQL_request += " GROUP BY " + self.group
+      if(self.limit):
+        SQL_request += " LIMIT "+self.limit
+  
+      return SQL_request
+    else :
+      return self.script
+        
   def getTable(self):
     return self.table
   
@@ -75,6 +79,7 @@ class Query:
   
   def setInterval(self, interval=None):
     self.interval=interval
+    
   def getFiltre(self):
     return self.filtre
   
@@ -85,9 +90,14 @@ class Query:
         self.filtre+=" AND "+element
     else : 
       self.filtre=filtre
-
+      
+  def getScript(self):
+    return self.script
+  
+  def setScript(self, script=None):
+    self.script=script
   def execute(self) :
-    if self.table==None :
+    if self.script==None and self.table==None :
       return "Table argument is missing"
     try:
       connection = mysql.connector.connect(user=env.DATABASE_USER, password=env.DATABASE_PASSWORD,
