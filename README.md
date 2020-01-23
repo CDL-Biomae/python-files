@@ -9,8 +9,10 @@ pip install mysql-connector-python
 
 Query is an object to make SQL request to database and return the result as an array. It can get 5 arguments:
 
-- table (need to be precise)
-- column (can be a list or just a string)
-- limit (an integer)
-- filtre (egality/inegality or list of that)
-- interval (variable, start, end)
+- 'table' where you are looking for(need to be precise)
+- 'column' you wanted to see (can be a list or just a string)
+- 'limit' number of result (an integer)
+- 'group' to regroup by one particular value (string)
+- 'filtre' (egality/inegality or list of that)
+- 'interval' (variable, start, end)
+- 'distinct' if you only the different outputs without any duplicate (boolean)  
