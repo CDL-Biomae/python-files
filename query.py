@@ -153,8 +153,9 @@ class Query:
       query = (self.__str__())
       cursor.executemany(query, self.rows)
       connection.commit()
-
-      print(cursor.rowcount, "was inserted.")
+      
+      if __name__ == '__main__' :
+        print(cursor.rowcount, "was inserted.")
 
     except mysql.connector.Error as err:
       if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
