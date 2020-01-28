@@ -141,7 +141,7 @@ class QueryScript(Query) :
       self.script = script
     else :
       self.errorScript()
-      self.script = 
+      self.script = script
     self.rows = rows
 
   def errorScript():
@@ -151,7 +151,7 @@ class QueryScript(Query) :
     return self.rows
   
   def setRows(self, rows):
-    self.rows=
+    self.rows = rows
     
   def getScript(self):
     return self.script
