@@ -130,8 +130,9 @@ class Query:
     return output
   
   
+  
 
-class QueryScript(Query) :
+class QueryScript() :
   def __init__(self, script='', rows=None):
     if script!='':
       self.script = script
