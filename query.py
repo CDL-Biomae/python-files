@@ -4,8 +4,13 @@ from mysql.connector import errorcode
 
 class Query:
   
-  def __init__(self, table=None, column="*", limit=None, group=None, filtre=None, interval=None, distinct=False, script=None, rows=None):
+  def __init__(self, table=None, column="*", limit=None, group=None, filtre=None, interval=None, distinct=False):
     self.distinct = distinct
+    if table!=None :
+      self.table = table
+    else :
+      self.table = None
+      self.error()
     if column==None :
       self.column = "*"
     else :
@@ -14,7 +19,6 @@ class Query:
     self.rows = rows
     self.setFiltre(filtre)
     self.group = group
-    self.table = table
     self.limit = limit
     self.interval = interval
   
@@ -39,7 +43,9 @@ class Query:
       return SQL_request
     else :
       return self.script
-        
+  def error(self):
+    print('ERROR : table argument is missing')
+   
   def getTable(self):
     return self.table
   
@@ -51,12 +57,6 @@ class Query:
   
   def setDistinct(self, distinct):
     self.distinct=distinct
-
-  def getRows(self):
-    return self.rows
-  
-  def setRows(self, rows):
-    self.rows=rows
     
   def getColumn(self):
     return self.column
@@ -98,14 +98,9 @@ class Query:
     else : 
       self.filtre=filtre
       
-  def getScript(self):
-    return self.script
-  
-  def setScript(self, script=None):
-    self.script=script
   def execute(self) :
     if self.script==None and self.table==None :
-      return "Table argument is missing"
+      return []
     try:
       connection = mysql.connector.connect(user=env.DATABASE_USER, password=env.DATABASE_PASSWORD,
                                     host=env.DATABASE_IP,
@@ -138,6 +133,32 @@ class Query:
     
     return output
   
+  
+
+class QueryScript(Query) :
+  def __init__(self, script=None, rows=None):
+    if script!=None:
+      self.script = script
+    else :
+      self.errorScript()
+      self.script = 
+    self.rows = rows
+
+  def errorScript():
+    print('Script description is missing')
+  
+  def getRows(self):
+    return self.rows
+  
+  def setRows(self, rows):
+    self.rows=
+    
+  def getScript(self):
+    return self.script
+  
+  def setScript(self, script=None):
+    self.script=script
+    
   def executemany(self) :
     if self.script!=None and self.rows==None :
       return "Rows argument is missing"
@@ -165,5 +186,3 @@ class Query:
         print(err)
 
     return None
-
-    
