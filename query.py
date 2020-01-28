@@ -3,7 +3,7 @@ import mysql.connector
 from mysql.connector import errorcode
 
 class Query:
-  
+
   def __init__(self, table=None, column="*", limit=None, group=None, filtre=None, interval=None, distinct=False, script=None, rows=None):
     self.distinct = distinct
     if column==None :
@@ -64,7 +64,7 @@ class Query:
   def setColumn(self, column):
     if(len(column)>=0 and isinstance(column, list)):
       self.column=column[0]
-      for element in column[1:] :
+      for element in column[1:]:
         self.column+=", "+element
     else : 
       self.column=column
@@ -165,5 +165,3 @@ class Query:
         print(err)
 
     return None
-
-    
