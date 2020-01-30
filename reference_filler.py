@@ -32,7 +32,7 @@ def run():
   r2_constant_table.executemany()
 
 
-
+r2_pipiapa = QueryScript(SQL_request,values).executemany()
 
 
 
