@@ -1,5 +1,5 @@
 import xlrd 
-from query import QueryScript
+from tools import QueryScript
 
 file_name = ("AG-003-01_Macros.xlsm") 
 
