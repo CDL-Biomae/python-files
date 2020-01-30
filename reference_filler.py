@@ -32,9 +32,6 @@ def run():
   r2_constant_table.executemany()
 
 
-r2_pipiapa = QueryScript(SQL_request,values).executemany()
-
-
 
   # Threshold from r2 sheet
   r2_threshold_table = QueryScript("DROP TABLE IF EXISTS r2_threshold; CREATE TABLE r2_threshold (id INT AUTO_INCREMENT PRIMARY KEY, parameter VARCHAR(255), population VARCHAR(255), type VARCHAR(255), time VARCHAR(255), threshold FLOAT, unit VARCHAR(255), rule VARCHAR(255), meaning VARCHAR(255), version VARCHAR(255));")
