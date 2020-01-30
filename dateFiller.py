@@ -14,8 +14,6 @@ def datesClees(id_mp):
         script='SELECT step, recordedAt, barrel FROM measureexposurecondition WHERE measurepoint_id=' + str(
             id_mp)).execute()
     steps_barrels = [(x[0], x[2]) for x in exposureconditions]
-    # print(steps_barrels)
-    # print(exposureconditions[0])
 
     # Dictionnaire de dates cles à remplir
     dates_cles = {}
@@ -65,14 +63,21 @@ def datesClees(id_mp):
 
     dates_cles['Arret Reprotoxicite'] = {'date': temp_date, 'step': 170, 'barrel': None}
 
-    # (step 50, C0) Lancement Chimie (=Lancement reprotoxicité)
+    # (step 50, C0 ou T0) Lancement Chimie (=Lancement reprotoxicité)
     try:
         idx = steps_barrels.index((50, 'C0'))
+        barrel = 'C0'
         temp_date = exposureconditions[idx][1]
     except ValueError:
-        temp_date = None
+        try:
+            idx = steps_barrels.index((50, 'T0'))
+            barrel = 'T0'
+            temp_date = exposureconditions[idx][1]
+        except ValueError:
+            temp_date = None
+            barrel = 'C0'
 
-    dates_cles['Lancement Chimie'] = {'date': temp_date, 'step': 50, 'barrel': 'C0'}
+    dates_cles['Lancement Chimie'] = {'date': temp_date, 'step': 50, 'barrel': barrel}
 
     # (step 100, R21) Récupération Chimie
     try:
@@ -104,10 +109,6 @@ def datesCleesFusion(id_mp_alim, id_mp_chimie, id_mp_repro):
     steps_barrels_alim = [(x[0], x[2]) for x in exposureconditions_alim] if len(exposureconditions_alim) else []
     steps_barrels_chimie = [(x[0], x[2]) for x in exposureconditions_chimie] if len(exposureconditions_chimie) else []
     steps_barrels_repro = [(x[0], x[2]) for x in exposureconditions_repro] if len(exposureconditions_repro) else []
-
-    # print(steps_barrels_alim)
-    # print(steps_barrels_chimie)
-    # print(steps_barrels_repro)
 
     # Dictionnaire de dates cles à remplir
     dates_cles = {}
@@ -157,14 +158,21 @@ def datesCleesFusion(id_mp_alim, id_mp_chimie, id_mp_repro):
 
     dates_cles['Arret Reprotoxicite'] = {'date': temp_date, 'step': 170, 'barrel': None}
 
-    # (step 50, C0) Lancement Chimie (=Lancement reprotoxicité)
+    # (step 50, C0 ou T0) Lancement Chimie (=Lancement reprotoxicité)
     try:
         idx = steps_barrels_chimie.index((50, 'C0'))
+        barrel = 'C0'
         temp_date = exposureconditions_chimie[idx][1]
     except ValueError:
-        temp_date = None
+        try:
+            idx = steps_barrels_repro.index((50, 'T0'))
+            barrel = 'T0'
+            temp_date = exposureconditions_repro[idx][1]
+        except ValueError:
+            temp_date = None
+            barrel = 'C0'
 
-    dates_cles['Lancement Chimie'] = {'date': temp_date, 'step': 50, 'barrel': 'C0'}
+    dates_cles['Lancement Chimie'] = {'date': temp_date, 'step': 50, 'barrel': barrel}
 
     # (step 100, R21) Récupération Chimie
     try:
@@ -248,24 +256,21 @@ def insererDatesFusion(id_mp_list, dates):
 #%% ## INITIALISATION ##
 
 createEmptyDateTable()
-campaigns = QueryScript(script='SELECT id, reference FROM campaign').execute()
-id_campaigns = [x[0] for x in campaigns]
+id_campaigns = QueryScript(script='SELECT id FROM campaign').execute()
 
 #%% ## RECUPERATION ET INSERTION DES DATES CLEES ##
 
 for id_c in id_campaigns:
-    places = QueryScript(script='SELECT id, reference, type FROM place WHERE campaign_id='+str(id_c)).execute()
+    places = QueryScript(script='SELECT id, type FROM place WHERE campaign_id='+str(id_c)).execute()
     n_places = len(places)
     for i in range(n_places):
-        id_p, ref_p, type_p = places[i]
+        id_p, type_p = places[i]
 
-        measurepoints = QueryScript(script='SELECT id, reference FROM measurepoint WHERE place_id=' + str(id_p)).execute()
-        id_measurepoints = [x[0] for x in measurepoints]
+        id_measurepoints = QueryScript(script='SELECT id FROM measurepoint WHERE place_id=' + str(id_p)).execute()
 
         print('\n[+] id_place = ', id_p)
-        # print('[+] type_place =', type_p)
 
-        if type_p == 'work_monitoring':
+        if type_p == 'work_monitoring':  # or type_p == 'other': <-- question à poser à Rémi
             for id_mp in id_measurepoints:
                 dates_clees = datesClees(id_mp)
                 insererDates(id_mp, dates_clees)
@@ -278,7 +283,6 @@ for id_c in id_campaigns:
                 dates_clees = datesClees(id_mp)
                 insererDates(id_mp, dates_clees)
 
-            # Pas encore fait..
             # S'il y a plus de 3 points de mesure à un endroit (place) --> gérer comme si les points étaient indépendants
             elif len(id_measurepoints) > 2:
                 print(f"[+] /!\ plus de 3 points de mesures /!\ id_place = {id_p}")
@@ -287,15 +291,10 @@ for id_c in id_campaigns:
                 for id_mp in id_measurepoints:
                     dates_clees = datesClees(id_mp)
                     insererDates(id_mp, dates_clees)
-                    # print(steps_barrels)
-                    # print(exposureconditions[0])
 
             # Dernier cas: S'il y a exactement 2 points de mesure à un endroit <=> possibles biotests effectués à des périodes différentes donc fusion des dates
             # sinon voir les points comme indépendants
             else:
-                # print('\n[+] id_place = ', id_p)
-                # print('[+] point_monitoring --> id_measurepoints = ', id_measurepoints)
-
                 [id_mp1, id_mp2] = id_measurepoints
                 resultat, natures = independance(id_mp1, id_mp2)
 
@@ -327,3 +326,5 @@ for id_c in id_campaigns:
 
                     insererDatesFusion(id_list, dates_clees)
 
+        if type_p == None:
+            print('cas non géré actuellement')
