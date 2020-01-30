@@ -1,3 +1,4 @@
 env.py
 test.py
 *.xlsm
+__pycache__
