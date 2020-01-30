@@ -2,19 +2,10 @@ from query import QueryScript
 from tools import pack_finder
 
 
-def specimen_size(measurepoint_id):
-    packs = pack_finder(measurepoint_id)
-    SQL_request = "SELECT size_px, size_mm FROM measuresize WHERE individual>0 AND pack_id IN ("
-    SQL_request_standard = "SELECT size_px, size_mm FROM measuresize WHERE individual=0 AND pack_id IN ("
-    for i in range(len(packs)):
-        if i == len(packs)-1:
-            SQL_request += str(packs[i])
-            SQL_request_standard += str(packs[i])
-        else:
-            SQL_request += str(packs[i]) + ","
-            SQL_request_standard += str(packs[i]) + ","
-    SQL_request += ")"
-    SQL_request_standard += ")"
+def specimen_size(pack_id):
+    SQL_request = "SELECT size_px, size_mm FROM measuresize WHERE individual>0 AND pack_id="+str(pack_id)
+    SQL_request_standard = "SELECT size_px, size_mm FROM measuresize WHERE individual=0 AND pack_id="+str(pack_id)
+
     standard = QueryScript(SQL_request_standard).execute()
     ratio = standard[0][1]/standard[0][0]
 
@@ -26,16 +17,9 @@ def specimen_size(measurepoint_id):
         return [size[0]*ratio for size in output]
 
 
-def leaf_size(measurepoint_id):
-    packs = pack_finder(measurepoint_id)
-    SQL_request = "SELECT replicate, value FROM measureleaf WHERE pack_id IN ("
-    for i in range(len(packs)):
-        if i == len(packs)-1:
-            SQL_request += str(packs[i])
-        else:
-            SQL_request += str(packs[i]) + ","
+def leaf_size(pack_id):
 
-    SQL_request += ")"
+    SQL_request = "SELECT replicate, value FROM measureleaf WHERE pack_id="+str(pack_id)
 
     leaf_remaining = QueryScript(SQL_request).execute()
 
@@ -58,13 +42,12 @@ def leaf_size(measurepoint_id):
     return eaten_leaves
 
 
-def inhibition(measurepoint_id):
+def alimentation_inhibition(pack_id):
     constant_alim = QueryScript(
         "SELECT value FROM r2_constant WHERE name LIKE 'Constante alim%'").execute()
 
-    eaten_leaves = leaf_size(measurepoint_id)
-    print(eaten_leaves)
-    size = specimen_size(measurepoint_id)
+    eaten_leaves = leaf_size(pack_id)
+    size = specimen_size(pack_id)
 
     mean_size = sum(size)/len(size)
     inhibition_replicate = []
@@ -75,3 +58,25 @@ def inhibition(measurepoint_id):
                        expected_eaten_value for eaten_leaf in eaten_leaves]
 
     return sum(inhibition_list)/len(inhibition_list)*100
+
+def neurotoxicity(pack_id):
+    
+    constant_AChE = QueryScript(
+        "SELECT value FROM r2_constant WHERE name LIKE 'Constante ache%'").execute()
+    SQL_request = "SELECT ache, weight FROM cage WHERE pack_id="+str(pack_id)
+    output = QueryScript(SQL_request).execute()
+
+    AChE_list = []
+    weight_list = []
+
+    for element in output :
+        if element[0]!=None:
+            AChE_list.append(element[0])
+            weight_list.append(element[1])
+            
+    mean_AChE = sum(AChE_list)/len(AChE_list)
+    mean_weight = sum(weight_list)/len(weight_list)
+
+    AChE_expected = constant_AChE[0] + constant_AChE[1] * ( mean_weight ** constant_AChE[2] )
+    
+    return ( mean_AChE - AChE_expected ) / AChE_expected * 100
