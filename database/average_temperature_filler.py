@@ -1,4 +1,3 @@
-from query import QueryScript
 from tools import list_to_dict, pack_finder, QueryScript
 import numpy as np
 
