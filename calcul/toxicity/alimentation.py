@@ -1,5 +1,36 @@
 from tools import QueryScript
 
+def survie_alim(pack_id):
+    SQL_request = "SELECT scud_survivor,scud_quantity FROM cage where pack_id="+str(pack_id)+" and nature='alimentation' and scud_survivor!='null' "
+    resulat2 = []
+    resulat =  QueryScript(SQL_request).execute()
+    
+    
+    for j in range(len(resulat)) :       
+         tmp = sum(resulat[j])/len(resulat[j])
+         resulat2.append(tmp)
+        
+    return resulat2
+   
+
+def survie_7jour(pack_id):
+    survi_alim = survie_alim(pack_id)
+    SQL_request = "SELECT scud_survivor,scud_quantity FROM cage where pack_id="+str(pack_id)+" and nature='alimentation' and scud_survivor!='null'"
+    resulat =  QueryScript(SQL_request).execute()
+    survivor = []
+    quantity =[]
+    for i in range(len(resulat)) :
+            survivor.append(resulat[i][0])
+            quantity.append(resulat[i][1])
+
+    if sum(survi_alim) == 0:
+        return "0"
+    else:
+        return sum(survivor)/len(survivor)/quantity[0]*100
+
+
+         
+
 def specimen_size(pack_id):
     SQL_request = "SELECT size_px, size_mm FROM measuresize WHERE individual>0 AND pack_id="+str(pack_id)
     SQL_request_standard = "SELECT size_px, size_mm FROM measuresize WHERE individual=0 AND pack_id="+str(pack_id)
@@ -30,12 +61,11 @@ def leaf_size(pack_id):
         if element[0] == 0:
             replicate_raw_value = element[1] * \
                 replicate_leaf_number/standard_leaf_number
-
+    survivor = survie_alim(pack_id)    
     ############## ICI A REFAIRE AVEC LA SURVIE ET DEMANDEZ A REMI #############
     eaten_leaves = [(replicate_raw_value - leaf_remaining[i][1]) /
-                    17.5/test_duration*0.0071 for i in range(1, 5)]
+                    survivor[i-1]/test_duration*0.0071 for i in range(1, 5)]
     ############################################################################
-
     return eaten_leaves
 
 def alimentation(pack_id):
@@ -52,5 +82,7 @@ def alimentation(pack_id):
         mean_size - constant_alim[3])  # 12 est à changer par la température moyenne
     inhibition_list = [(eaten_leaf - expected_eaten_value) /
                        expected_eaten_value for eaten_leaf in eaten_leaves]
+    
+    print(survie_7jour(pack_id))
 
     return sum(inhibition_list)/len(inhibition_list)*100
