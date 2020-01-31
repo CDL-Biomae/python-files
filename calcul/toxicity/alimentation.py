@@ -1,5 +1,60 @@
 from tools import QueryScript
 
+def survie_alim(measurepoint_id):
+    packs = pack_finder(measurepoint_id)
+    SQL_request = "SELECT scud_survivor,scud_quantity FROM cage where pack_id in("
+        
+    for i in range(len(packs)) :
+        if i == len(packs)-1:
+            SQL_request += str(packs[i])
+           
+        else :
+            SQL_request += str(packs[i]) + ","
+           
+    SQL_request += ") and nature='alimentation' and scud_survivor!='null' "
+    resulat2 = []
+    resulat =  QueryScript(SQL_request).execute()
+    
+    
+    for j in range(len(resulat)) :       
+         tmp = sum(resulat[j])/len(resulat[j])
+         resulat2.append(tmp)
+         
+         
+    
+    return resulat2
+   
+
+def survie_7jour(measurepoint_id):
+    packs = pack_finder(measurepoint_id)
+    survi_alim = survie_alim(measurepoint_id)
+    SQL_request = "SELECT scud_survivor,scud_quantity FROM cage where pack_id in("
+        
+    for i in range(len(packs)) :
+        if i == len(packs)-1:
+            SQL_request += str(packs[i])
+           
+        else :
+            SQL_request += str(packs[i]) + ","
+           
+    SQL_request += ") and nature='alimentation' and scud_survivor!='null' "
+    resulat =  QueryScript(SQL_request).execute()
+    print (resulat)
+    survivor = []
+    quantity =[]
+    for i in range(len(resulat)) :
+            survivor.append(resulat[i][0])
+            quantity.append(resulat[i][1])
+
+    if sum(survi_alim) == 0:
+        return "0"
+    else:
+        return sum(survivor)/len(survivor)/quantity[0]*100
+
+
+
+         
+
 def specimen_size(pack_id):
     SQL_request = "SELECT size_px, size_mm FROM measuresize WHERE individual>0 AND pack_id="+str(pack_id)
     SQL_request_standard = "SELECT size_px, size_mm FROM measuresize WHERE individual=0 AND pack_id="+str(pack_id)
