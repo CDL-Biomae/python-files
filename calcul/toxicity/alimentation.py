@@ -83,6 +83,4 @@ def alimentation(pack_id):
     inhibition_list = [(eaten_leaf - expected_eaten_value) /
                        expected_eaten_value for eaten_leaf in eaten_leaves]
     
-    print(survie_7jour(pack_id))
-
     return sum(inhibition_list)/len(inhibition_list)*100
