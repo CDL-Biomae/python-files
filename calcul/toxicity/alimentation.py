@@ -1,17 +1,7 @@
 from tools import QueryScript
 
-def survie_alim(measurepoint_id):
-    packs = pack_finder(measurepoint_id)
-    SQL_request = "SELECT scud_survivor,scud_quantity FROM cage where pack_id in("
-        
-    for i in range(len(packs)) :
-        if i == len(packs)-1:
-            SQL_request += str(packs[i])
-           
-        else :
-            SQL_request += str(packs[i]) + ","
-           
-    SQL_request += ") and nature='alimentation' and scud_survivor!='null' "
+def survie_alim(pack_id):
+    SQL_request = "SELECT scud_survivor,scud_quantity FROM cage where pack_id="+str(pack_id)+" and nature='alimentation' and scud_survivor!='null' "
     resulat2 = []
     resulat =  QueryScript(SQL_request).execute()
     
@@ -19,27 +9,14 @@ def survie_alim(measurepoint_id):
     for j in range(len(resulat)) :       
          tmp = sum(resulat[j])/len(resulat[j])
          resulat2.append(tmp)
-         
-         
-    
+        
     return resulat2
    
 
-def survie_7jour(measurepoint_id):
-    packs = pack_finder(measurepoint_id)
-    survi_alim = survie_alim(measurepoint_id)
-    SQL_request = "SELECT scud_survivor,scud_quantity FROM cage where pack_id in("
-        
-    for i in range(len(packs)) :
-        if i == len(packs)-1:
-            SQL_request += str(packs[i])
-           
-        else :
-            SQL_request += str(packs[i]) + ","
-           
-    SQL_request += ") and nature='alimentation' and scud_survivor!='null' "
+def survie_7jour(pack_id):
+    survi_alim = survie_alim(pack_id)
+    SQL_request = "SELECT scud_survivor,scud_quantity FROM cage where pack_id="+str(pack_id)+" and nature='alimentation' and scud_survivor!='null'"
     resulat =  QueryScript(SQL_request).execute()
-    print (resulat)
     survivor = []
     quantity =[]
     for i in range(len(resulat)) :
@@ -50,7 +27,6 @@ def survie_7jour(measurepoint_id):
         return "0"
     else:
         return sum(survivor)/len(survivor)/quantity[0]*100
-
 
 
          
@@ -85,12 +61,11 @@ def leaf_size(pack_id):
         if element[0] == 0:
             replicate_raw_value = element[1] * \
                 replicate_leaf_number/standard_leaf_number
-
+    survivor = survie_alim(pack_id)    
     ############## ICI A REFAIRE AVEC LA SURVIE ET DEMANDEZ A REMI #############
     eaten_leaves = [(replicate_raw_value - leaf_remaining[i][1]) /
-                    17.5/test_duration*0.0071 for i in range(1, 5)]
+                    survivor[i-1]/test_duration*0.0071 for i in range(1, 5)]
     ############################################################################
-
     return eaten_leaves
 
 def alimentation(pack_id):
@@ -107,5 +82,7 @@ def alimentation(pack_id):
         mean_size - constant_alim[3])  # 12 est à changer par la température moyenne
     inhibition_list = [(eaten_leaf - expected_eaten_value) /
                        expected_eaten_value for eaten_leaf in eaten_leaves]
+    
+    print(survie_7jour(pack_id))
 
     return sum(inhibition_list)/len(inhibition_list)*100
