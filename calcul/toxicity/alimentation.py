@@ -2,26 +2,26 @@ from tools import QueryScript
 
 def survie_alim(pack_id):
     SQL_request = "SELECT scud_survivor,scud_quantity FROM cage where pack_id="+str(pack_id)+" and nature='alimentation' and scud_survivor!='null' "
-    resulat2 = []
-    resulat =  QueryScript(SQL_request).execute()
+    resultat2 = []
+    resultat =  QueryScript(SQL_request).execute()
     
     
-    for j in range(len(resulat)) :       
-         tmp = sum(resulat[j])/len(resulat[j])
-         resulat2.append(tmp)
+    for j in range(len(resultat)) :       
+         tmp = sum(resultat[j])/len(resultat[j])
+         resultat2.append(tmp)
         
-    return resulat2
+    return resultat2
    
 
 def survie_7jour(pack_id):
     survi_alim = survie_alim(pack_id)
     SQL_request = "SELECT scud_survivor,scud_quantity FROM cage where pack_id="+str(pack_id)+" and nature='alimentation' and scud_survivor!='null'"
-    resulat =  QueryScript(SQL_request).execute()
+    resultat =  QueryScript(SQL_request).execute()
     survivor = []
     quantity =[]
-    for i in range(len(resulat)) :
-            survivor.append(resulat[i][0])
-            quantity.append(resulat[i][1])
+    for i in range(len(resultat)) :
+            survivor.append(resultat[i][0])
+            quantity.append(resultat[i][1])
 
     if sum(survi_alim) == 0:
         return "0"
