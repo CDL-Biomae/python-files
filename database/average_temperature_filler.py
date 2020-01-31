@@ -12,41 +12,26 @@ def run():
     liste_fusion_id = QueryScript(
         "SELECT DISTINCT measurepoint_fusion_id FROM datesclees").execute()
 
-    # for elt_mp_id in liste_fusion_id:
+    for elt_mp_id in liste_fusion_id:
+        elt_insert = [elt_mp_id]
+        for num_sensor in [1, 2, 3]:
+            list_temp = liste_temperature(elt_mp_id, num_sensor)
+            elt_insert += [np.average(list_temp),
+                           min(list_temp), max(list_temp)]
+        list_temp += [np.average(liste_temperature(elt_mp_id, "2lab"))]
+        values.append(tuple(list_temp))
 
-    #     dates_clees = QueryScript(
-    #         "SELECT date_id, date FROM datesclees WHERE measurepoint_fusion_id = {}".format(elt)).execute()
-    #     measurepoint_id = QueryScript(
-    #         "SELECT DISTINCT measurepoint_id FROM datesclees WHERE measurepoint_fusion_id = {}".format(elt)).execute()
-    #     dico_dates_clees = list_to_dict(dates_clees)
-    #     pack_id = []
-    #     SQL_request_temperature_sonde1 = "SELECT value FROM measuretemperature WHERE ( (recordedAt>= {}) AND (recordedAt<= {})".format(
-    #         dico_dates_clees[1], dico_dates_clees[2])
-    #     SQL_request_temperature_sonde1 += " AND ( measurepoint_id IN("
-    #     for mp_id in measurepoint_id:
-    #         SQL_request_temperature_sonde1 += "{},".format(mp_id)
-    #         pack_id += pack_finder(mp_id)
-
-    #     SQL_request_temperature_sonde1 += ") OR pack_id IN("
-    #     for pck_id in pack_id:
-    #         SQL_request_temperature_sonde1 += "{},".format(pck_id)
-    #     SQL_request_temperature_sonde1 += ") )"
-
-    #     SQL_request_temperature_sonde1 += " AND ( nature = 'sensor1') )"
-
-    # average_temperature_table.setScript(SQL_request)
-    # average_temperature_table.setRows(values)
-    # average_temperature_table.executemany()
-
-    return None
+    average_temperature_table.setScript(SQL_request)
+    average_temperature_table.setRows(values)
+    average_temperature_table.executemany()
 
 
-# prend en argument un measurepoint_id et le numero de la sonde (1, 2 ou 3 ou 2lab qui correpond a la moyenne in situ+lab)
-def liste_temperature(measurepoint_id, num_sensor):
+# prend en argument un measurepoint_fusion_id et le numero de la sonde (1, 2 ou 3 ou 2lab qui correpond a la moyenne in situ+lab)
+def liste_temperature(measurepoint_fusion_id, num_sensor):
     dates_clees = QueryScript(
-        "SELECT date_id, date FROM datesclees WHERE measurepoint_fusion_id = {}".format(measurepoint_id)).execute()
-    measurepoint_id = QueryScript(
-        "SELECT DISTINCT measurepoint_id FROM datesclees WHERE measurepoint_fusion_id = {}".format(measurepoint_id)).execute()
+        "SELECT date_id, date FROM datesclees WHERE measurepoint_fusion_id = {}".format(measurepoint_fusion_id)).execute()
+    measurepoint_id = QueryScript(  # a optimiser
+        "SELECT DISTINCT measurepoint_id FROM datesclees WHERE measurepoint_fusion_id = {}".format(measurepoint_fusion_id)).execute()
     dico_dates_clees = list_to_dict(dates_clees)
     pack_id = []
     if num_sensor == 1:
@@ -79,7 +64,7 @@ def liste_temperature(measurepoint_id, num_sensor):
     else:  # cas correspondant a 2lab, qui est la moyenne in situ+lab
         SQL_request_temperature_sonde += " AND ( nature = 'sensor{}') )".format(
             2)
-    return QueryScript(SQL_request_temperature_sonde)
+    return QueryScript(SQL_request_temperature_sonde).execute()
 
 
 #test = print(np.mean(liste_temperature(2944, 1).execute()))
