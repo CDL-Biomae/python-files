@@ -1,5 +1,4 @@
-from query import QueryScript
-from tools import list_to_dict, pack_finder
+from tools import list_to_dict, pack_finder, QueryScript
 import numpy as np
 
 
@@ -53,10 +52,10 @@ def liste_temperature(measurepoint_id, num_sensor):
     if num_sensor == 1:
         SQL_request_temperature_sonde = "SELECT value FROM measuretemperature WHERE ( (recordedAt>= '{}') AND (recordedAt<= '{}')".format(
             dico_dates_clees[1], dico_dates_clees[2])
-    else if num_sensor == 2:
+    elif num_sensor == 2:
         SQL_request_temperature_sonde = "SELECT value FROM measuretemperature WHERE ( (recordedAt>= '{}') AND (recordedAt<= '{}')".format(
             dico_dates_clees[6], dico_dates_clees[4])
-    else if num_sensor == "2lab":
+    elif num_sensor == "2lab":
         SQL_request_temperature_sonde = "SELECT value FROM measuretemperature WHERE ( (recordedAt>= '{}') AND (recordedAt<= '{}')".format(
             dico_dates_clees[6], dico_dates_clees[5])
     else:
