@@ -1,7 +1,7 @@
 #%% ## IMPORT ##
 from query import QueryScript
 
-#%% ## FONCTIONS ##
+#%% ## TOOLS ##
 
 def createEmptyDateTable():
     datesclees_table = QueryScript(
@@ -253,78 +253,81 @@ def insererDatesFusion(id_mp_list, dates):
     QueryScript(SQL_request, values).executemany()
     print(' --> dates insérées (mode fusion)')
 
-#%% ## INITIALISATION ##
+# %% ## RECUPERATION ET INSERTION DES DATES CLEES ##
 
-createEmptyDateTable()
-id_campaigns = QueryScript(script='SELECT id FROM campaign').execute()
+def fillDateTable():
+    id_campaigns = QueryScript(script='SELECT id FROM campaign').execute()
+    for id_c in id_campaigns:
+        places = QueryScript(script='SELECT id, type FROM place WHERE campaign_id=' + str(id_c)).execute()
+        n_places = len(places)
+        for i in range(n_places):
+            id_p, type_p = places[i]
 
-#%% ## RECUPERATION ET INSERTION DES DATES CLEES ##
+            id_measurepoints = QueryScript(script='SELECT id FROM measurepoint WHERE place_id=' + str(id_p)).execute()
 
-for id_c in id_campaigns:
-    places = QueryScript(script='SELECT id, type FROM place WHERE campaign_id='+str(id_c)).execute()
-    n_places = len(places)
-    for i in range(n_places):
-        id_p, type_p = places[i]
+            print('\n[+] id_place = ', id_p)
 
-        id_measurepoints = QueryScript(script='SELECT id FROM measurepoint WHERE place_id=' + str(id_p)).execute()
-
-        print('\n[+] id_place = ', id_p)
-
-        if type_p == 'work_monitoring':  # or type_p == 'other': <-- question à poser à Rémi
-            for id_mp in id_measurepoints:
-                dates_clees = datesClees(id_mp)
-                insererDates(id_mp, dates_clees)
-
-        if type_p == 'point_monitoring':
-
-            # S'il n'y a qu'un seul point de mesure à un endroit (place) il n'y a aucune fusion de dates a faire
-            if len(id_measurepoints) == 1:
-                id_mp = id_measurepoints[0]
-                dates_clees = datesClees(id_mp)
-                insererDates(id_mp, dates_clees)
-
-            # S'il y a plus de 3 points de mesure à un endroit (place) --> gérer comme si les points étaient indépendants
-            elif len(id_measurepoints) > 2:
-                print(f"[+] /!\ plus de 3 points de mesures /!\ id_place = {id_p}")
-                print('[+] Ils sont donc considérés comme indépendants')
-                # print('[+] point_monitoring --> id_measurepoints = ', id_measurepoints)
+            if type_p == 'work_monitoring':  # or type_p == 'other': <-- question à poser à Rémi
                 for id_mp in id_measurepoints:
                     dates_clees = datesClees(id_mp)
                     insererDates(id_mp, dates_clees)
 
-            # Dernier cas: S'il y a exactement 2 points de mesure à un endroit <=> possibles biotests effectués à des périodes différentes donc fusion des dates
-            # sinon voir les points comme indépendants
-            else:
-                [id_mp1, id_mp2] = id_measurepoints
-                resultat, natures = independance(id_mp1, id_mp2)
+            if type_p == 'point_monitoring':
 
-                if resultat:  # Si les points sont indépendants (c'est à dire qu'ils ont des types de biotests communs)
+                # S'il n'y a qu'un seul point de mesure à un endroit (place) il n'y a aucune fusion de dates a faire
+                if len(id_measurepoints) == 1:
+                    id_mp = id_measurepoints[0]
+                    dates_clees = datesClees(id_mp)
+                    insererDates(id_mp, dates_clees)
+
+                # S'il y a plus de 3 points de mesure à un endroit (place) --> gérer comme si les points étaient indépendants
+                elif len(id_measurepoints) > 2:
+                    print(f"[+] /!\ plus de 3 points de mesures /!\ id_place = {id_p}")
+                    print('[+] Ils sont donc considérés comme indépendants')
+                    # print('[+] point_monitoring --> id_measurepoints = ', id_measurepoints)
                     for id_mp in id_measurepoints:
                         dates_clees = datesClees(id_mp)
                         insererDates(id_mp, dates_clees)
 
+                # Dernier cas: S'il y a exactement 2 points de mesure à un endroit <=> possibles biotests effectués à des périodes différentes donc fusion des dates
+                # sinon voir les points comme indépendants
                 else:
-                    try:
-                        id_mp_alim = natures['alimentation']
-                    except KeyError:
-                        id_mp_alim = None
+                    [id_mp1, id_mp2] = id_measurepoints
+                    resultat, natures = independance(id_mp1, id_mp2)
 
-                    try:
-                        id_mp_chimie = natures['chemistry']
-                    except KeyError:
-                        id_mp_chimie = None
+                    if resultat:  # Si les points sont indépendants (c'est à dire qu'ils ont des types de biotests communs)
+                        for id_mp in id_measurepoints:
+                            dates_clees = datesClees(id_mp)
+                            insererDates(id_mp, dates_clees)
 
-                    try:
-                        id_mp_repro = natures['reproduction']
-                    except KeyError:
-                        id_mp_repro = None
+                    else:
+                        try:
+                            id_mp_alim = natures['alimentation']
+                        except KeyError:
+                            id_mp_alim = None
 
-                    if id_mp_repro != id_mp_chimie:
-                        print('\n /!\\ Erreur le point de mesure pour la chimie est différent du point de mesure pour la reproduction')
-                    dates_clees = datesCleesFusion(id_mp_alim, id_mp_chimie, id_mp_repro)
-                    id_list = [id_mp_alim, id_mp_chimie, id_mp_repro]
+                        try:
+                            id_mp_chimie = natures['chemistry']
+                        except KeyError:
+                            id_mp_chimie = None
 
-                    insererDatesFusion(id_list, dates_clees)
+                        try:
+                            id_mp_repro = natures['reproduction']
+                        except KeyError:
+                            id_mp_repro = None
 
-        if type_p == None:
-            print('cas non géré actuellement')
+                        if id_mp_repro != id_mp_chimie:
+                            print(
+                                '\n /!\\ Erreur le point de mesure pour la chimie est différent du point de mesure pour la reproduction')
+                        dates_clees = datesCleesFusion(id_mp_alim, id_mp_chimie, id_mp_repro)
+                        id_list = [id_mp_alim, id_mp_chimie, id_mp_repro]
+
+                        insererDatesFusion(id_list, dates_clees)
+
+            if type_p == None:
+                print('cas non géré actuellement')
+
+#%% ## MAIN ##
+# createEmptyDateTable()
+# fillDateTable()
+
