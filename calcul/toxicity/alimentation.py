@@ -1,4 +1,4 @@
-from tools import QueryScript
+from tools import QueryScript, fusion_id_finder
 
 def survie_alim(pack_id):
     SQL_request = "SELECT scud_survivor,scud_quantity FROM cage where pack_id="+str(pack_id)+" and nature='alimentation' and scud_survivor!='null' "
@@ -62,7 +62,7 @@ def leaf_size(pack_id):
             replicate_raw_value = element[1] * \
                 replicate_leaf_number/standard_leaf_number
     survivor = survie_alim(pack_id)    
-    ############## ICI A REFAIRE AVEC LA SURVIE ET DEMANDEZ A REMI #############
+    ############## ICI DEMANDEZ A REMI #############
     eaten_leaves = [(replicate_raw_value - leaf_remaining[i][1]) /
                     survivor[i-1]/test_duration*0.0071 for i in range(1, 5)]
     ############################################################################
@@ -71,15 +71,17 @@ def leaf_size(pack_id):
 def alimentation(pack_id):
     constant_alim = QueryScript(
         "SELECT value FROM r2_constant WHERE name LIKE 'Constante alim%'").execute()
-
+    fusion_id = fusion_id_finder(pack_id)
+    average_temperature = QueryScript("SELECT sonde1_moy FROM average_temperature_table WHERE measurepoint_fusion_id="+str(fusion_id)).execute()[0]
+    print(average_temperature)
     eaten_leaves = leaf_size(pack_id)
     size = specimen_size(pack_id)
 
     mean_size = sum(size)/len(size)
     inhibition_replicate = []
 
-    expected_eaten_value = constant_alim[0] * 12 + constant_alim[1] + constant_alim[2] * (
-        mean_size - constant_alim[3])  # 12 est à changer par la température moyenne
+    expected_eaten_value = constant_alim[0] * average_temperature + constant_alim[1] + constant_alim[2] * (
+        mean_size - constant_alim[3]) 
     inhibition_list = [(eaten_leaf - expected_eaten_value) /
                        expected_eaten_value for eaten_leaf in eaten_leaves]
     
