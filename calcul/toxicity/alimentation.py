@@ -1,27 +1,27 @@
-from tools import QueryScript
+from tools import QueryScript, fusion_id_finder
 
 def survie_alim(pack_id):
     SQL_request = "SELECT scud_survivor,scud_quantity FROM cage where pack_id="+str(pack_id)+" and nature='alimentation' and scud_survivor!='null' "
-    resulat2 = []
-    resulat =  QueryScript(SQL_request).execute()
+    resultat2 = []
+    resultat =  QueryScript(SQL_request).execute()
     
     
-    for j in range(len(resulat)) :       
-         tmp = sum(resulat[j])/len(resulat[j])
-         resulat2.append(tmp)
+    for j in range(len(resultat)) :       
+         tmp = sum(resultat[j])/len(resultat[j])
+         resultat2.append(tmp)
         
-    return resulat2
+    return resultat2
    
 
 def survie_7jour(pack_id):
     survi_alim = survie_alim(pack_id)
     SQL_request = "SELECT scud_survivor,scud_quantity FROM cage where pack_id="+str(pack_id)+" and nature='alimentation' and scud_survivor!='null'"
-    resulat =  QueryScript(SQL_request).execute()
+    resultat =  QueryScript(SQL_request).execute()
     survivor = []
     quantity =[]
-    for i in range(len(resulat)) :
-            survivor.append(resulat[i][0])
-            quantity.append(resulat[i][1])
+    for i in range(len(resultat)) :
+            survivor.append(resultat[i][0])
+            quantity.append(resultat[i][1])
 
     if sum(survi_alim) == 0:
         return "0"
@@ -62,7 +62,7 @@ def leaf_size(pack_id):
             replicate_raw_value = element[1] * \
                 replicate_leaf_number/standard_leaf_number
     survivor = survie_alim(pack_id)    
-    ############## ICI A REFAIRE AVEC LA SURVIE ET DEMANDEZ A REMI #############
+    ############## ICI DEMANDEZ A REMI #############
     eaten_leaves = [(replicate_raw_value - leaf_remaining[i][1]) /
                     survivor[i-1]/test_duration*0.0071 for i in range(1, 5)]
     ############################################################################
@@ -71,18 +71,17 @@ def leaf_size(pack_id):
 def alimentation(pack_id):
     constant_alim = QueryScript(
         "SELECT value FROM r2_constant WHERE name LIKE 'Constante alim%'").execute()
-
+    fusion_id = fusion_id_finder(pack_id)
+    average_temperature = QueryScript("SELECT sonde1_moy FROM average_temperature_table WHERE measurepoint_fusion_id="+str(fusion_id)).execute()[0]
     eaten_leaves = leaf_size(pack_id)
     size = specimen_size(pack_id)
 
     mean_size = sum(size)/len(size)
     inhibition_replicate = []
 
-    expected_eaten_value = constant_alim[0] * 12 + constant_alim[1] + constant_alim[2] * (
-        mean_size - constant_alim[3])  # 12 est à changer par la température moyenne
+    expected_eaten_value = constant_alim[0] * average_temperature + constant_alim[1] + constant_alim[2] * (
+        mean_size - constant_alim[3]) 
     inhibition_list = [(eaten_leaf - expected_eaten_value) /
                        expected_eaten_value for eaten_leaf in eaten_leaves]
     
-    print(survie_7jour(pack_id))
-
     return sum(inhibition_list)/len(inhibition_list)*100

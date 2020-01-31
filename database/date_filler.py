@@ -1,5 +1,5 @@
 #%% ## IMPORT ##
-from query import QueryScript
+from tools import QueryScript
 
 #%% ## TOOLS ##
 
