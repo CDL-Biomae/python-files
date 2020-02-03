@@ -318,7 +318,7 @@ def fillDateTable():
 
                         if id_mp_repro != id_mp_chimie:
                             print(
-                                '\n /!\\ Erreur le point de mesure pour la chimie est différent du point de mesure pour la reproduction')
+                                '\n /!\\ Erreur le point de mesure pour la chemistry est différent du point de mesure pour la reproduction')
                         dates_clees = datesCleesFusion(id_mp_alim, id_mp_chimie, id_mp_repro)
                         id_list = [id_mp_alim, id_mp_chimie, id_mp_repro]
 
