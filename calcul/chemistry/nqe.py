@@ -10,10 +10,10 @@ elements_crustaces = {
     6616: 'DEHP',
     7707: 'Dioxines et composées de type dioxine'
 }
+code_sandre_elements = tuple(elements_crustaces.keys())
 
-def nqe_crustace_info():
-    code_sandre_elements = tuple(elements_crustaces.keys())
-    output = QueryScript(f"SELECT maximum, freq_quanti FROM r3 WHERE sandre IN {code_sandre_elements}").execute()
+def nqe_info(code_sandre):
+    output = QueryScript(f"SELECT maximum, freq_quanti FROM r3 WHERE sandre IN {code_sandre}").execute()
 
     maximum, freq_quanti = [], []
     for couple in output:
@@ -29,4 +29,4 @@ def nqe_crustace_info():
 def nqe_crustace_values(pack_id):
     print('ok')
 
-print(nqe_crustace_info())
+# print(nqe_crustace_info(code_sandre))
