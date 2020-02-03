@@ -13,6 +13,7 @@ def run():
         "SELECT DISTINCT measurepoint_fusion_id FROM datesclees").execute()
 
     for elt_mp_id in liste_fusion_id:
+        print(elt_mp_id)
         elt_insert = liste_temperature_moyenne(elt_mp_id)
         values.append(tuple(elt_insert))
 
@@ -30,6 +31,8 @@ def liste_temperature(measurepoint_fusion_id, num_sensor):
         "SELECT date_id, date FROM datesclees WHERE measurepoint_fusion_id = {}".format(measurepoint_fusion_id)).execute()
     measurepoint_id = QueryScript(  # a optimiser
         "SELECT DISTINCT measurepoint_id FROM datesclees WHERE measurepoint_fusion_id = {}".format(measurepoint_fusion_id)).execute()
+    if None in measurepoint_id:
+        measurepoint_id.remove(None)
     dico_dates_clees = list_to_dict(dates_clees)
     sortie_valable = False
     pack_id = []
@@ -55,7 +58,8 @@ def liste_temperature(measurepoint_fusion_id, num_sensor):
         SQL_request_temperature_sonde += "{},".format(mp_id)
         pack_id += pack_finder(mp_id)
     SQL_request_temperature_sonde = SQL_request_temperature_sonde[:-1]
-
+    if len(pack_id) == 0:
+        sortie_valable = False
     SQL_request_temperature_sonde += ") OR pack_id IN("
     for pck_id in pack_id:
         SQL_request_temperature_sonde += "{},".format(pck_id)
