@@ -1,5 +1,6 @@
 from tools import list_to_dict, pack_finder, QueryScript
 import numpy as np
+import time
 
 
 def run():
@@ -12,13 +13,14 @@ def run():
     liste_fusion_id = QueryScript(
         "SELECT DISTINCT measurepoint_fusion_id FROM datesclees").execute()
 
+    t0 = time.localtime()
+    compteur = 1
     for elt_mp_id in liste_fusion_id:
-        print(elt_mp_id)
+        print(elt_mp_id, compteur)
         elt_insert = liste_temperature_moyenne(elt_mp_id)
         values.append(tuple(elt_insert))
-
-    # elt_insert = liste_temperature_moyenne(2944)
-    # values.append(tuple(elt_insert))
+        compteur += 1
+    print(time.localtime() - t0)
 
     average_temperature_table.setScript(SQL_request)
     average_temperature_table.setRows(values)
@@ -27,15 +29,26 @@ def run():
 
 # prend en argument un measurepoint_fusion_id et le numero de la sonde (1, 2 ou 3 ou 2lab qui correpond a la moyenne in situ+lab)
 def liste_temperature(measurepoint_fusion_id, num_sensor):
-    dates_clees = QueryScript(
-        "SELECT date_id, date FROM datesclees WHERE measurepoint_fusion_id = {}".format(measurepoint_fusion_id)).execute()
-    measurepoint_id = QueryScript(  # a optimiser
-        "SELECT DISTINCT measurepoint_id FROM datesclees WHERE measurepoint_fusion_id = {}".format(measurepoint_fusion_id)).execute()
+    dates_clees_measurepoint_id = QueryScript(
+        "SELECT date_id, date, measurepoint_id FROM datesclees WHERE measurepoint_fusion_id = {}".format(measurepoint_fusion_id)).execute()
+    # measurepoint_id = QueryScript(  # a optimiser
+    #     "SELECT DISTINCT measurepoint_id FROM datesclees WHERE measurepoint_fusion_id = {}".format(measurepoint_fusion_id)).execute()
+    dates_clees = [elt[:-1] for elt in dates_clees_measurepoint_id]
+    measurepoint_id = [elt[-1] for elt in dates_clees_measurepoint_id]
+    measurepoint_id = list(set(measurepoint_id))
+
     if None in measurepoint_id:
         measurepoint_id.remove(None)
+
+    pack_id = []
+    for mp_id in measurepoint_id:
+        pack_id += pack_finder(mp_id)
+    if len(pack_id) == 0:
+        return []
+
     dico_dates_clees = list_to_dict(dates_clees)
     sortie_valable = False
-    pack_id = []
+
     SQL_request_temperature_sonde = []
     if (num_sensor == 1) & (dico_dates_clees[1] != None) & (dico_dates_clees[2] != None):
         SQL_request_temperature_sonde = "SELECT value FROM measuretemperature WHERE ( (recordedAt>= '{}') AND (recordedAt<= '{}')".format(
@@ -53,18 +66,25 @@ def liste_temperature(measurepoint_fusion_id, num_sensor):
         SQL_request_temperature_sonde = "SELECT value FROM measuretemperature WHERE ( (recordedAt>= '{}') AND (recordedAt<= '{}')".format(
             dico_dates_clees[6], dico_dates_clees[7])
         sortie_valable = True
-    SQL_request_temperature_sonde += " AND ( measurepoint_id IN("
-    for mp_id in measurepoint_id:
-        SQL_request_temperature_sonde += "{},".format(mp_id)
-        pack_id += pack_finder(mp_id)
-    SQL_request_temperature_sonde = SQL_request_temperature_sonde[:-1]
-    if len(pack_id) == 0:
-        sortie_valable = False
-    SQL_request_temperature_sonde += ") OR pack_id IN("
-    for pck_id in pack_id:
-        SQL_request_temperature_sonde += "{},".format(pck_id)
-    SQL_request_temperature_sonde = SQL_request_temperature_sonde[:-1]
-    SQL_request_temperature_sonde += ") )"
+
+    if len(measurepoint_id) > 1:
+        SQL_request_temperature_sonde += f" AND ( measurepoint_id IN{tuple(measurepoint_id)}"
+    else:
+        SQL_request_temperature_sonde += f" AND ( measurepoint_id IN({measurepoint_id[0]})"
+
+    # for mp_id in measurepoint_id:
+    #     SQL_request_temperature_sonde += "{},".format(mp_id)
+    #     pack_id += pack_finder(mp_id)
+    # SQL_request_temperature_sonde = SQL_request_temperature_sonde[:-1]
+    if len(pack_id) > 1:
+        SQL_request_temperature_sonde += f" OR pack_id IN{tuple(pack_id)} )"
+    else:
+        SQL_request_temperature_sonde += f" OR pack_id IN({pack_id[0]}) )"
+
+    # for pck_id in pack_id:
+    #     SQL_request_temperature_sonde += "{},".format(pck_id)
+    # SQL_request_temperature_sonde = SQL_request_temperature_sonde[:-1]
+    # SQL_request_temperature_sonde += ") )"
 
     if num_sensor in [1, 2, 3]:
         SQL_request_temperature_sonde += " AND ( nature = 'sensor{}') )".format(
