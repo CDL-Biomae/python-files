@@ -27,37 +27,46 @@ def run():
 
 # prend en argument un measurepoint_fusion_id et le numero de la sonde (1, 2 ou 3 ou 2lab qui correpond a la moyenne in situ+lab)
 def liste_temperature(measurepoint_fusion_id, num_sensor):
+
     dates_clees = QueryScript(
         "SELECT date_id, date FROM datesclees WHERE measurepoint_fusion_id = {}".format(measurepoint_fusion_id)).execute()
     measurepoint_id = QueryScript(  # a optimiser
         "SELECT DISTINCT measurepoint_id FROM datesclees WHERE measurepoint_fusion_id = {}".format(measurepoint_fusion_id)).execute()
+
     if None in measurepoint_id:
         measurepoint_id.remove(None)
     dico_dates_clees = list_to_dict(dates_clees)
     sortie_valable = False
     pack_id = []
-    SQL_request_temperature_sonde = []
+    SQL_request_temperature_sonde = ""
+
     if (num_sensor == 1) & (dico_dates_clees[1] != None) & (dico_dates_clees[2] != None):
         SQL_request_temperature_sonde = "SELECT value FROM measuretemperature WHERE ( (recordedAt>= '{}') AND (recordedAt<= '{}')".format(
             dico_dates_clees[1], dico_dates_clees[2])
         sortie_valable = True
+
     elif (num_sensor == 2) & (dico_dates_clees[6] != None) & (dico_dates_clees[4] != None):
         SQL_request_temperature_sonde = "SELECT value FROM measuretemperature WHERE ( (recordedAt>= '{}') AND (recordedAt<= '{}')".format(
             dico_dates_clees[6], dico_dates_clees[4])
         sortie_valable = True
+
     elif (num_sensor == "2lab") & (dico_dates_clees[6] != None) & (dico_dates_clees[5] != None):
         SQL_request_temperature_sonde = "SELECT value FROM measuretemperature WHERE ( (recordedAt>= '{}') AND (recordedAt<= '{}')".format(
             dico_dates_clees[6], dico_dates_clees[5])
         sortie_valable = True
+
     elif (num_sensor == 3) & (dico_dates_clees[6] != None) & (dico_dates_clees[7] != None):
         SQL_request_temperature_sonde = "SELECT value FROM measuretemperature WHERE ( (recordedAt>= '{}') AND (recordedAt<= '{}')".format(
             dico_dates_clees[6], dico_dates_clees[7])
         sortie_valable = True
+
     SQL_request_temperature_sonde += " AND ( measurepoint_id IN("
+
     for mp_id in measurepoint_id:
         SQL_request_temperature_sonde += "{},".format(mp_id)
         pack_id += pack_finder(mp_id)
     SQL_request_temperature_sonde = SQL_request_temperature_sonde[:-1]
+
     if len(pack_id) == 0:
         sortie_valable = False
     SQL_request_temperature_sonde += ") OR pack_id IN("

@@ -13,7 +13,9 @@ def datesClees(id_mp):
     exposureconditions = QueryScript(
         script='SELECT step, recordedAt, barrel FROM measureexposurecondition WHERE measurepoint_id=' + str(
             id_mp)).execute()
+    natures = QueryScript(f"SELECT nature FROM pack WHERE measurepoint_id = {id_mp}").execute()
     steps_barrels = [(x[0], x[2]) for x in exposureconditions]
+
 
     # Dictionnaire de dates cles à remplir
     dates_cles = {}
@@ -84,7 +86,18 @@ def datesClees(id_mp):
         idx = steps_barrels.index((100, 'R21'))
         temp_date = exposureconditions[idx][1]
     except ValueError:
-        temp_date = None
+        if 'chemistry' in natures:
+            try:
+                idx = steps_barrels.index((60, 'R7'))
+                temp_date = exposureconditions[idx][1]
+            except ValueError:
+                try:
+                    idx = steps_barrels.index((140, 'RN'))
+                    temp_date = exposureconditions[idx][1]
+                except ValueError:
+                    temp_date = None
+        else:
+            temp_date = None
 
     dates_cles['Recuperation Chimie'] = {'date': temp_date, 'step': 100, 'barrel': 'R21'}
 
@@ -179,11 +192,45 @@ def datesCleesFusion(id_mp_alim, id_mp_chimie, id_mp_repro):
         idx = steps_barrels_chimie.index((100, 'R21'))
         temp_date = exposureconditions_chimie[idx][1]
     except ValueError:
-        temp_date = None
+        try:
+            idx = steps_barrels_chimie.index((60, 'R7'))
+            temp_date = exposureconditions_chimie[idx][1]
+        except ValueError:
+            try:
+                idx = steps_barrels_chimie.index((140, 'RN'))
+                temp_date = exposureconditions_chimie[idx][1]
+            except ValueError:
+                temp_date = None
 
     dates_cles['Recuperation Chimie'] = {'date': temp_date, 'step': 100, 'barrel': 'R21'}
 
-    return dates_cles
+    # Trouver id_mp_fusion
+    debuts = {}
+
+    try:
+        idx_alim = steps_barrels_alim.index((20, None))
+        debuts[id_mp_alim] = exposureconditions_alim[idx_alim][1]
+    except ValueError:
+        debut_alim = None
+
+    try:
+        idx_repro = steps_barrels_repro.index((20, None))
+        debuts[id_mp_repro] = steps_barrels_repro[idx_repro][1]
+    except ValueError:
+        debut_repro = None
+
+    try:
+        idx_chimie = steps_barrels_chimie.index((20, None))
+        debuts[id_mp_chimie] = exposureconditions_chimie[idx_chimie][1]
+    except ValueError:
+        debut_chimie = None
+
+    date_debut = min(list(debuts.values()))
+    id_mp_fusion = list(debuts.keys())[list(debuts.values()).index(date_debut)]
+
+
+
+    return dates_cles, id_mp_fusion
 
 def intersection(liste1, liste2):
     liste3 = [x for x in liste1 if x in liste2]
@@ -227,7 +274,7 @@ def insererDates(id_mp, dates):
     print(' --> dates insérées')
 
 def insererDatesFusion(id_mp_list, dates):
-    [id_mp_alim, id_mp_chimie, id_mp_repro] = id_mp_list
+    [id_mp_alim, id_mp_chimie, id_mp_repro, id_mp_fusion] = id_mp_list
     SQL_request = f"INSERT INTO datesclees (measurepoint_id, date_id, date, measurepoint_fusion_id) VALUES (%s, %s, %s, %s)"
     values = []
 
@@ -243,7 +290,7 @@ def insererDatesFusion(id_mp_list, dates):
 
         date_id = i+1
         date = dates[key]['date']
-        measurepoint_fusion_id = id_mp_alim  # Pour l'instant le point de mesure de l'alimentation est considere commme le point de fusion des measurepoints
+        measurepoint_fusion_id = id_mp_fusion
 
         values.append((measurepoint_id, date_id, date, measurepoint_fusion_id))
     # print(f"id_mp_list = {id_mp_list}")
@@ -267,12 +314,12 @@ def fillDateTable():
 
             print('\n[+] id_place = ', id_p)
 
-            if type_p == 'work_monitoring':  # or type_p == 'other': <-- question à poser à Rémi
+            if type_p != 'point_monitoring':  # type_p appartient ici à work_monitoring, other ou null
                 for id_mp in id_measurepoints:
                     dates_clees = datesClees(id_mp)
                     insererDates(id_mp, dates_clees)
 
-            if type_p == 'point_monitoring':
+            else:
 
                 # S'il n'y a qu'un seul point de mesure à un endroit (place) il n'y a aucune fusion de dates a faire
                 if len(id_measurepoints) == 1:
@@ -319,15 +366,13 @@ def fillDateTable():
                         if id_mp_repro != id_mp_chimie:
                             print(
                                 '\n /!\\ Erreur le point de mesure pour la chemistry est différent du point de mesure pour la reproduction')
-                        dates_clees = datesCleesFusion(id_mp_alim, id_mp_chimie, id_mp_repro)
-                        id_list = [id_mp_alim, id_mp_chimie, id_mp_repro]
+                        dates_clees, id_mp_fusion = datesCleesFusion(id_mp_alim, id_mp_chimie, id_mp_repro)
+                        id_list = [id_mp_alim, id_mp_chimie, id_mp_repro, id_mp_fusion]
 
                         insererDatesFusion(id_list, dates_clees)
 
-            if type_p == None:
-                print('cas non géré actuellement')
 
 #%% ## MAIN ##
-# createEmptyDateTable()
-# fillDateTable()
+createEmptyDateTable()
+fillDateTable()
 
