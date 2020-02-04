@@ -1,5 +1,4 @@
 from tools import QueryScript
-import datetime
 
 def contexte(measurepoint_id):
     measurepoints = QueryScript(f"SELECT DISTINCT measurepoint_id FROM datesclees WHERE measurepoint_fusion_id = {measurepoint_id}").execute()

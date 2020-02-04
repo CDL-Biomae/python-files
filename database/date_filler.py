@@ -370,9 +370,3 @@ def fillDateTable():
                         id_list = [id_mp_alim, id_mp_chimie, id_mp_repro, id_mp_fusion]
 
                         insererDatesFusion(id_list, dates_clees)
-
-
-#%% ## MAIN ##
-createEmptyDateTable()
-fillDateTable()
-
