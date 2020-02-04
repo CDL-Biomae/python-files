@@ -1,14 +1,14 @@
 import xlrd 
 from tools import QueryScript
 
-file_name = ("AG-003-01_Macros.xlsm") 
+file_name = "reference.xlsx"
 
 def run():
-    
+  print("ouverture")
   # To open Workbook 
   wb = xlrd.open_workbook(file_name) 
 
-
+  print("premiere feuille")
   # Constants from r2 sheet
   sheet = wb.sheet_by_name('r2') 
 
@@ -26,6 +26,8 @@ def run():
   for i in range(21) :
     if(sheet.cell_value(28+i, 14)):
       values.append(("Repro",str(sheet.cell_value(28+i, 13)),float(sheet.cell_value(28+i, 14))))
+  for i in range(20):
+    values.append(("temperature_repro",str(sheet.cell_value(52+i, 13)),float(sheet.cell_value(52+i, 14))))
 
   r2_constant_table.setScript(SQL_request)
   r2_constant_table.setRows(values)
