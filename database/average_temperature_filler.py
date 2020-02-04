@@ -1,6 +1,5 @@
 from tools import list_to_dict, pack_finder, QueryScript
 import numpy as np
-import time
 
 
 def run():
@@ -13,14 +12,12 @@ def run():
     liste_fusion_id = QueryScript(
         "SELECT DISTINCT measurepoint_fusion_id FROM datesclees").execute()
 
-    t0 = time.localtime()
     compteur = 1
     for elt_mp_id in liste_fusion_id:
         print(elt_mp_id, compteur)
         elt_insert = liste_temperature_moyenne(elt_mp_id)
         values.append(tuple(elt_insert))
         compteur += 1
-    print(time.localtime() - t0)
 
     average_temperature_table.setScript(SQL_request)
     average_temperature_table.setRows(values)
