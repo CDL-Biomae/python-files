@@ -70,5 +70,3 @@ def parser(date):
     month = date.month
     day = date.day
     return f"{day}/{month}/{year}"
-
-print(contexte(2895))

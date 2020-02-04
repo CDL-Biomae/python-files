@@ -57,5 +57,3 @@ def conditions_simple(measurepoint_id):
         ph.append(output[1])
         oxygen.append(output[2])
     return conductivite, ph, oxygen
-
-print(conditions(852))

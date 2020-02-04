@@ -10,9 +10,23 @@ elements_crustaces = {
     6616: 'DEHP',
     7707: 'Dioxines et composées de type dioxine'
 }
+elements_poissons = {
+    1197: 'Heptachlore',
+    1198: 'Heptachlore Epoxyde',
+    1172: 'Dicofol',
+    1652: 'Hexachlorobutadiene',
+    1199: 'Hexachlorobenzene',
+    7128: 'HBCDD',
+    1955: 'Chloroalcanes C10-13',
+    1888: 'Pentachlorobenzene',
+    7705: 'PBDE (BDE-28,47,99,100,153,154)',
+    6560: 'PFOS',
+    1387: 'Mercure (Hg)'
+}
+
 code_sandre_elements = tuple(elements_crustaces.keys())
 
-def nqe_info(code_sandre):
+def maximum_freq_quanti(code_sandre):
     output = QueryScript(f"SELECT maximum, freq_quanti FROM r3 WHERE sandre IN {code_sandre}").execute()
 
     maximum, freq_quanti = [], []
