@@ -16,13 +16,17 @@ def run():
     compteur = 1
     for elt_mp_id in liste_fusion_id:
         print(elt_mp_id, compteur)
-        elt_insert = []
+        elt_insert = [elt_mp_id]
         values.append(tuple(elt_insert))
         compteur += 1
 
     temperature_repro_table.setScript(SQL_request)
     temperature_repro_table.setRows(values)
     temperature_repro_table.executemany()
+
+
+def calcul_av_cycle(alpha, beta, gamme, delta, liste_tempe):
+    return []
 
 
 def fct_aux_expected_percent(alpha, beta, x):
@@ -32,5 +36,5 @@ def fct_aux_expected_percent(alpha, beta, x):
 
 def fct_aux_av_cylce(alpha, beta, gamma, delta, temp):
     numerateur = alpha + beta*temp
-    denominateur = gamme + delta*temp
+    denominateur = gamma + delta*temp
     return((100*numerateur) / (24*denominateur))
