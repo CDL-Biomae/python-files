@@ -9,7 +9,7 @@ def campaign(campaign_ref):
 
 def measure_points(campaign_ref):
     output = QueryScript(
-        f"SELECT DISTINCT(measurepoint_fusion_id) FROM datesclees WHERE measurepoint_id IN (SELECT id FROM measurepoint WHERE place_id IN (SELECT id FROM place WHERE campaign_id in (SELECT id FROM campaign WHERE reference = '{campaign_ref}')));"
+        f"SELECT DISTINCT(measurepoint_fusion_id) FROM datesclees WHERE measurepoint_id IN (SELECT id FROM measurepoint WHERE reference LIKE '{campaign_ref}%');"
     )
     return output.execute()
 
@@ -76,4 +76,3 @@ def create_report(list_campaigns):
         list_dataframe.append(df)
 
     write_excel(list_dataframe, list_campaigns)
-
