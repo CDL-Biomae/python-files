@@ -3,6 +3,7 @@ from tools import agency_finder
 from calcul.contexte_d_etudes_2.contexte_d_etudes_2 import contexte
 import pandas as pd
 
+## CREATING DATAFRAME ##
 def campaign(campaign_ref):
     return int(campaign_ref[-2:])
 
@@ -28,7 +29,7 @@ def agency_mp(list_mp):
 
     return list_agency
 
-def create_matrix(campaign_ref):
+def create_dataframe(campaign_ref):
     campaign_id = campaign(campaign_ref)
     list_mp = measure_points(campaign_ref)
     list_number, list_name = number_name_mp(list_mp)
@@ -44,13 +45,35 @@ def create_matrix(campaign_ref):
         [J0, J14, JN, N, J21] = contexte(mp)
 
         temp = [campaign_id, number, name, agency, J0, J14, JN, N, J21]
-        print(temp)
         matrix.append(temp)
 
     df = pd.DataFrame(matrix)
     df.columns = ['Campagne', 'Numéro', 'Station de mesure', 'Code Agence', 'Intervention (J0)', 'Intervention (J14)', 'Intervention (JN)', 'N', 'Intervention (J21)']
 
-
     return df
 
-print(create_matrix('AG-003-01'))
+## CREATING EXCEL ##
+def clean(dataframe):
+    return dataframe.dropna(how='all', axis='columns')
+
+def write_excel(list_dataframe, list_campaigns):
+    df_concat = pd.concat(list_dataframe)
+    df_excel = clean(df_concat)
+
+    filename = 'Rapport_pour'
+    for c in list_campaigns:
+        filename += f"_{c}"
+    filename += '.xlsx'
+
+    df_excel.to_excel(filename, sheet_name='sheet1', index=False)
+    print(f"Rapport créé sous le nom: \"{filename}\"")
+
+## MAIN FUNCTION ##
+def create_report(list_campaigns):
+    list_dataframe = []
+    for campaign_str in list_campaigns:
+        df = create_dataframe(campaign_str)
+        list_dataframe.append(df)
+
+    write_excel(list_dataframe, list_campaigns)
+

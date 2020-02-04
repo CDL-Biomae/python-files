@@ -52,12 +52,15 @@ def contexte_simple(measurepoint_id):
         else:
             dates.append(output[0])
 
-    N = (dates[2] - dates[0]).days
+    try:
+        N = str((dates[2] - dates[0]).days)
+    except TypeError:
+        N = None
 
     cleaned_dates = [parser(dates[0]),
                      parser(dates[1]),
                      parser(dates[2]),
-                     str(N),
+                     N,
                      parser(dates[3])]
 
     return cleaned_dates
