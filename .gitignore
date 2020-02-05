@@ -2,4 +2,5 @@ env.py
 test.py
 *.xlsm
 *.xlsx
+*.docx
 __pycache__
