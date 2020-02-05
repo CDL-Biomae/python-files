@@ -11,8 +11,8 @@ def run():
   print("premiere feuille")
   # Constants from r2 sheet
   sheet = wb.sheet_by_name('r2') 
-
-  r2_constant_table = QueryScript("DROP TABLE IF EXISTS r2_constant; CREATE TABLE r2_constant (id INT AUTO_INCREMENT PRIMARY KEY, nature VARCHAR(255), name VARCHAR(255), value FLOAT);")
+  QueryScript("DROP TABLE IF EXISTS r2_constant").execute()
+  r2_constant_table = QueryScript("CREATE TABLE r2_constant (id INT AUTO_INCREMENT PRIMARY KEY, nature VARCHAR(255), name VARCHAR(255), value FLOAT)")
   r2_constant_table.execute()
   SQL_request = "INSERT INTO r2_constant (nature, name, value) VALUES (%s, %s, %s)"
   values = []
@@ -36,7 +36,8 @@ def run():
 
 
   # Threshold from r2 sheet
-  r2_threshold_table = QueryScript("DROP TABLE IF EXISTS r2_threshold; CREATE TABLE r2_threshold (id INT AUTO_INCREMENT PRIMARY KEY, parameter VARCHAR(255), population VARCHAR(255), type VARCHAR(255), time VARCHAR(255), threshold FLOAT, unit VARCHAR(255), rule VARCHAR(255), meaning VARCHAR(255), version VARCHAR(255));")
+  QueryScript("DROP TABLE IF EXISTS r2_threshold").execute()
+  r2_threshold_table = QueryScript("CREATE TABLE r2_threshold (id INT AUTO_INCREMENT PRIMARY KEY, parameter VARCHAR(255), population VARCHAR(255), type VARCHAR(255), time VARCHAR(255), threshold FLOAT, unit VARCHAR(255), rule VARCHAR(255), meaning VARCHAR(255), version VARCHAR(255))")
   r2_threshold_table.execute()
   SQL_request = "INSERT INTO r2_threshold (parameter, population, type, time, threshold, unit, rule, meaning, version) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)"
   values = []
@@ -53,7 +54,8 @@ def run():
 
   # Information from r3 sheet
   sheet = wb.sheet_by_name('r3')
-  r3_table = QueryScript("DROP TABLE IF EXISTS r3; CREATE TABLE r3 (id INT AUTO_INCREMENT PRIMARY KEY, unit VARCHAR(255), sandre VARCHAR(255), parameter VARCHAR(255), NQE VARCHAR(255), 7j_threshold FLOAT, 7j_graduate_25 FLOAT, 7j_graduate_50 FLOAT, 7j_graduate_75 FLOAT,  21j_threshold FLOAT, 21j_graduate_25 FLOAT, 21j_graduate_50 FLOAT, 21j_graduate_75 FLOAT, case_number VARCHAR(255), familly VARCHAR(255), maximum FLOAT, freq_quanti FLOAT);")
+  QueryScript("DROP TABLE IF EXISTS r3").execute()
+  r3_table = QueryScript("CREATE TABLE r3 (id INT AUTO_INCREMENT PRIMARY KEY, unit VARCHAR(255), sandre VARCHAR(255), parameter VARCHAR(255), NQE VARCHAR(255), 7j_threshold FLOAT, 7j_graduate_25 FLOAT, 7j_graduate_50 FLOAT, 7j_graduate_75 FLOAT,  21j_threshold FLOAT, 21j_graduate_25 FLOAT, 21j_graduate_50 FLOAT, 21j_graduate_75 FLOAT, case_number VARCHAR(255), familly VARCHAR(255), maximum FLOAT, freq_quanti FLOAT)")
   r3_table.execute()
   SQL_request = "INSERT INTO r3 (unit, sandre, parameter, NQE, 7j_threshold, 7j_graduate_25, 7j_graduate_50, 7j_graduate_75, 21j_threshold, 21j_graduate_25, 21j_graduate_50, 21j_graduate_75, case_number, familly, maximum, freq_quanti) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
   values = []
