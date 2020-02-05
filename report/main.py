@@ -14,7 +14,7 @@ def create_filename(list_campaigns):
     return filename
 
 def write_in_new_excel(dataframe, filename, sheet):
-    PATH = f"..\\output\\{filename}"
+    PATH = f"output\\{filename}"
     writer = pd.ExcelWriter(path=PATH, engine='openpyxl')
     dataframe.to_excel(writer, sheet_name=f"{sheet}", index=False)
     writer.save()
@@ -22,7 +22,7 @@ def write_in_new_excel(dataframe, filename, sheet):
     print(f"L'onglet \"{sheet}\" a été créé dans le nouveau fichier \"{filename}\"")
 
 def write_in_existing_excel(dataframe, filename, sheet):
-    PATH = f"..\\output\\{filename}"
+    PATH = f"output\\{filename}"
     book = load_workbook(PATH)
     writer = pd.ExcelWriter(path=PATH, engine='openpyxl')
     writer.book = book
