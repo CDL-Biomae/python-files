@@ -133,7 +133,7 @@ def nbr_female_concerned_area(pack_id):
 
 def Inhibition_fertility_ANd_Threshold_5_1(pack_id):
      #  change where by name not by id
-     SQL_request = "SELECT value FROM biomae.r2_constant where id IN(24,22,25,23)"
+     SQL_request = "SELECT value FROM biomae.r2_constant where name IN('indice de fertilité attendu - moyenne','Constante fertilité 1-1','indice de fertilité attendu - sd','Constante fertilité 2-1')"
      resultat =  QueryScript(SQL_request).execute()
      fertility = []
      fertility.append(100*(resultat[2]-Index_fertility_moy(pack_id))/resultat[2]) #  % INHIBITION - FECONDITE
