@@ -47,7 +47,6 @@ def Index_Fertility_female_X(pack_id):
 
       # n L6 (TOXFILE)
 def nbr_female_concerned(pack_id):
-
      female = Index_Fertility_female_X(pack_id)
      Nbr = 0
      for i in range(len(female)-1):
@@ -87,8 +86,11 @@ def Index_fertility_moy(pack_id):
 
  # Fécondité Cycle de mue
 def Moulting_cycle(pack_id):
+     fusion_id = fusion_id_finder(pack_id)
      SQL_request = "SELECT molting_stage FROM biomae.measurereprotoxicity where pack_id ="+str(pack_id)
+     SQL_request_tmp = "SELECT expected_C2,expected_D2 FROM biomae.temperature_repro where measurepoint_fusion_id="+str(fusion_id)
      resultat =  QueryScript(SQL_request).execute()
+     resultat2 =  QueryScript(SQL_request_tmp).execute()
      Nbr_C2_D1 = 0
      for i in range(len(resultat)-1):
           if resultat[i].upper()=='C2' or resultat[i].upper()=='D1':
@@ -101,7 +103,7 @@ def Moulting_cycle(pack_id):
            Moulting = Nbr_female_analysis(pack_id)/Nbr_C2_D1*100
 
      #  Moulting = round(Moulting) +"%" + round( Max Température repro % attendu au moins en C2 - MAX Température repro % attendu  au moins en D2)
-     Moulting = str(round(Moulting)) +"%"
+     Moulting = str(round(Moulting)) +"%("+str(round(resultat2[0][0]-resultat2[0][1]))+")%"
   
      return Moulting
 
@@ -109,7 +111,7 @@ def Moulting_cycle(pack_id):
 def nbr_female_concerned_area(pack_id):
           SQL_request = "SELECT molting_stage,oocyte_area_pixel,oocyte_area_pixel,oocyte_area_mm FROM biomae.measurereprotoxicity where pack_id ="+str(pack_id)
           resultat =  QueryScript(SQL_request).execute()
-          Area_delayµm = []
+          Area_delayµm = [] 
           Area_delay = []
           nbr_f_c = 0
           for i in range(len(resultat)-1):
@@ -125,13 +127,52 @@ def nbr_female_concerned_area(pack_id):
                          Area_delay.append(0)
                      else:
                          Area_delay.append(Area_delayµm[i])
-          
-          for i in range(len(Area_delay)-1):
-               if Area_delay[i]!=0:
-                    nbr_f_c = nbr_f_c +1
+                         nbr_f_c = nbr_f_c +1
+          return nbr_f_c, Area_delayµm
+
+
+def Inhibition_fertility_ANd_Threshold_5_1(pack_id):
+     #  change where by name not by id
+     SQL_request = "SELECT value FROM biomae.r2_constant where id IN(24,22,25,23)"
+     resultat =  QueryScript(SQL_request).execute()
+     fertility = []
+     fertility.append(100*(resultat[2]-Index_fertility_moy(pack_id))/resultat[2]) #  % INHIBITION - FECONDITE
+     fertility.append( (resultat[2]-(resultat[2]-resultat[0]*resultat[3]/sqrt(nbr_female_concerned(pack_id))))/resultat[2]*100 )  #  Seuil 1% fécondité      
+     fertility.append( (resultat[2]-(resultat[2]-resultat[1]*resultat[3]/sqrt(nbr_female_concerned(pack_id))))/resultat[2]*100 )  #  Seuil 5% fécondité    
+     if Nbr_female_analysis(pack_id)<10:
+          return "NA"
+     else:
+          return fertility
+
+def Result_Fertility(pack_id):
+     Inhibition = Inhibition_fertility_ANd_Threshold_5_1(pack_id)
+
+     if Nbr_female_analysis(pack_id)<10:
+          return "NA"
+     elif  Inhibition[0]>Inhibition[1] and Inhibition[0]>Inhibition[2]:
+          return "inhibition fort"
+     elif  Inhibition[0]>Inhibition[1] and Inhibition[0]<Inhibition[2]:
+          return "inhibition modérée"
+     elif Inhibition[0]<Inhibition[1]:
+          return "conforme"
+     else:
+          return ""
+def Endocrine_disruption(pack_id):
+
+     female_concerned = nbr_female_concerned_area(pack_id)
+
+     if Result_Fertility(pack_id) == "conforme" or Result_Fertility(pack_id) == "NA":
+          return "NA"
+     else:
+          if Nbr_female_analysis(pack_id)<10:
+               return 'NA'
+          else:
+               return female_concerned[1]/len(female_concerned)
+   
+
+
      
 
-          return nbr_f_c
 
 
 
