@@ -46,7 +46,7 @@ class QueryScript() :
         
     query = (self.__str__())
     
-    cursor.execute(query)
+    cursor.execute(query, multi=True)
     
     output = []
     
