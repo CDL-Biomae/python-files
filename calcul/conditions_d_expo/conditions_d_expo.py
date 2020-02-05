@@ -18,7 +18,7 @@ def conditions_fusion(measurepoints):
 
     for i in range(4):
         step, barrel = steps_barrel[i]
-        if i in [0,2]:
+        if i in [0, 2]:
             measurepoint = id_mp_2
         else:
             measurepoint = id_mp_1

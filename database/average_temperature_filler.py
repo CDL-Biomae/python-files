@@ -113,8 +113,3 @@ def liste_temperature_moyenne(measurepoint_fusion_id):
         elt_insert += [None]
     return elt_insert
 
-
-# test = print(np.mean(liste_temperature(2944, 1).execute()))
-
-# if __name__ == '__main__':
-#     run()
