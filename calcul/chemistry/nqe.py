@@ -1,6 +1,6 @@
 from tools import QueryScript
 
-elements_crustaces = {
+elements_crustacean = {
     1115: 'Benzo (a) pyrene',
     1118: 'Benzo (g,h,i) Perylene',
     1117: 'Benzo (k) Fluoranthene',
@@ -10,7 +10,7 @@ elements_crustaces = {
     6616: 'DEHP',
     7707: 'Dioxines et composées de type dioxine'
 }
-elements_poissons = {
+elements_fish = {
     1197: 'Heptachlore',
     1198: 'Heptachlore Epoxyde',
     1172: 'Dicofol',
@@ -24,10 +24,10 @@ elements_poissons = {
     1387: 'Mercure (Hg)'
 }
 
-code_sandre_elements = tuple(elements_crustaces.keys())
+code_sandre_elements = tuple(elements_crustacean.keys())
 
 def maximum_freq_quanti(code_sandre):
-    output = QueryScript(f"SELECT maximum, freq_quanti FROM r3 WHERE sandre IN {code_sandre}").execute()
+    output = QueryScript(f"SELECT maximum, freq_quanti FROM r3 WHERE sandre IN {tuple(code_sandre)}").execute()
 
     maximum, freq_quanti = [], []
     for couple in output:
@@ -38,9 +38,3 @@ def maximum_freq_quanti(code_sandre):
         freq_quanti.append(couple[1])
 
     return(maximum, freq_quanti)
-
-
-def nqe_crustace_values(pack_id):
-    print('ok')
-
-# print(nqe_crustace_info(code_sandre))
