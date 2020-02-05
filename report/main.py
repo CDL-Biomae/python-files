@@ -29,7 +29,7 @@ def write_in_existing_excel(dataframe, filename, sheet):
     dataframe.to_excel(writer, sheet_name=f"{sheet}", index=False)
     writer.save()
     writer.close()
-    print(f"L'onglet \"{sheet}\" a été créé dans le nouveau fichier \"{filename}\"")
+    print(f"L'onglet \"{sheet}\" a été créé dans le fichier \"{filename}\"")
 
 def measure_points(campaign_ref):
     output = QueryScript(
@@ -45,7 +45,7 @@ def create_dict_mp(list_campaigns):
     return dict
 
 ## MAIN FUNCTION ##
-# Prend en entrée une liste de reference de campagne, ex: ['AG-003-01', 'AG-003-02-]
+# Prend en entrée une liste de reference de campagne, ex: ['AG-003-01', 'AG-003-02']
 
 def main(list_campaigns):
     filename = create_filename(list_campaigns)
@@ -58,11 +58,12 @@ def main(list_campaigns):
     ## CREATION DE L'ONGLET STATIONS ##
     stations_dataframe = create_stations_dataframe(head_dataframe, list_campaigns, dict_mp)
     write_in_new_excel(stations_dataframe, filename, 'Stations')
+    # utiliser openpyxl pour changer le style de la feuille
 
-    # CREATION DE L'ONGLET CAMPAGNES ##
+    ## CREATION DE L'ONGLET CAMPAGNES ##
     campagnes_dataframe = create_campagnes_dataframe(head_dataframe, list_campaigns, dict_mp)
     write_in_existing_excel(campagnes_dataframe, filename, 'Campagnes')
 
 
-main(['AG-003-01', 'AG-003-02'])
+# main(['AG-003-01', 'AG-003-02'])
 

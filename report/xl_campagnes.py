@@ -1,4 +1,3 @@
-from tools import QueryScript
 from calcul.contexte_d_etudes_2.contexte_d_etudes_2 import contexte
 import pandas as pd
 
