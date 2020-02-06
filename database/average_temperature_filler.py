@@ -112,4 +112,3 @@ def average_temperature_list(measurepoint_fusion_id):
     else:
         elt_insert += [None]
     return elt_insert
-
