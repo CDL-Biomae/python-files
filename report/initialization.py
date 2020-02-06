@@ -21,7 +21,7 @@ def measure_points(campaign_ref):
 
 def number_name_mp(list_mp):
     output = QueryScript(
-        f"SELECT report_pin, name FROM measurepoint WHERE id in {tuple(list_mp)}"
+        f"SELECT substring(place.reference, -2, 2), measurepoint.name FROM measurepoint JOIN place ON place.id = measurepoint.place_id WHERE measurepoint.id in {tuple(list_mp)}"
     ).execute()
     list_number = [x[0] for x in output]
     list_name = [x[1] for x in output]

@@ -10,6 +10,13 @@ def contexte(measurepoint_id):
 
 def contexte_fusion(measurepoints):
     [id_mp_1, id_mp_2] = measurepoints
+    if id_mp_1 < id_mp_2:
+        id_mp_premier = id_mp_1
+        id_mp_second = id_mp_2
+    else:
+        id_mp_premier = id_mp_2
+        id_mp_second = id_mp_1
+
     dates = []
 
     steps_barrel = [(50, "\'R0\'"), (50, "\'R0\'"), (140, "\'RN\'"), (60, "\'R7\'")]
@@ -17,9 +24,9 @@ def contexte_fusion(measurepoints):
     for i in range(4):
         step, barrel = steps_barrel[i]
         if i in [0, 2]:
-            measurepoint = id_mp_2
+            measurepoint = id_mp_premier
         else:
-            measurepoint = id_mp_1
+            measurepoint = id_mp_second
 
         output = QueryScript(f"SELECT recordedAt FROM measureexposurecondition WHERE measurepoint_id = {measurepoint} and step = {step} and barrel = {barrel}").execute()
         if len(output) == 0:
