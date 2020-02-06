@@ -2,8 +2,6 @@ from calcul import contexte
 import pandas as pd
 
 ## CREATING DATAFRAME ##
-
-
 def create_dataframe(list_mp):
     matrix = []
 
