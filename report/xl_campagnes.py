@@ -1,7 +1,9 @@
-from calcul.contexte_d_etudes_2.contexte_d_etudes_2 import contexte
+from calcul.study_context.study_context import contexte
 import pandas as pd
 
 ## CREATING DATAFRAME ##
+
+
 def create_dataframe(list_mp):
     matrix = []
 
@@ -14,7 +16,8 @@ def create_dataframe(list_mp):
         matrix.append(temp)
 
     df = pd.DataFrame(matrix)
-    df.columns = ['Intervention (J0)', 'Intervention (J14)', 'Intervention (JN)', 'N', 'Intervention (J21)']
+    df.columns = ['Intervention (J0)', 'Intervention (J14)',
+                  'Intervention (JN)', 'N', 'Intervention (J21)']
     df = df.dropna(how='all', axis='columns')
 
     return df
@@ -33,4 +36,3 @@ def create_campagnes_dataframe(head_dataframe, list_campaigns, dict_mp):
     df_campaigns = df_concat.sort_values('Numéro')
 
     return df_campaigns
-
