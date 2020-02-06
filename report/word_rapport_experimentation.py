@@ -1,5 +1,6 @@
 from docx import Document
 from tools import QueryScript
+from report import measure_points
 
 
 def create_doc(campain):
@@ -10,18 +11,19 @@ def create_doc(campain):
     return []
 
 
-def recuperation_donnee(campain):
-    return []
+def recuperation_donnee(campaign):
+    measurepoints_fusion_id_list = measure_points(campaign)
+    return measurepoints_fusion_id_list
 
-# %%
+# %% Données exposure condition
 
 
-def contexte(measurepoint_id):
+def contexte(measurepoint_fusion_id):
     measurepoints = QueryScript(
-        f"SELECT DISTINCT measurepoint_id FROM key_dates WHERE measurepoint_fusion_id = {measurepoint_id}").execute()
+        f"SELECT DISTINCT measurepoint_id FROM key_dates WHERE measurepoint_fusion_id = {measurepoint_fusion_id}").execute()
 
     if len(measurepoints) < 2:
-        return data_exposure_condition_simple(measurepoint_id)
+        return data_exposure_condition_simple(measurepoint_fusion_id)
     else:
         return data_exposure_condition_fusion(measurepoints)
 
@@ -43,6 +45,7 @@ def data_exposure_condition_fusion(measurepoints):
 
         output = QueryScript(
             f"SELECT recordedAt, temperature, conductivity, oxygen, ph FROM measureexposurecondition WHERE measurepoint_id = {measurepoint} and step = {step} and barrel = {barrel}").execute()
+        output = output[0]
         if len(output) != 0:
             dico_temp["date"] = parser(output[0])
             dico_temp["temperature"] = output[1]
@@ -85,3 +88,26 @@ def parser(date):
     hour = date.hour
     minute = date.minute
     return f"{day}/{month}/{year} {hour}:{minute}"
+
+# %% Données températures moyenne
+
+
+def average_temperature(measurepoint_fusion_id):
+    tempe = QueryScript(
+        f"SELECT sensor3_average, sensor3_min, sensor3_max FROM average_temperature WHERE measurepoint_fusion_id = {measurepoint_fusion_id}").execute()
+    tempe = tempe[0]
+    dico = {'min': tempe[1], 'average': tempe[0], 'max': tempe[2]}
+    return dico
+
+# %% Récupération des données géographiques
+
+
+# on entre le nom de la campagne, cela nous ressort la liste des agences
+def campaign_to_agency(campaign):
+    QueryScript(
+        "SELECT code, name, zipcode, city, stream, lambertX, lambertY, network, hydroecoregion FROM agency WHERE")
+    return []
+
+
+def geaographic_data():
+    return []
