@@ -1,6 +1,6 @@
 from tools import QueryScript
 import pandas as pd
-from calcul.conditions_d_expo.conditions_d_expo import conditions
+from calcul.exposure_conditions.exposure_conditions import conditions
 
 def temperatures_dataframe(list_mp):
 
@@ -8,8 +8,8 @@ def values_dataframe(list_mp):
     matrix = []
 
     for mp in list_mp:
-        list_conductivite, list_ph, list_oxygen = conditions(mp)
-        values = list_conductivite + list_ph + list_oxygen
+        list_conductivity, list_ph, list_oxygen = conditions(mp)
+        values = list_conductivity + list_ph + list_oxygen
         matrix.append(values)
 
     df = pd.DataFrame(matrix)
