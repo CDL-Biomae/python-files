@@ -5,7 +5,7 @@ from math import *
 
 def number_days_exposition(pack_id):
      fusion_id = fusion_id_finder(pack_id)
-     SQL_request = "SELECT date FROM datesclees where date_id IN(4,6) and measurepoint_fusion_id="+str(fusion_id)
+     SQL_request = "SELECT date FROM key_dates where date_id IN(4,6) and measurepoint_fusion_id="+str(fusion_id)
      LR_dates =  QueryScript(SQL_request).execute()
      
      if(LR_dates!=""):
@@ -74,7 +74,7 @@ def number_female_analysis(pack_id):
      return  Nbr_B_C1+Nbr_C2_D1+Nbr_D2
 
    # Fécondité 
-def index_fertility_moy(pack_id):
+def index_fertility_average(pack_id):
      number_female= number_female_analysis(pack_id)
      if number_female<10 :
           return "NA"
@@ -133,10 +133,10 @@ def number_female_concerned_area(pack_id):
 
 def inhibition_fertility_and_threshold_5_1(pack_id):
      #  change where by name not by id
-     SQL_request = "SELECT value FROM biomae.r2_constant where name IN('indice de fertilité attendu - moyenne','Constante fertilité 1-1','indice de fertilité attendu - sd','Constante fertilité 2-1')"
+     SQL_request = "SELECT value FROM biomae.r2_constant where name IN('indice de fertilité attendu - averageenne','Constante fertilité 1-1','indice de fertilité attendu - sd','Constante fertilité 2-1')"
      resultat =  QueryScript(SQL_request).execute()
      fertility = []
-     fertility.append(100*(resultat[2]-index_fertility_moy(pack_id))/resultat[2]) #  % inhibition - FECONDITE
+     fertility.append(100*(resultat[2]-index_fertility_average(pack_id))/resultat[2]) #  % inhibition - FECONDITE
      fertility.append( (resultat[2]-(resultat[2]-resultat[0]*resultat[3]/sqrt(number_female_concerned(pack_id))))/resultat[2]*100 )  #  Seuil 1% fécondité      
      fertility.append( (resultat[2]-(resultat[2]-resultat[1]*resultat[3]/sqrt(number_female_concerned(pack_id))))/resultat[2]*100 )  #  Seuil 5% fécondité    
      if number_female_analysis(pack_id)<10:

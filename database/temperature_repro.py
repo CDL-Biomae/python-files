@@ -17,10 +17,10 @@ def run():
         "SELECT name,value FROM biomae.r2_constant WHERE nature='temperature_repro'").execute()
     constantes = list_to_dict(constantes)
 
-    compteur = 1
+    count = 1
     for elt_mp_id in liste_fusion_id:
         #elt_mp_id = 2895
-        print(elt_mp_id, compteur)
+        print(elt_mp_id, count)
         elt_insert = [elt_mp_id]
         liste_tempe = liste_temperature(elt_mp_id, "2lab")
         if len(liste_tempe) > 0:
@@ -46,7 +46,7 @@ def run():
             elt_insert += [av_cycle_BCD1, expected_C2, expected_D1,
                            expected_D2, av_cycle_1234, expected_st3, expected_st4, expected_st5]
             values.append(tuple(elt_insert))
-        compteur += 1
+        count += 1
 
     temperature_repro_table.setScript(SQL_request)
     temperature_repro_table.setRows(values)
