@@ -1,4 +1,4 @@
-from calcul.study_context.study_context import contexte
+from calcul import contexte
 import pandas as pd
 
 ## CREATING DATAFRAME ##
