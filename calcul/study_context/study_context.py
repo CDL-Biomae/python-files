@@ -1,7 +1,7 @@
 from tools import QueryScript
 
 def contexte(measurepoint_id):
-    measurepoints = QueryScript(f"SELECT DISTINCT measurepoint_id FROM datesclees WHERE measurepoint_fusion_id = {measurepoint_id}").execute()
+    measurepoints = QueryScript(f"SELECT DISTINCT measurepoint_id FROM key_dates WHERE measurepoint_fusion_id = {measurepoint_id}").execute()
 
     if len(measurepoints) < 2:
         return contexte_simple(measurepoint_id)
