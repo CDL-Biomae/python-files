@@ -2,7 +2,7 @@ from tools import QueryScript
 import pandas as pd
 from calcul.exposure_conditions.exposure_conditions import conditions
 
-def test_chimie_supérieur_repro(list_mp):
+def test_chimie_superieur_repro(list_mp):
     list_test = []
     output = QueryScript(
         f"SELECT date FROM key_dates WHERE date_id IN (1, 4, 6, 7) and measurepoint_fusion_id IN {tuple(list_mp)}"
@@ -32,7 +32,7 @@ def test_chimie_supérieur_repro(list_mp):
     return list_test
 
 def temperatures_dataframe(list_mp):
-    list_test = test_chimie_supérieur_repro(list_mp)
+    list_test = test_chimie_superieur_repro(list_mp)
     output = QueryScript(
         f"SELECT sonde2_min, sonde2_moy, sonde2_max, sonde3_min, sonde3_moy, sonde3_max FROM average_temperature WHERE measurepoint_fusion_id IN {tuple(list_mp)}"
     ).execute()
@@ -83,6 +83,7 @@ def values_dataframe(list_mp):
     df = df.dropna(how='all', axis='columns')
 
     return df
+
 
 def create_physicochimie_dataframe(head_dataframe, list_campaigns, dict_mp):
     list_dataframe = []

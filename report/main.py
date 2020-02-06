@@ -2,6 +2,7 @@ from tools import QueryScript
 from report import create_head_dataframe
 from report import create_stations_dataframe
 from report import create_campagnes_dataframe
+from report import create_physicochimie_dataframe
 import pandas as pd
 from openpyxl import load_workbook
 
@@ -65,7 +66,8 @@ def main(list_campaigns):
     write_in_existing_excel(campagnes_dataframe, filename, 'Campagnes')
 
     ## CREATION DE L'ONGLET PHYSICO-CHIMIE ##
-
+    physicochimie_dataframe = create_physicochimie_dataframe(head_dataframe, list_campaigns, dict_mp)
+    write_in_existing_excel(physicochimie_dataframe, filename, 'Physico-chimie')
 
 
 # main(['AG-003-01', 'AG-003-02'])
