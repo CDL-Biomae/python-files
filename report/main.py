@@ -33,7 +33,7 @@ def write_in_existing_excel(dataframe, filename, sheet):
 
 def measure_points(campaign_ref):
     output = QueryScript(
-        f"SELECT DISTINCT(measurepoint_fusion_id) FROM datesclees WHERE measurepoint_id IN (SELECT id FROM measurepoint WHERE reference LIKE '{campaign_ref}%');"
+        f"SELECT DISTINCT(measurepoint_fusion_id) FROM key_dates WHERE measurepoint_id IN (SELECT id FROM measurepoint WHERE reference LIKE '{campaign_ref}%');"
     )
     return output.execute()
 
@@ -63,6 +63,9 @@ def main(list_campaigns):
     ## CREATION DE L'ONGLET CAMPAGNES ##
     campagnes_dataframe = create_campagnes_dataframe(head_dataframe, list_campaigns, dict_mp)
     write_in_existing_excel(campagnes_dataframe, filename, 'Campagnes')
+
+    ## CREATION DE L'ONGLET PHYSICO-CHIMIE ##
+
 
 
 # main(['AG-003-01', 'AG-003-02'])
