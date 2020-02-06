@@ -10,7 +10,7 @@ def conditions(measurepoint_id):
 
 def conditions_fusion(measurepoints):
     [id_mp_1, id_mp_2] = measurepoints
-    conductivite = []
+    conductivity = []
     ph = []
     oxygen = []
 
@@ -30,14 +30,14 @@ def conditions_fusion(measurepoints):
         except IndexError:
             output = [None, None, None]
         print(output)
-        conductivite.append(output[0])
+        conductivity.append(output[0])
         ph.append(output[1])
         oxygen.append(output[2])
 
-    return (conductivite, ph, oxygen)
+    return (conductivity, ph, oxygen)
 
 def conditions_simple(measurepoint_id):
-    conductivite = []
+    conductivity = []
     ph = []
     oxygen = []
 
@@ -53,7 +53,7 @@ def conditions_simple(measurepoint_id):
         except IndexError:
             output = [None, None, None]
 
-        conductivite.append(output[0])
+        conductivity.append(output[0])
         ph.append(output[1])
         oxygen.append(output[2])
-    return conductivite, ph, oxygen
+    return conductivity, ph, oxygen
