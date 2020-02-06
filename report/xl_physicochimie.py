@@ -34,34 +34,38 @@ def test_chimie_superieur_repro(list_mp):
 def temperatures_dataframe(list_mp):
     list_test = test_chimie_superieur_repro(list_mp)
     output = QueryScript(
-        f"SELECT sensor2_min, sensor2_moy, sensor2_max, sensor3_min, sensor3_moy, sensor3_max FROM average_temperature WHERE measurepoint_fusion_id IN {tuple(list_mp)}"
+        f"SELECT sensor2_min, sensor2_average, sensor2_max, sensor3_min, sensor3_average, sensor3_max FROM average_temperature WHERE measurepoint_fusion_id IN {tuple(list_mp)}"
     ).execute()
 
     matrix = []
     n = len(list_mp)
     for i in range(n):
         test = list_test[i]
-        [sensor2_min, sensor2_moy, sensor2_max, sensor3_min, sensor3_moy, sensor3_max] = output[i]
+        [sensor2_min, sensor2_average, sensor2_max, sensor3_min, sensor3_average, sensor3_max] = output[i]
 
-        moyenne = sensor3_moy if test else sensor2_moy
+        average = sensor3_average if test else sensor2_average
+        if average == None:
+            average = 'NA'
+        else:
+            average = round(average, 1)
 
         try:
-            minimum = min(sensor2_min, sensor3_min)
+            minimum = round(min(sensor2_min, sensor3_min), 1)
         except TypeError:
             if sensor3_min == None and sensor2_min == None:
-                minimum = None
+                minimum = 'NA'
             else:
-                minimum = sensor2_min if sensor3_min == None else sensor3_min
+                minimum = round(sensor2_min, 1) if sensor3_min == None else round(sensor3_min, 1)
 
         try:
-            maximum = max(sensor2_max, sensor3_max)
+            maximum = round(max(sensor2_max, sensor3_max), 1)
         except TypeError:
             if sensor3_max == None and sensor2_max == None:
                 maximum = 'NA'
             else:
-                maximum = sensor2_max if sensor3_max == None else sensor3_max
+                maximum = round(sensor2_max, 1) if sensor3_max == None else round(sensor3_max, 1)
 
-        matrix.append([minimum, moyenne, maximum])
+        matrix.append([minimum, average, maximum])
 
     df = pd.DataFrame(matrix)
     df.columns = ['Temperature minimum', 'Temperature moyenne', 'Temperature maximum']
