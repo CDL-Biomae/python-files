@@ -73,5 +73,8 @@ def main(list_campaigns):
         head_dataframe, list_campaigns, dict_mp)
     write_in_existing_excel(campagnes_dataframe, filename, 'Campagnes')
 
+    ## CREATION DE L'ONGLET PHYSICO-CHIMIE ##
+
+
 
 # main(['AG-003-01', 'AG-003-02'])
