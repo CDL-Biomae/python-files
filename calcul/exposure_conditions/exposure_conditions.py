@@ -1,12 +1,15 @@
 from tools import QueryScript
 
+
 def conditions(measurepoint_id):
-    measurepoints = QueryScript(f"SELECT DISTINCT measurepoint_id FROM key_dates WHERE measurepoint_fusion_id = {measurepoint_id}").execute()
+    measurepoints = QueryScript(
+        f"SELECT DISTINCT measurepoint_id FROM key_dates WHERE measurepoint_fusion_id = {measurepoint_id}").execute()
 
     if len(measurepoints) < 2:
         return conditions_simple(measurepoint_id)
     else:
         return conditions_fusion(measurepoints)
+
 
 def conditions_fusion(measurepoints):
     [id_mp_1, id_mp_2] = measurepoints
@@ -14,7 +17,8 @@ def conditions_fusion(measurepoints):
     ph = []
     oxygen = []
 
-    steps_barrel = [(50, "\'R0\'"), (50, "\'R0\'"), (140, "\'RN\'"), (60, "\'R7\'")]
+    steps_barrel = [(50, "\'R0\'"), (50, "\'R0\'"),
+                    (140, "\'RN\'"), (60, "\'R7\'")]
 
     for i in range(4):
         step, barrel = steps_barrel[i]
@@ -25,7 +29,8 @@ def conditions_fusion(measurepoints):
 
         print(step, barrel, measurepoint)
         try:
-            output = QueryScript(f"SELECT conductivity, ph, oxygen FROM measureexposurecondition WHERE measurepoint_id = {measurepoint} and step = {step} and barrel = {barrel}").execute()
+            output = QueryScript(
+                f"SELECT conductivity, ph, oxygen FROM measureexposurecondition WHERE measurepoint_id = {measurepoint} and step = {step} and barrel = {barrel}").execute()
             output = output[0]
         except IndexError:
             output = [None, None, None]
@@ -36,12 +41,14 @@ def conditions_fusion(measurepoints):
 
     return (conductivity, ph, oxygen)
 
+
 def conditions_simple(measurepoint_id):
     conductivity = []
     ph = []
     oxygen = []
 
-    steps_barrel = [(50, "\'R0\'"), (60, "\'R7\'"), (140, "\'RN\'"), (100, "\'R21\'")]
+    steps_barrel = [(50, "\'R0\'"), (60, "\'R7\'"),
+                    (140, "\'RN\'"), (100, "\'R21\'")]
 
     for i in range(3):
         step, barrel = steps_barrel[i]

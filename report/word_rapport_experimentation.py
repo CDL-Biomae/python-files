@@ -92,6 +92,7 @@ def parser(date):
 # %% Données températures moyenne
 
 
+# a changer parce que je fais measurepoint par measurepoint
 def average_temperature(measurepoint_fusion_id):
     tempe = QueryScript(
         f"SELECT sensor3_average, sensor3_min, sensor3_max FROM average_temperature WHERE measurepoint_fusion_id = {measurepoint_fusion_id}").execute()
@@ -102,12 +103,16 @@ def average_temperature(measurepoint_fusion_id):
 # %% Récupération des données géographiques
 
 
-# on entre le nom de la campagne, cela nous ressort la liste des agences
-def campaign_to_agency(campaign):
-    QueryScript(
-        "SELECT code, name, zipcode, city, stream, lambertX, lambertY, network, hydroecoregion FROM agency WHERE")
-    return []
+# on entre le nom de la campagne, cela nous ressort les informations géographiques
+def geographic_data_agency(campaign):
+    query = QueryScript(
+        f"SELECT substring(place.reference, -2,2), agency.code, agency.name, agency.zipcode, agency.city, agency.stream, agency.lambertX, agency.lambertY, agency.network, agency.hydroecoregion FROM agency JOIN place ON agency.id = place.agency_id JOIN campaign ON place.campaign_id = campaign.id WHERE campaign.reference = '{campaign}';")
+    result = query.execute()
+    return result
 
 
-def geaographic_data():
-    return []
+# a changer parce que je fais measurepoint par measurepoint
+def geographic_data_measurepoint(measurepoint_id):
+    query = QueryScript(
+        f"SELECT latitudeSpotted, longitudeSpotted, lambertXSpotted, lambertYSpotted FROM biomae.measurepoint WHERE id={measurepoint_id}")
+    return query.execute()
