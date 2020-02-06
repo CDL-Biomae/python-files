@@ -5,6 +5,7 @@ from report import create_campagnes_dataframe
 import pandas as pd
 from openpyxl import load_workbook
 
+
 def create_filename(list_campaigns):
     filename = 'Rapport_pour'
     for c in list_campaigns:
@@ -13,13 +14,16 @@ def create_filename(list_campaigns):
 
     return filename
 
+
 def write_in_new_excel(dataframe, filename, sheet):
     PATH = f"output\\{filename}"
     writer = pd.ExcelWriter(path=PATH, engine='openpyxl')
     dataframe.to_excel(writer, sheet_name=f"{sheet}", index=False)
     writer.save()
     writer.close()
-    print(f"L'onglet \"{sheet}\" a été créé dans le nouveau fichier \"{filename}\"")
+    print(
+        f"L'onglet \"{sheet}\" a été créé dans le nouveau fichier \"{filename}\"")
+
 
 def write_in_existing_excel(dataframe, filename, sheet):
     PATH = f"output\\{filename}"
@@ -31,11 +35,13 @@ def write_in_existing_excel(dataframe, filename, sheet):
     writer.close()
     print(f"L'onglet \"{sheet}\" a été créé dans le fichier \"{filename}\"")
 
+
 def measure_points(campaign_ref):
     output = QueryScript(
         f"SELECT DISTINCT(measurepoint_fusion_id) FROM key_dates WHERE measurepoint_id IN (SELECT id FROM measurepoint WHERE reference LIKE '{campaign_ref}%');"
     )
     return output.execute()
+
 
 def create_dict_mp(list_campaigns):
     dict = {}
@@ -47,6 +53,7 @@ def create_dict_mp(list_campaigns):
 ## MAIN FUNCTION ##
 # Prend en entrée une liste de reference de campagne, ex: ['AG-003-01', 'AG-003-02']
 
+
 def main(list_campaigns):
     filename = create_filename(list_campaigns)
     print(filename)
@@ -56,14 +63,15 @@ def main(list_campaigns):
     dict_mp = create_dict_mp(list_campaigns)
 
     ## CREATION DE L'ONGLET STATIONS ##
-    stations_dataframe = create_stations_dataframe(head_dataframe, list_campaigns, dict_mp)
+    stations_dataframe = create_stations_dataframe(
+        head_dataframe, list_campaigns, dict_mp)
     write_in_new_excel(stations_dataframe, filename, 'Stations')
     # utiliser openpyxl pour changer le style de la feuille
 
     ## CREATION DE L'ONGLET CAMPAGNES ##
-    campagnes_dataframe = create_campagnes_dataframe(head_dataframe, list_campaigns, dict_mp)
+    campagnes_dataframe = create_campagnes_dataframe(
+        head_dataframe, list_campaigns, dict_mp)
     write_in_existing_excel(campagnes_dataframe, filename, 'Campagnes')
 
 
 # main(['AG-003-01', 'AG-003-02'])
-
