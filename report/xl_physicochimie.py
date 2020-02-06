@@ -34,7 +34,7 @@ def test_chimie_superieur_repro(list_mp):
 def temperatures_dataframe(list_mp):
     list_test = test_chimie_superieur_repro(list_mp)
     output = QueryScript(
-        f"SELECT sensor2_min, sensor2_moy, sensor2_max, sensor3_min, sensor3_moy, sensor3_max FROM average_temperature WHERE measurepoint_fusion_id IN {tuple(list_mp)}"
+        f"SELECT sensor2_min, sensor2_avg, sensor2_max, sensor3_min, sensor3_avg, sensor3_max FROM average_temperature WHERE measurepoint_fusion_id IN {tuple(list_mp)}"
     ).execute()
 
     matrix = []
