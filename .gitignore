@@ -2,6 +2,5 @@ env.py
 test.py
 *.xlsm
 *.xlsx
-!reference.xlsx
 *.docx
 __pycache__

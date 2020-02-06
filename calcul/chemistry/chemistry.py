@@ -12,7 +12,7 @@ def lyophilisation_pourcent(pack_id):
 def fat(pack_id):
     output = QueryScript(f"SELECT prefix, value, unit FROM analysis WHERE sandre=1358 AND pack_id={pack_id}").execute()
     if len(output) :
-        return f"{output[0][0] if output[0][0] else ''}{output[0][1]}{output[0][2]}"
+        return f"{output[0][0] if output[0][0] else ''}{output[0][1] * 100}{output[0][2]}"
     else :
         return None
     

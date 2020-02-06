@@ -72,7 +72,7 @@ def alimentation(pack_id):
     constant_alim = QueryScript(
         "SELECT value FROM r2_constant WHERE name LIKE 'Constante alim%'").execute()
     fusion_id = fusion_id_finder(pack_id)
-    average_temperature = QueryScript("SELECT sonde1_moy FROM average_temperature_table WHERE measurepoint_fusion_id="+str(fusion_id)).execute()[0]
+    average_temperature = QueryScript("SELECT sensor1_average FROM average_temperature WHERE measurepoint_fusion_id="+str(fusion_id)).execute()[0]
     eaten_leaves = leaf_size(pack_id)
     size = specimen_size(pack_id)
 

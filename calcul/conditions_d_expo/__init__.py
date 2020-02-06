@@ -1,1 +1,0 @@
-from .conditions_d_expo import *
