@@ -3,6 +3,8 @@ from report import create_head_dataframe
 from report import create_stations_dataframe
 from report import create_campagnes_dataframe
 from report import create_physicochimie_dataframe
+from report import create_dataframe
+from report import create_tox_dataframe
 import pandas as pd
 from openpyxl import load_workbook
 
@@ -60,23 +62,29 @@ def main(list_campaigns):
     print(filename)
     print('[+] Starting initialisation...')
     head_dataframe = create_head_dataframe(list_campaigns)
-    print(head_dataframe.head())
+    #print(head_dataframe.head())
     dict_mp = create_dict_mp(list_campaigns)
+    print (dict_mp['AG-003-01'])
+    #print (create_dataframe(dict_mp))
 
-    ## CREATION DE L'ONGLET STATIONS ##
-    stations_dataframe = create_stations_dataframe(
-        head_dataframe, list_campaigns, dict_mp)
+       ## CREATION DE L'ONGLET STATIONS ##
+    stations_dataframe = create_tox_dataframe(head_dataframe, list_campaigns, dict_mp)
     write_in_new_excel(stations_dataframe, filename, 'Stations')
     # utiliser openpyxl pour changer le style de la feuille
 
+    ## CREATION DE L'ONGLET STATIONS ##
+    #stations_dataframe = create_stations_dataframe(head_dataframe, list_campaigns, dict_mp)
+    #write_in_new_excel(stations_dataframe, filename, 'Stations')
+    # utiliser openpyxl pour changer le style de la feuille
+
     ## CREATION DE L'ONGLET CAMPAGNES ##
-    campagnes_dataframe = create_campagnes_dataframe(
-        head_dataframe, list_campaigns, dict_mp)
-    write_in_existing_excel(campagnes_dataframe, filename, 'Campagnes')
+    #campagnes_dataframe = create_campagnes_dataframe(
+    #head_dataframe, list_campaigns, dict_mp)
+    #write_in_existing_excel(campagnes_dataframe, filename, 'Campagnes')
 
     ## CREATION DE L'ONGLET PHYSICO-CHIMIE ##
-    physicochimie_dataframe = create_physicochimie_dataframe(head_dataframe, list_campaigns, dict_mp)
-    write_in_existing_excel(physicochimie_dataframe, filename, 'Physico-chimie')
+    #physicochimie_dataframe = create_physicochimie_dataframe(head_dataframe, list_campaigns, dict_mp)
+    #write_in_existing_excel(physicochimie_dataframe, filename, 'Physico-chimie')
 
 
 # main(['AG-003-01', 'AG-003-02'])

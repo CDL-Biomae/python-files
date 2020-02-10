@@ -6,7 +6,7 @@ def create_dataframe(list_mp):
     matrix = []
     list_pi = []
     
-
+    print(len(list_mp))
     for i in range(len(list_mp)):
         list_pi.append(pack_finder(list_mp[i]))
 
