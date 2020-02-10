@@ -59,12 +59,11 @@ def leaf_size(pack_id):
         "SELECT value FROM r2_constant WHERE name='Nombre de jour du test'").execute()[0]
     for element in leaf_remaining:
         if element[0] == 0:
-            replicate_raw_value = element[1] * \
-                replicate_leaf_number/standard_leaf_number
+            replicate_raw_value = element[1]*replicate_leaf_number/standard_leaf_number
     survivor = survie_alim(pack_id)    
     ############## ICI DEMANDEZ A REMI #############
     eaten_leaves = [(replicate_raw_value - leaf_remaining[i][1]) /
-                    survivor[i-1]/test_duration*0.0071 for i in range(1, 5)]
+                    survivor[i-1]/test_duration*0.0071 for i in range(1, len(survivor))]
     ############################################################################
     return eaten_leaves
 
