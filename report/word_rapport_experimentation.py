@@ -3,7 +3,7 @@ from tools import QueryScript
 from report import measure_points
 
 
-def create_doc(campain):
+def create_doc(campaign):
     doc = Document('Page_de_garde.docx')
     style = doc.styles['Normal']
     font = style.font
@@ -74,7 +74,7 @@ def data_exposure_condition_simple(measurepoint_id):
             dico_temp["conductivity"] = output[2]
             dico_temp["oxygen"] = output[3]
             dico_temp["ph"] = output[4]
-    dico[days[i]] = dico_temp
+        dico[days[i]] = dico_temp
 
     return dico
 
