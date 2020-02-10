@@ -1,12 +1,13 @@
 from calcul import contexte
 import pandas as pd
-
+from . import measurepoint_result
 ## CREATING DATAFRAME ##
 def create_dataframe(list_mp):
     matrix = []
 
     for i in range(len(list_mp)):
         mp = list_mp[i]
+        measurepoint_result(mp)
         [J0, J14, JN, N, J21] = contexte(mp)
 
         temp = [J0, J14, JN, N, J21]
