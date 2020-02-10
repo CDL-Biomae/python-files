@@ -1,14 +1,7 @@
-from docx import Document
 from tools import QueryScript
 from report import measure_points
 
-
-def create_doc(campain):
-    doc = Document('Page_de_garde.docx')
-    style = doc.styles['Normal']
-    font = style.font
-    font.name = "Arial"
-    return []
+# %% Fonction principale pour tout appeler
 
 
 def recuperation_donnee(campaign):
@@ -17,10 +10,10 @@ def recuperation_donnee(campaign):
     for measurepoint in measurepoints_fusion_id_list:
         data = data_exposure_condition(measurepoint)
         dico_exposure_condition[data[0]] = data[1]
-    dico_avg_tempe_geo_mp = average_temperature__geographic_data_measurepoint(
+    dico_avg_tempe, dico_geo_mp = average_temperature__geographic_data_measurepoint(
         measurepoints_fusion_id_list)
     dico_geo_agency = geographic_data_agency(campaign)
-    return dico_exposure_condition, dico_avg_tempe_geo_mp, dico_geo_agency
+    return dico_exposure_condition, dico_avg_tempe, dico_geo_mp, dico_geo_agency
 
 # %% Données exposure condition
 
@@ -94,14 +87,18 @@ def parser(date):
 
 def average_temperature__geographic_data_measurepoint(measurepoint_fusion_id_list):
     measurepoint_fusion_id_list = tuple(measurepoint_fusion_id_list)
-    dico = {}
+    dico_temperature = {}
+    dico_geo_data = {}
     tempe = QueryScript(
         f"SELECT substring(reference, -5,2), sensor3_average, sensor3_min, sensor3_max, latitudeSpotted, longitudeSpotted, lambertXSpotted, lambertYSpotted FROM average_temperature JOIN measurepoint ON average_temperature.measurepoint_fusion_id = measurepoint.id WHERE average_temperature.measurepoint_fusion_id IN {measurepoint_fusion_id_list}").execute()
     for elt in tempe:
-        dico_temp = {'min': elt[2], 'average': elt[1], 'max': elt[3], 'latitudeSpotted': elt[4],
-                     'longitudeSpotted': elt[5], 'lambertXSpotted': elt[6], 'lambertYSpotted': elt[7]}
-        dico[elt[0]] = dico_temp
-    return dico
+        dico_temp_temperature = {
+            'min': elt[2], 'average': elt[1], 'max': elt[3]}
+        dico_temp_geo = {'latitudeSpotted': elt[4],
+                         'longitudeSpotted': elt[5], 'lambertXSpotted': elt[6], 'lambertYSpotted': elt[7]}
+        dico_temperature[elt[0]] = dico_temp_temperature
+        dico_geo_data[elt[0]] = dico_temp_geo
+    return dico_temperature, dico_geo_data
 
 # %% Récupération des données géographiques de l'onglet agency
 
