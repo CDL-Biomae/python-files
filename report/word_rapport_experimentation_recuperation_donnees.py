@@ -89,7 +89,7 @@ def parser(date):
     minute = date.minute
     return f"{day}/{month}/{year} {hour}:{minute}"
 
-# %% Données températures moyenne
+# %% Données températures moyenne et données géographiques récupérées dans l'onglet measurepoint
 
 
 def average_temperature__geographic_data_measurepoint(measurepoint_fusion_id_list):
@@ -103,7 +103,7 @@ def average_temperature__geographic_data_measurepoint(measurepoint_fusion_id_lis
         dico[elt[0]] = dico_temp
     return dico
 
-# %% Récupération des données géographiques
+# %% Récupération des données géographiques de l'onglet agency
 
 
 # on entre le nom de la campagne, cela nous ressort les informations géographiques
