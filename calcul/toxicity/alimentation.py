@@ -79,9 +79,7 @@ def alimentation(pack_id):
     mean_size = sum(size)/len(size)
     inhibition_replicate = []
 
-    expected_eaten_value = constant_alim[0] * average_temperature + constant_alim[1] + constant_alim[2] * (
-        mean_size - constant_alim[3]) 
-    inhibition_list = [(eaten_leaf - expected_eaten_value) /
-                       expected_eaten_value for eaten_leaf in eaten_leaves]
+    expected_eaten_value = constant_alim[0] * average_temperature + constant_alim[1] + constant_alim[2] * ( mean_size - constant_alim[3]) 
+    inhibition_list = [(eaten_leaf - expected_eaten_value) /expected_eaten_value for eaten_leaf in eaten_leaves]
     
     return sum(inhibition_list)/len(inhibition_list)*100
