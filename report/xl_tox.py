@@ -5,7 +5,6 @@ import pandas as pd
 def create_dataframe(list_mp):
     matrix = []
     list_pi = []
-    
     print(len(list_mp))
     for i in range(len(list_mp)):
         list_pi.append(pack_finder(list_mp[i]))
@@ -21,11 +20,7 @@ def create_dataframe(list_mp):
             print(survie7jour)
             print(femalesurvivor)
 
-
-    
-       
-
-    
+           
     df = pd.DataFrame(matrix)
     df.columns = ['Survie Male - 7 jours', 'Alimentation','Neurotoxicité AChE', 'Survie Femelle','Nombre joursexposition in situ', 'n','indice/n','Cycle de mue','n','Perturbation endocrinienne']
     df = df.dropna(how='all', axis='columns')

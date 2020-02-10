@@ -5,7 +5,7 @@ from report import create_campagnes_dataframe
 from report import create_physicochimie_dataframe
 from report import create_dataframe
 from report import create_tox_dataframe
-from report import add_style_stations
+
 import pandas as pd
 from openpyxl import load_workbook
 
@@ -65,13 +65,15 @@ def main(list_campaigns):
     head_dataframe = create_head_dataframe(list_campaigns)
     #print(head_dataframe.head())
     dict_mp = create_dict_mp(list_campaigns)
-    print (dict_mp['AG-003-01'])
+    
+    create_tox_dataframe(head_dataframe, list_campaigns, dict_mp)
+    
     #print (create_dataframe(dict_mp))
 
        ## CREATION DE L'ONGLET STATIONS ##
-    stations_dataframe = create_tox_dataframe(head_dataframe, list_campaigns, dict_mp)
-    write_in_new_excel(stations_dataframe, filename, 'Stations')
-    add_style_stations(stations_dataframe, filename)
+    #stations_dataframe = create_tox_dataframe(head_dataframe, list_campaigns, dict_mp)
+    #write_in_new_excel(stations_dataframe, filename, 'Stations')
+    #add_style_stations(stations_dataframe, filename)
 
     ## CREATION DE L'ONGLET STATIONS ##
     #stations_dataframe = create_stations_dataframe(head_dataframe, list_campaigns, dict_mp)
