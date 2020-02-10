@@ -79,5 +79,3 @@ def main(list_campaigns):
     # physicochimie_dataframe = create_physicochimie_dataframe(head_dataframe, list_campaigns, dict_mp)
     # write_in_existing_excel(physicochimie_dataframe, filename, 'Physico-chimie')
 
-
-# main(['AG-003-01', 'AG-003-02'])
