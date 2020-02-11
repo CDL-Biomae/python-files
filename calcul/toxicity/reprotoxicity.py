@@ -8,7 +8,7 @@ def number_days_exposition(pack_id):
      SQL_request = "SELECT date FROM key_dates where date_id IN(4,6) and measurepoint_fusion_id="+str(fusion_id)
      LR_dates =  QueryScript(SQL_request).execute()
      
-     if(LR_dates!=""):
+     if(LR_dates==" "):
           return "NA"
      else:
           nbrdays =  LR_dates[0]-LR_dates[1]
@@ -157,6 +157,7 @@ def Result_Fertility(pack_id):
           return "conforme"
      else:
           return ""
+          
 def endocrine_disruption(pack_id):
 
      female_concerned = number_female_concerned_area(pack_id)

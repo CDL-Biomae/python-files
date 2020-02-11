@@ -1,11 +1,10 @@
 from tools import QueryScript, fusion_id_finder
+from math import *
 
 def survie_alim(pack_id):
-    SQL_request = "SELECT scud_survivor,scud_quantity FROM cage where pack_id="+str(pack_id)+" and nature='alimentation' and scud_survivor!='null' "
+    SQL_request = "SELECT scud_survivor,scud_quantity FROM cage where pack_id="+str(pack_id)+" and scud_survivor is not null "
     resultat2 = []
     resultat =  QueryScript(SQL_request).execute()
-    
-    
     for j in range(len(resultat)) :       
          tmp = sum(resultat[j])/len(resultat[j])
          resultat2.append(tmp)
@@ -15,16 +14,16 @@ def survie_alim(pack_id):
 
 def survie_7jour(pack_id):
     survi_alim = survie_alim(pack_id)
-    SQL_request = "SELECT scud_survivor,scud_quantity FROM cage where pack_id="+str(pack_id)+" and nature='alimentation' and scud_survivor!='null'"
+    SQL_request = "SELECT scud_survivor,scud_quantity FROM cage where pack_id="+str(pack_id)+" and scud_survivor is not null"
     resultat =  QueryScript(SQL_request).execute()
     survivor = []
     quantity =[]
-    for i in range(len(resultat)) :
+    for i in range(len(resultat)):
             survivor.append(resultat[i][0])
             quantity.append(resultat[i][1])
 
     if sum(survi_alim) == 0:
-        return "0"
+        return 0
     else:
         return sum(survivor)/len(survivor)/quantity[0]*100
 
