@@ -1,4 +1,3 @@
-from docx import Document
 from report import recuperation_donnee
 
 
