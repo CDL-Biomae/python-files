@@ -1,11 +1,12 @@
 from tools import QueryScript
 from report import create_head_dataframe
 from report import create_stations_dataframe
-from report import create_campagnes_dataframe
-from report import create_physicochimie_dataframe
 from report import add_style_stations
-from report import create_dataframe
-from report import create_tox_dataframe
+from report import create_campagnes_dataframe
+from report import add_style_campagnes
+from report import create_physicochimie_dataframe
+# from report import create_dataframe
+# from report import create_tox_dataframe
 
 import pandas as pd
 from openpyxl import load_workbook
@@ -61,26 +62,28 @@ def create_dict_mp(list_campaigns):
 
 def main(list_campaigns):
     filename = create_filename(list_campaigns)
-    print(filename)
-    print('[+] Starting initialisation...')
+    print(f"\nCréation d'un rapport sous le nom {filename}")
+    print('\n[!] Début de l\'initialisation...')
     head_dataframe = create_head_dataframe(list_campaigns)
-    #print(head_dataframe.head())
     dict_mp = create_dict_mp(list_campaigns)
-
-    create_tox_dataframe(head_dataframe, list_campaigns, dict_mp)
+    print('[+] Initialisation ')
+    # create_tox_dataframe(head_dataframe, list_campaigns, dict_mp)
 
     #print (create_dataframe(dict_mp))
 
     ## CREATION DE L'ONGLET STATIONS ##
+    print('\n[!] Création de l\'onglet \"Stations\"...')
     stations_dataframe = create_stations_dataframe(
         head_dataframe, list_campaigns, dict_mp)
     write_in_new_excel(stations_dataframe, filename, 'Stations')
     add_style_stations(stations_dataframe, filename)
 
     ## CREATION DE L'ONGLET CAMPAGNES ##
-    # campagnes_dataframe = create_campagnes_dataframe(
-    #     head_dataframe, list_campaigns, dict_mp)
-    # write_in_existing_excel(campagnes_dataframe, filename, 'Campagnes')
+    print('\n[!] Création de l\'onglet \"Campagnes\"...')
+    campagnes_dataframe = create_campagnes_dataframe(
+        head_dataframe, list_campaigns, dict_mp)
+    write_in_existing_excel(campagnes_dataframe, filename, 'Campagnes')
+    add_style_campagnes(campagnes_dataframe, filename)
 
     ## CREATION DE L'ONGLET PHYSICO-CHIMIE ##
     # physicochimie_dataframe = create_physicochimie_dataframe(head_dataframe, list_campaigns, dict_mp)

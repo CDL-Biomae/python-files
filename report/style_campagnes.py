@@ -4,12 +4,12 @@ from openpyxl.utils.cell import get_column_letter
 import pandas as pd
 
 
-def add_style_stations(stations_dataframe, filename):
+def add_style_campagnes(campagnes_dataframe, filename):
     PATH = f"output\\{filename}"
     wb = load_workbook(PATH)
-    ws = wb.get_sheet_by_name('Stations')
+    ws = wb.get_sheet_by_name('Campagnes')
 
-    nb_rows, nb_columns = stations_dataframe.shape
+    nb_rows, nb_columns = campagnes_dataframe.shape
 
     borders = Border(left=Side(border_style='thin', color='FF000000'),
                      right=Side(border_style='thin', color='FF000000'),
@@ -53,5 +53,5 @@ def add_style_stations(stations_dataframe, filename):
     wb.save(PATH)
     wb.close()
 
-    print('[+] La mise en page de l\'onglet \"Stations\" est terminée')
+    print('[+] La mise en page de l\'onglet \"Campagnes\" est terminée')
 

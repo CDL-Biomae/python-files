@@ -27,14 +27,13 @@ def conditions_fusion(measurepoints):
         else:
             measurepoint = id_mp_1
 
-        print(step, barrel, measurepoint)
         try:
             output = QueryScript(
                 f"SELECT conductivity, ph, oxygen FROM measureexposurecondition WHERE measurepoint_id = {measurepoint} and step = {step} and barrel = {barrel}").execute()
             output = output[0]
         except IndexError:
             output = [None, None, None]
-        print(output)
+
         conductivity.append(output[0])
         ph.append(output[1])
         oxygen.append(output[2])

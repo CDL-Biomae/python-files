@@ -16,7 +16,6 @@ def list_agency_finder(list_mp):
     output = QueryScript(
         f"SELECT measurepoint.id, code FROM agency JOIN place ON agency.id = place.agency_id JOIN measurepoint ON place.id = measurepoint.place_id WHERE measurepoint.id IN {tuple(list_mp)};"
     ).execute()
-    print(output)
     if len(output) == len(list_mp):
         list_agency = [x[1] for x in output]
         return list_agency
@@ -30,6 +29,4 @@ def list_agency_finder(list_mp):
                 list_agency.append(output[idx_code][1])
             except ValueError:
                 list_agency.append(None)
-
-        print(list_agency)
         return list_agency
