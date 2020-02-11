@@ -15,16 +15,29 @@ def campaign(campaign_ref):
 def measure_points(campaign_ref):
     output = QueryScript(
         f"SELECT DISTINCT(measurepoint_fusion_id) FROM key_dates WHERE measurepoint_id IN (SELECT id FROM measurepoint WHERE reference LIKE '{campaign_ref}%');"
-    )
-    return output.execute()
+    ).execute()
+    if len(output) == 0:
+        raise NameError('\n\n     /!\\ La référence de campagne demandée n\'existe pas dans la base de donnée /!\\')
+    return output
 
 
 def number_name_mp(list_mp):
     output = QueryScript(
-        f"SELECT substring(place.reference, -2, 2), measurepoint.name FROM measurepoint JOIN place ON place.id = measurepoint.place_id WHERE measurepoint.id in {tuple(list_mp)}"
+        f"SELECT measurepoint.id, substring(place.reference, -2, 2), measurepoint.name FROM measurepoint JOIN place ON place.id = measurepoint.place_id WHERE measurepoint.id in {tuple(list_mp)}"
     ).execute()
-    list_number = [x[0] for x in output]
-    list_name = [x[1] for x in output]
+
+    list_number = []
+    list_name = []
+    list_mp_output = [x[0] for x in output]
+    for mp_id in list_mp:
+        try:
+            idx_code = list_mp_output.index(mp_id)
+        except ValueError:
+            list_number.append(None)
+            list_name.append(None)
+        else:
+            list_number.append(output[idx_code][1])
+            list_name.append(output[idx_code][2])
 
     return list_number, list_name
 

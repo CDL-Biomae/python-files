@@ -33,7 +33,6 @@ def conditions_fusion(measurepoints):
             output = output[0]
         except IndexError:
             output = [None, None, None]
-
         conductivity.append(output[0])
         ph.append(output[1])
         oxygen.append(output[2])
@@ -49,7 +48,7 @@ def conditions_simple(measurepoint_id):
     steps_barrel = [(50, "\'R0\'"), (60, "\'R7\'"),
                     (140, "\'RN\'"), (100, "\'R21\'")]
 
-    for i in range(3):
+    for i in range(4):
         step, barrel = steps_barrel[i]
 
         try:
@@ -58,8 +57,8 @@ def conditions_simple(measurepoint_id):
             output = output[0]
         except IndexError:
             output = [None, None, None]
-
         conductivity.append(output[0])
         ph.append(output[1])
         oxygen.append(output[2])
+
     return conductivity, ph, oxygen

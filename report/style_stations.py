@@ -1,7 +1,7 @@
 from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
 from openpyxl import load_workbook
 from openpyxl.utils.cell import get_column_letter
-import pandas as pd
+from termcolor import colored
 
 
 def add_style_stations(stations_dataframe, filename):
@@ -53,5 +53,5 @@ def add_style_stations(stations_dataframe, filename):
     wb.save(PATH)
     wb.close()
 
-    print('[+] La mise en page de l\'onglet \"Stations\" est terminée')
+    print(colored('[+] La mise en page de l\'onglet \"Stations\" est terminée', 'green'))
 
