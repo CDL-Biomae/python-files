@@ -38,22 +38,17 @@ def clean(dataframe):
 def create_dataframe(campaign_str):
     campaign_id = campaign(campaign_str)
     list_mp = measure_points(campaign_str)
-    print(list_mp)
     list_number, list_name = number_name_mp(list_mp)
     list_agency = agency_mp(list_mp)
-    print(list_agency)
 
     matrix = []
 
     for i in range(len(list_mp)):
-        mp = list_mp[i]
-        print(mp)
         number = int(list_number[i])
         name = list_name[i]
         agency = list_agency[i]
 
         temp = [campaign_id, number, name, agency]
-        print(temp)
         matrix.append(temp)
 
     df = pd.DataFrame(matrix)

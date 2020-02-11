@@ -1,27 +1,28 @@
-from calcul import contexte
+from calcul import chemistry, elements_crustacean, elements_fish
 import pandas as pd
-from . import measurepoint_result
-## CREATING DATAFRAME ##
+from tools import QueryScript
+
+## CREATE DATAFRAME ##
 def create_dataframe(list_mp):
     matrix = []
 
     for i in range(len(list_mp)):
         mp = list_mp[i]
-        [J0, J14, JN, N, J21] = contexte(mp)
-
-        temp = [J0, J14, JN, N, J21]
-        matrix.append(temp)
-
+        pack = QueryScript(f"SELECT id FROM pack WHERE nature='chemistry' AND measurepoint_id={mp}").execute()
+        if len(pack)>0:
+            [crustacean, fish] = chemistry.data(pack[0])[:2]
+            matrix.append(crustacean + [''] + fish)
+        else:
+            print(pack)
     df = pd.DataFrame(matrix)
-    df.columns = ['Intervention (J0)', 'Intervention (J14)',
-                  'Intervention (JN)', 'N', 'Intervention (J21)']
+    df.columns =list(elements_crustacean.values()) + [''] + list(elements_fish.values())
     df = df.dropna(how='all', axis='columns')
 
     return df
 
 
 ## MAIN FUNCTION ##
-def create_campagnes_dataframe(head_dataframe, list_campaigns, dict_mp):
+def create_nqe_dataframe(head_dataframe, list_campaigns, dict_mp):
     list_dataframe = []
     for campaign_str in list_campaigns:
         list_mp = dict_mp[campaign_str]
@@ -33,3 +34,6 @@ def create_campagnes_dataframe(head_dataframe, list_campaigns, dict_mp):
     df_campaigns = df_concat.sort_values('Numéro')
 
     return df_campaigns
+
+        
+        

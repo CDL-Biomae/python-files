@@ -11,11 +11,10 @@ def create_dataframe(list_mp):
         [network, hydroecoregion, stream, zipcode, city, latitude, longitude, lambertY, lambertX, real_latitude, real_longitude] = row
 
         address = f"{zipcode} {city}"
-        coor_ref = f"{latitude}, {longitude}"
-        coor_ref_lambert = f"Y {lambertY}, X {lambertX}"
-        coor_real = f"{real_latitude}, {real_longitude}"
+        coor_ref = f"{latitude}; {longitude}"
+        coor_ref_lambert = f"Y {lambertY}; X {lambertX}"
+        coor_real = f"{real_latitude}; {real_longitude}"
 
-        print(coor_ref, coor_real)
         temp = [network, hydroecoregion, stream, address, coor_ref, coor_ref_lambert, coor_real]
         matrix.append(temp)
 

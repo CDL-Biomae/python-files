@@ -9,7 +9,7 @@ def recuperation_donnee(campaign):
     dico_exposure_condition = {}
     for measurepoint in measurepoints_fusion_id_list:
         data = data_exposure_condition(measurepoint)
-        dico_exposure_condition[data[0]] = data[1]
+        dico_exposure_condition[int(data[0])] = data[1]
     dico_avg_tempe, dico_geo_mp = average_temperature__geographic_data_measurepoint(
         measurepoints_fusion_id_list)
     dico_geo_agency = geographic_data_agency(campaign)
@@ -96,8 +96,8 @@ def average_temperature__geographic_data_measurepoint(measurepoint_fusion_id_lis
             'min': elt[2], 'average': elt[1], 'max': elt[3]}
         dico_temp_geo = {'latitudeSpotted': elt[4],
                          'longitudeSpotted': elt[5], 'lambertXSpotted': elt[6], 'lambertYSpotted': elt[7]}
-        dico_temperature[elt[0]] = dico_temp_temperature
-        dico_geo_data[elt[0]] = dico_temp_geo
+        dico_temperature[int(elt[0])] = dico_temp_temperature
+        dico_geo_data[int(elt[0])] = dico_temp_geo
     return dico_temperature, dico_geo_data
 
 # %% Récupération des données géographiques de l'onglet agency
@@ -111,5 +111,5 @@ def geographic_data_agency(campaign):
     for elt in query:
         dico_temp = {'code': elt[1], 'name': elt[2], 'zipcode': elt[3], 'city': elt[4], 'stream': elt[5],
                      'lambertX': elt[6], 'lambertY': elt[7], 'network': elt[8], 'hydroecoregion': elt[9]}
-        dico[elt[0]] = dico_temp
+        dico[int(elt[0])] = dico_temp
     return dico
