@@ -5,6 +5,8 @@ from report import add_style_stations
 from report import create_campagnes_dataframe
 from report import add_style_campagnes
 from report import create_physicochimie_dataframe
+from report import create_dataframe
+from report import create_tox_dataframe
 from report import create_nqe_dataframe
 
 # from report import create_dataframe
