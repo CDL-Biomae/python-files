@@ -3,4 +3,5 @@ test.py
 *.xlsm
 *.xlsx
 *.docx
+*.jpg
 __pycache__
