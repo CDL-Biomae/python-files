@@ -30,6 +30,8 @@ def create_nqe_dataframe(head_dataframe, list_campaigns, dict_mp):
         list_dataframe.append(df)
 
     df_values = pd.concat(list_dataframe)
+    print(head_dataframe.shape)
+    print(df_values.shape)
     df_concat = pd.concat([head_dataframe, df_values], axis=1)
     df_campaigns = df_concat.sort_values('Numéro')
 
