@@ -1,4 +1,4 @@
-from tools import list_to_dict, pack_finder, QueryScript
+from tools import list_to_dict, QueryScript
 import numpy as np
 
 
@@ -39,7 +39,7 @@ def liste_temperature(measurepoint_fusion_id, num_sensor):
 
     pack_id = []
     for mp_id in measurepoint_id:
-        pack_id += pack_finder(mp_id)
+        pack_id += QueryScript(f"SELECT id FROM pack WHERE measurepoint_id={mp_id}").execute()
     if len(pack_id) == 0:
         return []
 
@@ -71,7 +71,7 @@ def liste_temperature(measurepoint_fusion_id, num_sensor):
 
     # for mp_id in measurepoint_id:
     #     SQL_request_temperature_sensor += "{},".format(mp_id)
-    #     pack_id += pack_finder(mp_id)
+    #     pack_id += QueryScript(f"SELECT id FROM pack WHERE measurepoint_id={mp_id}").execute()
     # SQL_request_temperature_sensor = SQL_request_temperature_sensor[:-1]
     if len(pack_id) > 1:
         SQL_request_temperature_sensor += f" OR pack_id IN{tuple(pack_id)} )"
