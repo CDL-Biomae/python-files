@@ -10,6 +10,7 @@ from report import add_style_nqe
 from report import create_dataframe
 from report import create_tox_dataframe
 from report import create_nqe_dataframe
+from report import add_style_nqe
 
 # from report import create_dataframe
 # from report import create_tox_dataframe
@@ -77,19 +78,17 @@ def main(list_campaigns):  # Prend en entrée une liste de reference de campagne
 
     #print (create_dataframe(dict_mp))
 
-    # ## CREATION DE L'ONGLET STATIONS ##
-    # print('\n[!] Création de l\'onglet \"Stations\"...')
-    # stations_dataframe = create_stations_dataframe(
-    #     head_dataframe, list_campaigns, dict_mp)
-    # write_in_new_excel(stations_dataframe, filename, 'Stations')
-    # add_style_stations(stations_dataframe, filename)
+    ## CREATION DE L'ONGLET STATIONS ##
+    print('\n[!] Création de l\'onglet \"Stations\"...')
+    stations_dataframe = create_stations_dataframe(head_dataframe, list_campaigns, dict_mp)
+    write_in_new_excel(stations_dataframe, filename, 'Stations')
+    add_style_stations(stations_dataframe, filename)
 
     ## CREATION DE L'ONGLET CAMPAGNES ##
-    # print('\n[!] Création de l\'onglet \"Campagnes\"...')
-    # campagnes_dataframe = create_campagnes_dataframe(
-    #     head_dataframe, list_campaigns, dict_mp)
-    # write_in_existing_excel(campagnes_dataframe, filename, 'Campagnes')
-    # add_style_campagnes(campagnes_dataframe, filename)
+    print('\n[!] Création de l\'onglet \"Campagnes\"...')
+    campagnes_dataframe = create_campagnes_dataframe(head_dataframe, list_campaigns, dict_mp)
+    write_in_existing_excel(campagnes_dataframe, filename, 'Campagnes')
+    add_style_campagnes(campagnes_dataframe, filename)
 
     ## CREATION DE L'ONGLET PHYSICO-CHIMIE ##
     # print('\n[!] Création de l\'onglet \"Physico-chimie\"...')

@@ -5,12 +5,12 @@ import pandas as pd
 from calcul import chemistry, elements_crustacean, elements_fish
 
 
-def add_style_nqe(campagnes_dataframe, filename):
+def add_style_nqe(nqe_dataframe, filename):
     PATH = f"output\\{filename}"
     wb = load_workbook(PATH)
     ws = wb['NQE Biote']
     
-    nb_rows, nb_columns = campagnes_dataframe.shape
+    nb_rows, nb_columns = nqe_dataframe.shape
     header_row = '4'
     header_columns = [get_column_letter(col_idx) for col_idx in list(range(2, nb_columns + 2))]
     borders = Border(left=Side(border_style='thin', color='FFFFFF'),
@@ -18,8 +18,8 @@ def add_style_nqe(campagnes_dataframe, filename):
                      top=Side(border_style='thin', color='FFFFFF'),
                      bottom=Side(border_style='thin', color='FFFFFF'))
     
-    for letter in  [get_column_letter(col_idx) for col_idx in range(1,nb_columns+2)] :
-        for number in range(1,nb_rows+5):
+    for letter in [get_column_letter(col_idx) for col_idx in range(1, nb_columns+2)]:
+        for number in range(1, nb_rows+5):
             ws[letter+str(number)].border = borders
     
     ## UNIT 
