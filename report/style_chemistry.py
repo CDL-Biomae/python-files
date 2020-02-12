@@ -2,6 +2,7 @@ from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
 from openpyxl import load_workbook
 from openpyxl.utils.cell import get_column_letter
 import pandas as pd
+from calcul import chemistry, elements_crustacean, elements_fish
 
 
 def add_style_nqe(campagnes_dataframe, filename):
@@ -21,6 +22,27 @@ def add_style_nqe(campagnes_dataframe, filename):
         for number in range(1,nb_rows+5):
             ws[letter+str(number)].border = borders
     
+    ## UNIT 
+    # a ordonner
+    [unit_crustacean, sandre_crustacean] = chemistry.get_unit(elements_crustacean.keys()) 
+    [unit_fish, sandre_fish] = chemistry.get_unit(elements_fish.keys()) 
+    print(unit_fish,sandre_fish)
+    unit_fish.append('')
+    sandre_fish.append('')
+    index = 0
+    for letter in header_columns[5:]:
+        try :
+            ws[letter + '2'] = unit_crustacean[index]
+            ws[letter + '3'] = sandre_crustacean[index]
+            index+=1
+        except:
+            try : 
+                ws[letter + '2'] = unit_fish[index - len(unit_crustacean)-1]
+                ws[letter + '3'] = sandre_fish[index - len(unit_crustacean)-1]
+                index+=1
+            except :
+                a=1
+                
     
     ## HEADER STYLE ##
     
@@ -37,6 +59,7 @@ def add_style_nqe(campagnes_dataframe, filename):
     header_cells = [c+header_row for c in header_columns]
     header_font = Font(size=8, bold=True, name='Arial')
     header_alignment_rotate = Alignment(horizontal='center', vertical='bottom', text_rotation=90)
+    header_alignment_no_rotate = Alignment(horizontal='center', vertical='bottom')
     borders = Border(left=Side(border_style='thin', color='FF000000'),
                      right=Side(border_style='thin', color='FF000000'),
                      top=Side(border_style='thin', color='FF000000'),
@@ -51,10 +74,13 @@ def add_style_nqe(campagnes_dataframe, filename):
             ws[letter+str(number)].border = borders
             ws[letter+str(number)].font = header_font
     ws['B2'].alignment = header_alignment_rotate
+    ws['C2'].alignment = header_alignment_no_rotate
+    ws['D2'].alignment = header_alignment_no_rotate
     ws['E2'].alignment = header_alignment_rotate
     
     
-        
+    
+    header_font = Font(size=8, name='Arial')
     
     for letter in header_columns[4:]:
         if (ws[letter+'5'].value !=None and ws[letter+'5'].value !='') :
@@ -62,8 +88,14 @@ def add_style_nqe(campagnes_dataframe, filename):
             ws.column_dimensions[letter].width=5
             ws[letter+'4'].alignment = header_alignment_rotate
             ws[letter+'4'].font = header_font
+            ws[letter+'3'].alignment = header_alignment_no_rotate
+            ws[letter+'3'].font = header_font
+            ws[letter+'2'].alignment = header_alignment_no_rotate
+            ws[letter+'2'].font = header_font
         else :
             ws.column_dimensions[letter].width=2
+            
+    
     
     # for letter in header_columns:
     #     for i in range(2,6):
