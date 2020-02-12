@@ -8,6 +8,7 @@ from .xl_tox import *
 from .style_stations import *
 from .style_campagnes import *
 from .style_chemistry import *
+from .style_physicochimie import *
 from .word_rapport_experimentation_recuperation_donnees import *
 from .word_rapport_experimentation_creation_fichier import *
 
