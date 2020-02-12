@@ -11,10 +11,8 @@ def add_style_stations(stations_dataframe, filename):
 
     nb_rows, nb_columns = stations_dataframe.shape
 
-    borders = Border(left=Side(border_style='thin', color='FF000000'),
-                     right=Side(border_style='thin', color='FF000000'),
-                     top=Side(border_style='thin', color='FF000000'),
-                     bottom=Side(border_style='thin', color='FF000000'))
+    medium = Side(border_style='medium', color='FF000000')
+    borders = Border(top=medium, left=medium, right=medium, bottom=medium)
 
     ## HEADER STYLE ##
     header_row = '2'

@@ -22,6 +22,7 @@ def weight(pack_id):
         return [output[0][0]-output[0][1], (output[0][0]-output[0][1])/output[0][2], output[0][4]-output[0][3]]
     else :
         return None
+    
 def survival(pack_id):
     survival_list = QueryScript(f"SELECT scud_quantity, scud_survivor FROM cage WHERE pack_id={pack_id} AND scud_survivor IS NOT NULL").execute()
     if len(survival_list):
@@ -48,6 +49,9 @@ def convert_list(list_converted):
                 list_converted[i] = f'{list_converted[i]}'
             
     return list_converted
+
+def get_unit(pack_id,sandre_list):
+    return QueryScript(f"SELECT sandre, unit FROM analysis WHERE pack_id={pack_id} AND sandre IN {tuple(sandre_list)}").execute()
 
 def data(pack_id):
     
