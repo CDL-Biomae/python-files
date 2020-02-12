@@ -30,6 +30,7 @@ def create_campagnes_dataframe(head_dataframe, list_campaigns, dict_mp):
 
     df_values = pd.concat(list_dataframe)
     df_concat = pd.concat([head_dataframe, df_values], axis=1)
-    df_campaigns = df_concat.sort_values('Numéro')
+    df_campaigns = df_concat.sort_values(['Numéro', 'Campagne'])
+
 
     return df_campaigns
