@@ -133,16 +133,6 @@ def geographic_data_agency(campaign):
 # %% Récupération type de biotest
 
 
-# def type_biotest(campaign):
-#     query = QueryScript(
-#         f"SELECT substring(measurepoint.reference,-5,2), pack.nature FROM measurepoint JOIN pack ON pack.measurepoint_id = measurepoint.id WHERE measurepoint.reference LIKE '{campaign}'")
-#     pack_id = []
-#     for mp_id in measurepoint_id:
-#         pack_id += QueryScript(
-#             f"SELECT id FROM pack WHERE measurepoint_id={mp_id}").execute()
-#     if len(pack_id) == 0:
-#         return []
-
 def type_biotest(measurepoint_fusion_id):
     query = QueryScript(
         f"SELECT DISTINCT pack.nature FROM pack JOIN key_dates ON pack.measurepoint_id = key_dates.measurepoint_id WHERE key_dates.measurepoint_fusion_id = {measurepoint_fusion_id}").execute()
