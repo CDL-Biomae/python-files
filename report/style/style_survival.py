@@ -7,7 +7,7 @@ from termcolor import colored
 def add_style_survie(survie_dataframe, filename):
     PATH = f"output\\{filename}"
     wb = load_workbook(PATH)
-    ws = wb.get_sheet_by_name('Survie')
+    ws = wb['Survie']
 
     nb_rows, nb_columns = survie_dataframe.shape
 

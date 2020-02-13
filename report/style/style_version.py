@@ -6,7 +6,7 @@ from termcolor import colored
 def add_style_version(version_dataframe, list_campaigns, filename):
     PATH = f"output\\{filename}"
     wb = load_workbook(PATH)
-    ws = wb.get_sheet_by_name('Version')
+    ws = wb['Version']
 
     thin = Side(style='thin', color='000000')
     thin_borders = Border(top=thin, left=thin, right=thin, bottom=thin)

@@ -6,7 +6,7 @@ from termcolor import colored
 def add_style_physicochimie(physicochimie_dataframe, filename):
     PATH = f"output\\{filename}"
     wb = load_workbook(PATH)
-    ws = wb.get_sheet_by_name('Physico-chimie')
+    ws = wb['Physico-chimie']
 
     nb_rows, nb_columns = physicochimie_dataframe.shape
 
