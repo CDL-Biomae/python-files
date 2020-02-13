@@ -20,7 +20,6 @@ def create_dataframe(list_mp):
 
     return df
 
-
 ## MAIN FUNCTION ##
 def create_nqe_dataframe(head_dataframe, list_campaigns, dict_mp):
     list_dataframe = []

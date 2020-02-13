@@ -53,8 +53,19 @@ def convert_list(list_converted):
             
     return list_converted
 
-def get_unit(pack_id,sandre_list):
-    return QueryScript(f"SELECT sandre, unit FROM analysis WHERE pack_id={pack_id} AND sandre IN {tuple(sandre_list)}").execute()
+def get_unit(sandre_list):
+    output = QueryScript(f"SELECT familly, sandre FROM r3 WHERE sandre IN {tuple(sandre_list)}").execute()
+    result=[[],[]]
+    if len(output):
+        for i in range(len(output)):
+            if output[i][0]=='Métaux':
+                result[0].append('mg/kg PF')
+                result[1].append(int(float(output[i][1])))
+            else :
+                result[0].append('µg/kg PF')
+                result[1].append(int(float(output[i][1])))
+    return result
+                
 
 def data(pack_id):
     
