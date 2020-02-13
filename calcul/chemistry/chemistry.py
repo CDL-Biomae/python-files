@@ -4,26 +4,29 @@ from . import result_by_pack_and_sandre, elements_fish, elements_crustacean
 
 def lyophilisation_pourcent(pack_id):
     output = QueryScript(f"SELECT prefix, value, unit FROM analysis WHERE sandre='/' AND pack_id={pack_id}").execute()
-    if len(output) :
+    if len(output):
         return f"{output[0][0]}{output[0][1]}{output[0][2]}"
-    else :
+    else:
         return None
 
 def fat(pack_id):
     output = QueryScript(f"SELECT prefix, value, unit FROM analysis WHERE sandre=1358 AND pack_id={pack_id}").execute()
-    if len(output) :
+    if len(output):
         return f"{output[0][0] if output[0][0] else ''}{output[0][1] * 100}{output[0][2]}"
-    else :
+    else:
         return None
     
 def weight(pack_id):
     output = QueryScript(f"SELECT sampling_weight, metal_tare_bottle_weight, sampling_quantity, organic_tare_bottle_weight, organic_total_weight FROM pack WHERE id={pack_id}").execute()
     if len(output):
         return [output[0][0]-output[0][1], (output[0][0]-output[0][1])/output[0][2], output[0][4]-output[0][3]]
-    else :
+    else:
         return None
     
 def survival(pack_id):
+    if pack_id is None:
+        return None
+
     survival_list = QueryScript(f"SELECT scud_quantity, scud_survivor FROM cage WHERE pack_id={pack_id} AND scud_survivor IS NOT NULL").execute()
     if len(survival_list):
         quantity = survival_list[0][0]
@@ -31,27 +34,38 @@ def survival(pack_id):
         for replicate in survival_list:
             average += replicate[1]
         average = average / len(survival_list)
-        return str(average / quantity * 100) +'%'
+        return str(int(average / quantity * 100)) + '%'
     else:
         return None
     
 def convert_list(list_converted):
     for i in range(len(list_converted)):
-        if isinstance(list_converted[i],list):
-            try : 
+        if isinstance(list_converted[i], list):
+            try:
                 list_converted[i][0] = float(list_converted[i][0])
-            except :
+            except:
                 list_converted[i][0] = f'{list_converted[i][0]}'
-        else :
-            try : 
+        else:
+            try:
                 list_converted[i] = float(list_converted[i])
-            except :
+            except:
                 list_converted[i] = f'{list_converted[i]}'
             
     return list_converted
 
-def get_unit(pack_id,sandre_list):
-    return QueryScript(f"SELECT sandre, unit FROM analysis WHERE pack_id={pack_id} AND sandre IN {tuple(sandre_list)}").execute()
+def get_unit(sandre_list):
+    output = QueryScript(f"SELECT familly, sandre FROM r3 WHERE sandre IN {tuple(sandre_list)}").execute()
+    result=[[],[]]
+    if len(output):
+        for i in range(len(output)):
+            if output[i][0]=='Métaux':
+                result[0].append('mg/kg PF')
+                result[1].append(int(float(output[i][1])))
+            else :
+                result[0].append('µg/kg PF')
+                result[1].append(int(float(output[i][1])))
+    return result
+                
 
 def data(pack_id):
     

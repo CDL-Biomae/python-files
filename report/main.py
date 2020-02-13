@@ -1,17 +1,26 @@
 from tools import QueryScript
+
 from report import create_head_dataframe
+
 from report import create_stations_dataframe
 from report import add_style_stations
+
 from report import create_campagnes_dataframe
 from report import add_style_campagnes
+
 from report import create_physicochimie_dataframe
 from report import add_style_physicochimie
+
+from report import create_survie_dataframe
+from report import add_style_survie
+
+from report import create_nqe_dataframe
+from report import add_style_nqe
+
 from report import create_dataframe
 from report import create_tox_dataframe
-from report import create_nqe_dataframe
 
-# from report import create_dataframe
-# from report import create_tox_dataframe
+
 
 import pandas as pd
 from termcolor import colored
@@ -89,15 +98,22 @@ def main(list_campaigns):  # Prend en entrée une liste de reference de campagne
     add_style_campagnes(campagnes_dataframe, filename)
 
     ## CREATION DE L'ONGLET PHYSICO-CHIMIE ##
-    # print('\n[!] Création de l\'onglet \"Physico-chimie\"...')
-    # physicochimie_dataframe = create_physicochimie_dataframe(head_dataframe, list_campaigns, dict_mp)
-    # write_in_existing_excel(physicochimie_dataframe, filename, 'Physico-chimie', startrow=2)
-    # add_style_physicochimie(physicochimie_dataframe, filename)
+    print('\n[!] Création de l\'onglet \"Physico-chimie\"...')
+    physicochimie_dataframe = create_physicochimie_dataframe(head_dataframe, list_campaigns, dict_mp)
+    write_in_existing_excel(physicochimie_dataframe, filename, 'Physico-chimie', startrow=2)
+    add_style_physicochimie(physicochimie_dataframe, filename)
 
-    ## CREATION NQE ##
-    # print('\n[!] Création de l\'onglet \"NQE Biote\"...')
-    # nqe_dataframe = create_nqe_dataframe(head_dataframe, list_campaigns, dict_mp)
-    # write_in_existing_excel(nqe_dataframe, filename, 'NQE Biote')
+    ## CREATION DE L'ONGLET SURVIE ##
+    print('\n[!] Création de l\'onglet \"Survie\"...')
+    survie_dataframe = create_survie_dataframe(head_dataframe, list_campaigns, dict_mp)
+    write_in_existing_excel(survie_dataframe, filename, 'Survie', startcol=2, startrow=2)
+    add_style_survie(survie_dataframe, filename)
+
+    # CREATION NQE ##
+    print('\n[!] Création de l\'onglet \"NQE Biote\"...')
+    nqe_dataframe = create_nqe_dataframe(head_dataframe, list_campaigns, dict_mp)
+    write_in_existing_excel(nqe_dataframe, filename, 'NQE Biote', startrow=3)
+    add_style_nqe(nqe_dataframe, filename)
 
     print(colored('\nRapport terminé', 'green'))
 
