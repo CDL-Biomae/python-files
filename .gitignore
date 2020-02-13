@@ -4,4 +4,5 @@ test.py
 *.xlsx
 *.docx
 *.jpg
+*.zip
 __pycache__

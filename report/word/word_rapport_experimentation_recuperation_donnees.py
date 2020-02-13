@@ -7,13 +7,16 @@ from report import measure_points
 def recuperation_donnee(campaign):
     measurepoints_fusion_id_list = measure_points(campaign)
     dico_exposure_condition = {}
+    dico_type_biotest = {}
     for measurepoint in measurepoints_fusion_id_list:
         data = data_exposure_condition(measurepoint)
+        biotest = type_biotest(measurepoint)
         dico_exposure_condition[int(data[0])] = data[1]
+        dico_type_biotest[int(data[0])] = biotest
     dico_avg_tempe, dico_geo_mp = average_temperature__geographic_data_measurepoint(
         measurepoints_fusion_id_list)
     dico_geo_agency = geographic_data_agency(campaign)
-    return dico_exposure_condition, dico_avg_tempe, dico_geo_mp, dico_geo_agency
+    return dico_exposure_condition, dico_avg_tempe, dico_geo_mp, dico_geo_agency, dico_type_biotest
 
 # %% Données exposure condition
 
@@ -44,10 +47,13 @@ def data_exposure_condition_fusion(measurepoints):
 
         output = QueryScript(
             f"SELECT recordedAt, temperature, conductivity, oxygen, ph, type FROM measureexposurecondition WHERE measurepoint_id = {measurepoint} and step = {step} and barrel = {barrel}").execute()
-        output = output[0]
         if len(output) != 0:
+            output = output[0]
             dico_temp = {'date': parser(output[0]), 'temperature': output[1],
                          'conductivity': output[2], 'oxygen': output[3], 'ph': output[4], 'type': output[5]}
+        else:
+            dico_temp = {'date': None, 'temperature': None,
+                         'conductivity': None, 'oxygen': None, 'ph': None, 'type': None}
         dico[days[i]] = dico_temp
 
     return dico
@@ -58,15 +64,17 @@ def data_exposure_condition_simple(measurepoint_id):
     days = ["J+0", "J+14", "J+N", "J+21"]
     steps_barrel = [(50, "\'R0\'"), (60, "\'R7\'"),
                     (140, "\'RN\'"), (100, "\'R21\'")]
-
     for i in range(4):
         step, barrel = steps_barrel[i]
         output = QueryScript(
             f"SELECT recordedAt, temperature, conductivity, oxygen, ph, type FROM measureexposurecondition WHERE measurepoint_id = {measurepoint_id} and step = {step} and barrel = {barrel}").execute()
-        output = output[0]
         if len(output) != 0:
+            output = output[0]
             dico_temp = {'date': parser(output[0]), 'temperature': output[1],
                          'conductivity': output[2], 'oxygen': output[3], 'ph': output[4], 'type': output[5]}
+        else:
+            dico_temp = {'date': None, 'temperature': None,
+                         'conductivity': None, 'oxygen': None, 'ph': None, 'type': None}
         dico[days[i]] = dico_temp
 
     return dico
@@ -134,3 +142,8 @@ def geographic_data_agency(campaign):
 #             f"SELECT id FROM pack WHERE measurepoint_id={mp_id}").execute()
 #     if len(pack_id) == 0:
 #         return []
+
+def type_biotest(measurepoint_fusion_id):
+    query = QueryScript(
+        f"SELECT DISTINCT pack.nature FROM pack JOIN key_dates ON pack.measurepoint_id = key_dates.measurepoint_id WHERE key_dates.measurepoint_fusion_id = {measurepoint_fusion_id}").execute()
+    return query
