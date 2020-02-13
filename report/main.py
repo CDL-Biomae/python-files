@@ -84,11 +84,11 @@ def main(list_campaigns):  # Prend en entrée une liste de reference de campagne
     write_in_new_excel(stations_dataframe, filename, 'Stations')
     add_style_stations(stations_dataframe, filename)
 
-    ## CREATION DE L'ONGLET CAMPAGNES ##
-    print('\n[!] Création de l\'onglet \"Campagnes\"...')
-    campagnes_dataframe = create_campagnes_dataframe(head_dataframe, list_campaigns, dict_mp)
-    write_in_existing_excel(campagnes_dataframe, filename, 'Campagnes')
-    add_style_campagnes(campagnes_dataframe, filename)
+    # ## CREATION DE L'ONGLET CAMPAGNES ##
+    # print('\n[!] Création de l\'onglet \"Campagnes\"...')
+    # campagnes_dataframe = create_campagnes_dataframe(head_dataframe, list_campaigns, dict_mp)
+    # write_in_existing_excel(campagnes_dataframe, filename, 'Campagnes')
+    # add_style_campagnes(campagnes_dataframe, filename)
 
     ## CREATION DE L'ONGLET PHYSICO-CHIMIE ##
     # print('\n[!] Création de l\'onglet \"Physico-chimie\"...')

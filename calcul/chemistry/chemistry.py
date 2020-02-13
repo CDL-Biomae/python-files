@@ -51,16 +51,21 @@ def convert_list(list_converted):
     return list_converted
 
 def get_unit(sandre_list):
-    output = QueryScript(f"SELECT familly, sandre FROM r3 WHERE sandre IN {tuple(sandre_list)}").execute()
-    result=[[],[]]
+    output = QueryScript(f"SELECT familly, sandre, NQE FROM r3 WHERE sandre IN {tuple(sandre_list)}").execute()
+    result=[[],[],[]]
     if len(output):
-        for i in range(len(output)):
-            if output[i][0]=='Métaux':
-                result[0].append('mg/kg PF')
-                result[1].append(int(float(output[i][1])))
-            else :
-                result[0].append('µg/kg PF')
-                result[1].append(int(float(output[i][1])))
+        for sandre in sandre_list:
+            for element in output:
+                if sandre==int(float(element[1])):
+                    if element[0]=='Métaux':
+                        result[0].append('mg/kg PF')
+                        result[1].append(int(float(element[1])))
+                        result[2].append(float(element[2]) if element[2]!='' else '')
+                        
+                    else :
+                        result[0].append('µg/kg PF')
+                        result[1].append(int(float(element[1])))
+                        result[2].append(float(element[2]) if element[2]!='' else '')
     return result
                 
 
