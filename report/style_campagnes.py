@@ -1,7 +1,7 @@
 from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
 from openpyxl import load_workbook
 from openpyxl.utils.cell import get_column_letter
-import pandas as pd
+from termcolor import colored
 
 
 def add_style_campagnes(campagnes_dataframe, filename):
@@ -11,14 +11,12 @@ def add_style_campagnes(campagnes_dataframe, filename):
 
     nb_rows, nb_columns = campagnes_dataframe.shape
 
-    borders = Border(left=Side(border_style='thin', color='FF000000'),
-                     right=Side(border_style='thin', color='FF000000'),
-                     top=Side(border_style='thin', color='FF000000'),
-                     bottom=Side(border_style='thin', color='FF000000'))
+    medium = Side(border_style='medium', color='FF000000')
+    borders = Border(top=medium, left=medium, right=medium, bottom=medium)
 
     ## HEADER STYLE ##
     header_row = '2'
-    header_columns = [get_column_letter(col_idx) for col_idx in list(range(2, nb_columns + 2))]
+    header_columns = [get_column_letter(col_idx) for col_idx in range(2, nb_columns + 2)]
     header_cells = [c+header_row for c in header_columns]
 
     header_font = Font(size=10, bold=True, name='Arial', color='FFFFFF')
@@ -34,7 +32,7 @@ def add_style_campagnes(campagnes_dataframe, filename):
 
 
     ## BODY STYLE ##
-    body_rows = [str(r) for r in list(range(3, nb_rows+3))]
+    body_rows = [str(r) for r in range(3, nb_rows+3)]
     body_columns = header_columns
     body_cells = []
     for row in body_rows:
@@ -53,5 +51,5 @@ def add_style_campagnes(campagnes_dataframe, filename):
     wb.save(PATH)
     wb.close()
 
-    print('[+] La mise en page de l\'onglet \"Campagnes\" est terminée')
+    print(colored('[+] La mise en page de l\'onglet \"Campagnes\" est terminée', 'green'))
 

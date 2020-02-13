@@ -43,11 +43,11 @@ def data_exposure_condition_fusion(measurepoints):
             measurepoint = id_mp_1
 
         output = QueryScript(
-            f"SELECT recordedAt, temperature, conductivity, oxygen, ph FROM measureexposurecondition WHERE measurepoint_id = {measurepoint} and step = {step} and barrel = {barrel}").execute()
+            f"SELECT recordedAt, temperature, conductivity, oxygen, ph, type FROM measureexposurecondition WHERE measurepoint_id = {measurepoint} and step = {step} and barrel = {barrel}").execute()
         output = output[0]
         if len(output) != 0:
             dico_temp = {'date': parser(output[0]), 'temperature': output[1],
-                         'conductivity': output[2], 'oxygen': output[3], 'ph': output[4]}
+                         'conductivity': output[2], 'oxygen': output[3], 'ph': output[4], 'type': output[5]}
         dico[days[i]] = dico_temp
 
     return dico
@@ -62,11 +62,11 @@ def data_exposure_condition_simple(measurepoint_id):
     for i in range(4):
         step, barrel = steps_barrel[i]
         output = QueryScript(
-            f"SELECT recordedAt, temperature, conductivity, oxygen, ph FROM measureexposurecondition WHERE measurepoint_id = {measurepoint_id} and step = {step} and barrel = {barrel}").execute()
+            f"SELECT recordedAt, temperature, conductivity, oxygen, ph, type FROM measureexposurecondition WHERE measurepoint_id = {measurepoint_id} and step = {step} and barrel = {barrel}").execute()
         output = output[0]
         if len(output) != 0:
             dico_temp = {'date': parser(output[0]), 'temperature': output[1],
-                         'conductivity': output[2], 'oxygen': output[3], 'ph': output[4]}
+                         'conductivity': output[2], 'oxygen': output[3], 'ph': output[4], 'type': output[5]}
         dico[days[i]] = dico_temp
 
     return dico
@@ -77,9 +77,17 @@ def parser(date):
         return None
     year = date.year
     month = date.month
+    if month < 10:
+        month = "0"+str(month)
     day = date.day
+    if day < 10:
+        day = "0"+str(day)
     hour = date.hour
+    if hour < 10:
+        hour = "0"+str(hour)
     minute = date.minute
+    if minute < 10:
+        minute = "0"+str(minute)
     return f"{day}/{month}/{year} {hour}:{minute}"
 
 # %% Données températures moyenne et données géographiques récupérées dans l'onglet measurepoint
@@ -113,3 +121,16 @@ def geographic_data_agency(campaign):
                      'lambertX': elt[6], 'lambertY': elt[7], 'network': elt[8], 'hydroecoregion': elt[9]}
         dico[int(elt[0])] = dico_temp
     return dico
+
+# %% Récupération type de biotest
+
+
+# def type_biotest(campaign):
+#     query = QueryScript(
+#         f"SELECT substring(measurepoint.reference,-5,2), pack.nature FROM measurepoint JOIN pack ON pack.measurepoint_id = measurepoint.id WHERE measurepoint.reference LIKE '{campaign}'")
+#     pack_id = []
+#     for mp_id in measurepoint_id:
+#         pack_id += QueryScript(
+#             f"SELECT id FROM pack WHERE measurepoint_id={mp_id}").execute()
+#     if len(pack_id) == 0:
+#         return []
