@@ -34,7 +34,7 @@ def survival(pack_id):
         for replicate in survival_list:
             average += replicate[1]
         average = average / len(survival_list)
-        return str(int(average / quantity * 100)) + '%'
+        return str(round(average / quantity * 100)) + '%'
     else:
         return None
     
