@@ -123,6 +123,8 @@ def average_temperature__geographic_data_measurepoint(measurepoint_fusion_id_lis
 def geographic_data_agency(campaign):
     query = QueryScript(
         f"SELECT substring(place.reference, -2,2), agency.code, agency.name, agency.zipcode, agency.city, agency.stream, agency.lambertX, agency.lambertY, agency.network, agency.hydroecoregion FROM agency JOIN place ON agency.id = place.agency_id JOIN campaign ON place.campaign_id = campaign.id WHERE campaign.reference = '{campaign}';").execute()
+    # query = QueryScript(
+    #     f"SELECT DISTINCT measurepoint.reference, agency.code, agency.name, agency.zipcode, agency.city, agency.stream, agency.lambertX, agency.lambertY, agency.network, agency.hydroecoregion FROM agency JOIN place ON agency.id=place.agency_id JOIN campaign ON place.campaign_id=campaign.id JOIN measurepoint ON measurepoint.place_id=place.id JOIN key_dates ON measurepoint.id=key_dates.measurepoint_fusion_id WHERE campaign.reference='{campaign}'")
     dico = {}
     for elt in query:
         dico_temp = {'code': elt[1], 'name': elt[2], 'zipcode': elt[3], 'city': elt[4], 'stream': elt[5],
