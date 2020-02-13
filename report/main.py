@@ -9,6 +9,7 @@ from report import create_campagnes_dataframe
 from report import add_style_campagnes
 
 from report import create_physicochimie_dataframe
+
 from report import add_style_physicochimie
 
 from report import create_survie_dataframe
@@ -18,7 +19,9 @@ from report import create_nqe_dataframe
 from report import add_style_nqe
 
 from report import create_dataframe
+
 from report import create_tox_dataframe
+
 
 
 
@@ -63,6 +66,18 @@ def measure_points_fusion(campaign_ref):
     )
     return output.execute()
 
+def all_measure_points(campaign_ref):
+    output = QueryScript(
+        f"SELECT id FROM measurepoint WHERE reference LIKE '{campaign_ref}%';"
+    )
+    return output.execute()
+
+def create_dict_mp2(list_campaigns):
+    dict = {}
+    for c in list_campaigns:
+        list_mp = all_measure_points(c)
+        dict[c] = list_mp
+    return dict
 
 def create_dict_mp(list_campaigns):
     dict = {}
@@ -79,9 +94,16 @@ def main(list_campaigns):  # Prend en entrée une liste de reference de campagne
     print(colored(f"\n[-- Création d'un rapport sous le nom \"{filename}\" --]", 'blue'))
     print('\n[!] Début de l\'initialisation...')
     head_dataframe = create_head_dataframe(list_campaigns)
+    #print(head_dataframe.head())
+    dict_mp = create_dict_mp2(list_campaigns)
+    
+    create_tox_dataframe(head_dataframe, list_campaigns, dict_mp)
+    
+    #print (create_dataframe(dict_mp))
     dict_mp = create_dict_mp(list_campaigns)
     print(colored('[+] Initialisation terminée', 'green'))
     # create_tox_dataframe(head_dataframe, list_campaigns, dict_mp)
+
 
     #print (create_dataframe(dict_mp))
 

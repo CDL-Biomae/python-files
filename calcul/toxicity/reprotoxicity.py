@@ -32,16 +32,16 @@ def index_fertility_female_X(pack_id):
      index_female =[]
     
      for i in range (len(resultat)-1):
-          if resultat[i][0]>=2 and resultat[i][0]<=4:
-               if resultat[i][1] == 0:
-                   index_female.append(0) 
+       if resultat[i][0]!=None:
+               if (resultat[i][0]>=2 and resultat[i][0]<=4):
+                      if resultat[i][1] == 0:
+                           index_female.append(0) 
+                      else:
+                           index_female.append(resultat[i][1]/(size_female_mm(pack_id)[i]-5))
                else:
-                    index_female.append(resultat[i][1]/(size_female_mm(pack_id)[i]-5))
-          else:
-                index_female.append(0)
-
-
-     
+                    index_female.append(0)
+       else:
+             index_female.append(0)     
      return index_female
 
 
@@ -64,19 +64,27 @@ def number_female_analysis(pack_id):
      Nbr_D2 = 0
 
      for i in range(len(resultat)-1):
-          if resultat[i].upper()=='B' or resultat[i].upper()=='C1':
-               Nbr_B_C1 = Nbr_B_C1+1
-          elif resultat[i].upper()=='C2' or resultat[i].upper()=='D1':
-                Nbr_C2_D1=Nbr_C2_D1+1
-          elif resultat[i].upper()=='D2':
-                Nbr_D2 =  Nbr_D2+1
+          if resultat[i] != None:
+               if resultat[i].upper()=='B' or resultat[i].upper()=='C1':
+                    Nbr_B_C1 = Nbr_B_C1+1
+               elif resultat[i].upper()=='C2' or resultat[i].upper()=='D1':
+                    Nbr_C2_D1=Nbr_C2_D1+1
+               elif resultat[i].upper()=='D2':
+                     Nbr_D2 =  Nbr_D2+1
+          
+
+     if Nbr_B_C1+Nbr_C2_D1+Nbr_D2 == 0:
+          return 'NA'
+     else:
+          return  Nbr_B_C1+Nbr_C2_D1+Nbr_D2
+
                
-     return  Nbr_B_C1+Nbr_C2_D1+Nbr_D2
+     
 
    # Fécondité 
 def index_fertility_average(pack_id):
      number_female= number_female_analysis(pack_id)
-     if number_female<10 :
+     if number_female<10 or number_female=='NA':
           return "NA"
      else:
           return sum(index_fertility_female_X(pack_id))/len(index_fertility_female_X(pack_id))
@@ -87,48 +95,65 @@ def index_fertility_average(pack_id):
  # Fécondité Cycle de mue
 def molting_cycle(pack_id):
      fusion_id = fusion_id_finder(pack_id)
+     print("fision_id"+ str(fusion_id))
      SQL_request = "SELECT molting_stage FROM biomae.measurereprotoxicity where pack_id ="+str(pack_id)
      SQL_request_tmp = "SELECT expected_C2,expected_D2 FROM biomae.temperature_repro where measurepoint_fusion_id="+str(fusion_id)
      resultat =  QueryScript(SQL_request).execute()
      resultat2 =  QueryScript(SQL_request_tmp).execute()
+     print (resultat2)
      Nbr_C2_D1 = 0
      for i in range(len(resultat)-1):
-          if resultat[i].upper()=='C2' or resultat[i].upper()=='D1':
-                Nbr_C2_D1=Nbr_C2_D1+1
-          
+          if resultat[i] != None: 
+                if resultat[i].upper()=='C2' or resultat[i].upper()=='D1':
+                    Nbr_C2_D1=Nbr_C2_D1+1
 
-     if female_survivor(pack_id)=='NA':
-          return "NA"
+
+     if female_survivor(pack_id)=='NA' or number_female_analysis(pack_id) =='NA' or number_female_analysis(pack_id) == 0:
+              return "NA"
      else:
-           molting = number_female_analysis(pack_id)/Nbr_C2_D1*100
+           molting = Nbr_C2_D1/number_female_analysis(pack_id)*100
+           if resultat2==[] or resultat2[0][0] == None or resultat2[0][1]==None:
+                molting = str(round(molting)) +"%"
+           else:
+                molting = str(round(molting)) +"%("+str(round(resultat2[0][0]-resultat2[0][1]))+")%"
 
-     #  molting = round(molting) +"%" + round( Max Température repro % attendu au moins en C2 - MAX Température repro % attendu  au moins en D2)
-     molting = str(round(molting)) +"%("+str(round(resultat2[0][0]-resultat2[0][1]))+")%"
+
+     # molting = round(molting) +"%" + round( Max Température repro % attendu au moins en C2 - MAX Température repro % attendu  au moins en D2)
+     
   
      return molting
 
-    #  n p6 (TOXFILE)
+    #  n p6 (TOXFILE) il manque des variable dans la base de donner c'est pour cela les resultat sont pas identique
 def number_female_concerned_area(pack_id):
           SQL_request = "SELECT molting_stage,oocyte_area_pixel,oocyte_area_pixel,oocyte_area_mm FROM biomae.measurereprotoxicity where pack_id ="+str(pack_id)
           resultat =  QueryScript(SQL_request).execute()
+          
           Area_delayµm = [] 
           Area_delay = []
           nbr_f_c = 0
+
           for i in range(len(resultat)-1):
-                    if resultat[i][1]==None:
-                         Area_delayµm.append(None)
+                  
+                    if resultat[i][1]==None or resultat[i][1]==0 or resultat[i][3]==0 or resultat[i][2]:
+                         Area_delayµm.append('ND') # is tous les resultat dans la base donnée c'est vide sinn dans notre cas c'est NO DATA
                     else:
-                          Area_delayµm.append(resultat[i][1]*(resultat[i][2]/resultat[i][3]/97,82))
+                         Area_delayµm.append(resultat[i][1]*(resultat[i][2]/resultat[i][3]/97,82))
 
 
-          for i in range(len(resultat)-1):               
-                if resultat[i][0].upper()=='C1' or resultat[i][0].upper()=='B':
-                     if Area_delayµm[i]==None:
-                         Area_delay.append(0)
-                     else:
-                         Area_delay.append(Area_delayµm[i])
-                         nbr_f_c = nbr_f_c +1
-          return nbr_f_c, Area_delayµm
+          for i in range(len(resultat)-1): 
+                if resultat[i][0] != None:               
+                    if (resultat[i][0].upper()=='C1' or resultat[i][0].upper()=='B'):
+                          if Area_delayµm[i]=='ND':  #si aArea_delayµm[i] == 0 ou bien not defiend
+                               Area_delay.append('ND')  # 0 ça veut dire le vide 
+                          else:
+                               Area_delay.append(Area_delayµm[i])
+                               nbr_f_c = nbr_f_c +1
+                    else:
+                          Area_delay.append('NDV')# c'est le vide 
+                else:
+                     Area_delay.append('ND')  
+
+          return nbr_f_c, Area_delay
 
 
 def inhibition_fertility_and_threshold_5_1(pack_id):
@@ -136,9 +161,10 @@ def inhibition_fertility_and_threshold_5_1(pack_id):
      SQL_request = "SELECT value FROM biomae.r2_constant where name IN('indice de fertilité attendu - moyenne','Constante fertilité 1-1','indice de fertilité attendu - sd','Constante fertilité 2-1')"
      resultat =  QueryScript(SQL_request).execute()
      fertility = []
-     fertility.append(100*(resultat[2]-index_fertility_average(pack_id))/resultat[2]) #  % inhibition - FECONDITE
-     fertility.append( (resultat[2]-(resultat[2]-resultat[0]*resultat[3]/sqrt(number_female_concerned(pack_id))))/resultat[2]*100 )  #  Seuil 1% fécondité      
-     fertility.append( (resultat[2]-(resultat[2]-resultat[1]*resultat[3]/sqrt(number_female_concerned(pack_id))))/resultat[2]*100 )  #  Seuil 5% fécondité    
+     if resultat[2] != 0 or resultat[2] ==None:
+          fertility.append(100*(resultat[2]-index_fertility_average(pack_id))/resultat[2]) #  % inhibition - FECONDITE
+          fertility.append( (resultat[2]-(resultat[2]-resultat[0]*resultat[3]/sqrt(number_female_concerned(pack_id))))/resultat[2]*100 )  #  Seuil 1% fécondité      
+          fertility.append( (resultat[2]-(resultat[2]-resultat[1]*resultat[3]/sqrt(number_female_concerned(pack_id))))/resultat[2]*100 )  #  Seuil 5% fécondité    
      if number_female_analysis(pack_id)<10:
           return "NA"
      else:
@@ -156,19 +182,32 @@ def Result_Fertility(pack_id):
      elif inhibition[0]<inhibition[1]:
           return "conforme"
      else:
-          return ""
+          return "NDV"
           
 def endocrine_disruption(pack_id):
-
+     somme = 0
      female_concerned = number_female_concerned_area(pack_id)
-
+     print(female_concerned[1])
      if Result_Fertility(pack_id) == "conforme" or Result_Fertility(pack_id) == "NA":
           return "NA"
      else:
           if number_female_analysis(pack_id)<10:
                return 'NA'
           else:
-               return female_concerned[1]/len(female_concerned)
+               if female_concerned[0] != 0:     
+                    for i in range(len (female_concerned[1])):
+                         if female_concerned[i] != "ND":
+                              somme = somme+female_concerned[i]
+
+                    return  somme/female_concerned[0]
+               else:
+                    return "ND"
+                         
+
+
+
+
+               
    
 
 
