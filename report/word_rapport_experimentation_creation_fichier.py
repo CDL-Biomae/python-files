@@ -94,10 +94,10 @@ def create_doc(campaign):
         table_image.cell(5, 1).text = "Panorama encagement"
         table_image.cell(5, 1).paragraphs[0].alignment = 1
 
-        photo_amont = 'Fichiers_remplissage/step50_PDA1_AG-003-01-01-01_Amont_20190219_100021.jpg'
-        photo_aval = 'Fichiers_remplissage/step50_PDA1_AG-003-01-01-01_Aval_20190219_095956.jpg'
-        photo_zoom = 'Fichiers_remplissage/step50_PDA1_AG-003-01-01-01_Zoom_20190219_101351.jpg'
-        photo_pano = 'Fichiers_remplissage/step50_PDA1_AG-003-01-01-01_Panorama_20190219_101429.jpg'
+        photo_amont = 'Fichiers_remplissage/AG-003-01-01-01/step50_PDA1_AG-003-01-01-01_Amont_20190219_100021.jpg'
+        photo_aval = 'Fichiers_remplissage/AG-003-01-01-01/step50_PDA1_AG-003-01-01-01_Aval_20190219_095956.jpg'
+        photo_zoom = 'Fichiers_remplissage/AG-003-01-01-01/step50_PDA1_AG-003-01-01-01_Zoom_20190219_101351.jpg'
+        photo_pano = 'Fichiers_remplissage/AG-003-01-01-01/step50_PDA1_AG-003-01-01-01_Panorama_20190219_101429.jpg'
         table_image.cell(2, 0).paragraphs[0].add_run().add_picture(
             photo_aval, width=3046870, height=2111370)  # width=3046870, height=2111370
         table_image.cell(2, 1).paragraphs[0].add_run().add_picture(
