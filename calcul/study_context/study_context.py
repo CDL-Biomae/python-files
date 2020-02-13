@@ -30,7 +30,7 @@ def contexte_fusion(measurepoints):
 
         output = QueryScript(f"SELECT recordedAt FROM measureexposurecondition WHERE measurepoint_id = {measurepoint} and step = {step} and barrel = {barrel}").execute()
         if len(output) == 0:
-            output.append(None)
+            dates.append(None)
         else:
             dates.append(output[0])
 

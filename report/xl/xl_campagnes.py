@@ -1,6 +1,6 @@
 from calcul import contexte
 import pandas as pd
-from . import measurepoint_result
+
 ## CREATING DATAFRAME ##
 def create_dataframe(list_mp):
     matrix = []
