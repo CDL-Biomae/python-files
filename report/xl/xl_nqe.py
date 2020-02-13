@@ -25,7 +25,7 @@ def create_nqe_dataframe(head_dataframe, list_campaigns, dict_mp):
     list_dataframe = []
     for campaign_str in list_campaigns:
         list_mp = dict_mp[campaign_str]
-        df = create_dataframe(list_mp[:2])
+        df = create_dataframe(list_mp)
         list_dataframe.append(df)
 
     df_values = pd.concat(list_dataframe)

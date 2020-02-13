@@ -7,7 +7,7 @@ from termcolor import colored
 def add_style_stations(stations_dataframe, filename):
     PATH = f"output\\{filename}"
     wb = load_workbook(PATH)
-    ws = wb.get_sheet_by_name('Stations')
+    ws = wb['Stations']
 
     nb_rows, nb_columns = stations_dataframe.shape
 

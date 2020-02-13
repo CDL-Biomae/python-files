@@ -1,29 +1,5 @@
 from tools import QueryScript
-
-from report import create_head_dataframe
-
-from report import create_stations_dataframe
-from report import add_style_stations
-
-from report import create_campagnes_dataframe
-from report import add_style_campagnes
-
-from report import create_physicochimie_dataframe
-
-from report import add_style_physicochimie
-
-from report import create_survie_dataframe
-from report import add_style_survie
-
-from report import create_nqe_dataframe
-from report import add_style_nqe
-
-from report import create_dataframe
-
-from report import create_tox_dataframe
-
-
-
+from report import *
 
 import pandas as pd
 from termcolor import colored
@@ -96,21 +72,26 @@ def main(list_campaigns):  # Prend en entrée une liste de reference de campagne
     head_dataframe = create_head_dataframe(list_campaigns)
     #print(head_dataframe.head())
     dict_mp = create_dict_mp2(list_campaigns)
-    
+
     create_tox_dataframe(head_dataframe, list_campaigns, dict_mp)
-    
+
     #print (create_dataframe(dict_mp))
     dict_mp = create_dict_mp(list_campaigns)
     print(colored('[+] Initialisation terminée', 'green'))
     # create_tox_dataframe(head_dataframe, list_campaigns, dict_mp)
 
+    # print (create_dataframe(dict_mp))
 
-    #print (create_dataframe(dict_mp))
+    ## CREATION DE L'ONGLET VERSION ##
+    print('\n[!] Création de l\'onglet \"Version\"...')
+    version_dataframe = create_version_dataframe()
+    write_in_new_excel(version_dataframe, filename, 'Version', startrow=3)
+    add_style_version(version_dataframe, list_campaigns, filename)
 
     ## CREATION DE L'ONGLET STATIONS ##
     print('\n[!] Création de l\'onglet \"Stations\"...')
     stations_dataframe = create_stations_dataframe(head_dataframe, list_campaigns, dict_mp)
-    write_in_new_excel(stations_dataframe, filename, 'Stations')
+    write_in_existing_excel(stations_dataframe, filename, 'Stations')
     add_style_stations(stations_dataframe, filename)
 
     ## CREATION DE L'ONGLET CAMPAGNES ##
