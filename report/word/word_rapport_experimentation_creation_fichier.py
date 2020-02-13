@@ -209,12 +209,6 @@ def create_doc(campaign):
                 paragraph.paragraph_format.space_after = Pt(4)
                 paragraph.paragraph_format.space_before = Pt(4)
 
-    doc.add_page_break()
-    page_fin = Document('Page fin.docx')
-
-    for element in page_fin.element.body:
-        doc.element.body.append(element)
-
     doc.save(campaign + "_Rapport_d_expérimentation.docx")
 
 
