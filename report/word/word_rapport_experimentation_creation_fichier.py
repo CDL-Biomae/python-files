@@ -1,6 +1,7 @@
 from report import recuperation_donnee
 from docx import Document
 from docx.shared import Pt
+import os
 
 
 def create_doc(campaign):
@@ -22,7 +23,7 @@ def create_doc(campaign):
         header = table_geo.rows[0].cells
         header[0].merge(header[-1])
         case_header = table_geo.cell(0, 0).paragraphs[0].add_run(dico_geo_agency[reference]['code'] +
-                                                                 " : " + dico_geo_agency[reference]['name'])
+                                                                 " : " + dico_geo_agency[reference]['name'] + "   " + reference)
         case_header.bold = True
         case_header = table_geo.cell(0, 0).paragraphs[0].alignment = 1
 
@@ -94,10 +95,16 @@ def create_doc(campaign):
         table_image.cell(5, 1).text = "Panorama encagement"
         table_image.cell(5, 1).paragraphs[0].alignment = 1
 
-        photo_amont = 'Fichiers_remplissage/AG-003-01-01-01/step50_PDA1_AG-003-01-01-01_Amont_20190219_100021.jpg'
-        photo_aval = 'Fichiers_remplissage/AG-003-01-01-01/step50_PDA1_AG-003-01-01-01_Aval_20190219_095956.jpg'
-        photo_zoom = 'Fichiers_remplissage/AG-003-01-01-01/step50_PDA1_AG-003-01-01-01_Zoom_20190219_101351.jpg'
-        photo_pano = 'Fichiers_remplissage/AG-003-01-01-01/step50_PDA1_AG-003-01-01-01_Panorama_20190219_101429.jpg'
+        # photo_amont = 'Fichiers_remplissage/AG-003-01-01-01/step50_PDA1_AG-003-01-01-01_Amont_20190219_100021.jpg'
+        # photo_aval = 'Fichiers_remplissage/AG-003-01-01-01/step50_PDA1_AG-003-01-01-01_Aval_20190219_095956.jpg'
+        # photo_zoom = 'Fichiers_remplissage/AG-003-01-01-01/step50_PDA1_AG-003-01-01-01_Zoom_20190219_101351.jpg'
+        # photo_pano = 'Fichiers_remplissage/AG-003-01-01-01/step50_PDA1_AG-003-01-01-01_Panorama_20190219_101429.jpg'
+        nom_photo = recuperation_photo(reference)
+        photo_amont = nom_photo['amont']
+        photo_aval = nom_photo['aval']
+        photo_zoom = nom_photo['zoom']
+        photo_pano = nom_photo['panorama']
+
         table_image.cell(2, 0).paragraphs[0].add_run().add_picture(
             photo_aval, width=3046870, height=2111370)  # width=3046870, height=2111370
         table_image.cell(2, 1).paragraphs[0].add_run().add_picture(
@@ -234,3 +241,15 @@ def traduction_type_biotest(biotest_anglais):
         string += elt + ", "
     string = string[:-2]
     return string
+
+
+# photo_amont = 'Fichiers_remplissage/AG-003-01-01-01/step50_PDA1_AG-003-01-01-01_Amont_20190219_100021.jpg'
+def recuperation_photo(reference):
+    prefixe = "Fichiers_remplissage/" + reference
+    filenames = os.listdir(prefixe)
+    dico_nom = {}
+    for elt in filenames:
+        l_nom = elt.split("_")
+        type_photo = l_nom[3].lower()
+        dico_nom[type_photo] = prefixe + "/" + elt
+    return dico_nom
