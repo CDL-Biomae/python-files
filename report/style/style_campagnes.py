@@ -7,7 +7,7 @@ from termcolor import colored
 def add_style_campagnes(campagnes_dataframe, filename):
     PATH = f"output\\{filename}"
     wb = load_workbook(PATH)
-    ws = wb.get_sheet_by_name('Campagnes')
+    ws = wb['Campagnes']
 
     nb_rows, nb_columns = campagnes_dataframe.shape
 
