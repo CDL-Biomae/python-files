@@ -71,9 +71,9 @@ def main(list_campaigns):  # Prend en entrée une liste de reference de campagne
     print('\n[!] Début de l\'initialisation...')
     head_dataframe = create_head_dataframe(list_campaigns)
     #print(head_dataframe.head())
-    dict_mp = create_dict_mp2(list_campaigns)
+    # dict_mp = create_dict_mp2(list_campaigns)
 
-    create_tox_dataframe(head_dataframe, list_campaigns, dict_mp)
+    # create_tox_dataframe(head_dataframe, list_campaigns, dict_mp)
 
     #print (create_dataframe(dict_mp))
     dict_mp = create_dict_mp(list_campaigns)
