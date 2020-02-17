@@ -13,6 +13,12 @@ def conditions(measurepoint_id):
 
 def conditions_fusion(measurepoints):
     [id_mp_1, id_mp_2] = measurepoints
+    if id_mp_1 < id_mp_2:
+        id_mp_premier = id_mp_1
+        id_mp_second = id_mp_2
+    else:
+        id_mp_premier = id_mp_2
+        id_mp_second = id_mp_1
     conductivity = []
     ph = []
     oxygen = []
@@ -23,9 +29,9 @@ def conditions_fusion(measurepoints):
     for i in range(4):
         step, barrel = steps_barrel[i]
         if i in [0, 2]:
-            measurepoint = id_mp_2
+            measurepoint = id_mp_premier
         else:
-            measurepoint = id_mp_1
+            measurepoint = id_mp_second
 
         try:
             output = QueryScript(

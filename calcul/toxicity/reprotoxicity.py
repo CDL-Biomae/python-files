@@ -1,18 +1,25 @@
 from tools import QueryScript, fusion_id_finder
 from calcul.toxicity.reproduction import * 
 from math import *
+import numbers
 
 
 def number_days_exposition(pack_id):
      fusion_id = fusion_id_finder(pack_id)
      SQL_request = "SELECT date FROM key_dates where date_id IN(4,6) and measurepoint_fusion_id="+str(fusion_id)
      LR_dates =  QueryScript(SQL_request).execute()
-     
-     if(LR_dates==" "):
-          return "NA"
+     if (LR_dates[0]==None or LR_dates[1]==None ):
+           if(LR_dates==" "):
+                return "NA"
+           else:
+                 nbrdays =  LR_dates[0]-LR_dates[1]
+                 if (nbrdays.seconds/60/60)>=12:
+                       return nbrdays.days+1
+                 else:
+                       return nbrdays.days
      else:
-          nbrdays =  LR_dates[0]-LR_dates[1]
-          return nbrdays.days
+          return "NA" 
+    
 
 def size_female_mm(pack_id):
      SQL_request = "SELECT specimen_size_mm, specimen_size_px embryo_total FROM biomae.measurereprotoxicity where pack_id ="+str(pack_id)
@@ -84,10 +91,13 @@ def number_female_analysis(pack_id):
    # Fécondité 
 def index_fertility_average(pack_id):
      number_female= number_female_analysis(pack_id)
-     if number_female<10 or number_female=='NA':
+     if type(number_female) == int:
+           if number_female<10:
+                 return "NA"
+           else:
+                 return sum(index_fertility_female_X(pack_id))/len(index_fertility_female_X(pack_id))
+     else: 
           return "NA"
-     else:
-          return sum(index_fertility_female_X(pack_id))/len(index_fertility_female_X(pack_id))
 
 
 
@@ -95,12 +105,12 @@ def index_fertility_average(pack_id):
  # Fécondité Cycle de mue
 def molting_cycle(pack_id):
      fusion_id = fusion_id_finder(pack_id)
-     print("fision_id"+ str(fusion_id))
+    
      SQL_request = "SELECT molting_stage FROM biomae.measurereprotoxicity where pack_id ="+str(pack_id)
      SQL_request_tmp = "SELECT expected_C2,expected_D2 FROM biomae.temperature_repro where measurepoint_fusion_id="+str(fusion_id)
      resultat =  QueryScript(SQL_request).execute()
      resultat2 =  QueryScript(SQL_request_tmp).execute()
-     print (resultat2)
+   
      Nbr_C2_D1 = 0
      for i in range(len(resultat)-1):
           if resultat[i] != None: 
@@ -161,10 +171,14 @@ def inhibition_fertility_and_threshold_5_1(pack_id):
      SQL_request = "SELECT value FROM biomae.r2_constant where name IN('indice de fertilité attendu - moyenne','Constante fertilité 1-1','indice de fertilité attendu - sd','Constante fertilité 2-1')"
      resultat =  QueryScript(SQL_request).execute()
      fertility = []
-     if resultat[2] != 0 or resultat[2] ==None:
-          fertility.append(100*(resultat[2]-index_fertility_average(pack_id))/resultat[2]) #  % inhibition - FECONDITE
-          fertility.append( (resultat[2]-(resultat[2]-resultat[0]*resultat[3]/sqrt(number_female_concerned(pack_id))))/resultat[2]*100 )  #  Seuil 1% fécondité      
-          fertility.append( (resultat[2]-(resultat[2]-resultat[1]*resultat[3]/sqrt(number_female_concerned(pack_id))))/resultat[2]*100 )  #  Seuil 5% fécondité    
+     if isinstance(index_fertility_average(pack_id),numbers.Number): 
+          if resultat[2] != 0 or resultat[2] == None:
+                fertility.append(100*(resultat[2]-index_fertility_average(pack_id))/resultat[2]) #  % inhibition - FECONDITE
+                fertility.append( (resultat[2]-(resultat[2]-resultat[0]*resultat[3]/sqrt(number_female_concerned(pack_id))))/resultat[2]*100 )  #  Seuil 1% fécondité      
+                fertility.append( (resultat[2]-(resultat[2]-resultat[1]*resultat[3]/sqrt(number_female_concerned(pack_id))))/resultat[2]*100 )  #  Seuil 5% fécondité    
+     else:
+          return "NA"
+     
      if number_female_analysis(pack_id)<10:
           return "NA"
      else:
@@ -173,21 +187,23 @@ def inhibition_fertility_and_threshold_5_1(pack_id):
 def Result_Fertility(pack_id):
      inhibition = inhibition_fertility_and_threshold_5_1(pack_id)
 
-     if number_female_analysis(pack_id)<10:
-          return "NA"
-     elif  inhibition[0]>inhibition[1] and inhibition[0]>inhibition[2]:
-          return "inhibition fort"
-     elif  inhibition[0]>inhibition[1] and inhibition[0]<inhibition[2]:
-          return "inhibition modérée"
-     elif inhibition[0]<inhibition[1]:
-          return "conforme"
-     else:
+     if isinstance(index_fertility_average(pack_id),numbers.Number): 
+        if number_female_analysis(pack_id)<10:
+            return "NA"
+        elif  inhibition[0]>inhibition[1] and inhibition[0]>inhibition[2]:
+            return "inhibition fort"
+        elif  inhibition[0]>inhibition[1] and inhibition[0]<inhibition[2]:
+            return "inhibition modérée"
+        elif inhibition[0]<inhibition[1]:
+            return "conforme"
+        else:
           return "NDV"
+     else:
+          return "NA"
           
 def endocrine_disruption(pack_id):
      somme = 0
      female_concerned = number_female_concerned_area(pack_id)
-     print(female_concerned[1])
      if Result_Fertility(pack_id) == "conforme" or Result_Fertility(pack_id) == "NA":
           return "NA"
      else:

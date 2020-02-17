@@ -67,18 +67,26 @@ def create_dict_mp(list_campaigns):
 
 def main(list_campaigns):  # Prend en entrée une liste de reference de campagne, ex: ['AG-003-01', 'AG-003-02']
     filename = create_filename(list_campaigns)
-    print(colored(f"\n[-- Création d'un rapport sous le nom \"{filename}\" --]", 'blue'))
-    print('\n[!] Début de l\'initialisation...')
+    print(filename)
+    print('[+] Starting initialisation...')
     head_dataframe = create_head_dataframe(list_campaigns)
     #print(head_dataframe.head())
-    dict_mp = create_dict_mp2(list_campaigns)
+    # dict_mp = create_dict_mp2(list_campaigns)
 
-    create_tox_dataframe(head_dataframe, list_campaigns, dict_mp)
+    # create_tox_dataframe(head_dataframe, list_campaigns, dict_mp)
 
     #print (create_dataframe(dict_mp))
-    dict_mp = create_dict_mp(list_campaigns)
-    print(colored('[+] Initialisation terminée', 'green'))
-    # create_tox_dataframe(head_dataframe, list_campaigns, dict_mp)
+
+
+       ## CREATION DE L'ONGLET STATIONS ##
+    #stations_dataframe = create_tox_dataframe(head_dataframe, list_campaigns, dict_mp)
+    #write_in_new_excel(stations_dataframe, filename, 'Stations')
+    #add_style_stations(stations_dataframe, filename)
+
+    ## CREATION DE L'ONGLET STATIONS ##
+    #stations_dataframe = create_stations_dataframe(head_dataframe, list_campaigns, dict_mp)
+    #write_in_new_excel(stations_dataframe, filename, 'Stations')
+    # utiliser openpyxl pour changer le style de la feuille
 
     # print (create_dataframe(dict_mp))
 
@@ -95,28 +103,14 @@ def main(list_campaigns):  # Prend en entrée une liste de reference de campagne
     add_style_stations(stations_dataframe, filename)
 
     ## CREATION DE L'ONGLET CAMPAGNES ##
-    print('\n[!] Création de l\'onglet \"Campagnes\"...')
-    campagnes_dataframe = create_campagnes_dataframe(head_dataframe, list_campaigns, dict_mp)
-    write_in_existing_excel(campagnes_dataframe, filename, 'Campagnes')
-    add_style_campagnes(campagnes_dataframe, filename)
+
+    #campagnes_dataframe = create_campagnes_dataframe(
+    #head_dataframe, list_campaigns, dict_mp)
+    #write_in_existing_excel(campagnes_dataframe, filename, 'Campagnes')
 
     ## CREATION DE L'ONGLET PHYSICO-CHIMIE ##
-    print('\n[!] Création de l\'onglet \"Physico-chimie\"...')
-    physicochimie_dataframe = create_physicochimie_dataframe(head_dataframe, list_campaigns, dict_mp)
-    write_in_existing_excel(physicochimie_dataframe, filename, 'Physico-chimie', startrow=2)
-    add_style_physicochimie(physicochimie_dataframe, filename)
+    #physicochimie_dataframe = create_physicochimie_dataframe(head_dataframe, list_campaigns, dict_mp)
+    #write_in_existing_excel(physicochimie_dataframe, filename, 'Physico-chimie')
 
-    ## CREATION DE L'ONGLET SURVIE ##
-    print('\n[!] Création de l\'onglet \"Survie\"...')
-    survie_dataframe = create_survie_dataframe(head_dataframe, list_campaigns, dict_mp)
-    write_in_existing_excel(survie_dataframe, filename, 'Survie', startcol=2, startrow=2)
-    add_style_survie(survie_dataframe, filename)
-
-    # CREATION NQE ##
-    print('\n[!] Création de l\'onglet \"NQE Biote\"...')
-    nqe_dataframe = create_nqe_dataframe(head_dataframe, list_campaigns, dict_mp)
-    write_in_existing_excel(nqe_dataframe, filename, 'NQE Biote', startrow=3)
-    add_style_nqe(nqe_dataframe, filename)
-
-    print(colored('\nRapport terminé', 'green'))
+# main(['AG-003-01', 'AG-003-02'])
 
