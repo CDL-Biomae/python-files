@@ -2,6 +2,7 @@ from report import recuperation_donnee
 from docx import Document
 from docx.shared import Pt
 import os
+from PIL import Image, ExifTags
 
 
 def create_doc(campaign):
@@ -100,19 +101,38 @@ def create_doc(campaign):
         # photo_zoom = 'Fichiers_remplissage/AG-003-01-01-01/step50_PDA1_AG-003-01-01-01_Zoom_20190219_101351.jpg'
         # photo_pano = 'Fichiers_remplissage/AG-003-01-01-01/step50_PDA1_AG-003-01-01-01_Panorama_20190219_101429.jpg'
         nom_photo = recuperation_photo(reference)
-        photo_amont = nom_photo['amont']
-        photo_aval = nom_photo['aval']
-        photo_zoom = nom_photo['zoom']
-        photo_pano = nom_photo['panorama']
+        # photo_amont = Image.open(nom_photo['amont'])
+        # photo_aval = Image.open(nom_photo['aval'])
+        # photo_zoom = Image.open(nom_photo['zoom'])
+        # photo_pano = Image.open(nom_photo['panorama'])
+
+        # photo_amont = photo_amont.rotate(90, expand=True)
+        # photo_aval = photo_aval.rotate(90, expand=True)
+        # photo_zoom = photo_zoom.rotate(90, expand=True)
+        # photo_pano = photo_pano.rotate(90, expand=True)
+
+        # photo_amont.save(nom_photo['amont'])
+        # photo_amont.close()
+        # photo_aval.save(nom_photo['aval'])
+        # photo_aval.close()
+        # photo_zoom.save(nom_photo['zoom'])
+        # photo_zoom.close()
+        # photo_pano.save(nom_photo['panorama'])
+        # photo_pano.close()
+
+        rotation_image(nom_photo['amont'])
+        rotation_image(nom_photo['aval'])
+        rotation_image(nom_photo['zoom'])
+        rotation_image(nom_photo['panorama'])
 
         table_image.cell(2, 0).paragraphs[0].add_run().add_picture(
-            photo_aval, width=3046870, height=2111370)  # width=3046870, height=2111370
+            nom_photo['aval'], width=3046870, height=2111370)  # width=3046870, height=2111370
         table_image.cell(2, 1).paragraphs[0].add_run().add_picture(
-            photo_amont, width=3046870, height=2111370)
+            nom_photo['amont'], width=3046870, height=2111370)
         table_image.cell(4, 0).paragraphs[0].add_run().add_picture(
-            photo_zoom, width=3046870, height=2111370)
+            nom_photo['zoom'], width=3046870, height=2111370)
         table_image.cell(4, 1).paragraphs[0].add_run().add_picture(
-            photo_pano, width=3046870, height=2111370)
+            nom_photo['panorama'], width=3046870, height=2111370)
         for elt in [(2, 0), (2, 1), (4, 0), (4, 1)]:
             table_image.cell(elt[0],
                              elt[1]).paragraphs[0].paragraph_format.space_after = Pt(0)
@@ -253,3 +273,24 @@ def recuperation_photo(reference):
         type_photo = l_nom[3].lower()
         dico_nom[type_photo] = prefixe + "/" + elt
     return dico_nom
+
+
+def rotation_image(path_photo):
+    try:
+        image = Image.open(path_photo)
+        for orientation in ExifTags.TAGS.keys():
+            if ExifTags.TAGS[orientation] == 'Orientation':
+                break
+        exif = dict(image._getexif().items())
+        if exif[orientation] == 3:
+            image = image.rotate(180, expand=True)
+        elif exif[orientation] == 6:
+            image = image.rotate(270, expand=True)
+        elif exif[orientation] == 8:
+            image = image.rotate(90, expand=True)
+        image.save(path_photo)
+        image.close()
+
+    except (AttributeError, KeyError, IndexError):
+        # cases: image don't have getexif
+        pass
