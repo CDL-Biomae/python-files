@@ -1,7 +1,9 @@
 from . import recuperation_donnee
 from docx import Document
 from docx.shared import Pt
+from docxcompose.composer import Composer
 import os
+from PIL import Image, ExifTags
 
 
 def create_doc(campaign):
@@ -11,6 +13,7 @@ def create_doc(campaign):
     font.name = "Arial"
     dico_exposure_condition, dico_avg_tempe, dico_geo_mp, dico_geo_agency, dico_type_biotest = recuperation_donnee(
         campaign)
+    print('Données récupérées !')
     liste_reference = list(dico_avg_tempe.keys())
     for reference in liste_reference:
         doc.add_page_break()
@@ -95,24 +98,20 @@ def create_doc(campaign):
         table_image.cell(5, 1).text = "Panorama encagement"
         table_image.cell(5, 1).paragraphs[0].alignment = 1
 
-        # photo_amont = 'Fichiers_remplissage/AG-003-01-01-01/step50_PDA1_AG-003-01-01-01_Amont_20190219_100021.jpg'
-        # photo_aval = 'Fichiers_remplissage/AG-003-01-01-01/step50_PDA1_AG-003-01-01-01_Aval_20190219_095956.jpg'
-        # photo_zoom = 'Fichiers_remplissage/AG-003-01-01-01/step50_PDA1_AG-003-01-01-01_Zoom_20190219_101351.jpg'
-        # photo_pano = 'Fichiers_remplissage/AG-003-01-01-01/step50_PDA1_AG-003-01-01-01_Panorama_20190219_101429.jpg'
         nom_photo = recuperation_photo(reference)
-        photo_amont = nom_photo['amont']
-        photo_aval = nom_photo['aval']
-        photo_zoom = nom_photo['zoom']
-        photo_pano = nom_photo['panorama']
+        rotation_image(nom_photo['amont'])
+        rotation_image(nom_photo['aval'])
+        rotation_image(nom_photo['zoom'])
+        rotation_image(nom_photo['panorama'])
 
         table_image.cell(2, 0).paragraphs[0].add_run().add_picture(
-            photo_aval, width=3046870, height=2111370)  # width=3046870, height=2111370
+            nom_photo['aval'], width=3046870, height=2111370)  # width=3046870, height=2111370
         table_image.cell(2, 1).paragraphs[0].add_run().add_picture(
-            photo_amont, width=3046870, height=2111370)
+            nom_photo['amont'], width=3046870, height=2111370)
         table_image.cell(4, 0).paragraphs[0].add_run().add_picture(
-            photo_zoom, width=3046870, height=2111370)
+            nom_photo['zoom'], width=3046870, height=2111370)
         table_image.cell(4, 1).paragraphs[0].add_run().add_picture(
-            photo_pano, width=3046870, height=2111370)
+            nom_photo['panorama'], width=3046870, height=2111370)
         for elt in [(2, 0), (2, 1), (4, 0), (4, 1)]:
             table_image.cell(elt[0],
                              elt[1]).paragraphs[0].paragraph_format.space_after = Pt(0)
@@ -175,7 +174,10 @@ def create_doc(campaign):
         interligne.paragraph_format.space_after = Pt(0)
         interligne.paragraph_format.space_before = Pt(0)
 
-        liste_jours = ["J+0", "J+14", "J+N", "J+21"]
+        if dico_exposure_condition[reference]['fusion?']:
+            liste_jours = ["J+0", "J+14", "J+N", "J+21"]
+        else:
+            liste_jours = ["J+0", "J+7", "J+N", "J+21"]
         liste_indice_jours_utiles = []
         for num_jour in range(4):
             if dico_exposure_condition[reference][liste_jours[num_jour]]['date'] != None:
@@ -215,14 +217,13 @@ def create_doc(campaign):
                     num_entete, num_jour).paragraphs[0]
                 paragraph.paragraph_format.space_after = Pt(4)
                 paragraph.paragraph_format.space_before = Pt(4)
-
+        print(f'Page de la référence {reference} créée ! :D')
     doc.add_page_break()
 
-    # page_fin = Document('Fichiers_remplissage/Page_fin.docx')
-    # for element in page_fin.element.body:
-    #     doc.element.body.append(element)
-
-    doc.save(campaign + "_Rapport_d_expérimentation.docx")
+    composer = Composer(doc)
+    page_fin = Document('Fichiers_remplissage/Page_fin.docx')
+    composer.append(page_fin)
+    composer.save(campaign + "_Rapport_d_expérimentation.docx")
 
 
 def traduction_type_biotest(biotest_anglais):
@@ -253,3 +254,24 @@ def recuperation_photo(reference):
         type_photo = l_nom[3].lower()
         dico_nom[type_photo] = prefixe + "/" + elt
     return dico_nom
+
+
+def rotation_image(path_photo):
+    try:
+        image = Image.open(path_photo)
+        for orientation in ExifTags.TAGS.keys():
+            if ExifTags.TAGS[orientation] == 'Orientation':
+                break
+        exif = dict(image._getexif().items())
+        if exif[orientation] == 3:
+            image = image.rotate(180, expand=True)
+        elif exif[orientation] == 6:
+            image = image.rotate(270, expand=True)
+        elif exif[orientation] == 8:
+            image = image.rotate(90, expand=True)
+        image.save(path_photo)
+        image.close()
+
+    except (AttributeError, KeyError, IndexError):
+        # cases: image don't have getexif
+        pass

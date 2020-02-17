@@ -7,4 +7,3 @@ from .word import *
 
 # /!\ A METTRE EN DERNIER /!\ #
 from .main import main
-
