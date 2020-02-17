@@ -1,6 +1,7 @@
 from report import recuperation_donnee
 from docx import Document
 from docx.shared import Pt
+from docxcompose.composer import Composer
 import os
 from PIL import Image, ExifTags
 
@@ -12,6 +13,7 @@ def create_doc(campaign):
     font.name = "Arial"
     dico_exposure_condition, dico_avg_tempe, dico_geo_mp, dico_geo_agency, dico_type_biotest = recuperation_donnee(
         campaign)
+    print('Données récupérées !')
     liste_reference = list(dico_avg_tempe.keys())
     for reference in liste_reference:
         doc.add_page_break()
@@ -96,30 +98,7 @@ def create_doc(campaign):
         table_image.cell(5, 1).text = "Panorama encagement"
         table_image.cell(5, 1).paragraphs[0].alignment = 1
 
-        # photo_amont = 'Fichiers_remplissage/AG-003-01-01-01/step50_PDA1_AG-003-01-01-01_Amont_20190219_100021.jpg'
-        # photo_aval = 'Fichiers_remplissage/AG-003-01-01-01/step50_PDA1_AG-003-01-01-01_Aval_20190219_095956.jpg'
-        # photo_zoom = 'Fichiers_remplissage/AG-003-01-01-01/step50_PDA1_AG-003-01-01-01_Zoom_20190219_101351.jpg'
-        # photo_pano = 'Fichiers_remplissage/AG-003-01-01-01/step50_PDA1_AG-003-01-01-01_Panorama_20190219_101429.jpg'
         nom_photo = recuperation_photo(reference)
-        # photo_amont = Image.open(nom_photo['amont'])
-        # photo_aval = Image.open(nom_photo['aval'])
-        # photo_zoom = Image.open(nom_photo['zoom'])
-        # photo_pano = Image.open(nom_photo['panorama'])
-
-        # photo_amont = photo_amont.rotate(90, expand=True)
-        # photo_aval = photo_aval.rotate(90, expand=True)
-        # photo_zoom = photo_zoom.rotate(90, expand=True)
-        # photo_pano = photo_pano.rotate(90, expand=True)
-
-        # photo_amont.save(nom_photo['amont'])
-        # photo_amont.close()
-        # photo_aval.save(nom_photo['aval'])
-        # photo_aval.close()
-        # photo_zoom.save(nom_photo['zoom'])
-        # photo_zoom.close()
-        # photo_pano.save(nom_photo['panorama'])
-        # photo_pano.close()
-
         rotation_image(nom_photo['amont'])
         rotation_image(nom_photo['aval'])
         rotation_image(nom_photo['zoom'])
@@ -195,7 +174,10 @@ def create_doc(campaign):
         interligne.paragraph_format.space_after = Pt(0)
         interligne.paragraph_format.space_before = Pt(0)
 
-        liste_jours = ["J+0", "J+14", "J+N", "J+21"]
+        if dico_exposure_condition[reference]['fusion?']:
+            liste_jours = ["J+0", "J+14", "J+N", "J+21"]
+        else:
+            liste_jours = ["J+0", "J+7", "J+N", "J+21"]
         liste_indice_jours_utiles = []
         for num_jour in range(4):
             if dico_exposure_condition[reference][liste_jours[num_jour]]['date'] != None:
@@ -235,14 +217,13 @@ def create_doc(campaign):
                     num_entete, num_jour).paragraphs[0]
                 paragraph.paragraph_format.space_after = Pt(4)
                 paragraph.paragraph_format.space_before = Pt(4)
-
+        print(f'Page de la référence {reference} créée ! :D')
     doc.add_page_break()
 
-    # page_fin = Document('Fichiers_remplissage/Page_fin.docx')
-    # for element in page_fin.element.body:
-    #     doc.element.body.append(element)
-
-    doc.save(campaign + "_Rapport_d_expérimentation.docx")
+    composer = Composer(doc)
+    page_fin = Document('Fichiers_remplissage/Page_fin.docx')
+    composer.append(page_fin)
+    composer.save(campaign + "_Rapport_d_expérimentation.docx")
 
 
 def traduction_type_biotest(biotest_anglais):
