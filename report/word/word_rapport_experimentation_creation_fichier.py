@@ -1,4 +1,4 @@
-from report import recuperation_donnee
+from . import recuperation_donnee
 from docx import Document
 from docx.shared import Pt
 import os
