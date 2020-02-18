@@ -13,6 +13,7 @@ def create_doc(campaign, agence):  # campaign correspond au nom de la campagne (
     style = doc.styles['Normal']
     font = style.font
     font.name = "Arial"
+    font.size = Pt(10)
     dico_exposure_condition, dico_avg_tempe, dico_geo_mp, dico_geo_agency, dico_type_biotest = recuperation_donnee(
         campaign)
     print('Données récupérées !')
@@ -94,10 +95,25 @@ def create_doc(campaign, agence):  # campaign correspond au nom de la campagne (
             table_geo.cell(5, 3).paragraphs[0].add_run(
                 str(dico_geo_mp[reference]['latitudeSpotted']))
 
-        url = f"https://api.mapbox.com/styles/v1/mapbox/satellite-streets-v11/static/{str(dico_geo_mp[reference]['longitudeSpotted'])},{str(dico_geo_mp[reference]['latitudeSpotted'])},7.53/300x200?access_token=pk.eyJ1IjoiamJyb25uZXIiLCJhIjoiY2s2cW5kOWQwMHBybjNtcW8yMXJuYmo3aiJ9.z8Ekf7a0RGTZ4jrbJVpq8g"
-        response = requests.get(url)
+        table_carte = doc.add_table(rows=4, cols=1)
+        url_street = f"https://api.mapbox.com/styles/v1/mapbox/streets-v11/static/pin-s+FF0000({str(dico_geo_mp[reference]['longitudeSpotted'])},{str(dico_geo_mp[reference]['latitudeSpotted'])})/{str(dico_geo_mp[reference]['longitudeSpotted'])},{str(dico_geo_mp[reference]['latitudeSpotted'])},9.21/450x300@2x?access_token=pk.eyJ1IjoiamJyb25uZXIiLCJhIjoiY2s2cW5kOWQwMHBybjNtcW8yMXJuYmo3aiJ9.z8Ekf7a0RGTZ4jrbJVpq8g"
+        response = requests.get(url_street)
+        carte_street = BytesIO(response.content)
+        table_carte.cell(0, 0).paragraphs[0].add_run().add_picture(
+            carte_street, width=4500000)
+        table_carte.cell(0, 0).paragraphs[0].alignment = 1
+        table_carte.cell(1, 0).text = "Vue carte situant les villes alentours"
+        table_carte.cell(1, 0).paragraphs[0].alignment = 1
+
+        url_satellite = f"https://api.mapbox.com/styles/v1/mapbox/satellite-streets-v11/static/pin-s+FF0000({str(dico_geo_mp[reference]['longitudeSpotted'])},{str(dico_geo_mp[reference]['latitudeSpotted'])})/{str(dico_geo_mp[reference]['longitudeSpotted'])},{str(dico_geo_mp[reference]['latitudeSpotted'])},13.5/450x300@2x?access_token=pk.eyJ1IjoiamJyb25uZXIiLCJhIjoiY2s2cW5kOWQwMHBybjNtcW8yMXJuYmo3aiJ9.z8Ekf7a0RGTZ4jrbJVpq8g"
+        response = requests.get(url_satellite)
         carte_satellite = BytesIO(response.content)
-        doc.add_picture(carte_satellite)
+        table_carte.cell(2, 0).paragraphs[0].add_run().add_picture(
+            carte_satellite, width=4500000)
+        table_carte.cell(2, 0).paragraphs[0].alignment = 1
+        table_carte.cell(
+            3, 0).text = "Vue satellitaire montrant la zone d'encagement vue du ciel"
+        table_carte.cell(3, 0).paragraphs[0].alignment = 1
 
         doc.add_page_break()
 
@@ -234,7 +250,11 @@ def create_doc(campaign, agence):  # campaign correspond au nom de la campagne (
         table_exposure_condition.cell(6, 0).merge(
             table_exposure_condition.cell(6, nombre_jours_utiles))
         paragraph = table_exposure_condition.cell(6, 0).paragraphs[0]
-        paragraph.add_run("Commentaire : Où le trouver ? ")
+        comment = ""
+        for jour in liste_jours:
+            if dico_exposure_condition[reference][jour]['comment'] != None:
+                comment += f"{jour} : {dico_exposure_condition[reference][jour]['comment']}\n"
+        paragraph.add_run(comment[:-1])
         for num_entete in range(7):
             for num_jour in range(1+nombre_jours_utiles):
                 paragraph = table_exposure_condition.cell(
