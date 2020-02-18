@@ -47,14 +47,14 @@ def data_exposure_condition_fusion(measurepoints):
             measurepoint = id_mp_1
 
         output = QueryScript(
-            f"SELECT recordedAt, temperature, conductivity, oxygen, ph, type FROM measureexposurecondition WHERE measurepoint_id = {measurepoint} and step = {step} and barrel = {barrel}").execute()
+            f"SELECT recordedAt, temperature, conductivity, oxygen, ph, type, comment FROM measureexposurecondition WHERE measurepoint_id = {measurepoint} and step = {step} and barrel = {barrel}").execute()
         if len(output) != 0:
             output = output[0]
             dico_temp = {'date': parser(output[0]), 'temperature': output[1],
-                         'conductivity': output[2], 'oxygen': output[3], 'ph': output[4], 'type': output[5]}
+                         'conductivity': output[2], 'oxygen': output[3], 'ph': output[4], 'type': output[5], 'comment': output[6]}
         else:
             dico_temp = {'date': None, 'temperature': None,
-                         'conductivity': None, 'oxygen': None, 'ph': None, 'type': None}
+                         'conductivity': None, 'oxygen': None, 'ph': None, 'type': None, 'comment': None}
         dico[days[i]] = dico_temp
 
     return dico
@@ -68,14 +68,14 @@ def data_exposure_condition_simple(measurepoint_id):
     for i in range(4):
         step, barrel = steps_barrel[i]
         output = QueryScript(
-            f"SELECT recordedAt, temperature, conductivity, oxygen, ph, type FROM measureexposurecondition WHERE measurepoint_id = {measurepoint_id} and step = {step} and barrel = {barrel}").execute()
+            f"SELECT recordedAt, temperature, conductivity, oxygen, ph, type, comment FROM measureexposurecondition WHERE measurepoint_id = {measurepoint_id} and step = {step} and barrel = {barrel}").execute()
         if len(output) != 0:
             output = output[0]
             dico_temp = {'date': parser(output[0]), 'temperature': output[1],
-                         'conductivity': output[2], 'oxygen': output[3], 'ph': output[4], 'type': output[5]}
+                         'conductivity': output[2], 'oxygen': output[3], 'ph': output[4], 'type': output[5], 'comment': output[6]}
         else:
             dico_temp = {'date': None, 'temperature': None,
-                         'conductivity': None, 'oxygen': None, 'ph': None, 'type': None}
+                         'conductivity': None, 'oxygen': None, 'ph': None, 'type': None, 'comment': None}
         dico[days[i]] = dico_temp
 
     return dico
