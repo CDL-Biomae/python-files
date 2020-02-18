@@ -1,6 +1,5 @@
 from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
 from openpyxl import load_workbook
-from openpyxl.utils.cell import get_column_letter
 from termcolor import colored
 
 

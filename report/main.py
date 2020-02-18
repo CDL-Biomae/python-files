@@ -1,6 +1,4 @@
-from tools import QueryScript
 from report import *
-
 import pandas as pd
 from termcolor import colored
 from openpyxl import load_workbook

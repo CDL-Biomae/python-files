@@ -4,6 +4,7 @@ from openpyxl.utils.cell import get_column_letter
 from termcolor import colored
 import math
 
+
 def add_style_physicochimie(physicochimie_dataframe, filename):
     PATH = f"output\\{filename}"
     wb = load_workbook(PATH)
