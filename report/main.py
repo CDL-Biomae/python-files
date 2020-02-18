@@ -76,59 +76,49 @@ def main(list_campaigns):  # Prend en entrée une liste de reference de campagne
 
     # create_tox_dataframe(head_dataframe, list_campaigns, dict_mp)
 
-    #print (create_dataframe(dict_mp))
-
-
-    #    # CREATION DE L'ONGLET STATIONS ##
-    # stations_dataframe = create_tox_dataframe(head_dataframe, list_campaigns, dict_mp)
-    # write_in_new_excel(stations_dataframe, filename, 'Stations')
-    # add_style_stations(stations_dataframe, filename)
-
-    # CREATION DE L'ONGLET STATIONS ##
-    stations_dataframe = create_stations_dataframe(head_dataframe, list_campaigns, dict_mp)
-    write_in_new_excel(stations_dataframe, filename, 'Stations')
-    # utiliser openpyxl pour changer le style de la feuille
-
-    # print (create_dataframe(dict_mp))
-
     ## CREATION DE L'ONGLET VERSION ##
+
     print('\n[!] Création de l\'onglet \"Version\"...')
     version_dataframe = create_version_dataframe()
     write_in_new_excel(version_dataframe, filename, 'Version', startrow=3)
     add_style_version(version_dataframe, list_campaigns, filename)
 
     ## CREATION DE L'ONGLET STATIONS ##
+
     print('\n[!] Création de l\'onglet \"Stations\"...')
     stations_dataframe = create_stations_dataframe(head_dataframe, list_campaigns, dict_mp)
     write_in_existing_excel(stations_dataframe, filename, 'Stations')
     add_style_stations(stations_dataframe, filename)
-    
+
+    ## CREATION DE L'ONGLET CAMPAGNES ##
+
+    print('\n[!] Création de l\'onglet \"Campagnes\"...')
+    campagnes_dataframe = create_campagnes_dataframe(head_dataframe, list_campaigns, dict_mp)
+    write_in_existing_excel(campagnes_dataframe, filename, 'Campagnes')
+    add_style_campagnes(campagnes_dataframe, filename)
+
+    ## CREATION DE L'ONGLET PHYSICO-CHIMIE ##
+
+    print('\n[!] Création de l\'onglet \"Physico-chimie\"...')
+    physicochimie_dataframe = create_physicochimie_dataframe(head_dataframe, list_campaigns, dict_mp)
+    write_in_existing_excel(physicochimie_dataframe, filename, 'Physico-chimie_refChimie', startrow=2)
+    write_in_existing_excel(physicochimie_dataframe, filename, 'Physico-chimie_refToxicité', startrow=2)
+    add_style_physicochimie(physicochimie_dataframe, filename)
+
     ## CREATION DE L'ONGLET NQE ##
-    
+
     print('\n[!] Création de l\'onglet \"NQE Biote\"...')
     nqe_dataframe = create_nqe_dataframe(head_dataframe, list_campaigns, dict_mp)
     write_in_existing_excel(nqe_dataframe, filename, 'NQE Biote', startrow=3)
     add_style_nqe(nqe_dataframe, filename)
     
     ## CREATION DE L'ONGLET BBAC ##
-    
+
     print('\n[!] Création de l\'onglet \"BBAC\"...')
     bbac_dataframe = create_bbac_dataframe(head_dataframe, list_campaigns, dict_mp)
     bbac2_dataframe = create_bbac2_dataframe(head_dataframe, list_campaigns, dict_mp)
     write_in_existing_excel(bbac_dataframe, filename, 'BBAC', startrow=3)
     write_in_existing_excel(bbac2_dataframe, filename, 'BBAC2', startrow=3)
     add_style_bbac(bbac_dataframe, filename)
-    
 
-    # ## CREATION DE L'ONGLET CAMPAGNES ##
-
-    # campagnes_dataframe = create_campagnes_dataframe(
-    # head_dataframe, list_campaigns, dict_mp)
-    # write_in_existing_excel(campagnes_dataframe, filename, 'Campagnes')
-
-    # ## CREATION DE L'ONGLET PHYSICO-CHIMIE ##
-    # physicochimie_dataframe = create_physicochimie_dataframe(head_dataframe, list_campaigns, dict_mp)
-    # write_in_existing_excel(physicochimie_dataframe, filename, 'Physico-chimie')
-
-# main(['AG-003-01', 'AG-003-02'])
 
