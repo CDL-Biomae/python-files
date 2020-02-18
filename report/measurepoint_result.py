@@ -9,9 +9,9 @@ def measurepoint_result(measurepoint_id):
         
         if(pack[0]=='alimentation'):
             print("survie_7jour :" +str(survie_7jour(pack[1]))+" alimentation :" +str(alimentation(pack[1])) )
+            
         if(pack[0]=='neurology'):
             print("neurotoxicity :" +str(neurotoxicity(pack[1])))
-
         if(pack[0]=='reproduction'):
             print(" female_survivor :" +str(female_survivor(pack[1]))+
                   " nombre jour d'exepostion :" + str(number_days_exposition(pack[1]))+
@@ -22,7 +22,7 @@ def measurepoint_result(measurepoint_id):
                   " n :" + str(number_female_concerned_area(pack[1])[0])+
                   " perturbation endocrinienne :" + str(endocrine_disruption(pack[1]))
              )
-            #print("Survie female :"+ str(female_survivor(pack[1])) + "number_days_exposition :  "+ str(number_days_exposition(pack[1]))+"n L6 : "+str(number_female_concerned(pack[1])) +"index_fertility_average : "+str(index_fertility_average(pack[1])))
+         
           
 
 
