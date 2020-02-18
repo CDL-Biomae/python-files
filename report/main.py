@@ -120,15 +120,15 @@ def main(list_campaigns):  # Prend en entrée une liste de reference de campagne
     add_style_bbac(bbac_dataframe, filename)
     
 
-    ## CREATION DE L'ONGLET CAMPAGNES ##
+    # ## CREATION DE L'ONGLET CAMPAGNES ##
 
-    #campagnes_dataframe = create_campagnes_dataframe(
-    #head_dataframe, list_campaigns, dict_mp)
-    #write_in_existing_excel(campagnes_dataframe, filename, 'Campagnes')
+    # campagnes_dataframe = create_campagnes_dataframe(
+    # head_dataframe, list_campaigns, dict_mp)
+    # write_in_existing_excel(campagnes_dataframe, filename, 'Campagnes')
 
-    ## CREATION DE L'ONGLET PHYSICO-CHIMIE ##
-    #physicochimie_dataframe = create_physicochimie_dataframe(head_dataframe, list_campaigns, dict_mp)
-    #write_in_existing_excel(physicochimie_dataframe, filename, 'Physico-chimie')
+    # ## CREATION DE L'ONGLET PHYSICO-CHIMIE ##
+    # physicochimie_dataframe = create_physicochimie_dataframe(head_dataframe, list_campaigns, dict_mp)
+    # write_in_existing_excel(physicochimie_dataframe, filename, 'Physico-chimie')
 
 # main(['AG-003-01', 'AG-003-02'])
 
