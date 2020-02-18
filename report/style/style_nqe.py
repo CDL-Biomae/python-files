@@ -3,6 +3,8 @@ from openpyxl import load_workbook
 from openpyxl.utils.cell import get_column_letter
 import pandas as pd
 from calcul import chemistry, elements_crustacean, elements_fish
+from termcolor import colored
+
 
 
 def add_style_nqe(nqe_dataframe, filename):
@@ -23,27 +25,23 @@ def add_style_nqe(nqe_dataframe, filename):
             ws[letter+str(number)].border = borders
     
     ## UNIT 
-    [unit_crustacean, sandre_crustacean, NQE_crustacean] = chemistry.get_unit(elements_crustacean.keys()) 
-    [unit_fish, sandre_fish, NQE_fish] = chemistry.get_unit(elements_fish.keys()) 
-    unit_fish.append('')
-    
-    sandre_fish.append('')
+    [unit_crustacean, sandre_crustacean, NQE_crustacean] = chemistry.get_unit_NQE(elements_crustacean.keys()) 
+    [unit_fish, sandre_fish, NQE_fish] = chemistry.get_unit_NQE(elements_fish.keys()) 
     index = 0
+    sandre_checked = sandre_crustacean
+    unit_checked = unit_crustacean
+    
     for letter in header_columns[5:]:
-        try :
-            ws[letter + '2'].value = unit_crustacean[index]
-            ws[letter + '3'].value = sandre_crustacean[index]
+        
+        if index<len(sandre_checked):
+            ws[letter + '2'].value = unit_checked[index]
+            ws[letter + '3'].value = sandre_checked[index]
             index+=1
-        except:
-            try : 
-                ws[letter + '2'].value = unit_fish[index - len(unit_crustacean)-1]
+        else :
+            index=0
+            sandre_checked = sandre_fish
+            unit_checked = unit_fish
 
-                ws[letter + '3'].value = sandre_fish[index - len(unit_crustacean)-1]
-
-                index+=1
-            except :
-                ws[letter +'2'].value = ''
-                ws[letter +'3'].value = ''
     ## Merge unit
     
     current_unit = ws['G2'].value 
@@ -68,10 +66,6 @@ def add_style_nqe(nqe_dataframe, filename):
     ws['D2'].value = 'Station de mesure'
     ws['E2'].value = 'Code agence'
     
-    ws.merge_cells('B2:B4')
-    ws.merge_cells('C2:C4')
-    ws.merge_cells('D2:D4')
-    ws.merge_cells('E2:E4')
     
     header_cells = [c+header_row for c in header_columns]
     header_font = Font(size=8, bold=True, name='Arial')
@@ -95,6 +89,10 @@ def add_style_nqe(nqe_dataframe, filename):
     ws['D2'].alignment = header_alignment_no_rotate
     ws['E2'].alignment = header_alignment_rotate
     
+    ws.merge_cells('B2:B4')
+    ws.merge_cells('C2:C4')
+    ws.merge_cells('D2:D4')
+    ws.merge_cells('E2:E4')
     
     
     header_font = Font(size=8, name='Arial')
@@ -155,5 +153,5 @@ def add_style_nqe(nqe_dataframe, filename):
     wb.save(PATH)
     wb.close()
 
-    print('[+] La mise en page de l\'onglet \"NQE\" est terminée')
+    print(colored('[+] La mise en page de l\'onglet \"NQE\" est terminée','green'))
 

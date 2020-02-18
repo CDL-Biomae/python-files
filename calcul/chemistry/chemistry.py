@@ -53,7 +53,7 @@ def convert_list(list_converted):
             
     return list_converted
 
-def get_unit(sandre_list):
+def get_unit_NQE(sandre_list):
     output = QueryScript(f"SELECT familly, sandre, NQE FROM r3 WHERE sandre IN {tuple(sandre_list)}").execute()
     result=[[],[],[]]
     if len(output):
@@ -70,84 +70,117 @@ def get_unit(sandre_list):
                         result[1].append(int(float(element[1])))
                         result[2].append(float(element[2]) if element[2]!='' else '')
     return result
-                
 
-def data(pack_id):
-    
-    threshold_7j_metal = convert_list(QueryScript("SELECT sandre, parameter, 7j_threshold, 7j_graduate_25, 7j_graduate_50, 7j_graduate_75 FROM r3 WHERE familly='Métaux' AND 7j_threshold IS NOT NULL").execute())
-    threshold_21j_metal = convert_list(QueryScript("SELECT sandre, parameter, 21j_threshold, 21j_graduate_25, 21j_graduate_50, 21j_graduate_75 FROM r3 WHERE familly='Métaux' AND 21j_threshold IS NOT NULL").execute())
-    threshold_7j_organic = convert_list(QueryScript("SELECT sandre, parameter, 7j_threshold, 7j_graduate_25, 7j_graduate_50, 7j_graduate_75 FROM r3 WHERE familly!='Métaux' AND 7j_threshold IS NOT NULL").execute())
-    threshold_21j_organic = convert_list(QueryScript("SELECT sandre, parameter, 21j_threshold, 21j_graduate_25, 21j_graduate_50, 21j_graduate_75 FROM r3 WHERE familly!='Métaux' AND 21j_threshold IS NOT NULL").execute())
+def get_unit(sandre_list):
+    output = QueryScript(f"SELECT familly, sandre FROM r3 WHERE sandre IN {tuple(sandre_list)}").execute()
+    result=[[],[]]
+    if len(output):
+        for sandre in sandre_list:
+            for element in output:
+                if sandre==int(float(element[1])):
+                    if element[0]=='Métaux':
+                        result[0].append('mg/kg PF')
+                        result[1].append(int(float(element[1])))
 
-    # print(threshold_7j_organic)
-    sandre_list = convert_list(QueryScript("SELECT sandre FROM r3 WHERE sandre NOT IN ('/',1358,'') ORDER BY id").execute())
-    sandre_output = []
-    sandre_output.append(result_by_pack_and_sandre(pack_id,[element for element in sandre_list])) 
-    total_output = []
-    
-    crustacean_list = []
-    for element in elements_crustacean.keys() : 
+                    else :
+                        result[0].append('µg/kg PF')
+                        result[1].append(int(float(element[1])))
+    return result
+
+def result_by_pack_and_sandre(pack_id, sandre_list) :
+    result = [[],[]]
+    output = QueryScript(f"SELECT prefix, value, sandre FROM analysis WHERE pack_id={pack_id} AND sandre IN {tuple(sandre_list)}").execute()
+
+    for sandre in sandre_list:
         try :
-            index = [int(sandre[1]) for sandre in sandre_output[0]].index(element)
+            index = [int(element[2]) for element in output].index(sandre)
+            result[0].append(str(output[index][1]) if output[index][0]==None else output[index][0] + str(output[index][1]))
+            result[1].append(output[index][2])
         except :
-            index = "not found"
-        crustacean_list.append(sandre_output[0][index][0] if index != "not found" else "ND")
-    total_output.append(crustacean_list)
+            result[0].append("ND")
+            result[1].append(sandre)
+           
+    return result
+
+
+
+
+# def data(pack_id, sandre_list):
     
-    fish_list = []
-    for element in elements_fish.keys() : 
-        try :
-            index = [int(sandre[1]) for sandre in sandre_output[0]].index(element)
-        except :
-            index = "not found"
-        fish_list.append(sandre_output[0][index][0] if index != "not found" else "ND")
-    total_output.append(fish_list)
+#     threshold_7j_metal = convert_list(QueryScript("SELECT sandre, parameter, 7j_threshold, 7j_graduate_25, 7j_graduate_50, 7j_graduate_75 FROM r3 WHERE familly='Métaux' AND 7j_threshold IS NOT NULL").execute())
+#     threshold_21j_metal = convert_list(QueryScript("SELECT sandre, parameter, 21j_threshold, 21j_graduate_25, 21j_graduate_50, 21j_graduate_75 FROM r3 WHERE familly='Métaux' AND 21j_threshold IS NOT NULL").execute())
+#     threshold_7j_organic = convert_list(QueryScript("SELECT sandre, parameter, 7j_threshold, 7j_graduate_25, 7j_graduate_50, 7j_graduate_75 FROM r3 WHERE familly!='Métaux' AND 7j_threshold IS NOT NULL").execute())
+#     threshold_21j_organic = convert_list(QueryScript("SELECT sandre, parameter, 21j_threshold, 21j_graduate_25, 21j_graduate_50, 21j_graduate_75 FROM r3 WHERE familly!='Métaux' AND 21j_threshold IS NOT NULL").execute())
+
+#     # print(threshold_7j_organic)
+#     sandre_list = convert_list(QueryScript("SELECT sandre FROM r3 WHERE sandre NOT IN ('/',1358,'') ORDER BY id").execute())
+#     sandre_output = []
+#     sandre_output.append(result_by_pack_and_sandre(pack_id,[element for element in sandre_list])) 
+#     total_output = []
     
-    threshold_7j_metal_list = []
-    for element in [el[0] for el in threshold_7j_metal] : 
-        try :
-            index = [int(sandre[1]) for sandre in sandre_output[0]].index(element)
-        except :
-            index = "not found"
-        threshold_7j_metal_list.append(sandre_output[0][index][0] if index != "not found" else "ND")
-    total_output.append(threshold_7j_metal_list)
+#     crustacean_list = []
+#     for element in elements_crustacean.keys() : 
+#         try :
+#             index = [int(sandre[1]) for sandre in sandre_output[0]].index(element)
+#         except :
+#             index = "not found"
+#         crustacean_list.append(sandre_output[0][index][0] if index != "not found" else "ND")
+#     total_output.append(crustacean_list)
     
-    threshold_7j_organic_list = []
-    for element in [el[0] for el in threshold_7j_organic] : 
-        try :
-            index = [int(sandre[1]) for sandre in sandre_output[0]].index(element)
-        except :
-            index = "not found"
-        threshold_7j_organic_list.append(sandre_output[0][index][0] if index != "not found" else "ND")
-    total_output.append(threshold_7j_organic_list)
+#     fish_list = []
+#     for element in elements_fish.keys() : 
+#         try :
+#             index = [int(sandre[1]) for sandre in sandre_output[0]].index(element)
+#         except :
+#             index = "not found"
+#         fish_list.append(sandre_output[0][index][0] if index != "not found" else "ND")
+#     total_output.append(fish_list)
     
-    threshold_21j_metal_list = []
-    for element in [el[0] for el in threshold_21j_metal] : 
-        try :
-            index = [int(sandre[1]) for sandre in sandre_output[0]].index(element)
-        except :
-            index = "not found"
-        threshold_21j_metal_list.append(sandre_output[0][index][0] if index != "not found" else "ND")
-    total_output.append(threshold_21j_metal_list)
+#     threshold_7j_metal_list = []
+#     for element in [el[0] for el in threshold_7j_metal] : 
+#         try :
+#             index = [int(sandre[1]) for sandre in sandre_output[0]].index(element)
+#         except :
+#             index = "not found"
+#         threshold_7j_metal_list.append(sandre_output[0][index][0] if index != "not found" else "ND")
+#     total_output.append(threshold_7j_metal_list)
+    
+#     threshold_7j_organic_list = []
+#     for element in [el[0] for el in threshold_7j_organic] : 
+#         try :
+#             index = [int(sandre[1]) for sandre in sandre_output[0]].index(element)
+#         except :
+#             index = "not found"
+#         threshold_7j_organic_list.append(sandre_output[0][index][0] if index != "not found" else "ND")
+#     total_output.append(threshold_7j_organic_list)
+    
+#     threshold_21j_metal_list = []
+#     for element in [el[0] for el in threshold_21j_metal] : 
+#         try :
+#             index = [int(sandre[1]) for sandre in sandre_output[0]].index(element)
+#         except :
+#             index = "not found"
+#         threshold_21j_metal_list.append(sandre_output[0][index][0] if index != "not found" else "ND")
+#     total_output.append(threshold_21j_metal_list)
      
-    threshold_21j_organic_list = []
-    for element in [el[0] for el in threshold_21j_organic] : 
-        try :
-            index = [int(sandre[1]) for sandre in sandre_output[0]].index(element)
-        except :
-            index = "not found"
-        threshold_21j_organic_list.append(sandre_output[0][index][0] if index != "not found" else "ND")
-    total_output.append(threshold_21j_organic_list)
+#     threshold_21j_organic_list = []
+#     for element in [el[0] for el in threshold_21j_organic] : 
+#         try :
+#             index = [int(sandre[1]) for sandre in sandre_output[0]].index(element)
+#         except :
+#             index = "not found"
+#         threshold_21j_organic_list.append(sandre_output[0][index][0] if index != "not found" else "ND")
+#     total_output.append(threshold_21j_organic_list)
     
-    sandre_output_list = []
-    for element in sandre_list : 
+#     sandre_output_list = []
+#     for element in sandre_list : 
 
-        try :
-            index = [float(sandre[1]) for sandre in sandre_output[0]].index(element)
-        except :
-            index = "not found"
-        sandre_output_list.append(sandre_output[0][index][0] if index != "not found" else "ND")
-    total_output.append(sandre_output_list)
+#         try :
+#             index = [float(sandre[1]) for sandre in sandre_output[0]].index(element)
+#         except :
+#             index = "not found"
+#         sandre_output_list.append(sandre_output[0][index][0] if index != "not found" else "ND")
+#     total_output.append(sandre_output_list)
     
     
-    return total_output
+#     return total_output
