@@ -4,9 +4,11 @@ from docx.shared import Pt
 from docxcompose.composer import Composer
 import os
 from PIL import Image, ExifTags
+import requests
+from io import BytesIO
 
 
-def create_doc(campaign):
+def create_doc(campaign, agence):  # campaign correspond au nom de la campagne (ex: AG-003-01) et agence est un booléen qui dit si c'est une agence l'eau ou non
     doc = Document('Fichiers_remplissage/Page_de_garde.docx')
     style = doc.styles['Normal']
     font = style.font
@@ -17,11 +19,19 @@ def create_doc(campaign):
     liste_reference = list(dico_avg_tempe.keys())
     for reference in liste_reference:
         doc.add_page_break()
-        table_geo = doc.add_table(rows=8, cols=4)
-        for j in range(2, 8):
-            table_geo.cell(j, 0).merge(table_geo.cell(j, 1))
-        for j in range(2, 5):
-            table_geo.cell(j, 2).merge(table_geo.cell(j, 3))
+
+        if agence:
+            table_geo = doc.add_table(rows=8, cols=4)
+            for j in range(2, 8):
+                table_geo.cell(j, 0).merge(table_geo.cell(j, 1))
+            for j in range(2, 5):
+                table_geo.cell(j, 2).merge(table_geo.cell(j, 3))
+        else:
+            table_geo = doc.add_table(rows=6, cols=4)
+            for j in range(2, 6):
+                table_geo.cell(j, 0).merge(table_geo.cell(j, 1))
+            for j in range(2, 5):
+                table_geo.cell(j, 2).merge(table_geo.cell(j, 3))
 
         header = table_geo.rows[0].cells
         header[0].merge(header[-1])
@@ -54,26 +64,40 @@ def create_doc(campaign):
         table_geo.cell(4, 2).paragraphs[0].add_run(
             dico_geo_agency[reference]['hydroecoregion'])
 
-        table_geo.cell(5, 0).paragraphs[0].add_run(
-            "Coordonnées Agence Lambert 93 :").bold = True
-        table_geo.cell(5, 2).paragraphs[0].add_run('Y ' +
-                                                   dico_geo_agency[reference]['lambertY'])
-        table_geo.cell(5, 3).paragraphs[0].add_run('X ' +
-                                                   dico_geo_agency[reference]['lambertX'])
+        if agence:
+            table_geo.cell(5, 0).paragraphs[0].add_run(
+                "Coordonnées Agence Lambert 93 :").bold = True
+            table_geo.cell(5, 2).paragraphs[0].add_run('Y ' +
+                                                       dico_geo_agency[reference]['lambertY'])
+            table_geo.cell(5, 3).paragraphs[0].add_run('X ' +
+                                                       dico_geo_agency[reference]['lambertX'])
 
-        table_geo.cell(6, 0).paragraphs[0].add_run(
-            "Coordonnées BIOMÆ en degrés décimaux : ").bold = True
-        table_geo.cell(6, 2).paragraphs[0].add_run(
-            str(dico_geo_mp[reference]['longitudeSpotted']))
-        table_geo.cell(6, 3).paragraphs[0].add_run(
-            str(dico_geo_mp[reference]['latitudeSpotted']))
+            table_geo.cell(6, 0).paragraphs[0].add_run(
+                "Coordonnées BIOMÆ en degrés décimaux : ").bold = True
+            table_geo.cell(6, 2).paragraphs[0].add_run(
+                str(dico_geo_mp[reference]['longitudeSpotted']))
+            table_geo.cell(6, 3).paragraphs[0].add_run(
+                str(dico_geo_mp[reference]['latitudeSpotted']))
 
-        table_geo.cell(7, 0).paragraphs[0].add_run(
-            "Coordonnées BIOMÆ Lambert 93 : ").bold = True
-        table_geo.cell(7, 2).paragraphs[0].add_run('Y ' +
-                                                   dico_geo_mp[reference]['lambertYSpotted'])
-        table_geo.cell(7, 3).paragraphs[0].add_run('X ' +
-                                                   dico_geo_mp[reference]['lambertXSpotted'])
+            table_geo.cell(7, 0).paragraphs[0].add_run(
+                "Coordonnées BIOMÆ Lambert 93 : ").bold = True
+            table_geo.cell(7, 2).paragraphs[0].add_run('Y ' +
+                                                       dico_geo_mp[reference]['lambertYSpotted'])
+            table_geo.cell(7, 3).paragraphs[0].add_run('X ' +
+                                                       dico_geo_mp[reference]['lambertXSpotted'])
+
+        else:
+            table_geo.cell(5, 0).paragraphs[0].add_run(
+                "Coordonnées BIOMÆ en degrés décimaux : ").bold = True
+            table_geo.cell(5, 2).paragraphs[0].add_run(
+                str(dico_geo_mp[reference]['longitudeSpotted']))
+            table_geo.cell(5, 3).paragraphs[0].add_run(
+                str(dico_geo_mp[reference]['latitudeSpotted']))
+
+        url = f"https://api.mapbox.com/styles/v1/mapbox/satellite-streets-v11/static/{str(dico_geo_mp[reference]['longitudeSpotted'])},{str(dico_geo_mp[reference]['latitudeSpotted'])},7.53/300x200?access_token=pk.eyJ1IjoiamJyb25uZXIiLCJhIjoiY2s2cW5kOWQwMHBybjNtcW8yMXJuYmo3aiJ9.z8Ekf7a0RGTZ4jrbJVpq8g"
+        response = requests.get(url)
+        carte_satellite = BytesIO(response.content)
+        doc.add_picture(carte_satellite)
 
         doc.add_page_break()
 
