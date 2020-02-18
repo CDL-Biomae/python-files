@@ -8,7 +8,7 @@ def number_days_exposition(pack_id):
      fusion_id = fusion_id_finder(pack_id)
      SQL_request = "SELECT date FROM key_dates where date_id IN(4,6) and measurepoint_fusion_id="+str(fusion_id)
      LR_dates =  QueryScript(SQL_request).execute()
-     if (LR_dates[0]==None or LR_dates[1]==None ):
+     if LR_dates[0]!=None or LR_dates[1]!=None :
            if(LR_dates==" "):
                 return "NA"
            else:
@@ -22,12 +22,14 @@ def number_days_exposition(pack_id):
     
 
 def size_female_mm(pack_id):
-     SQL_request = "SELECT specimen_size_mm, specimen_size_px embryo_total FROM biomae.measurereprotoxicity where pack_id ="+str(pack_id)
+     SQL_request = "SELECT specimen_size_mm, specimen_size_px, embryo_total FROM biomae.measurereprotoxicity where pack_id ="+str(pack_id)
      siz_female_mm =[]
      resultat2 =  QueryScript(SQL_request).execute()
-          
-     for i in range (len(resultat2)-1):
-          siz_female_mm.append(resultat2[i][1]*resultat2[len(resultat2)-1][0]/resultat2[len(resultat2)-1][1])
+     if(resultat2[len(resultat2)-1][1]!=0):     
+          for i in range (len(resultat2)-1):
+               siz_female_mm.append(resultat2[i][1]*resultat2[len(resultat2)-1][0]/resultat2[len(resultat2)-1][1])
+     
+     #print(siz_female_mm)
 
      return siz_female_mm
 
@@ -48,7 +50,8 @@ def index_fertility_female_X(pack_id):
                else:
                     index_female.append(0)
        else:
-             index_female.append(0)     
+             index_female.append(0)  
+          
      return index_female
 
 
@@ -91,6 +94,7 @@ def number_female_analysis(pack_id):
    # Fécondité 
 def index_fertility_average(pack_id):
      number_female= number_female_analysis(pack_id)
+    
      if type(number_female) == int:
            if number_female<10:
                  return "NA"
