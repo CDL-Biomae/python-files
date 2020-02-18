@@ -10,10 +10,12 @@ def create_dataframe(list_mp):
         mp = list_mp[i]
         pack = QueryScript(f"SELECT id FROM pack WHERE nature='chemistry' AND measurepoint_id={mp}").execute()
         if len(pack)>0:
-            [crustacean, fish] = chemistry.data(pack[0])[:2]
-            matrix.append([''] + crustacean + [''] + fish)
+            crustacean = chemistry.result_by_pack_and_sandre(pack[0],list(elements_crustacean.keys()))
+            fish = chemistry.result_by_pack_and_sandre(pack[0],list(elements_fish.keys()))
         else:
-            matrix.append([''] + ['ND' for el in elements_crustacean] + [''] + ['ND' for el in elements_fish])
+            crustacean =  [['ND' for el in elements_crustacean],list(elements_crustacean.keys())]
+            fish =  [['ND' for el in elements_fish],list(elements_fish.keys())]
+        matrix.append([''] + crustacean[0] + [''] + fish[0])
     df = pd.DataFrame(matrix)
     df.columns = [''] + list(elements_crustacean.values()) + [''] + list(elements_fish.values())
     df = df.dropna(how='all', axis='columns')

@@ -1,24 +1,37 @@
-from report import recuperation_donnee
+from . import recuperation_donnee
 from docx import Document
 from docx.shared import Pt
+from docxcompose.composer import Composer
 import os
+from PIL import Image, ExifTags
+import requests
+from io import BytesIO
 
 
-def create_doc(campaign):
+def create_doc(campaign, agence):  # campaign correspond au nom de la campagne (ex: AG-003-01) et agence est un booléen qui dit si c'est une agence l'eau ou non
     doc = Document('Fichiers_remplissage/Page_de_garde.docx')
     style = doc.styles['Normal']
     font = style.font
     font.name = "Arial"
     dico_exposure_condition, dico_avg_tempe, dico_geo_mp, dico_geo_agency, dico_type_biotest = recuperation_donnee(
         campaign)
+    print('Données récupérées !')
     liste_reference = list(dico_avg_tempe.keys())
     for reference in liste_reference:
         doc.add_page_break()
-        table_geo = doc.add_table(rows=8, cols=4)
-        for j in range(2, 8):
-            table_geo.cell(j, 0).merge(table_geo.cell(j, 1))
-        for j in range(2, 5):
-            table_geo.cell(j, 2).merge(table_geo.cell(j, 3))
+
+        if agence:
+            table_geo = doc.add_table(rows=8, cols=4)
+            for j in range(2, 8):
+                table_geo.cell(j, 0).merge(table_geo.cell(j, 1))
+            for j in range(2, 5):
+                table_geo.cell(j, 2).merge(table_geo.cell(j, 3))
+        else:
+            table_geo = doc.add_table(rows=6, cols=4)
+            for j in range(2, 6):
+                table_geo.cell(j, 0).merge(table_geo.cell(j, 1))
+            for j in range(2, 5):
+                table_geo.cell(j, 2).merge(table_geo.cell(j, 3))
 
         header = table_geo.rows[0].cells
         header[0].merge(header[-1])
@@ -51,26 +64,40 @@ def create_doc(campaign):
         table_geo.cell(4, 2).paragraphs[0].add_run(
             dico_geo_agency[reference]['hydroecoregion'])
 
-        table_geo.cell(5, 0).paragraphs[0].add_run(
-            "Coordonnées Agence Lambert 93 :").bold = True
-        table_geo.cell(5, 2).paragraphs[0].add_run('Y ' +
-                                                   dico_geo_agency[reference]['lambertY'])
-        table_geo.cell(5, 3).paragraphs[0].add_run('X ' +
-                                                   dico_geo_agency[reference]['lambertX'])
+        if agence:
+            table_geo.cell(5, 0).paragraphs[0].add_run(
+                "Coordonnées Agence Lambert 93 :").bold = True
+            table_geo.cell(5, 2).paragraphs[0].add_run('Y ' +
+                                                       dico_geo_agency[reference]['lambertY'])
+            table_geo.cell(5, 3).paragraphs[0].add_run('X ' +
+                                                       dico_geo_agency[reference]['lambertX'])
 
-        table_geo.cell(6, 0).paragraphs[0].add_run(
-            "Coordonnées BIOMÆ en degrés décimaux : ").bold = True
-        table_geo.cell(6, 2).paragraphs[0].add_run(
-            str(dico_geo_mp[reference]['longitudeSpotted']))
-        table_geo.cell(6, 3).paragraphs[0].add_run(
-            str(dico_geo_mp[reference]['latitudeSpotted']))
+            table_geo.cell(6, 0).paragraphs[0].add_run(
+                "Coordonnées BIOMÆ en degrés décimaux : ").bold = True
+            table_geo.cell(6, 2).paragraphs[0].add_run(
+                str(dico_geo_mp[reference]['longitudeSpotted']))
+            table_geo.cell(6, 3).paragraphs[0].add_run(
+                str(dico_geo_mp[reference]['latitudeSpotted']))
 
-        table_geo.cell(7, 0).paragraphs[0].add_run(
-            "Coordonnées BIOMÆ Lambert 93 : ").bold = True
-        table_geo.cell(7, 2).paragraphs[0].add_run('Y ' +
-                                                   dico_geo_mp[reference]['lambertYSpotted'])
-        table_geo.cell(7, 3).paragraphs[0].add_run('X ' +
-                                                   dico_geo_mp[reference]['lambertXSpotted'])
+            table_geo.cell(7, 0).paragraphs[0].add_run(
+                "Coordonnées BIOMÆ Lambert 93 : ").bold = True
+            table_geo.cell(7, 2).paragraphs[0].add_run('Y ' +
+                                                       dico_geo_mp[reference]['lambertYSpotted'])
+            table_geo.cell(7, 3).paragraphs[0].add_run('X ' +
+                                                       dico_geo_mp[reference]['lambertXSpotted'])
+
+        else:
+            table_geo.cell(5, 0).paragraphs[0].add_run(
+                "Coordonnées BIOMÆ en degrés décimaux : ").bold = True
+            table_geo.cell(5, 2).paragraphs[0].add_run(
+                str(dico_geo_mp[reference]['longitudeSpotted']))
+            table_geo.cell(5, 3).paragraphs[0].add_run(
+                str(dico_geo_mp[reference]['latitudeSpotted']))
+
+        url = f"https://api.mapbox.com/styles/v1/mapbox/satellite-streets-v11/static/{str(dico_geo_mp[reference]['longitudeSpotted'])},{str(dico_geo_mp[reference]['latitudeSpotted'])},7.53/300x200?access_token=pk.eyJ1IjoiamJyb25uZXIiLCJhIjoiY2s2cW5kOWQwMHBybjNtcW8yMXJuYmo3aiJ9.z8Ekf7a0RGTZ4jrbJVpq8g"
+        response = requests.get(url)
+        carte_satellite = BytesIO(response.content)
+        doc.add_picture(carte_satellite)
 
         doc.add_page_break()
 
@@ -95,24 +122,20 @@ def create_doc(campaign):
         table_image.cell(5, 1).text = "Panorama encagement"
         table_image.cell(5, 1).paragraphs[0].alignment = 1
 
-        # photo_amont = 'Fichiers_remplissage/AG-003-01-01-01/step50_PDA1_AG-003-01-01-01_Amont_20190219_100021.jpg'
-        # photo_aval = 'Fichiers_remplissage/AG-003-01-01-01/step50_PDA1_AG-003-01-01-01_Aval_20190219_095956.jpg'
-        # photo_zoom = 'Fichiers_remplissage/AG-003-01-01-01/step50_PDA1_AG-003-01-01-01_Zoom_20190219_101351.jpg'
-        # photo_pano = 'Fichiers_remplissage/AG-003-01-01-01/step50_PDA1_AG-003-01-01-01_Panorama_20190219_101429.jpg'
         nom_photo = recuperation_photo(reference)
-        photo_amont = nom_photo['amont']
-        photo_aval = nom_photo['aval']
-        photo_zoom = nom_photo['zoom']
-        photo_pano = nom_photo['panorama']
+        rotation_image(nom_photo['amont'])
+        rotation_image(nom_photo['aval'])
+        rotation_image(nom_photo['zoom'])
+        rotation_image(nom_photo['panorama'])
 
         table_image.cell(2, 0).paragraphs[0].add_run().add_picture(
-            photo_aval, width=3046870, height=2111370)  # width=3046870, height=2111370
+            nom_photo['aval'], width=3046870, height=2111370)  # width=3046870, height=2111370
         table_image.cell(2, 1).paragraphs[0].add_run().add_picture(
-            photo_amont, width=3046870, height=2111370)
+            nom_photo['amont'], width=3046870, height=2111370)
         table_image.cell(4, 0).paragraphs[0].add_run().add_picture(
-            photo_zoom, width=3046870, height=2111370)
+            nom_photo['zoom'], width=3046870, height=2111370)
         table_image.cell(4, 1).paragraphs[0].add_run().add_picture(
-            photo_pano, width=3046870, height=2111370)
+            nom_photo['panorama'], width=3046870, height=2111370)
         for elt in [(2, 0), (2, 1), (4, 0), (4, 1)]:
             table_image.cell(elt[0],
                              elt[1]).paragraphs[0].paragraph_format.space_after = Pt(0)
@@ -175,7 +198,10 @@ def create_doc(campaign):
         interligne.paragraph_format.space_after = Pt(0)
         interligne.paragraph_format.space_before = Pt(0)
 
-        liste_jours = ["J+0", "J+14", "J+N", "J+21"]
+        if dico_exposure_condition[reference]['fusion?']:
+            liste_jours = ["J+0", "J+14", "J+N", "J+21"]
+        else:
+            liste_jours = ["J+0", "J+7", "J+N", "J+21"]
         liste_indice_jours_utiles = []
         for num_jour in range(4):
             if dico_exposure_condition[reference][liste_jours[num_jour]]['date'] != None:
@@ -215,14 +241,13 @@ def create_doc(campaign):
                     num_entete, num_jour).paragraphs[0]
                 paragraph.paragraph_format.space_after = Pt(4)
                 paragraph.paragraph_format.space_before = Pt(4)
-
+        print(f'Page de la référence {reference} créée ! :D')
     doc.add_page_break()
 
-    # page_fin = Document('Fichiers_remplissage/Page_fin.docx')
-    # for element in page_fin.element.body:
-    #     doc.element.body.append(element)
-
-    doc.save(campaign + "_Rapport_d_expérimentation.docx")
+    composer = Composer(doc)
+    page_fin = Document('Fichiers_remplissage/Page_fin.docx')
+    composer.append(page_fin)
+    composer.save(campaign + "_Rapport_d_expérimentation.docx")
 
 
 def traduction_type_biotest(biotest_anglais):
@@ -253,3 +278,24 @@ def recuperation_photo(reference):
         type_photo = l_nom[3].lower()
         dico_nom[type_photo] = prefixe + "/" + elt
     return dico_nom
+
+
+def rotation_image(path_photo):
+    try:
+        image = Image.open(path_photo)
+        for orientation in ExifTags.TAGS.keys():
+            if ExifTags.TAGS[orientation] == 'Orientation':
+                break
+        exif = dict(image._getexif().items())
+        if exif[orientation] == 3:
+            image = image.rotate(180, expand=True)
+        elif exif[orientation] == 6:
+            image = image.rotate(270, expand=True)
+        elif exif[orientation] == 8:
+            image = image.rotate(90, expand=True)
+        image.save(path_photo)
+        image.close()
+
+    except (AttributeError, KeyError, IndexError):
+        # cases: image don't have getexif
+        pass

@@ -12,6 +12,7 @@ def recuperation_donnee(campaign):
         data = data_exposure_condition(measurepoint)
         biotest = type_biotest(measurepoint)
         dico_exposure_condition[data[0]] = data[1]
+        dico_exposure_condition[data[0]]['fusion?'] = data[2]
         dico_type_biotest[data[0]] = biotest
     dico_avg_tempe, dico_geo_mp = average_temperature__geographic_data_measurepoint(
         measurepoints_fusion_id_list)
@@ -26,9 +27,9 @@ def data_exposure_condition(measurepoint_fusion_id):
         f"SELECT DISTINCT reference, measurepoint_id FROM key_dates JOIN measurepoint ON measurepoint.id = key_dates.measurepoint_fusion_id WHERE measurepoint_fusion_id = {measurepoint_fusion_id}").execute()
     measurepoints = [elt[1] for elt in query]
     if len(measurepoints) < 2:
-        return query[0][0], data_exposure_condition_simple(measurepoint_fusion_id)
+        return query[0][0], data_exposure_condition_simple(measurepoint_fusion_id), False
     else:
-        return query[0][0], data_exposure_condition_fusion(measurepoints)
+        return query[0][0], data_exposure_condition_fusion(measurepoints), True
 
 
 def data_exposure_condition_fusion(measurepoints):
@@ -61,7 +62,7 @@ def data_exposure_condition_fusion(measurepoints):
 
 def data_exposure_condition_simple(measurepoint_id):
     dico = {}
-    days = ["J+0", "J+14", "J+N", "J+21"]
+    days = ["J+0", "J+7", "J+N", "J+21"]
     steps_barrel = [(50, "\'R0\'"), (60, "\'R7\'"),
                     (140, "\'RN\'"), (100, "\'R21\'")]
     for i in range(4):
