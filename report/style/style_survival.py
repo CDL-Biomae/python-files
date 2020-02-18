@@ -16,6 +16,15 @@ def add_style_survie(survie_dataframe, filename):
     font_Arial9 = Font(size=9, name='Arial')
     alignment_center = Alignment(horizontal='center', vertical='center')
 
+    ## COLUMN WIDTH ##
+    ws.column_dimensions['A'].width = 3
+    ws.column_dimensions['B'].width = 30
+    ws.column_dimensions['C'].width = 12
+    ws.column_dimensions['D'].width = 3
+    ws.column_dimensions['E'].width = 45
+    ws.column_dimensions['F'].width = 14
+    ws.column_dimensions['G'].width = 20
+
     ## HEADER STYLE ##
     merging_cells = ['B2:B3', 'C2:C3', 'D2:D3', 'E2:E3', 'F2:F3', 'G2:G3']
     border_cells = ['B2', 'B3', 'C2', 'C3', 'D2', 'D3', 'E2', 'E3', 'F2', 'F3', 'G2', 'G3']

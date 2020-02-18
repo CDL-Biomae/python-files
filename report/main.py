@@ -67,8 +67,6 @@ def create_dict_mp(list_campaigns):
 
 def main(list_campaigns):  # Prend en entrée une liste de reference de campagne, ex: ['AG-003-01', 'AG-003-02']
     filename = create_filename(list_campaigns)
-    # print(list_campaigns)
-    # print(filename)
     print('[+] Starting initialisation...')
     head_dataframe = create_head_dataframe(list_campaigns)
     # print(head_dataframe.head())
@@ -97,6 +95,13 @@ def main(list_campaigns):  # Prend en entrée une liste de reference de campagne
     write_in_existing_excel(campagnes_dataframe, filename, 'Campagnes')
     add_style_campagnes(campagnes_dataframe, filename)
 
+    ## CREATION DE L'ONGLET SURVIE ##
+
+    print('\n[!] Création de l\'onglet \"Survie\"...')
+    survie_dataframe = create_survie_dataframe(head_dataframe, list_campaigns, dict_mp)
+    write_in_existing_excel(survie_dataframe, filename, 'Survie', startcol=2, startrow=2)
+    add_style_survie(survie_dataframe, filename)
+
     ## CREATION DE L'ONGLET PHYSICO-CHIMIE ##
 
     print('\n[!] Création de l\'onglet \"Physico-chimie\"...')
@@ -111,7 +116,7 @@ def main(list_campaigns):  # Prend en entrée une liste de reference de campagne
     nqe_dataframe = create_nqe_dataframe(head_dataframe, list_campaigns, dict_mp)
     write_in_existing_excel(nqe_dataframe, filename, 'NQE Biote', startrow=3)
     add_style_nqe(nqe_dataframe, filename)
-    
+
     ## CREATION DE L'ONGLET BBAC ##
 
     print('\n[!] Création de l\'onglet \"BBAC\"...')
@@ -120,5 +125,7 @@ def main(list_campaigns):  # Prend en entrée une liste de reference de campagne
     write_in_existing_excel(bbac_dataframe, filename, 'BBAC', startrow=3)
     write_in_existing_excel(bbac2_dataframe, filename, 'BBAC2', startrow=3)
     add_style_bbac(bbac_dataframe, filename)
+
+    print(colored('\n --> Rapport terminée', 'green'))
 
 

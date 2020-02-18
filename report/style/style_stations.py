@@ -14,6 +14,19 @@ def add_style_stations(stations_dataframe, filename):
     medium = Side(border_style='medium', color='FF000000')
     borders = Border(top=medium, left=medium, right=medium, bottom=medium)
 
+    ## COLUMN WIDTH ##
+    ws.column_dimensions['A'].width = 3
+    ws.column_dimensions['B'].width = 3
+    ws.column_dimensions['C'].width = 45
+    ws.column_dimensions['D'].width = 13
+    ws.column_dimensions['E'].width = 45
+    ws.column_dimensions['F'].width = 18
+    ws.column_dimensions['G'].width = 20
+    ws.column_dimensions['H'].width = 30
+    ws.column_dimensions['I'].width = 27
+    ws.column_dimensions['J'].width = 37
+    ws.column_dimensions['K'].width = 25
+
     ## HEADER STYLE ##
     header_row = '2'
     header_columns = [get_column_letter(col_idx)
