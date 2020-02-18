@@ -87,7 +87,7 @@ def main(list_campaigns):  # Prend en entrée une liste de reference de campagne
 
     print('\n[!] Création de l\'onglet \"Stations\"...')
     stations_dataframe = create_stations_dataframe(head_dataframe, list_campaigns, dict_mp)
-    write_in_new_excel(stations_dataframe, filename, 'Stations')
+    write_in_existing_excel(stations_dataframe, filename, 'Stations')
     add_style_stations(stations_dataframe, filename)
 
     ## CREATION DE L'ONGLET CAMPAGNES ##
@@ -104,7 +104,7 @@ def main(list_campaigns):  # Prend en entrée une liste de reference de campagne
     write_in_existing_excel(physicochimie_dataframe, filename, 'Physico-chimie_refChimie', startrow=2)
     write_in_existing_excel(physicochimie_dataframe, filename, 'Physico-chimie_refToxicité', startrow=2)
     add_style_physicochimie(physicochimie_dataframe, filename)
-    
+
     ## CREATION DE L'ONGLET NQE ##
 
     print('\n[!] Création de l\'onglet \"NQE Biote\"...')
