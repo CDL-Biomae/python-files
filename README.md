@@ -32,3 +32,7 @@ Dans create_xl_annexes.py
 from report import main
 main(<NOM DE/DES CAMPAGNE/S OU CONTRAT/S>)
 ```
+
+## Création du Rapport d'expérimentation (Word)
+
+Pour créer le rapport d'expérimentation il faut entrer le nom de la campagne, tout en vérifiant qu'il y a dans le dossier XXX Fichier Remplissage XXX des dossiers nommés en fonction d'un point de mesure (ex : AG-003-01-01-01), et que dans chacun de ces dossiers il y a 4 photos, de 4 natures différentes (amont, aval, panorama, zoom). Les photos doivent respecter la nomenclature suivant : "stepXX_PDA1_AG-003-01-01-01_Amont_5445664_65454.png". Les éléments importants sont la séparation par des Underscores (_, touche 8), que le 3e élément (ainsi séparé) soit la référence du point de mesure (ex : AG-003-01-01-01) et le 4e soit le point de vue de la photo (amont, aval, panorama, zoom).
