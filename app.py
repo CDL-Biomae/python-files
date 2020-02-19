@@ -19,7 +19,7 @@ class QueryApp(App):
  
     def clearText(self, instance):
         self.query.text = ''
-    
+
     def main_is_possible(self,instance):
         if self.query.text!='' and self.query.text!=None:
             main([self.query.text])
