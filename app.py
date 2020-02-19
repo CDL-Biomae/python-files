@@ -6,7 +6,6 @@ from kivy.uix.boxlayout import BoxLayout
 from report import main
 
 from kivy.core.window import Window
-from kivy.uix.screenmanager import ScreenManager, Screen
 
 
 class QueryApp(App):
