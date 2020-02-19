@@ -30,7 +30,7 @@ class QueryApp(App):
         self.query.text = ''
 
     def main_is_possible(self, instance):
-        if self.query.text != '':
+        if self.query.text != '' and self.query.text != None:
             main([self.query.text])
 
 
