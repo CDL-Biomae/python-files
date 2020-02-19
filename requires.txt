@@ -5,5 +5,6 @@ pandas==0.23.4
 openpyxl==2.5.6
 xlrd==1.1.0
 termcolor==1.1.0
+virtualenv==20.0.4
 
 Pillow==6.1.0

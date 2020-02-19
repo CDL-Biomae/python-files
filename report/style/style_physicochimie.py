@@ -205,15 +205,23 @@ def add_style_physicochimie(physicochimie_dataframe, filename):
 
     for cell_str in avg_temp_cells:
         cell = ws[cell_str]
-        avg_temp = float(cell.value)
-        if avg_temp < min_temp_chimie or avg_temp > max_temp_chimie:
-            cell.fill = PatternFill(patternType='solid', start_color='B20000', end_color='B20000')
+        try:
+            avg_temp = float(cell.value)
+        except (ValueError, TypeError):
+            cell.fill = PatternFill(patternType='solid', start_color='A6A6A6', end_color='A6A6A6')
+        else:
+            if avg_temp < min_temp_chimie or avg_temp > max_temp_chimie:
+                cell.fill = PatternFill(patternType='solid', start_color='B20000', end_color='B20000')
 
     for cell_str in avg_temp_cells:
         cell = ws2[cell_str]
-        avg_temp = float(cell.value)
-        if avg_temp < min_temp_tox or avg_temp > max_temp_tox:
-            cell.fill = PatternFill(patternType='solid', start_color='B20000', end_color='B20000')
+        try:
+            avg_temp = float(cell.value)
+        except (ValueError, TypeError):
+            cell.fill = PatternFill(patternType='solid', start_color='A6A6A6', end_color='A6A6A6')
+        else:
+            if avg_temp < min_temp_tox or avg_temp > max_temp_tox:
+                cell.fill = PatternFill(patternType='solid', start_color='B20000', end_color='B20000')
 
     # conductivité
     min_cond_chimie = min_cond_chimie if min_cond_chimie is not None else -math.inf
@@ -230,15 +238,23 @@ def add_style_physicochimie(physicochimie_dataframe, filename):
 
     for cell_str in cond_values_cells:
         cell = ws[cell_str]
-        cond = float(cell.value)
-        if cond < min_cond_chimie or cond > max_cond_chimie:
-            cell.fill = PatternFill(patternType='solid', start_color='B20000', end_color='B20000')
+        try:
+            cond = float(cell.value)
+        except (ValueError, TypeError):
+            cell.fill = PatternFill(patternType='solid', start_color='A6A6A6', end_color='A6A6A6')
+        else:
+            if cond < min_cond_chimie or cond > max_cond_chimie:
+                cell.fill = PatternFill(patternType='solid', start_color='B20000', end_color='B20000')
 
     for cell_str in cond_values_cells:
         cell = ws2[cell_str]
-        cond = float(cell.value)
-        if cond < min_cond_tox or cond > max_cond_tox:
-            cell.fill = PatternFill(patternType='solid', start_color='B20000', end_color='B20000')
+        try:
+            cond = float(cell.value)
+        except (ValueError, TypeError):
+            cell.fill = PatternFill(patternType='solid', start_color='A6A6A6', end_color='A6A6A6')
+        else:
+            if cond < min_cond_tox or cond > max_cond_tox:
+                cell.fill = PatternFill(patternType='solid', start_color='B20000', end_color='B20000')
 
     # pH
     min_pH_chimie = min_pH_chimie if min_pH_chimie is not None else -math.inf
@@ -255,15 +271,23 @@ def add_style_physicochimie(physicochimie_dataframe, filename):
 
     for cell_str in pH_values_cells:
         cell = ws[cell_str]
-        pH = float(cell.value)
-        if pH < min_pH_chimie or pH > max_pH_chimie:
-            cell.fill = PatternFill(patternType='solid', start_color='B20000', end_color='B20000')
+        try:
+            pH = float(cell.value)
+        except (ValueError, TypeError):
+            cell.fill = PatternFill(patternType='solid', start_color='A6A6A6', end_color='A6A6A6')
+        else:
+            if pH < min_pH_chimie or pH > max_pH_chimie:
+                cell.fill = PatternFill(patternType='solid', start_color='B20000', end_color='B20000')
 
     for cell_str in pH_values_cells:
         cell = ws2[cell_str]
-        pH = float(cell.value)
-        if pH < min_pH_tox or pH > max_pH_tox:
-            cell.fill = PatternFill(patternType='solid', start_color='B20000', end_color='B20000')
+        try:
+            pH = float(cell.value)
+        except (ValueError, TypeError):
+            cell.fill = PatternFill(patternType='solid', start_color='A6A6A6', end_color='A6A6A6')
+        else:
+            if pH < min_pH_tox or pH > max_pH_tox:
+                cell.fill = PatternFill(patternType='solid', start_color='B20000', end_color='B20000')
 
     # oxygene
     min_oxygen_chimie = min_oxygen_chimie if min_oxygen_chimie is not None else -math.inf
@@ -280,15 +304,23 @@ def add_style_physicochimie(physicochimie_dataframe, filename):
 
     for cell_str in oxygen_values_cells:
         cell = ws[cell_str]
-        oxygen = float(cell.value)
-        if oxygen < min_oxygen_chimie or oxygen > max_oxygen_chimie:
-            cell.fill = PatternFill(patternType='solid', start_color='B20000', end_color='B20000')
+        try:
+            oxygen = float(cell.value)
+        except (ValueError, TypeError):
+            cell.fill = PatternFill(patternType='solid', start_color='A6A6A6', end_color='A6A6A6')
+        else:
+            if oxygen < min_oxygen_chimie or oxygen > max_oxygen_chimie:
+                cell.fill = PatternFill(patternType='solid', start_color='B20000', end_color='B20000')
 
     for cell_str in oxygen_values_cells:
         cell = ws2[cell_str]
-        oxygen = float(cell.value)
-        if oxygen < min_oxygen_tox or oxygen > max_oxygen_tox:
-            cell.fill = PatternFill(patternType='solid', start_color='B20000', end_color='B20000')
+        try:
+            oxygen = float(cell.value)
+        except (ValueError, TypeError):
+            cell.fill = PatternFill(patternType='solid', start_color='A6A6A6', end_color='A6A6A6')
+        else:
+            if oxygen < min_oxygen_tox or oxygen > max_oxygen_tox:
+                cell.fill = PatternFill(patternType='solid', start_color='B20000', end_color='B20000')
 
     wb.save(PATH)
     wb.close()
