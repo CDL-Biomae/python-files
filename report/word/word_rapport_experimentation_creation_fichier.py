@@ -9,6 +9,7 @@ from io import BytesIO
 
 
 def create_doc(campaign, agence):  # campaign correspond au nom de la campagne (ex: AG-003-01) et agence est un booléen qui dit si c'est une agence l'eau ou non
+    campaign = campaign.upper()
     doc = Document('Fichiers_remplissage/Page_de_garde.docx')
     style = doc.styles['Normal']
     font = style.font
