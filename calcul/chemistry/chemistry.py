@@ -1,5 +1,5 @@
 from tools import QueryScript
-from . import result_by_pack_and_sandre, elements_fish, elements_crustacean
+from . import elements_fish, elements_crustacean
 
 
 def lyophilisation_pourcent(pack_id):

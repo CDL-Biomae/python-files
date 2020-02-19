@@ -4,6 +4,7 @@ from openpyxl.utils.cell import get_column_letter
 from termcolor import colored
 import math
 
+
 def add_style_physicochimie(physicochimie_dataframe, filename):
     PATH = f"output\\{filename}"
     wb = load_workbook(PATH)
@@ -19,6 +20,19 @@ def add_style_physicochimie(physicochimie_dataframe, filename):
 
     font_Arial9 = Font(size=9, name='Arial')
     alignment_center = Alignment(horizontal='center', vertical='center')
+
+    ## COLUMN WIDTH ##
+    ws.column_dimensions['A'].width = 3
+    ws.column_dimensions['B'].width = 12
+    ws.column_dimensions['C'].width = 10
+    ws.column_dimensions['D'].width = 45
+    ws.column_dimensions['E'].width = 14
+
+    ws2.column_dimensions['A'].width = 3
+    ws2.column_dimensions['B'].width = 12
+    ws2.column_dimensions['C'].width = 10
+    ws2.column_dimensions['D'].width = 45
+    ws2.column_dimensions['E'].width = 14
 
     ## REFORMATAGE STATIONS HEADER ##
     merging_cells = ['B2:B3', 'C2:C3', 'D2:D3', 'E2:E3']
