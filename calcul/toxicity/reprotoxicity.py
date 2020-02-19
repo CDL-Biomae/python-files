@@ -176,10 +176,13 @@ def inhibition_fertility_and_threshold_5_1(pack_id):
      resultat =  QueryScript(SQL_request).execute()
      fertility = []
      if isinstance(index_fertility_average(pack_id),numbers.Number): 
-          if resultat[2] != 0 or resultat[2] == None:
+          if resultat[2] != 0 and resultat[2] == None and resultat[0] != None and  resultat[3] !=None :
                 fertility.append(100*(resultat[2]-index_fertility_average(pack_id))/resultat[2]) #  % inhibition - FECONDITE
                 fertility.append( (resultat[2]-(resultat[2]-resultat[0]*resultat[3]/sqrt(number_female_concerned(pack_id))))/resultat[2]*100 )  #  Seuil 1% fécondité      
                 fertility.append( (resultat[2]-(resultat[2]-resultat[1]*resultat[3]/sqrt(number_female_concerned(pack_id))))/resultat[2]*100 )  #  Seuil 5% fécondité    
+          else:
+               return "NA"
+     
      else:
           return "NA"
      
