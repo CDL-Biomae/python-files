@@ -7,3 +7,4 @@ test.py
 *.zip
 __pycache__
 kivy_venv
+build
