@@ -1,38 +1,38 @@
-### All python files and functions needed for the Biomae project
+### Description du fonctionnement de l'application 
 
-You have to install mySQL connector with this command :
+Pour lancer le programme, il faut au préalable installer les dépendances indiquées dans requires.txt.
+Pour les installer, écrire les commandes suivantes dans un invite de commandes :
 ```
-pip install mysql-connector-python
+pip install --upgrade pip
+pip install -r requires.txt
 ```
-Be sure to have the env.py file before lauch any programm
+Assurez-vous d'avoir le fichier env.py dans le même dossier que requires.txt
+
+## Remplissage de la base de données
+
+Les coordonnées de votre base de données sont précisées dans le fichier env.py sous les noms DATABASE ... Il faut ajouter les différents identifiants et adresses IP à cet endroit
+
+Pour remplir la base de données par les références et les résultats des moyennes de températures et autres dates clés, il faut avoir le fichier reference.xlsx dans le dossier principal (le même que celui contenant requires.txt)
+Pour inforamtion : les différents noms de colonne du excel ne doivent pas changer car le remplissage est calibré sur les noms et le nombre de colonne précisé à la fin du projet Digital Lab de 2020.
+
+Ensuite lancer la commande suivante :
+```
+python database.py
+```
+Si aucun message d'erreur n'est apparu, la base de données a été remplie avec succès !!
 
 
-## Query
+## Création des livrables excel et word
 
-Query is an object to make SQL request to database and return the result as an array. It can get 5 arguments:
+L'écriture des différents livrables se fait à partir du fichier main.py du dossier report.
+Pour l'appeler il suffit de l'importer et lui donner un nom de campagne ou de contrat:
 
-- 'table' where you are looking for (need to be precise)
-- 'column' you wanted to see (can be a list or just a string)
-- 'limit' number of result (an integer)
-- 'group' to regroup by one particular value (string)
-- 'filtre' (egality/inegality or list of that)
-- 'interval' (variable, start, end)
-- 'distinct' if you only the different outputs without any duplicate (boolean)
+Dans create_xl_annexes.py
+```
+from report import main
+main(<NOM DE/DES CAMPAGNE/S OU CONTRAT/S>)
+```
 
-Example : Query("agency", "city", "2") is an object with the two first 'city' values from the table 'agency'. (SQL script : SELECT city FROM agency LIMIT 2 )
+## Création du Rapport d'expérimentation (Word)
 
-Finally, you have to run the function execute() to get the response.
-
-
-
-If you prefer to write on your own, you can use the object QueryScript. It can get 2 arguments:
-
-- 'script' : ths SQL script you want to use
-- 'rows' : when you wanted to add in database plurar rows (Array).
-
-to execute the filler, use the fonction executemany() with the to arguments completed.
-
-## Fill the database with xlsm reference
-
-To add all reference (r2 and r3 sheets) into the database, launch run() from reference_filler.py file with the correct xlsm file nearby.
-(You have to fill in the line 4 its name)
+Pour créer le rapport d'expérimentation il faut entrer le nom de la campagne, tout en vérifiant qu'il y a dans le dossier XXX Fichier Remplissage XXX des dossiers nommés en fonction d'un point de mesure (ex : AG-003-01-01-01), et que dans chacun de ces dossiers il y a 4 photos, de 4 natures différentes (amont, aval, panorama, zoom). Les photos doivent respecter la nomenclature suivant : "stepXX_PDA1_AG-003-01-01-01_Amont_5445664_65454.png". Les éléments importants sont la séparation par des Underscores (_), que le 3e élément (ainsi séparé) soit la référence du point de mesure et le 4e soit le point de vue de la photo (amont, aval, panorama, zoom). De 

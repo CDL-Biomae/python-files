@@ -14,6 +14,18 @@ def add_style_campagnes(campagnes_dataframe, filename):
     medium = Side(border_style='medium', color='FF000000')
     borders = Border(top=medium, left=medium, right=medium, bottom=medium)
 
+    ## COLUMN WIDTH ##
+    ws.column_dimensions['A'].width = 3
+    ws.column_dimensions['B'].width = 12
+    ws.column_dimensions['C'].width = 10
+    ws.column_dimensions['D'].width = 45
+    ws.column_dimensions['E'].width = 14
+    ws.column_dimensions['F'].width = 18
+    ws.column_dimensions['G'].width = 18
+    ws.column_dimensions['H'].width = 18
+    ws.column_dimensions['I'].width = 10
+    ws.column_dimensions['J'].width = 18
+
     ## HEADER STYLE ##
     header_row = '2'
     header_columns = [get_column_letter(col_idx) for col_idx in range(2, nb_columns + 2)]
