@@ -1,3 +1,20 @@
+'''
+Il y a 2 scripts dans ce fichier:
+--> create_empty_date_table(): vide la table key_dates si elle existe, ou la crée si elle n'existe pas
+--> fill_date_table(): remplie la table key_dates avec 7 dates clées par point de mesure
+
+Les 7 dates clées sont détaillées dans le fichier reference_date_filler.py
+
+/!\ C'est quoi une fusion?
+--> Dans certains cas on regroupe 2 points de mesure sous un seul point de mesure. C'est le cas si la 'place' est de
+type 'point_monitoring', qu'il y a exactement 2 points à cette 'place' et que les expériences associées à ces points
+sont compatibles (pas 2 expériences du même type)
+--> Exemple: Il y a de la fusion pour la campagne 'AG-003-01'
+
+'''
+
+
+
 #%% ## IMPORT ##
 from tools import QueryScript
 
@@ -8,7 +25,7 @@ def create_empty_date_table():
     key_dates_table = QueryScript(
         "DROP TABLE IF EXISTS key_dates; CREATE TABLE key_dates (id INT AUTO_INCREMENT PRIMARY KEY, measurepoint_id INT, date_id INT, date DATETIME, measurepoint_fusion_id INT);")
     key_dates_table.execute()
-    print('La table key_dates a été créée')
+    print('Une table key_dates vide a été créée')
 
 
 def key_dates(id_mp):
@@ -293,8 +310,6 @@ def dates_insert(id_mp, dates):
 
         values.append((measurepoint_id, date_id, date, measurepoint_fusion_id))
 
-    # print(SQL_request)
-    # print(values)
 
     QueryScript(SQL_request, values).executemany()
     print(' --> dates insérées')
