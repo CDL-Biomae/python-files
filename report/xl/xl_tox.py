@@ -36,7 +36,7 @@ def create_table_Tox(list_mp):
 
 
     for element in matrix:
-        measurepoint_result_tox_table_calcule(element)
+        measurepoint_result_tox_table_calcul(element)
 
 
 def create_tox_dataframe_tabletox_by_list_campaigns(list_campaigns, dict_mp):
@@ -57,7 +57,7 @@ def create_table_byplaceid():
 
 
     for element in matrix:
-        measurepoint_result_tox_table_calcule(element)
+        measurepoint_result_tox_table_calcul(element)
 
 
 
@@ -100,7 +100,7 @@ def create_tox_dataframe(head_dataframe, list_campaigns, dict_mp):
 
    
 
-def measurepoint_result_tox_table_calcule(measurepoint_id):
+def measurepoint_result_tox_table_calcul(measurepoint_id):
 
     place_id = QueryScript(f"SELECT place_id FROM measurepoint WHERE id={measurepoint_id[0]}").execute()
     if len(measurepoint_id) > 1:
