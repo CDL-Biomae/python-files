@@ -39,13 +39,18 @@ class QueryScript() :
     except mysql.connector.Error as err:
       if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
         print("Something is wrong with your user name or password")
+        return 
       elif err.errno == errorcode.ER_BAD_DB_ERROR:
         print("Database does not exist")
+        return 
       else:
         print(err)
-        
-    query = (self.__str__())
+        return 
     
+    query = (self.__str__())
+    if not cursor:
+      print("Database not connected")
+      return
     cursor.execute(query)
     
     output = []

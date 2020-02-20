@@ -5,8 +5,8 @@ def survie_alim(pack_id):
     SQL_request = "SELECT scud_survivor,scud_quantity FROM cage where pack_id="+str(pack_id)+" and scud_survivor is not null "
     resultat2 = []
     resultat =  QueryScript(SQL_request).execute()
-    for j in range(len(resultat)) :       
-         tmp = sum(resultat[j])/len(resultat[j])
+    for element in resultat :       
+         tmp = sum(element)/len(element)
          resultat2.append(tmp)
         
     return resultat2
@@ -18,9 +18,9 @@ def survie_7jour(pack_id):
     resultat =  QueryScript(SQL_request).execute()
     survivor = []
     quantity =[]
-    for i in range(len(resultat)):
-            survivor.append(resultat[i][0])
-            quantity.append(resultat[i][1])
+    for element in resultat:
+            survivor.append(element[0])
+            quantity.append(element[1])
 
     if sum(survi_alim) == 0:
         return 0

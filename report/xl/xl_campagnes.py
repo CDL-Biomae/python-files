@@ -5,8 +5,7 @@ import pandas as pd
 def create_dataframe(list_mp):
     matrix = []
 
-    for i in range(len(list_mp)):
-        mp = list_mp[i]
+    for mp in list_mp:
         [J0, J14, JN, N, J21] = contexte(mp)
 
         temp = [J0, J14, JN, N, J21]

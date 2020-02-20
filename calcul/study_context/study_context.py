@@ -1,3 +1,10 @@
+'''
+Permet de récupérer les dates clés d'un point de mesure
+
+[+] prend en entrée un 'measurepoint_id'
+--> renvoie 1 liste: [J0, J14, JN, N, J21] avec N = (JN-J14)
+'''
+
 from tools import QueryScript
 
 def contexte(measurepoint_id):
