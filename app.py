@@ -1,6 +1,6 @@
 import tkinter as tk
 from tkinter import filedialog
-from report import main
+from report import excel_main
 
 def main_button():
     print(campaign_input.get())

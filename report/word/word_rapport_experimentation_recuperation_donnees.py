@@ -34,6 +34,12 @@ def data_exposure_condition(measurepoint_fusion_id):
 
 def data_exposure_condition_fusion(measurepoints):
     [id_mp_1, id_mp_2] = measurepoints
+    if id_mp_1 < id_mp_2:
+        id_mp_premier = id_mp_1
+        id_mp_second = id_mp_2
+    else:
+        id_mp_premier = id_mp_2
+        id_mp_second = id_mp_1
     dico = {}
     days = ["J+0", "J+14", "J+N", "J+21"]
     steps_barrel = [(50, "\'R0\'"), (50, "\'R0\'"),
@@ -42,9 +48,9 @@ def data_exposure_condition_fusion(measurepoints):
     for i in range(4):
         step, barrel = steps_barrel[i]
         if i in [0, 2]:
-            measurepoint = id_mp_2
+            measurepoint = id_mp_premier
         else:
-            measurepoint = id_mp_1
+            measurepoint = id_mp_second
 
         output = QueryScript(
             f"SELECT recordedAt, temperature, conductivity, oxygen, ph, type, comment FROM measureexposurecondition WHERE measurepoint_id = {measurepoint} and step = {step} and barrel = {barrel}").execute()
@@ -103,7 +109,11 @@ def parser(date):
 
 
 def average_temperature__geographic_data_measurepoint(measurepoint_fusion_id_list):
-    measurepoint_fusion_id_list = tuple(measurepoint_fusion_id_list)
+    if len(measurepoint_fusion_id_list) == 1:
+        measurepoint_fusion_id_list = "(" + \
+            measurepoint_fusion_id_list[0] + ")"
+    else:
+        measurepoint_fusion_id_list = tuple(measurepoint_fusion_id_list)
     dico_temperature = {}
     dico_geo_data = {}
     tempe = QueryScript(

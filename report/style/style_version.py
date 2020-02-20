@@ -2,8 +2,8 @@ from openpyxl.styles import Font, Alignment, Border, Side
 from openpyxl import load_workbook
 from termcolor import colored
 
-def add_style_version(version_dataframe, list_campaigns, filename):
-    PATH = f"output\\{filename}"
+def add_style_version(version_dataframe, list_campaigns, filename, folder_PATH):
+    PATH = f"{folder_PATH}\\{filename}"
     wb = load_workbook(PATH)
     ws = wb['Version']
 

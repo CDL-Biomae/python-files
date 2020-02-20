@@ -7,8 +7,8 @@ from tools import QueryScript
 from termcolor import colored
 
 
-def add_style_bbac_21j(bbac_dataframe, filename):
-    PATH = f"output\\{filename}"
+def add_style_bbac_21j(bbac_dataframe, filename, folder_PATH):
+    PATH = f"{folder_PATH}\\{filename}"
     wb = load_workbook(PATH)
     ws = wb['BBAC_21j']
     ws2 = wb['BBAC2_21j']

@@ -172,11 +172,12 @@ def number_female_concerned_area(pack_id):
 
 def inhibition_fertility_and_threshold_5_1(pack_id):
      #  change where by name not by id
-     SQL_request = "SELECT value FROM biomae.r2_constant where name IN('indice de fertilité attendu - moyenne','Constante fertilité 1-1','indice de fertilité attendu - sd','Constante fertilité 2-1')"
+     SQL_request = "SELECT value FROM biomae.r2_constant where name IN('indice de fertilité attendu - moyenne','Constante fertilité 1','indice de fertilité attendu - sd','Constante fertilité 2')"
      resultat =  QueryScript(SQL_request).execute()
+     print(resultat)
      fertility = []
      if isinstance(index_fertility_average(pack_id),numbers.Number): 
-          if resultat[2] != 0 and resultat[2] == None and resultat[0] != None and  resultat[3] !=None :
+          if resultat[2] != 0 :
                 fertility.append(100*(resultat[2]-index_fertility_average(pack_id))/resultat[2]) #  % inhibition - FECONDITE
                 fertility.append( (resultat[2]-(resultat[2]-resultat[0]*resultat[3]/sqrt(number_female_concerned(pack_id))))/resultat[2]*100 )  #  Seuil 1% fécondité      
                 fertility.append( (resultat[2]-(resultat[2]-resultat[1]*resultat[3]/sqrt(number_female_concerned(pack_id))))/resultat[2]*100 )  #  Seuil 5% fécondité    

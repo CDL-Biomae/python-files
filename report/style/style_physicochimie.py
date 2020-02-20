@@ -6,8 +6,8 @@ from tools import QueryScript
 import math
 
 
-def add_style_physicochimie(physicochimie_dataframe, filename):
-    PATH = f"output\\{filename}"
+def add_style_physicochimie(physicochimie_dataframe, filename, folder_PATH):
+    PATH = f"{folder_PATH}\\{filename}"
     wb = load_workbook(PATH)
     ws = wb['Physico-chimie_refChimie']
     ws2 = wb['Physico-chimie_refToxicité']

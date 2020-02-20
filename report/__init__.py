@@ -6,4 +6,4 @@ from .word import *
 
 
 # /!\ A METTRE EN DERNIER /!\ #
-from .main import main
+from .excel_main import excel_main

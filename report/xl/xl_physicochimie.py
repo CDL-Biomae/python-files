@@ -76,7 +76,6 @@ def test_chimie_superieur_repro(list_mp):
     return list_test
 
 
-
 def temperatures_dataframe(list_mp):
     list_test = test_chimie_superieur_repro(list_mp)
     output = QueryScript(
