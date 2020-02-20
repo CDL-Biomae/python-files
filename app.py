@@ -9,7 +9,7 @@ def reset():
 
 def browse_button():
     global folder_path
-    filename = filedialog.askdirectory()
+    filename = tk.filedialog.askdirectory()
     folder_path.set(filename)
     print(filename)
 
