@@ -1,11 +1,20 @@
 import tkinter as tk
 from tkinter import filedialog
-from report import excel_main
+from report import excel_main, word_main
 
 def main_button():
-    print(campaign_input.get())
-    print(word.get(), excel.get())
-    campaign_input.delete(0,'end')
+    if campaign_input.get() :
+        if excel.get() or word.get():
+            if not output_path.get():
+                browse_output_button()
+            if word.get():
+                if not input_path.get():
+                    browse_input_button()
+                word_main(campaign_input.get(), agence.get(), input_path.get(), output_path.get())
+            if excel.get():
+                excel_main([campaign_input.get()], output_path.get())
+            campaign_input.delete(0,'end')
+    
 
 def enter(event):
     main_button()
@@ -47,10 +56,12 @@ window.bind('<Return>', enter)
 frame_word_excel = tk.Frame(window)
 tk.Label(master=frame_word_excel, text='Livrable').grid(row=0)
 word = tk.IntVar()
+word.set(1)
 word_button = tk.Checkbutton(
         master=frame_word_excel, text="Word", variable=word)
 word_button.grid(row=1)
 excel = tk.IntVar()
+excel.set(1)
 excel_button = tk.Checkbutton(
         master=frame_word_excel, text="Excel", variable=excel)
 excel_button.grid(row=2)
