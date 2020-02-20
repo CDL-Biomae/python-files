@@ -8,9 +8,11 @@ import requests
 from io import BytesIO
 
 
-def create_doc(campaign, agence):  # campaign correspond au nom de la campagne (ex: AG-003-01) et agence est un booléen qui dit si c'est une agence l'eau ou non
+# campaign correspond au nom de la campagne (ex: AG-003-01) et agence est un booléen qui dit si c'est une agence l'eau ou non
+def word_main(campaign, agence, path_photo="Photos", path_output="output"):
+    path_ressources = "Ressources/"
     campaign = campaign.upper()
-    doc = Document('Fichiers_remplissage/Page_de_garde.docx')
+    doc = Document(path_ressources + 'Page_de_garde.docx')
     style = doc.styles['Normal']
     font = style.font
     font.name = "Arial"
@@ -140,7 +142,7 @@ def create_doc(campaign, agence):  # campaign correspond au nom de la campagne (
         table_image.cell(5, 1).text = "Panorama encagement"
         table_image.cell(5, 1).paragraphs[0].alignment = 1
 
-        nom_photo = recuperation_photo(reference)
+        nom_photo = recuperation_photo(reference, path_photo)
         rotation_image(nom_photo['amont'])
         rotation_image(nom_photo['aval'])
         rotation_image(nom_photo['zoom'])
@@ -267,11 +269,10 @@ def create_doc(campaign, agence):  # campaign correspond au nom de la campagne (
     doc.add_page_break()
 
     composer = Composer(doc)
-    page_fin = Document('Fichiers_remplissage/Page_fin.docx')
+    page_fin = Document(path_ressources + 'Page_fin.docx')
     composer.append(page_fin)
     name_doc = campaign + "_Rapport_d_expérimentation.docx"
-    path = "output"
-    composer.save(path + "/" + name_doc)
+    composer.save(path_output + "/" + name_doc)
 
 
 def traduction_type_biotest(biotest_anglais):
@@ -292,8 +293,8 @@ def traduction_type_biotest(biotest_anglais):
     return string
 
 
-def recuperation_photo(reference):
-    prefixe = "Fichiers_remplissage/" + reference
+def recuperation_photo(reference, path_photo):
+    prefixe = path_photo + "/" + reference
     filenames = os.listdir(prefixe)
     dico_nom = {}
     for elt in filenames:
