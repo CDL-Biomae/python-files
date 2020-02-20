@@ -39,17 +39,17 @@ def survival(pack_id):
         return None
     
 def convert_list(list_converted):
-    for i in range(len(list_converted)):
+    for element in list_converted:
         if isinstance(list_converted[i], list):
             try:
-                list_converted[i][0] = float(list_converted[i][0])
+                element[0] = float(element[0])
             except:
-                list_converted[i][0] = f'{list_converted[i][0]}'
+                element[0] = f'{element[0]}'
         else:
             try:
-                list_converted[i] = float(list_converted[i])
+                element = float(element)
             except:
-                list_converted[i] = f'{list_converted[i]}'
+                element = f'{element}'
             
     return list_converted
 

@@ -284,8 +284,8 @@ def dates_insert(id_mp, dates):
     SQL_request = f"INSERT INTO key_dates (measurepoint_id, date_id, date, measurepoint_fusion_id) VALUES (%s, %s, %s, %s)"
     values = []
 
-    for i in range(len(dates)):
-        key = list(dates.keys())[i]
+    for i, date in enumerate(dates):
+        key = date.keys()
         measurepoint_id = id_mp
         date_id = i+1
         date = dates[key]['date']
@@ -305,8 +305,8 @@ def fusion_dates_insert(id_mp_list, dates):
     SQL_request = f"INSERT INTO key_dates (measurepoint_id, date_id, date, measurepoint_fusion_id) VALUES (%s, %s, %s, %s)"
     values = []
 
-    for i in range(len(dates)):
-        key = list(dates.keys())[i]
+    for i, date in enumerate(dates):
+        key = date.keys()
 
         if i in [0, 1, 2]:
             measurepoint_id = id_mp_alim

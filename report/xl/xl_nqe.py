@@ -6,8 +6,7 @@ from tools import QueryScript
 def create_dataframe(list_mp):
     matrix = []
 
-    for i in range(len(list_mp)):
-        mp = list_mp[i]
+    for mp in list_mp:
         pack = QueryScript(f"SELECT id FROM pack WHERE nature='chemistry' AND measurepoint_id={mp}").execute()
         if len(pack)>0:
             crustacean = chemistry.result_by_pack_and_sandre(pack[0],list(elements_crustacean.keys()))

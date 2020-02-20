@@ -26,17 +26,17 @@ def create_dict_mp2(list_campaigns):
 
 def create_table_Tox(list_mp):
     matrix = [] 
-    for i in range(len(list_mp)):
-        place_id = QueryScript(f"SELECT place_id FROM measurepoint WHERE id={list_mp[i]}").execute()
+    for mp in list_mp:
+        place_id = QueryScript(f"SELECT place_id FROM measurepoint WHERE id={mp}").execute()
         measurepoint_placeid = QueryScript(f"SELECT id FROM measurepoint WHERE place_id={place_id[0]}").execute()
         if measurepoint_placeid not in matrix:
                 matrix.append(measurepoint_placeid)
         else:
-                print("measure point id exist befor")
+                print("measure point id exist before")
 
 
-    for i in range(len(matrix)):
-        measurepoint_result_tox_table_calcule(matrix[i])
+    for element in matrix:
+        measurepoint_result_tox_table_calcule(element)
 
 
 def create_tox_dataframe_tabletox_by_list_campaigns(list_campaigns, dict_mp):
@@ -50,16 +50,14 @@ def create_table_byplaceid():
     matrix = [] 
     place_id = QueryScript(f"SELECT place_id FROM biomae.measurepoint").execute()
 
-    for i in range(len(place_id)):
-        measurepoint_placeid = QueryScript(f"SELECT id FROM measurepoint WHERE place_id={place_id[i]}").execute()
+    for place in place_id:
+        measurepoint_placeid = QueryScript(f"SELECT id FROM measurepoint WHERE place_id={place}").execute()
         if measurepoint_placeid not in matrix:
                 matrix.append(measurepoint_placeid)
-        else:
-                print("measure point id exist befor")
 
 
-    for i in range(len(matrix)):
-        measurepoint_result_tox_table_calcule(matrix[i])
+    for element in matrix:
+        measurepoint_result_tox_table_calcule(element)
 
 
 
@@ -68,20 +66,17 @@ def create_dataframe(list_mp):
     matrixchek =[]
 
 
-    for i in range(len(list_mp)):
-        place_id = QueryScript(f"SELECT place_id FROM measurepoint WHERE id={list_mp[i]}").execute()
+    for mp in list_mp:
+        place_id = QueryScript(f"SELECT place_id FROM measurepoint WHERE id={mp}").execute()
         if place_id not in matrixchek:
              resulat = QueryScript(f"SELECT survie_7jour, alimentation, neurotoxicity, female_survivor, number_days_exposition, number_female_concerned, index_fertility_average, number_female_analysis, molting_cycle,number_female_concerned_area,endocrine_disruption FROM toxtable WHERE place_id={place_id[0]}").execute()
              matrixchek.append(place_id)
              matrix.append(resulat[0])
              
             
-        else:
-                print("placeid existe")
 
     
 
-    print(matrix)  
     df = pd.DataFrame(matrix)
     df.columns = ['Survie Male - 7 jours', 'Alimentation',
                 'Neurotoxicité AChE', 'Survie Femelle','Nombre joursexposition in situ',
