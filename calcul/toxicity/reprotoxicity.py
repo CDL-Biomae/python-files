@@ -57,17 +57,17 @@ def index_fertility_female_X(pack_id):
 
       # n L6 (TOXFILE)
 def number_female_concerned(pack_id):
-     females = index_fertility_female_X(pack_id)
-     Nbr = 0
-     for female in females[:-1]:
-          if female==0:
-              Nbr = Nbr+1
-     
-     return len(female)-Nbr
+    females = index_fertility_female_X(pack_id)
+    Nbr = 0
+    for female in females[:-1]:
+        if female == 0:
+            Nbr += 1
+
+    return len(females)-Nbr
 
      #  n N6 (TOXFILE)
 def number_female_analysis(pack_id):
-     SQL_request = "SELECT molting_stage FROM biomae.measurereprotoxicity where pack_id ="+str(pack_id)
+     SQL_request = "SELECT molting_stage FROM biomae.measurereprotoxicity where pack_id" + str(pack_id)
      resultat =  QueryScript(SQL_request).execute()
      Nbr_B_C1 = 0
      Nbr_C2_D1 = 0
@@ -154,7 +154,7 @@ def number_female_concerned_area(pack_id):
                          Area_delayµm.append(element[1]*(element[2]/element[3]/97,82))
 
 
-          for element in resultat[:-1]: 
+          for i, element in enumerate(resultat[:-1]):
                 if element[0] != None:               
                     if (element[0].upper()=='C1' or element[0].upper()=='B'):
                           if Area_delayµm[i]=='ND':  #si aArea_delayµm[i] == 0 ou bien not defiend
