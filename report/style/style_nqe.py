@@ -7,8 +7,8 @@ from termcolor import colored
 
 
 
-def add_style_nqe(nqe_dataframe, filename):
-    PATH = f"output\\{filename}"
+def add_style_nqe(nqe_dataframe, filename, folder_PATH):
+    PATH = f"{folder_PATH}\\{filename}"
     wb = load_workbook(PATH)
     ws = wb['NQE Biote']
     

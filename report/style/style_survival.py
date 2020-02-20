@@ -3,8 +3,8 @@ from openpyxl import load_workbook
 from termcolor import colored
 
 
-def add_style_survie(survie_dataframe, filename):
-    PATH = f"output\\{filename}"
+def add_style_survie(survie_dataframe, filename, folder_PATH):
+    PATH = f"{folder_PATH}\\{filename}"
     wb = load_workbook(PATH)
     ws = wb['Survie']
 
