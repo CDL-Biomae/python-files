@@ -1,43 +1,38 @@
-import kivy
-from kivy.app import App
-from kivy.uix.button import Button
-from kivy.uix.textinput import TextInput
-from kivy.uix.boxlayout import BoxLayout
+import tkinter as tk
+from tkinter import filedialog
 from report import main
 
-from kivy.core.window import Window
+def main_button(campaign_input):
+    print(campaign_input.get)
+
+def reset():
+    campaign_input.set()
+
+def browse_button():
+    global folder_path
+    filename = tk.filedialog.askdirectory()
+    folder_path.set(filename)
+    print(filename)
 
 
-class QueryApp(App):
+window = tk.Tk()
+window.title('Digital Lab App')
+window.geometry("540x360")
+window.minsize(480, 360)
+folder_path = tk.StringVar()
 
-    def build(self):
-        Window.clearcolor = (0.29, 0.549, 0.792, 1)  # Bleu clair de Biomae
-        self.box = BoxLayout(orientation='horizontal', spacing=20)
-        self.query = TextInput(hint_text='Write here', size_hint=(.5, .2))
-        self.btn = Button(
-            text='Reset', on_press=self.clearText, size_hint=(.1, .2))
-        self.btn.background_color = (
-            0.004, 0.314, 0.624, 1)  # Bleu foncé Biomae
-        self.main = Button(
-            text='Go', on_press=self.main_is_possible, size_hint=(.1, .2))
-        self.main.background_color = (0.004, 0.314, 0.624, 1)
-        self.box.add_widget(self.query)
-        self.box.add_widget(self.btn)
-        self.box.add_widget(self.main)
-        return self.box
+frame_campaign = tk.Frame(master=window)
+campaign_name = tk.Label(master=frame_campaign, text='Nom de campagne').grid(row=0,column=0)
+campaign_input = tk.Entry(frame_campaign).grid(row=0,column=1)
+campaign_button = tk.Button(master=frame_campaign,text="Lancer", command=main_button).grid(row=1, column=0)
+reset_button = tk.Button(master=frame_campaign,text="Effacer", command=reset).grid(row=1, column=1)
+frame_campaign.pack(expand='YES')
+window.bind('<Return>', main_button)
 
-    def clearText(self, instance):
-        self.query.text = ''
+frame_folder = tk.Frame(master=window)
+folder_button = tk.Button(master=frame_folder,text="Choisir une destination ...", command=browse_button)
+folder_button.pack()
+lbl1 = tk.Label(master=frame_folder,textvariable=folder_path).pack()
+frame_folder.pack(expand='YES')
 
-    def main_is_possible(self, instance):
-        if self.query.text != '' and self.query.text != None:
-            main([self.query.text])
-
-
-class Excel_CreatorApp(App):
-    def build(self):
-        return QueryApp()
-
-
-if __name__ == "__main__":
-    QueryApp().run()
+window.mainloop()
