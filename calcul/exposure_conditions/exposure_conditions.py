@@ -1,3 +1,14 @@
+'''
+Permet de récupérer les informations physico-chimiques pour les dates clés d'un point de mesure
+
+[+] prend en entrée un 'measurepoint_id'
+--> renvoie 3 listes:
+        conductivité = [cond_J0, cond_J14, cond_JN, cond_J21]
+        pH = [pH_J0, pH_J14, pH_JN, pH_J21]
+        oxygene = [oxygen_J0, oxygen_J14, oxygen_JN, oxygen_J21]
+'''
+
+
 from tools import QueryScript
 
 
@@ -6,8 +17,10 @@ def conditions(measurepoint_id):
         f"SELECT DISTINCT measurepoint_id FROM key_dates WHERE measurepoint_fusion_id = {measurepoint_id}").execute()
 
     if len(measurepoints) < 2:
+        # Si jamais il n'y a qu'un seul point de mesure
         return conditions_simple(measurepoint_id)
     else:
+        # Si jamais on a 2 points de mesure on est dans un cas de fusion de point de mesure
         return conditions_fusion(measurepoints)
 
 

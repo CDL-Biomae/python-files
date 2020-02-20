@@ -269,7 +269,9 @@ def create_doc(campaign, agence):  # campaign correspond au nom de la campagne (
     composer = Composer(doc)
     page_fin = Document('Fichiers_remplissage/Page_fin.docx')
     composer.append(page_fin)
-    composer.save(campaign + "_Rapport_d_expérimentation.docx")
+    name_doc = campaign + "_Rapport_d_expérimentation.docx"
+    path = "output"
+    composer.save(path + "/" + name_doc)
 
 
 def traduction_type_biotest(biotest_anglais):
@@ -290,7 +292,6 @@ def traduction_type_biotest(biotest_anglais):
     return string
 
 
-# photo_amont = 'Fichiers_remplissage/AG-003-01-01-01/step50_PDA1_AG-003-01-01-01_Amont_20190219_100021.jpg'
 def recuperation_photo(reference):
     prefixe = "Fichiers_remplissage/" + reference
     filenames = os.listdir(prefixe)
