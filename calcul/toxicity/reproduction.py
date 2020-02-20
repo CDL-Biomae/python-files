@@ -7,9 +7,9 @@ def female_survivor(pack_id):
     f_survivor = []
     quantity =[]
     resultat =  QueryScript(SQL_request).execute()
-    for i in range(len(resultat)) :
-            f_survivor.append(resultat[i][0])
-            quantity.append(resultat[i][1])
+    for element in resultat :
+            f_survivor.append(element[0])
+            quantity.append(element[1])
 
     if sum(f_survivor) == None:
         return "NA"

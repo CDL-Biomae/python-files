@@ -8,8 +8,11 @@ import requests
 from io import BytesIO
 
 
-def create_doc(campaign, agence):  # campaign correspond au nom de la campagne (ex: AG-003-01) et agence est un booléen qui dit si c'est une agence l'eau ou non
-    doc = Document('Fichiers_remplissage/Page_de_garde.docx')
+# campaign correspond au nom de la campagne (ex: AG-003-01) et agence est un booléen qui dit si c'est une agence l'eau ou non
+def word_main(campaign, agence, path_photo="Photos", path_output="output"):
+    path_ressources = "Ressources/"
+    campaign = campaign.upper()
+    doc = Document(path_ressources + 'Page_de_garde.docx')
     style = doc.styles['Normal']
     font = style.font
     font.name = "Arial"
@@ -96,7 +99,8 @@ def create_doc(campaign, agence):  # campaign correspond au nom de la campagne (
                 str(dico_geo_mp[reference]['latitudeSpotted']))
 
         table_carte = doc.add_table(rows=4, cols=1)
-        url_street = f"https://api.mapbox.com/styles/v1/mapbox/streets-v11/static/pin-s+FF0000({str(dico_geo_mp[reference]['longitudeSpotted'])},{str(dico_geo_mp[reference]['latitudeSpotted'])})/{str(dico_geo_mp[reference]['longitudeSpotted'])},{str(dico_geo_mp[reference]['latitudeSpotted'])},9.21/450x300@2x?access_token=pk.eyJ1IjoiamJyb25uZXIiLCJhIjoiY2s2cW5kOWQwMHBybjNtcW8yMXJuYmo3aiJ9.z8Ekf7a0RGTZ4jrbJVpq8g"
+        access_token = "pk.eyJ1IjoiamJyb25uZXIiLCJhIjoiY2s2cW5kOWQwMHBybjNtcW8yMXJuYmo3aiJ9.z8Ekf7a0RGTZ4jrbJVpq8g"
+        url_street = f"https://api.mapbox.com/styles/v1/mapbox/streets-v11/static/pin-s+FF0000({str(dico_geo_mp[reference]['longitudeSpotted'])},{str(dico_geo_mp[reference]['latitudeSpotted'])})/{str(dico_geo_mp[reference]['longitudeSpotted'])},{str(dico_geo_mp[reference]['latitudeSpotted'])},9.21/450x300@2x?access_token={access_token}"
         response = requests.get(url_street)
         carte_street = BytesIO(response.content)
         table_carte.cell(0, 0).paragraphs[0].add_run().add_picture(
@@ -105,7 +109,7 @@ def create_doc(campaign, agence):  # campaign correspond au nom de la campagne (
         table_carte.cell(1, 0).text = "Vue carte situant les villes alentours"
         table_carte.cell(1, 0).paragraphs[0].alignment = 1
 
-        url_satellite = f"https://api.mapbox.com/styles/v1/mapbox/satellite-streets-v11/static/pin-s+FF0000({str(dico_geo_mp[reference]['longitudeSpotted'])},{str(dico_geo_mp[reference]['latitudeSpotted'])})/{str(dico_geo_mp[reference]['longitudeSpotted'])},{str(dico_geo_mp[reference]['latitudeSpotted'])},13.5/450x300@2x?access_token=pk.eyJ1IjoiamJyb25uZXIiLCJhIjoiY2s2cW5kOWQwMHBybjNtcW8yMXJuYmo3aiJ9.z8Ekf7a0RGTZ4jrbJVpq8g"
+        url_satellite = f"https://api.mapbox.com/styles/v1/mapbox/satellite-streets-v11/static/pin-s+FF0000({str(dico_geo_mp[reference]['longitudeSpotted'])},{str(dico_geo_mp[reference]['latitudeSpotted'])})/{str(dico_geo_mp[reference]['longitudeSpotted'])},{str(dico_geo_mp[reference]['latitudeSpotted'])},13.5/450x300@2x?access_token={access_token}"
         response = requests.get(url_satellite)
         carte_satellite = BytesIO(response.content)
         table_carte.cell(2, 0).paragraphs[0].add_run().add_picture(
@@ -138,7 +142,7 @@ def create_doc(campaign, agence):  # campaign correspond au nom de la campagne (
         table_image.cell(5, 1).text = "Panorama encagement"
         table_image.cell(5, 1).paragraphs[0].alignment = 1
 
-        nom_photo = recuperation_photo(reference)
+        nom_photo = recuperation_photo(reference, path_photo)
         rotation_image(nom_photo['amont'])
         rotation_image(nom_photo['aval'])
         rotation_image(nom_photo['zoom'])
@@ -265,9 +269,10 @@ def create_doc(campaign, agence):  # campaign correspond au nom de la campagne (
     doc.add_page_break()
 
     composer = Composer(doc)
-    page_fin = Document('Fichiers_remplissage/Page_fin.docx')
+    page_fin = Document(path_ressources + 'Page_fin.docx')
     composer.append(page_fin)
-    composer.save(campaign + "_Rapport_d_expérimentation.docx")
+    name_doc = campaign + "_Rapport_d_expérimentation.docx"
+    composer.save(path_output + "/" + name_doc)
 
 
 def traduction_type_biotest(biotest_anglais):
@@ -288,9 +293,8 @@ def traduction_type_biotest(biotest_anglais):
     return string
 
 
-# photo_amont = 'Fichiers_remplissage/AG-003-01-01-01/step50_PDA1_AG-003-01-01-01_Amont_20190219_100021.jpg'
-def recuperation_photo(reference):
-    prefixe = "Fichiers_remplissage/" + reference
+def recuperation_photo(reference, path_photo):
+    prefixe = path_photo + "/" + reference
     filenames = os.listdir(prefixe)
     dico_nom = {}
     for elt in filenames:

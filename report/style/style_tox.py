@@ -7,8 +7,8 @@ from termcolor import colored
 from tools import QueryScript
 
 
-def add_style_tox(tox_dataframe, filename):
-    PATH = f"output\\{filename}"
+def add_style_tox(tox_dataframe, filename, folder_PATH):
+    PATH = f"{folder_PATH}\\{filename}"
     wb = load_workbook(PATH)
     ws = wb['Tox']
 

@@ -58,8 +58,8 @@ def calcul_av_cycle(alpha, beta, gamme, delta, liste_tempe):
         "SELECT value FROM biomae.r2_constant WHERE name='FEMELLES'").execute()[0])
     somme = constante_duree_femelle * \
         fct_aux_av_cycle(alpha, beta, gamme, delta, liste_tempe[0])
-    for i in range(len(liste_tempe)):
-        somme += fct_aux_av_cycle(alpha, beta, gamme, delta, liste_tempe[i])
+    for temperature in liste_tempe:
+        somme += fct_aux_av_cycle(alpha, beta, gamme, delta, temperature)
     return somme
 
 

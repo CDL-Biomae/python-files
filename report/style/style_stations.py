@@ -4,8 +4,8 @@ from openpyxl.utils.cell import get_column_letter
 from termcolor import colored
 
 
-def add_style_stations(stations_dataframe, filename):
-    PATH = f"output\\{filename}"
+def add_style_stations(stations_dataframe, filename, folder_PATH):
+    PATH = f"{folder_PATH}\\{filename}"
     wb = load_workbook(PATH)
     ws = wb['Stations']
 

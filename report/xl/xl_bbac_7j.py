@@ -4,12 +4,11 @@ from tools import QueryScript
 
 ## CREATE DATAFRAME ##
 def create_dataframe(list_mp):
-    elements_metal = QueryScript("SELECT sandre, parameter FROM r3 WHERE 21j_threshold IS NOT NULL AND familly='Métaux'").execute()
-    elements_organic = QueryScript("SELECT sandre, parameter FROM r3 WHERE 21j_threshold IS NOT NULL AND familly!='Métaux'").execute()
+    elements_metal = QueryScript("SELECT sandre, parameter FROM r3 WHERE 7j_threshold IS NOT NULL AND familly='Métaux'").execute()
+    elements_organic = QueryScript("SELECT sandre, parameter FROM r3 WHERE 7j_threshold IS NOT NULL AND familly!='Métaux'").execute()
     matrix = []
 
-    for i in range(len(list_mp)):
-        mp = list_mp[i]
+    for mp in list_mp:
         pack = QueryScript(f"SELECT id FROM pack WHERE nature='chemistry' AND measurepoint_id={mp}").execute()
         if len(pack)>0:
             metal = chemistry.result_by_pack_and_sandre(pack[0],[int(float(element[0])) for element in elements_metal])
@@ -25,22 +24,17 @@ def create_dataframe(list_mp):
     return df
 
 def create_empty_dataframe(list_mp):
-    elements_metal = QueryScript("SELECT sandre, parameter FROM r3 WHERE 21j_threshold IS NOT NULL AND familly='Métaux'").execute()
-    elements_organic = QueryScript("SELECT sandre, parameter FROM r3 WHERE 21j_threshold IS NOT NULL AND familly!='Métaux'").execute()
+    elements_metal = QueryScript("SELECT sandre, parameter FROM r3 WHERE 7j_threshold IS NOT NULL AND familly='Métaux'").execute()
+    elements_organic = QueryScript("SELECT sandre, parameter FROM r3 WHERE 7j_threshold IS NOT NULL AND familly!='Métaux'").execute()
     matrix = []
 
 
-    mp = list_mp[0]
-    pack = QueryScript(f"SELECT id FROM pack WHERE nature='chemistry' AND measurepoint_id={mp}").execute()
-    if len(pack)>0:
+    for mp in list_mp:
         metal_list = ['' for element in elements_metal]
         metal = [metal_list, metal_list]
         organic_list = ['' for element in elements_organic]
         organic = [organic_list, organic_list]
-    else:
-        metal =  [['ND' for el in elements_metal],[int(float(element[0])) for element in elements_metal]]
-        organic =  [['ND' for el in elements_organic],[int(float(element[0])) for element in elements_organic]]
-    matrix.append([''] + metal[0] + [''] + organic[0])
+        matrix.append([''] + metal[0] + [''] + organic[0])
     df = pd.DataFrame(matrix)
     df.columns = [''] + [element[1] for element in elements_metal]  + [''] + [element[1] for element in elements_organic]
     df = df.dropna(how='all', axis='columns')
@@ -48,7 +42,7 @@ def create_empty_dataframe(list_mp):
     return df
 
 ## MAIN FUNCTION ##
-def create_bbac_dataframe(head_dataframe, list_campaigns, dict_mp):
+def create_bbac_7j_dataframe(head_dataframe, list_campaigns, dict_mp):
     list_dataframe = []
     for campaign_str in list_campaigns:
         list_mp = dict_mp[campaign_str]
@@ -61,7 +55,7 @@ def create_bbac_dataframe(head_dataframe, list_campaigns, dict_mp):
 
     return df_campaigns
 
-def create_bbac2_dataframe(head_dataframe, list_campaigns, dict_mp):
+def create_bbac2_7j_dataframe(head_dataframe, list_campaigns, dict_mp):
     list_dataframe = []
     for campaign_str in list_campaigns:
         list_mp = dict_mp[campaign_str]

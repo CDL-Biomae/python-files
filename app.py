@@ -1,27 +1,42 @@
-import kivy
-from kivy.app import App
-from kivy.uix.button import  Button
-from kivy.uix.textinput import TextInput
-from kivy.uix.boxlayout import BoxLayout
-from report import main
- 
-class QueryApp(App):
- 
-    def build(self):
-        self.box = BoxLayout(orientation='horizontal', spacing=20)
-        self.query = TextInput(hint_text='Write here', size_hint=(.5,.1))
-        self.btn = Button(text='Reset', on_press=self.clearText, size_hint=(.1,.1))
-        self.btn = Button(text='Go', on_press=main([self.text]), size_hint=(.1,.1))
-        self.box.add_widget(self.query)
-        self.box.add_widget(self.btn)
-        return self.box
- 
-    def clearText(self, instance):
-        self.query.text = ''
+import tkinter as tk
+from tkinter import filedialog
+from report import excel_main
 
-class Excel_CreatorApp(App):
-    def build(self):
-        return QueryApp()
+def main_button():
+    print(campaign_input.get())
 
-if __name__ == "__main__":
-    ClearApp().run()
+def enter(event):
+    print(campaign_input.get())
+    
+def reset():
+    campaign_input.set('')
+
+def browse_button():
+    global folder_path
+    filename = tk.filedialog.askdirectory()
+    folder_path.set(filename)
+    print(filename)
+
+
+window = tk.Tk()
+window.title('Digital Lab App')
+window.geometry("540x360")
+window.minsize(480, 360)
+folder_path = tk.StringVar()
+
+frame_campaign = tk.Frame(master=window)
+tk.Label(master=frame_campaign, text='Nom de campagne').grid(row=0,column=0)
+campaign_input = tk.Entry(frame_campaign)
+campaign_input.grid(row=0,column=1)
+campaign_button = tk.Button(master=frame_campaign,text="Lancer", command=main_button)
+campaign_button.grid(row=0, column=2)
+frame_campaign.pack(expand='YES')
+window.bind('<Return>', enter)
+
+frame_folder = tk.Frame(master=window)
+folder_button = tk.Button(master=frame_folder,text="Choisir une destination ...", command=browse_button)
+folder_button.pack()
+lbl1 = tk.Label(master=frame_folder,textvariable=folder_path).pack()
+frame_folder.pack(expand='YES')
+
+window.mainloop()

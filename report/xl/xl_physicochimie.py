@@ -24,7 +24,7 @@ def test_chimie_superieur_repro(list_mp):
         f"SELECT measurepoint_id, date FROM key_dates WHERE date_id = 7 and measurepoint_fusion_id IN {tuple(list_mp)}"
     ).execute()
 
-    dict_date1 = list_of_list_to_dict(output_date1)
+    dict_date1 = list_of_list_to_dict(output_date1)  # {mp: [date]}
     dict_date4 = list_of_list_to_dict(output_date4)
     dict_date6 = list_of_list_to_dict(output_date6)
     dict_date7 = list_of_list_to_dict(output_date7)
@@ -56,12 +56,12 @@ def test_chimie_superieur_repro(list_mp):
         mp = list_mp[i]
         [R0, RN, debut_chimie, fin_chimie] = dict_date1467[mp]
 
-        if RN == None or R0 == None:
+        if RN is None or R0 is None:
             delta_repro = None
         else:
             delta_repro = (RN - R0).days
 
-        if debut_chimie == None or fin_chimie == None:
+        if debut_chimie is None or fin_chimie is None:
             delta_chimie = None
         else:
             delta_chimie = (fin_chimie - debut_chimie).days
@@ -69,28 +69,36 @@ def test_chimie_superieur_repro(list_mp):
         try:
             boolean = delta_chimie > delta_repro
         except TypeError:
-            boolean = (delta_chimie != None)
+            boolean = (delta_chimie is not None)
 
         list_test.append(boolean)
 
     return list_test
 
 
-
 def temperatures_dataframe(list_mp):
     list_test = test_chimie_superieur_repro(list_mp)
     output = QueryScript(
-        f"SELECT sensor2_min, sensor2_average, sensor2_max, sensor3_min, sensor3_average, sensor3_max FROM average_temperature WHERE measurepoint_fusion_id IN {tuple(list_mp)}"
+        f"SELECT measurepoint_fusion_id, sensor2_min, sensor2_average, sensor2_max, sensor3_min, sensor3_average, sensor3_max FROM average_temperature WHERE measurepoint_fusion_id IN {tuple(list_mp)}"
     ).execute()
+
+    dict_output = list_of_list_to_dict(output)  # {mp: [sensor2_min, sensor2_average, sensor2_max, sensor3_min, sensor3_average, sensor3_max]}
 
     matrix = []
     n = len(list_mp)
     for i in range(n):
         test = list_test[i]
-        [sensor2_min, sensor2_average, sensor2_max, sensor3_min, sensor3_average, sensor3_max] = output[i]
+        mp = list_mp[i]
+
+        try:
+            data = dict_output[mp]
+        except KeyError:
+            data = [None, None, None, None, None, None]
+
+        [sensor2_min, sensor2_average, sensor2_max, sensor3_min, sensor3_average, sensor3_max] = data
 
         average = sensor3_average if test else sensor2_average
-        if average == None:
+        if average is None:
             average = 'NA'
         else:
             average = round(average, 1)
@@ -98,18 +106,18 @@ def temperatures_dataframe(list_mp):
         try:
             minimum = round(min(sensor2_min, sensor3_min), 1)
         except TypeError:
-            if sensor3_min == None and sensor2_min == None:
+            if sensor3_min is None and sensor2_min is None:
                 minimum = 'NA'
             else:
-                minimum = round(sensor2_min, 1) if sensor3_min == None else round(sensor3_min, 1)
+                minimum = round(sensor2_min, 1) if sensor3_min is None else round(sensor3_min, 1)
 
         try:
             maximum = round(max(sensor2_max, sensor3_max), 1)
         except TypeError:
-            if sensor3_max == None and sensor2_max == None:
+            if sensor3_max is None and sensor2_max is None:
                 maximum = 'NA'
             else:
-                maximum = round(sensor2_max, 1) if sensor3_max == None else round(sensor3_max, 1)
+                maximum = round(sensor2_max, 1) if sensor3_max is None else round(sensor3_max, 1)
 
         matrix.append(['', minimum, average, maximum])
 

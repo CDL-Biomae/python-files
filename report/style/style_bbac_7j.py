@@ -7,11 +7,11 @@ from tools import QueryScript
 from termcolor import colored
 
 
-def add_style_bbac(bbac_dataframe, filename):
-    PATH = f"output\\{filename}"
+def add_style_bbac_7j(bbac_dataframe, filename, folder_PATH):
+    PATH = f"{folder_PATH}\\{filename}"
     wb = load_workbook(PATH)
-    ws = wb['BBAC']
-    ws2 = wb['BBAC2']
+    ws = wb['BBAC_7j']
+    ws2 = wb['BBAC2_7j']
     
     nb_rows, nb_columns = bbac_dataframe.shape
     header_row = '4'
@@ -20,8 +20,8 @@ def add_style_bbac(bbac_dataframe, filename):
                      right=Side(border_style='thin', color='FFFFFF'),
                      top=Side(border_style='thin', color='FFFFFF'),
                      bottom=Side(border_style='thin', color='FFFFFF'))
-    elements_metal = QueryScript("SELECT sandre, parameter, 21j_threshold, 21j_graduate_25, 21j_graduate_50, 21j_graduate_75 FROM r3 WHERE familly='Métaux' AND 21j_threshold IS NOT NULL").execute()
-    elements_organic = QueryScript("SELECT sandre, parameter, 21j_threshold, 21j_graduate_25, 21j_graduate_50, 21j_graduate_75 FROM r3 WHERE familly!='Métaux' AND 21j_threshold IS NOT NULL").execute()
+    elements_metal = QueryScript("SELECT sandre, parameter, 7j_threshold, 7j_graduate_25, 7j_graduate_50, 7j_graduate_75 FROM r3 WHERE familly='Métaux' AND 7j_threshold IS NOT NULL").execute()
+    elements_organic = QueryScript("SELECT sandre, parameter, 7j_threshold, 7j_graduate_25, 7j_graduate_50, 7j_graduate_75 FROM r3 WHERE familly!='Métaux' AND 7j_threshold IS NOT NULL").execute()
     
     for letter in [get_column_letter(col_idx) for col_idx in range(1, nb_columns+5)]:
         for number in range(1, nb_rows+21):
@@ -237,5 +237,5 @@ def add_style_bbac(bbac_dataframe, filename):
     wb.save(PATH)
     wb.close()
 
-    print(colored('[+] La mise en page des onglets \"BBAC\" et \"BBAC2\" est terminée','green'))
+    print(colored('[+] La mise en page des onglets \"BBAC_7j\" et \"BBAC2_7j\" est terminée','green'))
 

@@ -26,8 +26,8 @@ def size_female_mm(pack_id):
      siz_female_mm =[]
      resultat2 =  QueryScript(SQL_request).execute()
      if(resultat2[len(resultat2)-1][1]!=0):     
-          for i in range (len(resultat2)-1):
-               siz_female_mm.append(resultat2[i][1]*resultat2[len(resultat2)-1][0]/resultat2[len(resultat2)-1][1])
+          for element in resultat2[:-1]:
+               siz_female_mm.append(element[1]*resultat2[len(resultat2)-1][0]/resultat2[len(resultat2)-1][1])
      
      #print(siz_female_mm)
 
@@ -40,13 +40,13 @@ def index_fertility_female_X(pack_id):
      resultat =  QueryScript(SQL_request).execute()
      index_female =[]
     
-     for i in range (len(resultat)-1):
-       if resultat[i][0]!=None:
-               if (resultat[i][0]>=2 and resultat[i][0]<=4):
-                      if resultat[i][1] == 0:
+     for element in resultat[:-1]:
+       if element[0]!=None:
+               if (element[0]>=2 and element[0]<=4):
+                      if element[1] == 0:
                            index_female.append(0) 
                       else:
-                           index_female.append(resultat[i][1]/(size_female_mm(pack_id)[i]-5))
+                           index_female.append(element[1]/(size_female_mm(pack_id)[i]-5))
                else:
                     index_female.append(0)
        else:
@@ -57,10 +57,10 @@ def index_fertility_female_X(pack_id):
 
       # n L6 (TOXFILE)
 def number_female_concerned(pack_id):
-     female = index_fertility_female_X(pack_id)
+     females = index_fertility_female_X(pack_id)
      Nbr = 0
-     for i in range(len(female)-1):
-          if female[i]==0:
+     for female in females[:-1]:
+          if female==0:
               Nbr = Nbr+1
      
      return len(female)-Nbr
@@ -73,13 +73,13 @@ def number_female_analysis(pack_id):
      Nbr_C2_D1 = 0
      Nbr_D2 = 0
 
-     for i in range(len(resultat)-1):
-          if resultat[i] != None:
-               if resultat[i].upper()=='B' or resultat[i].upper()=='C1':
+     for element in resultat[:-1]:
+          if element != None:
+               if element.upper()=='B' or element.upper()=='C1':
                     Nbr_B_C1 = Nbr_B_C1+1
-               elif resultat[i].upper()=='C2' or resultat[i].upper()=='D1':
+               elif element.upper()=='C2' or element.upper()=='D1':
                     Nbr_C2_D1=Nbr_C2_D1+1
-               elif resultat[i].upper()=='D2':
+               elif element.upper()=='D2':
                      Nbr_D2 =  Nbr_D2+1
           
 
@@ -116,9 +116,9 @@ def molting_cycle(pack_id):
      resultat2 =  QueryScript(SQL_request_tmp).execute()
    
      Nbr_C2_D1 = 0
-     for i in range(len(resultat)-1):
-          if resultat[i] != None: 
-                if resultat[i].upper()=='C2' or resultat[i].upper()=='D1':
+     for element in resultat[:-1]:
+          if element != None: 
+                if element.upper()=='C2' or element.upper()=='D1':
                     Nbr_C2_D1=Nbr_C2_D1+1
 
 
@@ -146,17 +146,17 @@ def number_female_concerned_area(pack_id):
           Area_delay = []
           nbr_f_c = 0
 
-          for i in range(len(resultat)-1):
+          for element in resultat[:-1]:
                   
-                    if resultat[i][1]==None or resultat[i][1]==0 or resultat[i][3]==0 or resultat[i][2]:
+                    if element[1]==None or element[1]==0 or element[3]==0 or element[2]:
                          Area_delayµm.append('ND') # is tous les resultat dans la base donnée c'est vide sinn dans notre cas c'est NO DATA
                     else:
-                         Area_delayµm.append(resultat[i][1]*(resultat[i][2]/resultat[i][3]/97,82))
+                         Area_delayµm.append(element[1]*(element[2]/element[3]/97,82))
 
 
-          for i in range(len(resultat)-1): 
-                if resultat[i][0] != None:               
-                    if (resultat[i][0].upper()=='C1' or resultat[i][0].upper()=='B'):
+          for element in resultat[:-1]: 
+                if element[0] != None:               
+                    if (element[0].upper()=='C1' or element[0].upper()=='B'):
                           if Area_delayµm[i]=='ND':  #si aArea_delayµm[i] == 0 ou bien not defiend
                                Area_delay.append('ND')  # 0 ça veut dire le vide 
                           else:
@@ -219,9 +219,9 @@ def endocrine_disruption(pack_id):
                return 'NA'
           else:
                if female_concerned[0] != 0:     
-                    for i in range(len (female_concerned[1])):
-                         if female_concerned[i] != "ND":
-                              somme = somme+female_concerned[i]
+                    for element in female_concerned[1]:
+                         if element != "ND":
+                              somme = somme+element
 
                     return  somme/female_concerned[0]
                else:
