@@ -4,8 +4,8 @@ from tools import QueryScript
 
 ## CREATE DATAFRAME ##
 def create_dataframe(list_mp):
-    elements_metal = QueryScript("SELECT sandre, parameter FROM r3 WHERE 21j_threshold IS NOT NULL AND familly='Métaux'").execute()
-    elements_organic = QueryScript("SELECT sandre, parameter FROM r3 WHERE 21j_threshold IS NOT NULL AND familly!='Métaux'").execute()
+    elements_metal = QueryScript("SELECT sandre, parameter FROM r3 WHERE 7j_threshold IS NOT NULL AND familly='Métaux'").execute()
+    elements_organic = QueryScript("SELECT sandre, parameter FROM r3 WHERE 7j_threshold IS NOT NULL AND familly!='Métaux'").execute()
     matrix = []
 
     for mp in list_mp:
@@ -24,8 +24,8 @@ def create_dataframe(list_mp):
     return df
 
 def create_empty_dataframe(list_mp):
-    elements_metal = QueryScript("SELECT sandre, parameter FROM r3 WHERE 21j_threshold IS NOT NULL AND familly='Métaux'").execute()
-    elements_organic = QueryScript("SELECT sandre, parameter FROM r3 WHERE 21j_threshold IS NOT NULL AND familly!='Métaux'").execute()
+    elements_metal = QueryScript("SELECT sandre, parameter FROM r3 WHERE 7j_threshold IS NOT NULL AND familly='Métaux'").execute()
+    elements_organic = QueryScript("SELECT sandre, parameter FROM r3 WHERE 7j_threshold IS NOT NULL AND familly!='Métaux'").execute()
     matrix = []
 
 
@@ -42,7 +42,7 @@ def create_empty_dataframe(list_mp):
     return df
 
 ## MAIN FUNCTION ##
-def create_bbac_dataframe(head_dataframe, list_campaigns, dict_mp):
+def create_bbac_7j_dataframe(head_dataframe, list_campaigns, dict_mp):
     list_dataframe = []
     for campaign_str in list_campaigns:
         list_mp = dict_mp[campaign_str]
@@ -55,7 +55,7 @@ def create_bbac_dataframe(head_dataframe, list_campaigns, dict_mp):
 
     return df_campaigns
 
-def create_bbac2_dataframe(head_dataframe, list_campaigns, dict_mp):
+def create_bbac2_7j_dataframe(head_dataframe, list_campaigns, dict_mp):
     list_dataframe = []
     for campaign_str in list_campaigns:
         list_mp = dict_mp[campaign_str]

@@ -72,12 +72,12 @@ def main(list_campaigns):  # Prend en entrée une liste de reference de campagne
 
     # create_tox_dataframe(head_dataframe, list_campaigns, dict_mp)
 
-    # ## CREATION DE L'ONGLET VERSION ##
+    ## CREATION DE L'ONGLET VERSION ##
 
-    # print('\n[!] Création de l\'onglet \"Version\"...')
-    # version_dataframe = create_version_dataframe()
-    # write_in_new_excel(version_dataframe, filename, 'Version', startrow=3)
-    # add_style_version(version_dataframe, list_campaigns, filename)
+    print('\n[!] Création de l\'onglet \"Version\"...')
+    version_dataframe = create_version_dataframe()
+    write_in_new_excel(version_dataframe, filename, 'Version', startrow=3)
+    add_style_version(version_dataframe, list_campaigns, filename)
 
     # ## CREATION DE L'ONGLET STATIONS ##
 
@@ -117,12 +117,18 @@ def main(list_campaigns):  # Prend en entrée une liste de reference de campagne
 
     ## CREATION DE L'ONGLET BBAC ##
 
-    print('\n[!] Création de l\'onglet \"BBAC\"...')
-    bbac_dataframe = create_bbac_dataframe(head_dataframe, list_campaigns, dict_mp)
-    bbac2_dataframe = create_bbac2_dataframe(head_dataframe, list_campaigns, dict_mp)
-    write_in_existing_excel(bbac_dataframe, filename, 'BBAC', startrow=3)
-    write_in_existing_excel(bbac2_dataframe, filename, 'BBAC2', startrow=3)
-    add_style_bbac(bbac_dataframe, filename)
+    print('\n[!] Création de l\'onglet \"BBAC 21j\"...')
+    bbac_dataframe = create_bbac_21j_dataframe(head_dataframe, list_campaigns, dict_mp)
+    bbac2_dataframe = create_bbac2_21j_dataframe(head_dataframe, list_campaigns, dict_mp)
+    write_in_existing_excel(bbac_dataframe, filename, 'BBAC_21j', startrow=3)
+    write_in_existing_excel(bbac2_dataframe, filename, 'BBAC2_21j', startrow=3)
+    add_style_bbac_21j(bbac_dataframe, filename)
+    print('\n[!] Création de l\'onglet \"BBAC 7j\"...')
+    bbac_dataframe = create_bbac_7j_dataframe(head_dataframe, list_campaigns, dict_mp)
+    bbac2_dataframe = create_bbac2_7j_dataframe(head_dataframe, list_campaigns, dict_mp)
+    write_in_existing_excel(bbac_dataframe, filename, 'BBAC_7j', startrow=3)
+    write_in_existing_excel(bbac2_dataframe, filename, 'BBAC2_7j', startrow=3)
+    add_style_bbac_7j(bbac_dataframe, filename)
 
     # ## CREATION DE L'ONGLET TOX ##
 
