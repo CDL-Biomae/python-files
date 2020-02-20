@@ -38,7 +38,7 @@ def run():
   r2_constant_table.execute()
   SQL_request = "INSERT INTO r2_constant (nature, name, value) VALUES (%s, %s, %s)"
   values = []
-  index=1
+  index=0
   current_nature = ''
   is_readable =True
   while is_readable:
