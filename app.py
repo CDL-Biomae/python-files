@@ -1,8 +1,9 @@
 import tkinter as tk
+from tkinter import filedialog
 from report import main
 
 def main_button(campaign_input):
-    print(campaign_input.get())
+    print(campaign_input.get)
 
 def reset():
     campaign_input.set()
