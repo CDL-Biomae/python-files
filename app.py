@@ -2,11 +2,14 @@ import tkinter as tk
 from tkinter import filedialog
 from report import main
 
-def main_button(campaign_input):
-    print(campaign_input.get)
+def main_button():
+    print(campaign_input.get())
 
+def enter(event):
+    print(campaign_input.get())
+    
 def reset():
-    campaign_input.set()
+    campaign_input.set('')
 
 def browse_button():
     global folder_path
@@ -22,12 +25,13 @@ window.minsize(480, 360)
 folder_path = tk.StringVar()
 
 frame_campaign = tk.Frame(master=window)
-campaign_name = tk.Label(master=frame_campaign, text='Nom de campagne').grid(row=0,column=0)
-campaign_input = tk.Entry(frame_campaign).grid(row=0,column=1)
-campaign_button = tk.Button(master=frame_campaign,text="Lancer", command=main_button).grid(row=1, column=0)
-reset_button = tk.Button(master=frame_campaign,text="Effacer", command=reset).grid(row=1, column=1)
+tk.Label(master=frame_campaign, text='Nom de campagne').grid(row=0,column=0)
+campaign_input = tk.Entry(frame_campaign)
+campaign_input.grid(row=0,column=1)
+campaign_button = tk.Button(master=frame_campaign,text="Lancer", command=main_button)
+campaign_button.grid(row=0, column=2)
 frame_campaign.pack(expand='YES')
-window.bind('<Return>', main_button)
+window.bind('<Return>', enter)
 
 frame_folder = tk.Frame(master=window)
 folder_button = tk.Button(master=frame_folder,text="Choisir une destination ...", command=browse_button)
