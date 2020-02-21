@@ -3,7 +3,7 @@ from tools import QueryScript
 
 def get_dict_pack_fusion():
     output = QueryScript(
-        f"SELECT id, measurepoint_id, nature FROM pack"
+        f"SELECT DISTINCT pack.id, key_dates.measurepoint_fusion_id, pack.nature FROM pack JOIN key_dates ON key_dates.measurepoint_id=pack.measurepoint_id;"
     ).execute()
 
     dict_pack_fusion = {}
