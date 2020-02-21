@@ -1,6 +1,6 @@
 from tools import QueryScript
 from calcul import  survie_7jour,alimentation, neurotoxicity,female_survivor,number_days_exposition,number_female_concerned,index_fertility_average,number_female_analysis,number_female_concerned_area,endocrine_disruption,molting_cycle
-
+import math
 def create_tox_calcul_table(values):
     tox_table = QueryScript(
         " CREATE TABLE IF NOT EXISTS toxtable (id INT AUTO_INCREMENT PRIMARY KEY, place_id INT, Male_Survival_7_days varchar(255), alimentation varchar(255), neurotoxicity varchar(255), female_survivor varchar(255), number_days_exposition varchar(255), number_female_concerned varchar(255),index_fertility_average varchar(255),number_female_analysis varchar(255),molting_cycle varchar(255),number_female_concerned_area varchar(255),endocrine_disruption varchar(255));")
@@ -70,31 +70,32 @@ def measurepoint_result_tox_table_calcule(measurepoint_id):
     for pack in packs :    
      
         if(pack[0]=='alimentation'):
-            print("survie_7jour :" +str(survie_7jour(pack[1]))+" alimentation :" +str(alimentation(pack[1])) )
+            print("survie_7jour :" +str(survie_7jour(pack[1]))+" alimentation :" +str(alimentation(pack[1])))
             
-            tmp[1]= str(round(survie_7jour(pack[1])))    
-            tmp[2]= str("%.1f" % alimentation(pack[1]))
+            tmp[1]= str(round(survie_7jour(pack[1]))) 
+            if   alimentation(pack[1])=="NA":
+                tmp[2]= str(alimentation(pack[1]))
+            else:
+                tmp[2]= str("%.1f" % alimentation(pack[1]))
+
 
         if(pack[0]=='neurology'):
             print("neurotoxicity :" +str( neurotoxicity(pack[1])))
-           
-            tmp[3]= str("%.1f" % neurotoxicity(pack[1]))
+            if neurotoxicity(pack[1]) == "NA":
+                tmp[3]= str(neurotoxicity(pack[1]))
+            else:
+                tmp[3]= str("%.1f" % neurotoxicity(pack[1]))
            
 
         if(pack[0]=='reproduction'):
-            print(" female_survivor :" +str(female_survivor(pack[1]))+
-                  " nombre jour d'exepostion :" + str(number_days_exposition(pack[1]))+
-                  " n :" + str(number_female_concerned(pack[1]))+
-                  " fécondité :" + str("%.1f" % index_fertility_average(pack[1]))+
-                  " n :" + str(number_female_analysis(pack[1]))+
-                  " cycle de mue :" + str(molting_cycle(pack[1]))+
-                  " n :" + str(number_female_concerned_area(pack[1])[0])+
-                  " perturbation endocrinienne :" + str(endocrine_disruption(pack[1]))
-             )
+                
             tmp[4]=str(female_survivor(pack[1]))
             tmp[5]=str(number_days_exposition(pack[1]))
             tmp[6]=str(number_female_concerned(pack[1]))
-            tmp[7]=str(index_fertility_average(pack[1]))
+            if index_fertility_average(pack[1]) == "NA": 
+                tmp[7] = str(index_fertility_average(pack[1]))
+            else:
+                tmp[7] = str("%.1f" %index_fertility_average(pack[1]))             
             tmp[8]=str(number_female_analysis(pack[1]))
             tmp[9]=str(molting_cycle(pack[1]))
             tmp[10]=str(number_female_concerned_area(pack[1])[0])

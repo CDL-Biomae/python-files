@@ -86,7 +86,7 @@ def add_style_tox(tox_dataframe, filename, folder_PATH):
     body_fill_not_ok_2 = PatternFill(fill_type='solid', start_color='FFFF00', end_color='FFFF00')
     body_fill_not_ok_3 = PatternFill(fill_type='solid', start_color='FF7F00', end_color='FF7F00')
     body_fill_not_ok_4 = PatternFill(fill_type='solid', start_color='DE1738', end_color='DE1738')
-    body_fill_NA = PatternFill(fill_type='solid', start_color='eff0f1', end_color='#bdbdbd')
+    body_fill_NA = PatternFill(fill_type='solid', start_color='eff0f1', end_color='bdbdbd')
 
     ws.column_dimensions['F'].width = 3
     ws.column_dimensions['J'].width = 3
