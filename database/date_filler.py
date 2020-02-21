@@ -251,19 +251,19 @@ def key_datesFusion(id_mp_alim, id_mp_chimie, id_mp_repro):
         idx_alim = steps_barrels_alim.index((20, None))
         debuts[id_mp_alim] = exposureconditions_alim[idx_alim][1]
     except ValueError:
-        debut_alim = None
+        debuts[id_mp_alim] = None
 
     try:
         idx_repro = steps_barrels_repro.index((20, None))
         debuts[id_mp_repro] = steps_barrels_repro[idx_repro][1]
     except ValueError:
-        debut_repro = None
+        debuts[id_mp_repro] = None
 
     try:
         idx_chimie = steps_barrels_chimie.index((20, None))
         debuts[id_mp_chimie] = exposureconditions_chimie[idx_chimie][1]
     except ValueError:
-        debut_chimie = None
+        debuts[id_mp_chimie] = None
 
     date_debut = min(list(debuts.values()))
     id_mp_fusion = list(debuts.keys())[list(debuts.values()).index(date_debut)]
