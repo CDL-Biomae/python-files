@@ -4,22 +4,52 @@ from math import *
 import numbers
 
 
-def number_days_exposition(pack_id):
-     fusion_id = fusion_id_finder(pack_id)
-     SQL_request = "SELECT date FROM key_dates where date_id IN(4,6) and measurepoint_fusion_id="+str(fusion_id)
-     LR_dates =  QueryScript(SQL_request).execute()
-     if LR_dates[0]!=None or LR_dates[1]!=None :
-           if(LR_dates==" "):
-                return "NA"
-           else:
-                 nbrdays =  LR_dates[0]-LR_dates[1]
-                 if (nbrdays.seconds/60/60)>=12:
-                       return nbrdays.days+1
-                 else:
-                       return nbrdays.days
-     else:
-          return "NA" 
-    
+def number_days_exposition(dict_pack_fusion):
+    nature = 'reproduction'
+    list_mp_repro = []
+    for mp in dict_pack_fusion:
+        try:
+            pack_id = dict_pack_fusion[mp][nature]
+        except KeyError:
+            pass
+        else:
+            list_mp_repro.append(mp)
+
+    # Récupération des dates de début et de fin
+    output_dates_debut = QueryScript(
+        f"SELECT measurepoint_fusion_id, date FROM key_dates where date_id=6 and measurepoint_fusion_id IN {tuple(list_mp_repro)};"
+    ).execute()
+    output_dates_fin = QueryScript(
+        f"SELECT measurepoint_fusion_id, date FROM key_dates where date_id=4 and measurepoint_fusion_id IN {tuple(list_mp_repro)};"
+    ).execute()
+
+    output_mp_debut = [x[0] for x in output_dates_debut]
+    output_mp_fin = [x[0] for x in output_dates_fin]
+
+    dict_dates_debut_fin = {}  # {mp: [date_debut, date_fin]}
+    for mp in list_mp_repro:
+        idx_debut = output_mp_debut.index(mp)
+        idx_fin = output_mp_fin.index(mp)
+        dict_dates_debut_fin[mp] = [output_dates_debut[idx_debut][1], output_dates_fin[idx_fin][1]]
+
+    # Initialisation du dictionnaire de sortie
+    dict_nbr_days_exposition = {}
+    for mp in dict_pack_fusion:
+        dict_nbr_days_exposition[mp] = None
+
+    # Calcul
+    for mp in list_mp_repro:
+        [date_debut, date_fin] = dict_dates_debut_fin[mp]
+        if date_debut is not None and date_fin is not None:
+            if date_debut is None and date_fin is None:
+                dict_nbr_days_exposition[mp] = "NA"
+            else:
+                nbrdays = (date_fin - date_debut).days
+                dict_nbr_days_exposition[mp] = nbrdays
+        else:
+            dict_nbr_days_exposition[mp] = "NA"
+
+    return dict_nbr_days_exposition
 
 def size_female_mm(pack_id):
      SQL_request = "SELECT specimen_size_mm, specimen_size_px, embryo_total FROM biomae.measurereprotoxicity where pack_id ="+str(pack_id)

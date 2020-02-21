@@ -18,5 +18,3 @@ def get_dict_pack_fusion():
             dict_pack_fusion[mp][nature] = pack_id
 
     return(dict_pack_fusion)
-
-a = get_dict_pack_fusion()
