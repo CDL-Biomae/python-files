@@ -31,11 +31,10 @@ def word_main(campaign, agence, path_photo="Photos", path_output="output"):
             for j in range(2, 5):
                 table_geo.cell(j, 2).merge(table_geo.cell(j, 3))
         else:
-            table_geo = doc.add_table(rows=6, cols=4)
-            for j in range(2, 6):
+            table_geo = doc.add_table(rows=4, cols=4)
+            for j in range(2, 4):
                 table_geo.cell(j, 0).merge(table_geo.cell(j, 1))
-            for j in range(2, 5):
-                table_geo.cell(j, 2).merge(table_geo.cell(j, 3))
+            table_geo.cell(3, 2).merge(table_geo.cell(3, 3))
 
         header = table_geo.rows[0].cells
         header[0].merge(header[-1])
@@ -54,21 +53,21 @@ def word_main(campaign, agence, path_photo="Photos", path_output="output"):
 
         table_geo.cell(2, 0).paragraphs[0].add_run("Biotests :").bold = True
         biotest_francais = traduction_type_biotest(
-            dico_type_biotest[reference])
+            dico_type_biotest[reference]['biotest'])
         table_geo.cell(2, 2).paragraphs[0].add_run(
             biotest_francais)
 
-        table_geo.cell(3, 0).paragraphs[0].add_run(
-            "Réseau de surveillance :").bold = True
-        table_geo.cell(3, 2).paragraphs[0].add_run(
-            dico_geo_agency[reference]['network'])
-
-        table_geo.cell(4, 0).paragraphs[0].add_run(
-            "Type d'hydroécorégion :").bold = True
-        table_geo.cell(4, 2).paragraphs[0].add_run(
-            dico_geo_agency[reference]['hydroecoregion'])
-
         if agence:
+            table_geo.cell(3, 0).paragraphs[0].add_run(
+                "Réseau de surveillance :").bold = True
+            table_geo.cell(3, 2).paragraphs[0].add_run(
+                dico_geo_agency[reference]['network'])
+
+            table_geo.cell(4, 0).paragraphs[0].add_run(
+                "Type d'hydroécorégion :").bold = True
+            table_geo.cell(4, 2).paragraphs[0].add_run(
+                dico_geo_agency[reference]['hydroecoregion'])
+
             table_geo.cell(5, 0).paragraphs[0].add_run(
                 "Coordonnées Agence Lambert 93 :").bold = True
             table_geo.cell(5, 2).paragraphs[0].add_run('Y ' +
@@ -91,15 +90,16 @@ def word_main(campaign, agence, path_photo="Photos", path_output="output"):
                                                        dico_geo_mp[reference]['lambertXSpotted'])
 
         else:
-            table_geo.cell(5, 0).paragraphs[0].add_run(
+            table_geo.cell(3, 0).paragraphs[0].add_run(
                 "Coordonnées BIOMÆ en degrés décimaux : ").bold = True
-            table_geo.cell(5, 2).paragraphs[0].add_run(
+            table_geo.cell(3, 2).paragraphs[0].add_run(
                 str(dico_geo_mp[reference]['longitudeSpotted']))
-            table_geo.cell(5, 3).paragraphs[0].add_run(
+            table_geo.cell(3, 3).paragraphs[0].add_run(
                 str(dico_geo_mp[reference]['latitudeSpotted']))
 
         table_carte = doc.add_table(rows=4, cols=1)
         access_token = "pk.eyJ1IjoiamJyb25uZXIiLCJhIjoiY2s2cW5kOWQwMHBybjNtcW8yMXJuYmo3aiJ9.z8Ekf7a0RGTZ4jrbJVpq8g"
+        layer = '{"id":"water","source":{"url":"mapbox://mapbox.mapbox-streets-v8","type":"vector"},"source-layer":"water","type":"fill","paint":{"fill-color":"%2300ffff"}}'
         url_street = f"https://api.mapbox.com/styles/v1/mapbox/streets-v11/static/pin-s+FF0000({str(dico_geo_mp[reference]['longitudeSpotted'])},{str(dico_geo_mp[reference]['latitudeSpotted'])})/{str(dico_geo_mp[reference]['longitudeSpotted'])},{str(dico_geo_mp[reference]['latitudeSpotted'])},9.21/450x300@2x?access_token={access_token}"
         response = requests.get(url_street)
         carte_street = BytesIO(response.content)
@@ -109,7 +109,7 @@ def word_main(campaign, agence, path_photo="Photos", path_output="output"):
         table_carte.cell(1, 0).text = "Vue carte situant les villes alentours"
         table_carte.cell(1, 0).paragraphs[0].alignment = 1
 
-        url_satellite = f"https://api.mapbox.com/styles/v1/mapbox/satellite-streets-v11/static/pin-s+FF0000({str(dico_geo_mp[reference]['longitudeSpotted'])},{str(dico_geo_mp[reference]['latitudeSpotted'])})/{str(dico_geo_mp[reference]['longitudeSpotted'])},{str(dico_geo_mp[reference]['latitudeSpotted'])},13.5/450x300@2x?access_token={access_token}"
+        url_satellite = f"https://api.mapbox.com/styles/v1/mapbox/satellite-streets-v11/static/pin-s+FF0000({str(dico_geo_mp[reference]['longitudeSpotted'])},{str(dico_geo_mp[reference]['latitudeSpotted'])})/{str(dico_geo_mp[reference]['longitudeSpotted'])},{str(dico_geo_mp[reference]['latitudeSpotted'])},13.5/450x300@2x?addlayer={layer}&access_token={access_token}"
         response = requests.get(url_satellite)
         carte_satellite = BytesIO(response.content)
         table_carte.cell(2, 0).paragraphs[0].add_run().add_picture(
@@ -165,15 +165,7 @@ def word_main(campaign, agence, path_photo="Photos", path_output="output"):
         table_image.cell(6, 0).paragraphs[0].add_run(
             "Type de système d’exposition : ").bold = True
 
-        # Vérifier avec Biomae que juste ça suffit
         type_barrel_J0 = dico_exposure_condition[reference]['J+0']['type']
-        # type_barrel_J14 = dico_exposure_condition[reference]['J+14']['type']
-        # type_barrel_J0 = type_barrel_J14 if type_barrel_J14 else type_barrel_J0
-        # type_barrel_J14 = type_barrel_J0 if type_barrel_J0 else type_barrel_J14
-        # if (type_barrel_J0 == 'barrel') & (type_barrel_J14 == 'barrel'):
-        #     type_barrel_J0 = 'Fut'
-        # elif (type_barrel_J0 == 'box') & (type_barrel_J14 == 'box'):
-        #     type_barrel_J0 = "Caisse"
         if (type_barrel_J0 == 'barrel'):
             type_barrel_J0 = 'Fut'
         elif (type_barrel_J0 == 'box'):
@@ -218,6 +210,7 @@ def word_main(campaign, agence, path_photo="Photos", path_output="output"):
         interligne.paragraph_format.space_after = Pt(0)
         interligne.paragraph_format.space_before = Pt(0)
 
+        chemistry = 1 if "chemistry" in dico_type_biotest[reference]['biotest'] else 0
         if dico_exposure_condition[reference]['fusion?']:
             liste_jours = ["J+0", "J+14", "J+N", "J+21"]
         else:
@@ -228,12 +221,12 @@ def word_main(campaign, agence, path_photo="Photos", path_output="output"):
                 liste_indice_jours_utiles.append(num_jour)
         nombre_jours_utiles = len(liste_indice_jours_utiles)
         table_exposure_condition = doc.add_table(
-            rows=7, cols=1+nombre_jours_utiles, style="Table Grid")
+            rows=7+chemistry, cols=1+nombre_jours_utiles, style="Table Grid")
         liste_entete = ["Intervention", "Date - Heure",
-                        "Température (°C)", "Conductivité (µS/cm)", "pH", "Oxygène dissous (mg/L)"]
+                        "Température (°C)", "Conductivité (µS/cm)", "pH", "Oxygène dissous (mg/L)", "Survie Chimie (%)"]
         liste_entete_BDD = ["date", "temperature",
                             "conductivity", "ph", "oxygen"]
-        for num_entete in range(6):
+        for num_entete in range(6+chemistry):
             paragraph = table_exposure_condition.cell(
                 num_entete, 0).paragraphs[0]
             paragraph.add_run(liste_entete[num_entete]).italic = True
@@ -251,15 +244,30 @@ def word_main(campaign, agence, path_photo="Photos", path_output="output"):
                 paragraph.add_run(str(
                     dico_exposure_condition[reference][liste_jours[liste_indice_jours_utiles[num_jour]]][liste_entete_BDD[num_entete]]))
                 paragraph.alignment = 1
-        table_exposure_condition.cell(6, 0).merge(
-            table_exposure_condition.cell(6, nombre_jours_utiles))
-        paragraph = table_exposure_condition.cell(6, 0).paragraphs[0]
+
+        if chemistry:
+            table_exposure_condition.cell(6, 1).merge(
+                table_exposure_condition.cell(6, nombre_jours_utiles))
+            paragraph_survie = table_exposure_condition.cell(
+                6, 1).paragraphs[0]
+            paragraph_survie.add_run(str(
+                round(dico_type_biotest[reference]['survivor_chemistry'], 1)))
+
+            table_exposure_condition.cell(7, 0).merge(
+                table_exposure_condition.cell(7, nombre_jours_utiles))
+            paragraph_comment = table_exposure_condition.cell(
+                7, 0).paragraphs[0]
+        else:
+            table_exposure_condition.cell(6, 0).merge(
+                table_exposure_condition.cell(6, nombre_jours_utiles))
+            paragraph_comment = table_exposure_condition.cell(
+                6, 0).paragraphs[0]
         comment = ""
         for jour in liste_jours:
             if dico_exposure_condition[reference][jour]['comment'] != None:
                 comment += f"{jour} : {dico_exposure_condition[reference][jour]['comment']}\n"
-        paragraph.add_run(comment[:-1])
-        for num_entete in range(7):
+        paragraph_comment.add_run(comment[:-1])
+        for num_entete in range(7+chemistry):
             for num_jour in range(1+nombre_jours_utiles):
                 paragraph = table_exposure_condition.cell(
                     num_entete, num_jour).paragraphs[0]
