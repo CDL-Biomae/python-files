@@ -142,20 +142,20 @@ def word_main(campaign, agence, path_photo="Photos", path_output="output"):
         table_image.cell(5, 1).text = "Panorama encagement"
         table_image.cell(5, 1).paragraphs[0].alignment = 1
 
-        nom_photo = recuperation_photo(reference, path_photo)
+        nom_photo = recuperation_photo(reference, path_photo, path_ressources)
         rotation_image(nom_photo['amont'])
         rotation_image(nom_photo['aval'])
         rotation_image(nom_photo['zoom'])
         rotation_image(nom_photo['panorama'])
 
         table_image.cell(2, 0).paragraphs[0].add_run().add_picture(
-            nom_photo['aval'], width=3046870, height=2111370)  # width=3046870, height=2111370
+            nom_photo['aval'], width=3046870)  # width=3046870, height=2111370
         table_image.cell(2, 1).paragraphs[0].add_run().add_picture(
-            nom_photo['amont'], width=3046870, height=2111370)
+            nom_photo['amont'], width=3046870)
         table_image.cell(4, 0).paragraphs[0].add_run().add_picture(
-            nom_photo['zoom'], width=3046870, height=2111370)
+            nom_photo['zoom'], width=3046870)
         table_image.cell(4, 1).paragraphs[0].add_run().add_picture(
-            nom_photo['panorama'], width=3046870, height=2111370)
+            nom_photo['panorama'], width=3046870)
         for elt in [(2, 0), (2, 1), (4, 0), (4, 1)]:
             table_image.cell(elt[0],
                              elt[1]).paragraphs[0].paragraph_format.space_after = Pt(0)
@@ -252,6 +252,7 @@ def word_main(campaign, agence, path_photo="Photos", path_output="output"):
                 6, 1).paragraphs[0]
             paragraph_survie.add_run(str(
                 round(dico_type_biotest[reference]['survivor_chemistry'], 1)))
+            paragraph_survie.alignment = 1
 
             table_exposure_condition.cell(7, 0).merge(
                 table_exposure_condition.cell(7, nombre_jours_utiles))
@@ -301,14 +302,26 @@ def traduction_type_biotest(biotest_anglais):
     return string
 
 
-def recuperation_photo(reference, path_photo):
+def recuperation_photo(reference, path_photo, path_ressources):
     prefixe = path_photo + "/" + reference
-    filenames = os.listdir(prefixe)
+    list_type = ["amont", "aval", "zoom", "panorama"]
     dico_nom = {}
-    for elt in filenames:
-        l_nom = elt.split("_")
-        type_photo = l_nom[3].lower()
-        dico_nom[type_photo] = prefixe + "/" + elt
+    try:
+        filenames = os.listdir(prefixe)
+    except FileNotFoundError:
+        for typ in list_type:
+            dico_nom[typ] = path_ressources + "/carre_blanc.jpg"
+    else:
+        for elt in filenames:
+            l_nom = elt.split("_")
+            type_photo = l_nom[3].lower()
+            dico_nom[type_photo] = prefixe + "/" + elt
+
+        for typ in list_type:
+            try:
+                val = dico_nom[typ]
+            except KeyError:
+                dico_nom[typ] = path_ressources + "/carre_blanc.jpg"
     return dico_nom
 
 
