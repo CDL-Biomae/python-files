@@ -11,9 +11,12 @@ def recuperation_donnee(campaign):
     for measurepoint in measurepoints_fusion_id_list:
         data = data_exposure_condition(measurepoint)
         biotest = type_biotest(measurepoint)
+        scud_survivor = scud_survivor_chemistry(measurepoint)
         dico_exposure_condition[data[0]] = data[1]
         dico_exposure_condition[data[0]]['fusion?'] = data[2]
-        dico_type_biotest[data[0]] = biotest
+        dico_type_biotest[data[0]] = {}
+        dico_type_biotest[data[0]]['biotest'] = biotest
+        dico_type_biotest[data[0]]['survivor_chemistry'] = scud_survivor
     dico_avg_tempe, dico_geo_mp = average_temperature__geographic_data_measurepoint(
         measurepoints_fusion_id_list)
     dico_geo_agency = geographic_data_agency(campaign)
@@ -146,5 +149,17 @@ def geographic_data_agency(campaign):
 
 def type_biotest(measurepoint_fusion_id):
     query = QueryScript(
-        f"SELECT DISTINCT pack.nature FROM pack JOIN key_dates ON pack.measurepoint_id = key_dates.measurepoint_id WHERE key_dates.measurepoint_fusion_id = {measurepoint_fusion_id}").execute()
+        f"SELECT DISTINCT pack.nature FROM pack JOIN key_dates ON pack.measurepoint_id = key_dates.measurepoint_id JOIN cage ON pack.id = cage.pack_id WHERE key_dates.measurepoint_fusion_id = {measurepoint_fusion_id}").execute()
     return query
+
+# %% Récupération Survie Chimie
+
+
+def scud_survivor_chemistry(measurepoint_fusion_id):
+    query = QueryScript(
+        f"SELECT Distinct cage.scud_survivor, cage.scud_quantity FROM cage JOIN pack ON cage.pack_id = pack.id JOIN key_dates ON pack.measurepoint_id = key_dates.measurepoint_id WHERE pack.nature = 'chemistry' AND cage.scud_survivor IS not null AND key_dates.measurepoint_fusion_id = {measurepoint_fusion_id}").execute()
+    total = 0
+    for elt in query:
+        total += elt[0]/elt[1]
+    average = total/len(query)*100
+    return average
