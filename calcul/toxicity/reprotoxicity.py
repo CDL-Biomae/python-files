@@ -161,42 +161,75 @@ def fecundity(dict_pack_fusion):  # retourne le nombre de femelles concernées e
             fecondite_moyenne = "NA"
         dict_fecundity[mp_fusion]['fécondité_moyenne'] = fecondite_moyenne
 
-     
     return dict_fecundity  # {mp_fusion: {{'nbr_femelles_analysées': int, 'nbr_femelles_concernées': int, 'fécondité_moyenne': float}}
 
 
 # Cycle de mue
-def molting_cycle(pack_id):
-     fusion_id = fusion_id_finder(pack_id)
-    
-     SQL_request = "SELECT molting_stage FROM biomae.measurereprotoxicity where pack_id ="+str(pack_id)
-     SQL_request_tmp = "SELECT expected_C2,expected_D2 FROM biomae.temperature_repro where measurepoint_fusion_id="+str(fusion_id)
-     resultat =  QueryScript(SQL_request).execute()
-     resultat2 =  QueryScript(SQL_request_tmp).execute()
-   
-     Nbr_C2_D1 = 0
-     for i in range(len(resultat)-1):
-          if resultat[i] != None: 
-                if resultat[i].upper()=='C2' or resultat[i].upper()=='D1':
-                    Nbr_C2_D1=Nbr_C2_D1+1
+def molting_cycle(dict_pack_fusion):
+    nature = 'reproduction'
+    list_pack_repro = []
+    list_mp_repro = []
+    for mp in dict_pack_fusion:
+        try:
+            pack_id = dict_pack_fusion[mp][nature]
+        except KeyError:
+            pass
+        else:
+            list_mp_repro.append(mp)
+            list_pack_repro.append(pack_id)
 
+    SQL_request = f"SELECT pack_id, molting_stage FROM biomae.measurereprotoxicity where pack_id IN {tuple(list_pack_repro)};"
+    SQL_request_2 = f"SELECT measurepoint_fusion_id, expected_C2,expected_D2 FROM biomae.temperature_repro where measurepoint_fusion_id IN {tuple(list_mp_repro)};"
+    resultat_molting_stage =  QueryScript(SQL_request).execute()
+    resultat_expected_stage =  QueryScript(SQL_request_2).execute()
 
-     if female_survivor(pack_id)=='NA' or number_female_analysis(pack_id) =='NA' or number_female_analysis(pack_id) == 0:
-              return "NA"
-     else:
-           molting = Nbr_C2_D1/number_female_analysis(pack_id)*100
-           if resultat2==[] or resultat2[0][0] == None or resultat2[0][1]==None:
-                molting = str(round(molting)) +"%"
-           else:
-                molting = str(round(molting)) +"%("+str(round(resultat2[0][0]-resultat2[0][1]))+")%"
+    dict_molting_stage = {pack_id: [] for pack_id in list_pack_repro}
+    for row in resultat_molting_stage:
+        [pack_id, molting_stage] = row
+        dict_molting_stage[pack_id].append(molting_stage)
 
+    dict_expected_stage = {mp_fusion: {'expected C2': None, 'expected D2': None} for mp_fusion in list_mp_repro}
+    for row in resultat_expected_stage:
+        [measurepoint_fusion_id, expected_C2, expected_D2] = row
+        dict_expected_stage[measurepoint_fusion_id]['expected C2'] = expected_C2
+        dict_expected_stage[measurepoint_fusion_id]['expected D2'] = expected_D2
 
-     # molting = round(molting) +"%" + round( Max Température repro % attendu au moins en C2 - MAX Température repro % attendu  au moins en D2)
-     
-  
-     return molting
+    # Initialisation du dictionnaire de sortie
+    dict_molting = {mp_fusion: {'cycle de mue': None, 'cycle de mue attendu': None} for mp_fusion in dict_pack_fusion.keys()}
+
+    # Remplissage du dictionnaire de sortie
+    for i, mp_fusion in enumerate(list_mp_repro):
+        pack_id = list_pack_repro[i]
+        dict_molting[mp_fusion]['cycle de mue attendu'] = dict_expected_stage[mp_fusion]['expected C2']
+
+        list_molting_stage = dict_molting_stage[pack_id]
+        cpt_molting_stage = Counter(list_molting_stage)
+        cpt_analysees = [cpt_molting_stage.get(molting_stage) for molting_stage in ['b', 'c1', 'c2', 'd1', 'd2']]
+        cpt_c2_d1 = [cpt_molting_stage.get(molting_stage) for molting_stage in ['c2', 'd1']]
+
+        nbr_femelles_analysees = 0
+        for x in cpt_analysees:
+            if x is not None:
+                nbr_femelles_analysees += x
+
+        nbr_femelles_c2_d1 = 0
+        for x in cpt_c2_d1:
+            if x is not None:
+                nbr_femelles_c2_d1 += x
+
+        if nbr_femelles_analysees == 0:
+            molting_percent = 'NA'
+        else:
+            molting_percent = nbr_femelles_c2_d1/nbr_femelles_analysees
+
+        dict_molting[mp_fusion]['cycle de mue'] = molting_percent if molting_percent == 'NA' else molting_percent*100
+
+    return dict_molting  # {mp_fusion: {'cycle de mue': ..%, 'cycle de mue attendu': ..%}}
+
 
     #  n p6 (TOXFILE) il manque des variable dans la base de donner c'est pour cela les resultat sont pas identique
+
+
 def number_female_concerned_area(pack_id):
           SQL_request = "SELECT molting_stage,oocyte_area_pixel,oocyte_area_pixel,oocyte_area_mm FROM biomae.measurereprotoxicity where pack_id ="+str(pack_id)
           resultat =  QueryScript(SQL_request).execute()
