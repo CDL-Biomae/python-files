@@ -106,7 +106,7 @@ def word_main(campaign, agence, path_photo="Photos", path_output="output"):
         table_carte.cell(0, 0).paragraphs[0].add_run().add_picture(
             carte_street, width=4500000)
         table_carte.cell(0, 0).paragraphs[0].alignment = 1
-        table_carte.cell(1, 0).text = "Vue carte situant les villes alentours"
+        table_carte.cell(1, 0).text = "Localisation du point de mesure"
         table_carte.cell(1, 0).paragraphs[0].alignment = 1
 
         url_satellite = f"https://api.mapbox.com/styles/v1/mapbox/satellite-streets-v11/static/pin-s+FF0000({str(dico_geo_mp[reference]['longitudeSpotted'])},{str(dico_geo_mp[reference]['latitudeSpotted'])})/{str(dico_geo_mp[reference]['longitudeSpotted'])},{str(dico_geo_mp[reference]['latitudeSpotted'])},13.5/450x300@2x?addlayer={layer}&access_token={access_token}"
@@ -116,7 +116,7 @@ def word_main(campaign, agence, path_photo="Photos", path_output="output"):
             carte_satellite, width=4500000)
         table_carte.cell(2, 0).paragraphs[0].alignment = 1
         table_carte.cell(
-            3, 0).text = "Vue satellitaire montrant la zone d'encagement vue du ciel"
+            3, 0).text = "Vue satellitaire"
         table_carte.cell(3, 0).paragraphs[0].alignment = 1
 
         doc.add_page_break()
