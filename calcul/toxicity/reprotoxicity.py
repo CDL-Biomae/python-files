@@ -2,6 +2,7 @@ from tools import QueryScript, fusion_id_finder
 from calcul.toxicity.reproduction import * 
 from math import *
 import numbers
+from collections import Counter
 
 
 def number_days_exposition(dict_pack_fusion):
@@ -33,7 +34,7 @@ def number_days_exposition(dict_pack_fusion):
         dict_dates_debut_fin[mp] = [output_dates_debut[idx_debut][1], output_dates_fin[idx_fin][1]]
 
     # Initialisation du dictionnaire de sortie
-    dict_nbr_days_exposition = {}
+    dict_nbr_days_exposition = {}  # {mp: nbrdays}
     for mp in dict_pack_fusion:
         dict_nbr_days_exposition[mp] = None
 
@@ -51,92 +52,120 @@ def number_days_exposition(dict_pack_fusion):
 
     return dict_nbr_days_exposition
 
-def size_female_mm(pack_id):
-     SQL_request = "SELECT specimen_size_mm, specimen_size_px, embryo_total FROM biomae.measurereprotoxicity where pack_id ="+str(pack_id)
-     siz_female_mm =[]
-     resultat2 =  QueryScript(SQL_request).execute()
-     if(resultat2[len(resultat2)-1][1]!=0):     
-          for i in range (len(resultat2)-1):
-               siz_female_mm.append(resultat2[i][1]*resultat2[len(resultat2)-1][0]/resultat2[len(resultat2)-1][1])
+
+def index_fecundity_female(list_pack_repro):
+    SQL_request = f"SELECT pack_id, female, molting_stage, embryo_stage, specimen_size_mm, specimen_size_px, embryo_total FROM biomae.measurereprotoxicity where pack_id IN {tuple(list_pack_repro)};"
+    output = QueryScript(SQL_request).execute()
+
+    # Initialisation du dictionnaire de la requête mise en forme
+    # {pack_id: {'px_to_mm': int, 'data': [[molting_stage, embryo_stage, specimen_size_mm, specimen_size_px, embryo_total], [...]] }}
+    dict_result = {pack_id: {'px_to_mm': None, 'data': []} for pack_id in list_pack_repro}
+
+    pack_errors = []
+
+    for row in output:
+        [pack_id, female, molting_stage, embryo_stage, specimen_size_mm, specimen_size_px, embryo_total] = row
+
+        if female == '' or female == '0bis':
+            continue
+
+        if int(female) == 0:  # Valeur étalon
+            try:
+                px_to_mm = specimen_size_mm/specimen_size_px
+            except TypeError:
+                pack_errors.append(pack_id)
+                continue
+            dict_result[pack_id]['px_to_mm'] = px_to_mm
+        elif female is not None:  # Données à traiter ensuite
+            data = [molting_stage, embryo_stage, specimen_size_mm, specimen_size_px, embryo_total]
+            dict_result[pack_id]['data'].append(data)
+
+    # Initialisation du dictionnaire de sortie
+    dict_index_fecundity = {pack_id: {'list_molting_stage': [], 'list_index_fecundity': []} for pack_id in list_pack_repro}
+
+    for pack_id in dict_result.keys():
+        data = dict_result[pack_id]['data']
+        px_to_mm = dict_result[pack_id]['px_to_mm']
+        for row in data:
+            [molting_stage, embryo_stage, specimen_size_mm, specimen_size_px, embryo_total] = row
+
+            if len(row) == 0:
+                dict_index_fecundity[pack_id]['list_index_fecundity'].append(0)
+            else:
+                dict_index_fecundity[pack_id]['list_molting_stage'].append(molting_stage)
+                if embryo_stage in [2, 3, 4]:
+                    if embryo_total == 0:
+                        dict_index_fecundity[pack_id]['list_index_fecundity'].append(0)
+                    else:
+                        if specimen_size_mm is None or specimen_size_mm == 0:
+                            if specimen_size_px == 0:
+                                continue
+                            try:
+                                specimen_size_mm = specimen_size_px * px_to_mm
+                            except TypeError:
+                                pack_errors.append(pack_id)
+                                continue
+                        if specimen_size_mm == 0:
+                            pack_errors.append(pack_id)
+                            continue
+                        dict_index_fecundity[pack_id]['list_index_fecundity'].append(embryo_total/(specimen_size_mm-5))
+                else:
+                    dict_index_fecundity[pack_id]['list_index_fecundity'].append(0)
+    print(f"Il y a eu des erreurs pour les calculs de fécondité des packs suivants: {list(set(pack_errors))}")
+    return dict_index_fecundity  # {pack_id: {'list_molting_stage': [...], 'list_index_fecundity': [...]}
+
+
+def fecundity(dict_pack_fusion):  # retourne le nombre de femelles concernées et la fécondité moyenne de chaque pack
+    nature = 'reproduction'
+    list_pack_repro = []
+    list_mp_repro = []
+    for mp in dict_pack_fusion:
+        try:
+            pack_id = dict_pack_fusion[mp][nature]
+        except KeyError:
+            pass
+        else:
+            list_mp_repro.append(mp)
+            list_pack_repro.append(pack_id)
+
+    dict_index_fecundity = index_fecundity_female(list_pack_repro)  # {pack_id: {'list_molting_stage': [...], 'list_index_fecundity': [...]}
+
+    # Initialisation du dictionnaire de sortie
+    # {mp_fusion: {{'nbr_femelles_analysées': int, 'nbr_femelles_concernées': int, 'fécondité_moyenne': float}}
+    dict_fecundity = {mp_fusion: {'nbr_femelles_analysées': None, 'nbr_femelles_concernées': None, 'fécondité_moyenne': None} for mp_fusion in dict_pack_fusion.keys()}
+
+    for pack_id in dict_index_fecundity.keys():
+        list_index_fecundity = dict_index_fecundity[pack_id]['list_index_fecundity']
+        list_molting_stage = dict_index_fecundity[pack_id]['list_molting_stage']
+        mp_fusion = list_mp_repro[list_pack_repro.index(pack_id)]
+
+        nbr_femelles_concernees = len(list_index_fecundity) - list_index_fecundity.count(0)
+        dict_fecundity[mp_fusion]['nbr_femelles_concernées'] = nbr_femelles_concernees
+
+        cpt_molting_stage = Counter(list_molting_stage)
+        cpt_filtre = [cpt_molting_stage.get(molting_stage) for molting_stage in ['b', 'c1', 'c2', 'd1', 'd2']]
+
+        nbr_femelles_analysees = 0
+        for x in cpt_filtre:
+            if x is not None:
+                nbr_femelles_analysees += x
+
+        if nbr_femelles_analysees == 0:
+            dict_fecundity[mp_fusion]['nbr_femelles_analysées'] = 'NA'
+        else:
+            dict_fecundity[mp_fusion]['nbr_femelles_analysées'] = nbr_femelles_analysees
+
+        if nbr_femelles_analysees > 10 and len(list_index_fecundity) != 0:
+            fecondite_moyenne = sum(list_index_fecundity)/len(list_index_fecundity)
+        else:
+            fecondite_moyenne = "NA"
+        dict_fecundity[mp_fusion]['fécondité_moyenne'] = fecondite_moyenne
+
      
-     #print(siz_female_mm)
-
-     return siz_female_mm
+    return dict_fecundity  # {mp_fusion: {{'nbr_femelles_analysées': int, 'nbr_femelles_concernées': int, 'fécondité_moyenne': float}}
 
 
-def index_fertility_female_X(pack_id):
-     SQL_request = "SELECT embryo_stage, embryo_total FROM biomae.measurereprotoxicity where pack_id ="+str(pack_id)
-     
-     resultat =  QueryScript(SQL_request).execute()
-     index_female =[]
-    
-     for i in range (len(resultat)-1):
-       if resultat[i][0]!=None:
-               if (resultat[i][0]>=2 and resultat[i][0]<=4):
-                      if resultat[i][1] == 0:
-                           index_female.append(0) 
-                      else:
-                           index_female.append(resultat[i][1]/(size_female_mm(pack_id)[i]-5))
-               else:
-                    index_female.append(0)
-       else:
-             index_female.append(0)  
-          
-     return index_female
-
-
-      # n L6 (TOXFILE)
-def number_female_concerned(pack_id):
-     female = index_fertility_female_X(pack_id)
-     Nbr = 0
-     for i in range(len(female)-1):
-          if female[i]==0:
-              Nbr = Nbr+1
-     
-     return len(female)-Nbr
-
-     #  n N6 (TOXFILE)
-def number_female_analysis(pack_id):
-     SQL_request = "SELECT molting_stage FROM biomae.measurereprotoxicity where pack_id ="+str(pack_id)
-     resultat =  QueryScript(SQL_request).execute()
-     Nbr_B_C1 = 0
-     Nbr_C2_D1 = 0
-     Nbr_D2 = 0
-
-     for i in range(len(resultat)-1):
-          if resultat[i] != None:
-               if resultat[i].upper()=='B' or resultat[i].upper()=='C1':
-                    Nbr_B_C1 = Nbr_B_C1+1
-               elif resultat[i].upper()=='C2' or resultat[i].upper()=='D1':
-                    Nbr_C2_D1=Nbr_C2_D1+1
-               elif resultat[i].upper()=='D2':
-                     Nbr_D2 =  Nbr_D2+1
-          
-
-     if Nbr_B_C1+Nbr_C2_D1+Nbr_D2 == 0:
-          return 'NA'
-     else:
-          return  Nbr_B_C1+Nbr_C2_D1+Nbr_D2
-
-               
-     
-
-   # Fécondité 
-def index_fertility_average(pack_id):
-     number_female= number_female_analysis(pack_id)
-    
-     if type(number_female) == int:
-           if number_female<10:
-                 return "NA"
-           else:
-                 return sum(index_fertility_female_X(pack_id))/len(index_fertility_female_X(pack_id))
-     else: 
-          return "NA"
-
-
-
-
- # Fécondité Cycle de mue
+# Cycle de mue
 def molting_cycle(pack_id):
      fusion_id = fusion_id_finder(pack_id)
     

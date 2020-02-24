@@ -1,5 +1,5 @@
 from tools import QueryScript
-from calcul import  survie_7jour,alimentation, neurotoxicity,female_survivor,number_days_exposition,number_female_concerned,index_fertility_average,number_female_analysis,number_female_concerned_area,endocrine_disruption,molting_cycle
+from calcul import *
 import math
 def create_tox_calcul_table(values):
     tox_table = QueryScript(
