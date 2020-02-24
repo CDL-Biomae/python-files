@@ -11,12 +11,13 @@ def recuperation_donnee(campaign):
     for measurepoint in measurepoints_fusion_id_list:
         data = data_exposure_condition(measurepoint)
         biotest = type_biotest(measurepoint)
-        scud_survivor = scud_survivor_chemistry(measurepoint)
         dico_exposure_condition[data[0]] = data[1]
         dico_exposure_condition[data[0]]['fusion?'] = data[2]
         dico_type_biotest[data[0]] = {}
         dico_type_biotest[data[0]]['biotest'] = biotest
-        dico_type_biotest[data[0]]['survivor_chemistry'] = scud_survivor
+        if "chemistry" in biotest:
+            scud_survivor = scud_survivor_chemistry(measurepoint)
+            dico_type_biotest[data[0]]['survivor_chemistry'] = scud_survivor
     dico_avg_tempe, dico_geo_mp = average_temperature__geographic_data_measurepoint(
         measurepoints_fusion_id_list)
     dico_geo_agency = geographic_data_agency(campaign)
@@ -124,8 +125,8 @@ def average_temperature__geographic_data_measurepoint(measurepoint_fusion_id_lis
     for elt in tempe:
         dico_temp_temperature = {
             'min': elt[2], 'average': elt[1], 'max': elt[3]}
-        dico_temp_geo = {'latitudeSpotted': elt[4],
-                         'longitudeSpotted': elt[5], 'lambertXSpotted': elt[6], 'lambertYSpotted': elt[7]}
+        dico_temp_geo = {'latitudeSpotted': f"{elt[4]}".replace(',', '.'),
+                         'longitudeSpotted': f"{elt[5]}".replace(',', '.'), 'lambertXSpotted': f"{elt[6]}".replace(',', '.'), 'lambertYSpotted': f"{elt[7]}".replace(',', '.')}
         dico_temperature[elt[0]] = dico_temp_temperature
         dico_geo_data[elt[0]] = dico_temp_geo
     return dico_temperature, dico_geo_data
@@ -157,9 +158,12 @@ def type_biotest(measurepoint_fusion_id):
 
 def scud_survivor_chemistry(measurepoint_fusion_id):
     query = QueryScript(
-        f"SELECT Distinct cage.scud_survivor, cage.scud_quantity FROM cage JOIN pack ON cage.pack_id = pack.id JOIN key_dates ON pack.measurepoint_id = key_dates.measurepoint_id WHERE pack.nature = 'chemistry' AND cage.scud_survivor IS not null AND key_dates.measurepoint_fusion_id = {measurepoint_fusion_id}").execute()
+        f"SELECT Distinct cage.scud_survivor, pack.scud_quantity, pack.id FROM cage JOIN pack ON cage.pack_id = pack.id JOIN key_dates ON pack.measurepoint_id = key_dates.measurepoint_id WHERE pack.nature = 'chemistry' AND cage.scud_survivor IS not null AND key_dates.measurepoint_fusion_id = {measurepoint_fusion_id}").execute()
     total = 0
     for elt in query:
         total += elt[0]/elt[1]
-    average = total/len(query)*100
+    if len(query) == 0:
+        average = 0
+    else:
+        average = total/len(query)*100
     return average
