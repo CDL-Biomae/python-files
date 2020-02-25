@@ -1,7 +1,7 @@
 from tools import QueryScript
 from . import elements_fish, elements_crustacean
 
-
+############## PAS optimisé
 def lyophilisation_pourcent(pack_id):
     output = QueryScript(f"SELECT prefix, value, unit FROM analysis WHERE sandre='/' AND pack_id={pack_id}").execute()
     if len(output):
@@ -23,6 +23,7 @@ def weight(pack_id):
     else:
         return None
     
+    
 def survival(pack_id):
     if pack_id is None:
         return None
@@ -37,6 +38,8 @@ def survival(pack_id):
         return str(round(average / quantity * 100)) + '%'
     else:
         return None
+
+############################
     
 def convert_list(list_converted):
     for element in list_converted:
@@ -87,17 +90,42 @@ def get_unit(sandre_list):
                         result[1].append(int(float(element[1])))
     return result
 
-def result_by_pack_and_sandre(pack_id, sandre_list) :
-    result = [[],[]]
-    output = QueryScript(f"SELECT prefix, value, sandre FROM analysis WHERE pack_id={pack_id} AND sandre IN {tuple(sandre_list)}").execute()
+def result_by_packs_and_sandre(dict_pack_fusion, sandre_list=None) :
+    pack_dict = {}
+    for element in dict_pack_fusion:
+        try:
+            pack_dict[dict_pack_fusion[element]['chemistry']] = element 
+        except KeyError:
+            None 
+    result = {element:None for element in dict_pack_fusion}
+    if not sandre_list:
+        sandre_list = QueryScript("SELECT sandre FROM r3").execute()
+        for index, sandre in enumerate(sandre_list):
+            try :
+                sandre_list[index] = float(sandre)
+            except ValueError:
+                sandre_list[index] = sandre
+    data =  QueryScript(f"SELECT pack_id, prefix, value, sandre FROM analysis WHERE pack_id IN {tuple([element for element in pack_dict])} AND sandre IN {tuple(sandre_list)}").execute()
 
-    for sandre in sandre_list:
+    for element in data:
         try :
-            index = [int(element[2]) for element in output].index(sandre)
-            result[0].append(str(output[index][1]) if output[index][0]==None else output[index][0] + str(output[index][1]))
-            result[1].append(output[index][2])
-        except :
-            result[0].append("ND")
-            result[1].append(sandre)
-           
+            sandre = int(element[3])
+        except ValueError :
+            sandre = element[3]
+        if result[pack_dict[element[0]]]:
+            result[pack_dict[element[0]]][sandre]= element[1] + str(element[2]) if element[1] else str(element[2])
+        else :
+            result[pack_dict[element[0]]] = {sandre: element[1] + str(element[2]) if element[1] else str(element[2])}
+            
+        
+    for element in result:
+        if result[element]:
+            for sandre in sandre_list:
+                if not sandre in result[element]:
+                    try :
+                        sandre = int(sandre)
+                    except ValueError :
+                        sandre = sandre
+                    result[element][sandre]="ND"        
+
     return result
