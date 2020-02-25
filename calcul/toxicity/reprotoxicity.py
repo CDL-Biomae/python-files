@@ -227,39 +227,80 @@ def molting_cycle(dict_pack_fusion):
     return dict_molting  # {mp_fusion: {'cycle de mue': ..%, 'cycle de mue attendu': ..%}}
 
 
-    #  n p6 (TOXFILE) il manque des variable dans la base de donner c'est pour cela les resultat sont pas identique
+# Surface des retards - nombre de femelles concernées
+def number_female_concerned_area(dict_pack_fusion):
+    nature = 'reproduction'
+    list_pack_repro = []
+    list_mp_repro = []
+    for mp in dict_pack_fusion:
+        try:
+            pack_id = dict_pack_fusion[mp][nature]
+        except KeyError:
+            pass
+        else:
+            list_mp_repro.append(mp)
+            list_pack_repro.append(pack_id)
 
+    output = QueryScript(
+        f"SELECT pack_id, female, molting_stage, oocyte_area_pixel, oocyte_area_mm FROM measurereprotoxicity WHERE pack_id IN {tuple(list_pack_repro)};"
+    ).execute()
 
-def number_female_concerned_area(pack_id):
-          SQL_request = "SELECT molting_stage,oocyte_area_pixel,oocyte_area_pixel,oocyte_area_mm FROM biomae.measurereprotoxicity where pack_id ="+str(pack_id)
-          resultat =  QueryScript(SQL_request).execute()
-          
-          Area_delayµm = [] 
-          Area_delay = []
-          nbr_f_c = 0
+    # Reformatage des données de la requête
+    dict_surface_ovocytaire = {pack_id: {'px_to_mm': None, 'data': []} for pack_id in list_pack_repro}
 
-          for i in range(len(resultat)-1):
-                              
-               if resultat[i][1]==None or resultat[i][1]==0 or resultat[i][3]==0 or resultat[i][2]:
-                    Area_delayµm.append('ND') # si tous les resultat dans la base donnée c'est vide sinn dans notre cas c'est NO DATA
-               else:
-                    Area_delayµm.append(resultat[i][1]*(resultat[i][2]/resultat[i][3]/97,82))
+    for row in output:
+        [pack_id, female, molting_stage, oocyte_area_pixel, oocyte_area_mm] = row
 
+        if female == '' or female == '0bis':
+            continue
 
-          for i in range(len(resultat)-1): 
-               if resultat[i][0] != None:               
-                    if (resultat[i][0].upper()=='C1' or resultat[i][0].upper()=='B'):
-                         if Area_delayµm[i]=='ND':  #si aArea_delayµm[i] == 0 ou bien not defiend
-                              Area_delay.append('ND')  # 0 ça veut dire le vide 
-                         else:
-                              Area_delay.append(Area_delayµm[i])
-                              nbr_f_c = nbr_f_c +1
-                    else:
-                         Area_delay.append('NDV')# c'est le vide 
-               else:
-                    Area_delay.append('ND')  
+        if int(female) == 0:
+            try:
+                dict_surface_ovocytaire[pack_id]['px_to_mm'] = oocyte_area_pixel / (oocyte_area_mm * 97.82)  # Formule écrite en dure dans l'excel contenant les macros
+            except TypeError:
+                pass
+        else:
+            data = [molting_stage, oocyte_area_pixel, oocyte_area_mm]
+            dict_surface_ovocytaire[pack_id]['data'].append(data)
 
-          return nbr_f_c, Area_delay
+    # Calcul des surfaces des retards
+    dict_surface_des_retards = {pack_id: [] for pack_id in list_pack_repro}
+
+    for pack_id in dict_surface_ovocytaire.keys():
+        px_to_mm = dict_surface_ovocytaire[pack_id]['px_to_mm']
+        data = dict_surface_ovocytaire[pack_id]['data']
+
+        if len(data) == 0:
+            continue
+
+        else:
+            for [molting_stage, oocyte_area_pixel, oocyte_area_mm] in data:
+                if oocyte_area_mm is not None:
+                    surface_retard = oocyte_area_mm
+                    dict_surface_des_retards[pack_id].append(surface_retard)
+                    continue
+
+                if molting_stage in ['c1', 'b'] and oocyte_area_pixel is not None:
+                    if px_to_mm is None:
+                        print('Pas de surface en mm ni d\'étalon pour calculer depuis le pixel: ', pack_id)
+                        continue
+                    surface_retard = oocyte_area_pixel * px_to_mm
+                    dict_surface_des_retards[pack_id].append(surface_retard)
+                else:
+                    continue
+
+    # Calcul nbr_femelles_concernées
+    dict_surface_femelles_concernees = {mp_fusion: 0 for mp_fusion in dict_pack_fusion.keys()}
+
+    for mp_fusion in dict_surface_femelles_concernees.keys():
+        if mp_fusion not in list_mp_repro:
+            continue
+        else:
+            pack_id = dict_pack_fusion[mp_fusion]['reproduction']
+            nbr_femelles_concernees = len(dict_surface_des_retards[pack_id])
+            dict_surface_femelles_concernees[mp_fusion] = nbr_femelles_concernees
+
+    return dict_surface_femelles_concernees
 
 
 def inhibition_fertility_and_threshold_5_1(pack_id):
