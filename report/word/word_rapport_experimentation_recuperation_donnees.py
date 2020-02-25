@@ -1,4 +1,4 @@
-from tools import QueryScript
+from tools import QueryScript, clean_dict
 from report import measure_points
 
 # %% Fonction principale pour tout appeler
@@ -18,9 +18,10 @@ def recuperation_donnee(campaign):
         if "chemistry" in biotest:
             scud_survivor = scud_survivor_chemistry(measurepoint)
             dico_type_biotest[data[0]]['survivor_chemistry'] = scud_survivor
-    dico_avg_tempe, dico_geo_mp = average_temperature__geographic_data_measurepoint(
-        measurepoints_fusion_id_list)
+    dico_geo_mp = geographic_data_measurepoint(measurepoints_fusion_id_list)
+    dico_avg_tempe = average_temperature(measurepoints_fusion_id_list)
     dico_geo_agency = geographic_data_agency(campaign)
+    clean_dict(dico_geo_mp)
     return dico_exposure_condition, dico_avg_tempe, dico_geo_mp, dico_geo_agency, dico_type_biotest
 
 # %% Données exposure condition
@@ -109,27 +110,40 @@ def parser(date):
         minute = "0"+str(minute)
     return f"{day}/{month}/{year} {hour}:{minute}"
 
-# %% Données températures moyenne et données géographiques récupérées dans l'onglet measurepoint
+# %% Données géographiques récupérées dans l'onglet measurepoint
 
 
-def average_temperature__geographic_data_measurepoint(measurepoint_fusion_id_list):
+def geographic_data_measurepoint(measurepoint_fusion_id_list):
     if len(measurepoint_fusion_id_list) == 1:
         measurepoint_fusion_id_list = "(" + \
             measurepoint_fusion_id_list[0] + ")"
     else:
         measurepoint_fusion_id_list = tuple(measurepoint_fusion_id_list)
-    dico_temperature = {}
     dico_geo_data = {}
     tempe = QueryScript(
-        f"SELECT reference, sensor3_average, sensor3_min, sensor3_max, latitudeSpotted, longitudeSpotted, lambertXSpotted, lambertYSpotted FROM average_temperature JOIN measurepoint ON average_temperature.measurepoint_fusion_id = measurepoint.id WHERE average_temperature.measurepoint_fusion_id IN {measurepoint_fusion_id_list}").execute()
+        f"SELECT reference, latitudeSpotted, longitudeSpotted, lambertXSpotted, lambertYSpotted, measurepoint.name, measurepoint.city, measurepoint.zipcode, measurepoint.stream FROM average_temperature JOIN measurepoint ON average_temperature.measurepoint_fusion_id = measurepoint.id WHERE average_temperature.measurepoint_fusion_id IN {measurepoint_fusion_id_list}").execute()
     for elt in tempe:
-        dico_temp_temperature = {
-            'min': elt[2], 'average': elt[1], 'max': elt[3]}
-        dico_temp_geo = {'latitudeSpotted': f"{elt[4]}".replace(',', '.'),
-                         'longitudeSpotted': f"{elt[5]}".replace(',', '.'), 'lambertXSpotted': f"{elt[6]}".replace(',', '.'), 'lambertYSpotted': f"{elt[7]}".replace(',', '.')}
-        dico_temperature[elt[0]] = dico_temp_temperature
+        dico_temp_geo = {'latitudeSpotted': f"{elt[1]}".replace(',', '.'),
+                         'longitudeSpotted': f"{elt[2]}".replace(',', '.'), 'lambertXSpotted': f"{elt[3]}".replace(',', '.'), 'lambertYSpotted': f"{elt[4]}".replace(',', '.'), 'name_mp': elt[4], 'city': elt[6], 'zipcode': elt[7], 'stream': elt[8]}
         dico_geo_data[elt[0]] = dico_temp_geo
-    return dico_temperature, dico_geo_data
+    return dico_geo_data
+
+# %% Données températures moyennes
+
+
+def average_temperature(measurepoint_fusion_id_list):
+    if len(measurepoint_fusion_id_list) == 1:
+        measurepoint_fusion_id_list = "(" + \
+            measurepoint_fusion_id_list[0] + ")"
+    else:
+        measurepoint_fusion_id_list = tuple(measurepoint_fusion_id_list)
+    dico_avg_tempe = {}
+    tempe = QueryScript(
+        f"SELECT reference, sensor3_min, sensor3_average, sensor3_max FROM average_temperature JOIN measurepoint ON average_temperature.measurepoint_fusion_id = measurepoint.id WHERE average_temperature.measurepoint_fusion_id IN {measurepoint_fusion_id_list}").execute()
+    for elt in tempe:
+        dico_temp_tempe = {'min': elt[1], 'average': elt[2], 'max': elt[3]}
+        dico_avg_tempe[elt[0]] = dico_temp_tempe
+    return dico_avg_tempe
 
 # %% Récupération des données géographiques de l'onglet agency
 
