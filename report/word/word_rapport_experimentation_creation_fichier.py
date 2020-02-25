@@ -108,22 +108,33 @@ def word_main(campaign, agence, path_photo="Photos", path_output="output"):
                 str(dico_geo_mp[reference]['latitudeSpotted']))
 
         table_carte = doc.add_table(rows=4, cols=1)
-        access_token = "pk.eyJ1IjoiamJyb25uZXIiLCJhIjoiY2s2cW5kOWQwMHBybjNtcW8yMXJuYmo3aiJ9.z8Ekf7a0RGTZ4jrbJVpq8g"
-        layer = '{"id":"water","source":{"url":"mapbox://mapbox.mapbox-streets-v8","type":"vector"},"source-layer":"water","type":"fill","paint":{"fill-color":"%2300ffff"}}'
-        url_street = f"https://api.mapbox.com/styles/v1/mapbox/streets-v11/static/pin-s+FF0000({str(dico_geo_mp[reference]['longitudeSpotted'])},{str(dico_geo_mp[reference]['latitudeSpotted'])})/{str(dico_geo_mp[reference]['longitudeSpotted'])},{str(dico_geo_mp[reference]['latitudeSpotted'])},9.21/450x300@2x?access_token={access_token}"
-        response = requests.get(url_street)
-        carte_street = BytesIO(response.content)
-        table_carte.cell(0, 0).paragraphs[0].add_run().add_picture(
-            carte_street, width=4500000)
+        lon = str(dico_geo_mp[reference]['longitudeSpotted'])
+        lat = str(dico_geo_mp[reference]['latitudeSpotted'])
+        if (lon != "None") & (lat != "None"):
+            access_token = "pk.eyJ1IjoiamJyb25uZXIiLCJhIjoiY2s2cW5kOWQwMHBybjNtcW8yMXJuYmo3aiJ9.z8Ekf7a0RGTZ4jrbJVpq8g"
+            layer = '{"id":"water","source":{"url":"mapbox://mapbox.mapbox-streets-v8","type":"vector"},"source-layer":"water","type":"fill","paint":{"fill-color":"%2300ffff"}}'
+            url_street = f"https://api.mapbox.com/styles/v1/mapbox/streets-v11/static/pin-s+FF0000({lon},{lat})/{lon},{lat},9.21/450x300@2x?access_token={access_token}"
+            print(url_street)
+            response = requests.get(url_street)
+            carte_street = BytesIO(response.content)
+            table_carte.cell(0, 0).paragraphs[0].add_run().add_picture(
+                carte_street, width=4500000)
+        else:
+            table_carte.cell(0, 0).paragraphs[0].add_run().add_picture(
+                path_ressources + "/carre_blanc.jpg", width=4500000)
         table_carte.cell(0, 0).paragraphs[0].alignment = 1
         table_carte.cell(1, 0).text = "Localisation du point de mesure"
         table_carte.cell(1, 0).paragraphs[0].alignment = 1
 
-        url_satellite = f"https://api.mapbox.com/styles/v1/mapbox/satellite-streets-v11/static/pin-s+FF0000({str(dico_geo_mp[reference]['longitudeSpotted'])},{str(dico_geo_mp[reference]['latitudeSpotted'])})/{str(dico_geo_mp[reference]['longitudeSpotted'])},{str(dico_geo_mp[reference]['latitudeSpotted'])},13.5/450x300@2x?addlayer={layer}&access_token={access_token}"
-        response = requests.get(url_satellite)
-        carte_satellite = BytesIO(response.content)
-        table_carte.cell(2, 0).paragraphs[0].add_run().add_picture(
-            carte_satellite, width=4500000)
+        if (lon != "None") & (lat != "None"):
+            url_satellite = f"https://api.mapbox.com/styles/v1/mapbox/satellite-streets-v11/static/pin-s+FF0000({lon},{lat})/{lon},{lat},13.5/450x300@2x?addlayer={layer}&access_token={access_token}"
+            response = requests.get(url_satellite)
+            carte_satellite = BytesIO(response.content)
+            table_carte.cell(2, 0).paragraphs[0].add_run().add_picture(
+                carte_satellite, width=4500000)
+        else:
+            table_carte.cell(0, 0).paragraphs[0].add_run().add_picture(
+                path_ressources + "/carre_blanc.jpg", width=4500000)
         table_carte.cell(2, 0).paragraphs[0].alignment = 1
         table_carte.cell(
             3, 0).text = "Vue satellitaire"
