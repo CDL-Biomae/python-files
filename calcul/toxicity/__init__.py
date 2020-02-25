@@ -1,5 +1,5 @@
-from .alimentation import alimentation
-from .alimentation import survie_7jour
+from .alimentation import alimentation, survie_alim
+# from .alimentation import survie_7jour
 from .neurotoxicity import neurotoxicity
 from .reproduction import female_survivor
 from .reprotoxicity import number_days_exposition, index_fertility_female_X,number_female_concerned,number_female_analysis,index_fertility_average, molting_cycle,number_female_concerned_area,number_female_concerned_area,inhibition_fertility_and_threshold_5_1,endocrine_disruption
