@@ -1,4 +1,4 @@
-from tools import QueryScript
+from tools import QueryScript, clean_dict
 from report import measure_points
 
 # %% Fonction principale pour tout appeler
@@ -21,6 +21,7 @@ def recuperation_donnee(campaign):
     dico_avg_tempe, dico_geo_mp = average_temperature__geographic_data_measurepoint(
         measurepoints_fusion_id_list)
     dico_geo_agency = geographic_data_agency(campaign)
+    clean_dict(dico_geo_mp)
     return dico_exposure_condition, dico_avg_tempe, dico_geo_mp, dico_geo_agency, dico_type_biotest
 
 # %% Données exposure condition
