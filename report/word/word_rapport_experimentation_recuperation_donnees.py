@@ -1,4 +1,4 @@
-from tools import QueryScript
+from tools import QueryScript, clean_dict
 from report import measure_points
 
 # %% Fonction principale pour tout appeler
@@ -13,10 +13,15 @@ def recuperation_donnee(campaign):
         biotest = type_biotest(measurepoint)
         dico_exposure_condition[data[0]] = data[1]
         dico_exposure_condition[data[0]]['fusion?'] = data[2]
-        dico_type_biotest[data[0]] = biotest
+        dico_type_biotest[data[0]] = {}
+        dico_type_biotest[data[0]]['biotest'] = biotest
+        if "chemistry" in biotest:
+            scud_survivor = scud_survivor_chemistry(measurepoint)
+            dico_type_biotest[data[0]]['survivor_chemistry'] = scud_survivor
     dico_avg_tempe, dico_geo_mp = average_temperature__geographic_data_measurepoint(
         measurepoints_fusion_id_list)
     dico_geo_agency = geographic_data_agency(campaign)
+    clean_dict(dico_geo_mp)
     return dico_exposure_condition, dico_avg_tempe, dico_geo_mp, dico_geo_agency, dico_type_biotest
 
 # %% Données exposure condition
@@ -117,12 +122,12 @@ def average_temperature__geographic_data_measurepoint(measurepoint_fusion_id_lis
     dico_temperature = {}
     dico_geo_data = {}
     tempe = QueryScript(
-        f"SELECT reference, sensor3_average, sensor3_min, sensor3_max, latitudeSpotted, longitudeSpotted, lambertXSpotted, lambertYSpotted FROM average_temperature JOIN measurepoint ON average_temperature.measurepoint_fusion_id = measurepoint.id WHERE average_temperature.measurepoint_fusion_id IN {measurepoint_fusion_id_list}").execute()
+        f"SELECT reference, sensor3_average, sensor3_min, sensor3_max, latitudeSpotted, longitudeSpotted, lambertXSpotted, lambertYSpotted, measurepoint.name, measurepoint.city, measurepoint.zipcode, measurepoint.stream FROM average_temperature JOIN measurepoint ON average_temperature.measurepoint_fusion_id = measurepoint.id WHERE average_temperature.measurepoint_fusion_id IN {measurepoint_fusion_id_list}").execute()
     for elt in tempe:
         dico_temp_temperature = {
             'min': elt[2], 'average': elt[1], 'max': elt[3]}
-        dico_temp_geo = {'latitudeSpotted': elt[4],
-                         'longitudeSpotted': elt[5], 'lambertXSpotted': elt[6], 'lambertYSpotted': elt[7]}
+        dico_temp_geo = {'latitudeSpotted': f"{elt[4]}".replace(',', '.'),
+                         'longitudeSpotted': f"{elt[5]}".replace(',', '.'), 'lambertXSpotted': f"{elt[6]}".replace(',', '.'), 'lambertYSpotted': f"{elt[7]}".replace(',', '.'), 'name_mp': elt[8], 'city': elt[9], 'zipcode': elt[10], 'stream': elt[11]}
         dico_temperature[elt[0]] = dico_temp_temperature
         dico_geo_data[elt[0]] = dico_temp_geo
     return dico_temperature, dico_geo_data
@@ -146,5 +151,20 @@ def geographic_data_agency(campaign):
 
 def type_biotest(measurepoint_fusion_id):
     query = QueryScript(
-        f"SELECT DISTINCT pack.nature FROM pack JOIN key_dates ON pack.measurepoint_id = key_dates.measurepoint_id WHERE key_dates.measurepoint_fusion_id = {measurepoint_fusion_id}").execute()
+        f"SELECT DISTINCT pack.nature FROM pack JOIN key_dates ON pack.measurepoint_id = key_dates.measurepoint_id JOIN cage ON pack.id = cage.pack_id WHERE key_dates.measurepoint_fusion_id = {measurepoint_fusion_id}").execute()
     return query
+
+# %% Récupération Survie Chimie
+
+
+def scud_survivor_chemistry(measurepoint_fusion_id):
+    query = QueryScript(
+        f"SELECT Distinct cage.scud_survivor, pack.scud_quantity, pack.id FROM cage JOIN pack ON cage.pack_id = pack.id JOIN key_dates ON pack.measurepoint_id = key_dates.measurepoint_id WHERE pack.nature = 'chemistry' AND cage.scud_survivor IS not null AND key_dates.measurepoint_fusion_id = {measurepoint_fusion_id}").execute()
+    total = 0
+    for elt in query:
+        total += elt[0]/elt[1]
+    if len(query) == 0:
+        average = 0
+    else:
+        average = total/len(query)*100
+    return average
