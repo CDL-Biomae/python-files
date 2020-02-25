@@ -34,22 +34,32 @@ def word_main(campaign, agence, path_photo="Photos", path_output="output"):
             table_geo = doc.add_table(rows=4, cols=4)
             for j in range(2, 4):
                 table_geo.cell(j, 0).merge(table_geo.cell(j, 1))
-            table_geo.cell(3, 2).merge(table_geo.cell(3, 3))
+            table_geo.cell(2, 2).merge(table_geo.cell(2, 3))
 
         header = table_geo.rows[0].cells
         header[0].merge(header[-1])
-        case_header = table_geo.cell(0, 0).paragraphs[0].add_run(dico_geo_agency[reference]['code'] +
-                                                                 " : " + dico_geo_agency[reference]['name'] + "   " + reference)
+        if agence:
+            case_header = table_geo.cell(0, 0).paragraphs[0].add_run(dico_geo_agency[reference]['code'] +
+                                                                     " : " + dico_geo_agency[reference]['name'] + "   " + reference)
+        else:
+            case_header = table_geo.cell(0, 0).paragraphs[0].add_run("Point " + reference[-5:-3] + " : " +
+                                                                     dico_geo_mp[reference]['name_mp'])
         case_header.bold = True
         case_header = table_geo.cell(0, 0).paragraphs[0].alignment = 1
 
         table_geo.cell(1, 0).paragraphs[0].add_run('Commune :').bold = True
-        table_geo.cell(1, 1).paragraphs[0].add_run(
-            dico_geo_agency[reference]['city'] + "    " + dico_geo_agency[reference]['zipcode'])
+        if agence:
+            table_geo.cell(1, 1).paragraphs[0].add_run(
+                dico_geo_agency[reference]['city'] + "    " + dico_geo_agency[reference]['zipcode'])
+            table_geo.cell(1, 3).paragraphs[0].add_run(
+                dico_geo_agency[reference]['stream'])
+        else:
+            table_geo.cell(1, 1).paragraphs[0].add_run(
+                dico_geo_mp[reference]['city'] + "    " + dico_geo_mp[reference]['zipcode'])
+            table_geo.cell(1, 3).paragraphs[0].add_run(
+                dico_geo_mp[reference]['stream'])
         table_geo.cell(1, 2).paragraphs[0].add_run(
             "Cours d'eau : ").bold = True
-        table_geo.cell(1, 3).paragraphs[0].add_run(
-            dico_geo_agency[reference]['stream'])
 
         table_geo.cell(2, 0).paragraphs[0].add_run("Biotests :").bold = True
         biotest_francais = traduction_type_biotest(
@@ -125,8 +135,12 @@ def word_main(campaign, agence, path_photo="Photos", path_output="output"):
         table_image.cell(0, 0).merge(table_image.cell(0, 1))
         table_image.cell(1, 0).merge(table_image.cell(1, 1))
 
-        table_image.cell(0, 0).paragraphs[0].add_run(dico_geo_agency[reference]['code'] +
-                                                     " : " + dico_geo_agency[reference]['name']).bold = True
+        if agence:
+            table_image.cell(0, 0).paragraphs[0].add_run(dico_geo_agency[reference]['code'] +
+                                                         " : " + dico_geo_agency[reference]['name']).bold = True
+        else:
+            table_image.cell(0, 0).paragraphs[0].add_run("Point " + reference[-5:-3] + " : " +
+                                                         dico_geo_mp[reference]['name_mp']).bold = True
         table_image.cell(0, 0).paragraphs[0].alignment = 1
 
         table_image.cell(1, 0).paragraphs[0].add_run(

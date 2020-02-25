@@ -121,12 +121,12 @@ def average_temperature__geographic_data_measurepoint(measurepoint_fusion_id_lis
     dico_temperature = {}
     dico_geo_data = {}
     tempe = QueryScript(
-        f"SELECT reference, sensor3_average, sensor3_min, sensor3_max, latitudeSpotted, longitudeSpotted, lambertXSpotted, lambertYSpotted FROM average_temperature JOIN measurepoint ON average_temperature.measurepoint_fusion_id = measurepoint.id WHERE average_temperature.measurepoint_fusion_id IN {measurepoint_fusion_id_list}").execute()
+        f"SELECT reference, sensor3_average, sensor3_min, sensor3_max, latitudeSpotted, longitudeSpotted, lambertXSpotted, lambertYSpotted, measurepoint.name, measurepoint.city, measurepoint.zipcode, measurepoint.stream FROM average_temperature JOIN measurepoint ON average_temperature.measurepoint_fusion_id = measurepoint.id WHERE average_temperature.measurepoint_fusion_id IN {measurepoint_fusion_id_list}").execute()
     for elt in tempe:
         dico_temp_temperature = {
             'min': elt[2], 'average': elt[1], 'max': elt[3]}
         dico_temp_geo = {'latitudeSpotted': f"{elt[4]}".replace(',', '.'),
-                         'longitudeSpotted': f"{elt[5]}".replace(',', '.'), 'lambertXSpotted': f"{elt[6]}".replace(',', '.'), 'lambertYSpotted': f"{elt[7]}".replace(',', '.')}
+                         'longitudeSpotted': f"{elt[5]}".replace(',', '.'), 'lambertXSpotted': f"{elt[6]}".replace(',', '.'), 'lambertYSpotted': f"{elt[7]}".replace(',', '.'), 'name_mp': elt[8], 'city': elt[9], 'zipcode': elt[10], 'stream': elt[11]}
         dico_temperature[elt[0]] = dico_temp_temperature
         dico_geo_data[elt[0]] = dico_temp_geo
     return dico_temperature, dico_geo_data
