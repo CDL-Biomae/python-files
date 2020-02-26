@@ -1,5 +1,5 @@
 from tools import QueryScript
-
+import env
 
 def female_survivor(dict_pack_fusion):
     nature = 'reproduction'
@@ -15,7 +15,7 @@ def female_survivor(dict_pack_fusion):
             list_pack_repro.append(pack_id)
 
     output = QueryScript(
-        f"SELECT pack_id, scud_survivor_female, scud_quantity FROM cage WHERE pack_id IN {tuple(list_pack_repro)};"
+        f"  SELECT pack_id, scud_survivor_female, scud_quantity   FROM {env.DATABASE_RAW}.cage WHERE pack_id IN {tuple(list_pack_repro)};"
     ).execute()
 
     # Reformatage des données de la requête
@@ -29,7 +29,7 @@ def female_survivor(dict_pack_fusion):
             dict_requete[pack_id]['scud_survivor_female'].append(scud_survivor_female)
 
     # Calcul du pourcentage de survie par pack
-    dict_survie_femelle = {mp_fusion: 'ND' for mp_fusion in dict_pack_fusion.keys()}
+    dict_survie_femelle = {mp_fusion: None for mp_fusion in dict_pack_fusion.keys()}
 
     for mp_fusion in dict_survie_femelle.keys():
         if mp_fusion not in list_mp_repro:
@@ -44,7 +44,7 @@ def female_survivor(dict_pack_fusion):
             except ZeroDivisionError:
                 print(f"Point de mesure: {mp_fusion} --> Erreur de calcul de survie femelle, quantité de gamares dans la cage inconnu")
                 continue
-            dict_survie_femelle[mp_fusion] = f"{survie_femelle*100}"
+            dict_survie_femelle[mp_fusion] = survie_femelle*100
 
     return dict_survie_femelle
 

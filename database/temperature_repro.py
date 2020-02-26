@@ -1,20 +1,21 @@
 from tools import QueryScript, list_to_dict
 from database import liste_temperature
 from math import exp
-
+import env
 
 def run():
+     
     temperature_repro_table = QueryScript(
-        "DROP TABLE IF EXISTS temperature_repro; CREATE TABLE temperature_repro (id INT AUTO_INCREMENT PRIMARY KEY, measurepoint_fusion_id INT(11), av_cycle_BCD1 DOUBLE, expected_C2 DOUBLE, expected_D1 DOUBLE, expected_D2 DOUBLE, av_cycle_1234 DOUBLE, expected_st3 DOUBLE, expected_st4 DOUBLE, expected_st5 DOUBLE );")
-    temperature_repro_table.execute()
-    SQL_request = "INSERT INTO temperature_repro (measurepoint_fusion_id, av_cycle_BCD1, expected_C2, expected_D1, expected_D2, av_cycle_1234, expected_st3, expected_st4, expected_st5) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)"
+        f" DROP TABLE IF EXISTS temperature_repro; CREATE TABLE temperature_repro (id INT AUTO_INCREMENT PRIMARY KEY, measurepoint_fusion_id INT(11), av_cycle_BCD1 DOUBLE, expected_C2 DOUBLE, expected_D1 DOUBLE, expected_D2 DOUBLE, av_cycle_1234 DOUBLE, expected_st3 DOUBLE, expected_st4 DOUBLE, expected_st5 DOUBLE );")
+    temperature_repro_table.execute(True)
+    SQL_request = f" INSERT INTO temperature_repro (measurepoint_fusion_id, av_cycle_BCD1, expected_C2, expected_D1, expected_D2, av_cycle_1234, expected_st3, expected_st4, expected_st5) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)"
     values = []
 
     liste_fusion_id = QueryScript(
-        "SELECT measurepoint_fusion_id FROM average_temperature").execute()
+        f" SELECT measurepoint_fusion_id   FROM {env.DATABASE_TREATED}.average_temperature and version={env.VERSION}").execute()
 
     constantes = QueryScript(
-        "SELECT name,value FROM biomae.r2_constant WHERE nature='temperature_repro'").execute()
+        f" SELECT name,value   FROM {env.DATABASE_TREATED}.r2_constant WHERE nature='temperature_repro' and version={env.VERSION}").execute()
     constantes = list_to_dict(constantes)
 
     count = 1
@@ -55,7 +56,7 @@ def run():
 
 def calcul_av_cycle(alpha, beta, gamme, delta, liste_tempe):
     constante_duree_femelle = int(QueryScript(
-        "SELECT value FROM biomae.r2_constant WHERE name='FEMELLES'").execute()[0])
+        f" SELECT value   FROM {env.DATABASE_TREATED}.r2_constant WHERE name='FEMELLES'").execute()[0])
     somme = constante_duree_femelle * \
         fct_aux_av_cycle(alpha, beta, gamme, delta, liste_tempe[0])
     for temperature in liste_tempe:

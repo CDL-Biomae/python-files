@@ -2,10 +2,11 @@ from tools import QueryScript
 from math import *
 from scipy.stats import binom
 from collections import Counter
-
+import env
 
 # retourne dict_nbr_days_exposition = {mp_fusion: nbrdays}
 def number_days_exposition(dict_pack_fusion):
+     
     nature = 'reproduction'
     list_mp_repro = []
     for mp in dict_pack_fusion:
@@ -18,10 +19,10 @@ def number_days_exposition(dict_pack_fusion):
 
     # Récupération des dates de début et de fin
     output_dates_debut = QueryScript(
-        f"SELECT measurepoint_fusion_id, date FROM key_dates where date_id=6 and measurepoint_fusion_id IN {tuple(list_mp_repro)};"
+        f" SELECT measurepoint_fusion_id, date   FROM {env.DATABASE_TREATED}.key_dates where date_id=6 and measurepoint_fusion_id IN {tuple(list_mp_repro)} and version={env.VERSION};"
     ).execute()
     output_dates_fin = QueryScript(
-        f"SELECT measurepoint_fusion_id, date FROM key_dates where date_id=4 and measurepoint_fusion_id IN {tuple(list_mp_repro)};"
+        f" SELECT measurepoint_fusion_id, date   FROM {env.DATABASE_TREATED}.key_dates where date_id=4 and measurepoint_fusion_id IN {tuple(list_mp_repro)} and version={env.VERSION};"
     ).execute()
 
     output_mp_debut = [x[0] for x in output_dates_debut]
@@ -34,9 +35,7 @@ def number_days_exposition(dict_pack_fusion):
         dict_dates_debut_fin[mp] = [output_dates_debut[idx_debut][1], output_dates_fin[idx_fin][1]]
 
     # Initialisation du dictionnaire de sortie
-    dict_nbr_days_exposition = {}  # {mp: nbrdays}
-    for mp in dict_pack_fusion:
-        dict_nbr_days_exposition[mp] = None
+    dict_nbr_days_exposition = {mp: None for mp in dict_pack_fusion}  # {mp: nbrdays}
 
     # Calcul
     for mp in list_mp_repro:
@@ -55,7 +54,7 @@ def number_days_exposition(dict_pack_fusion):
 
 # retourne dict_index_fecundity = {pack_id: {'list_molting_stage': [...], 'list_index_fecundity': [...]}
 def index_fecundity_female(list_pack_repro):
-    SQL_request = f"SELECT pack_id, female, molting_stage, embryo_stage, specimen_size_mm, specimen_size_px, embryo_total FROM biomae.measurereprotoxicity where pack_id IN {tuple(list_pack_repro)};"
+    SQL_request = f"  SELECT pack_id, female, molting_stage, embryo_stage, specimen_size_mm, specimen_size_px, embryo_total FROM biomae.measurereprotoxicity where pack_id IN {tuple(list_pack_repro)};"
     output = QueryScript(SQL_request).execute()
 
     # Initialisation du dictionnaire de la requête mise en forme
@@ -180,8 +179,8 @@ def molting_cycle(dict_pack_fusion):
             list_mp_repro.append(mp)
             list_pack_repro.append(pack_id)
 
-    SQL_request = f"SELECT pack_id, molting_stage FROM biomae.measurereprotoxicity where pack_id IN {tuple(list_pack_repro)};"
-    SQL_request_2 = f"SELECT measurepoint_fusion_id, expected_C2,expected_D2 FROM biomae.temperature_repro where measurepoint_fusion_id IN {tuple(list_mp_repro)};"
+    SQL_request = f"  SELECT pack_id, molting_stage FROM biomae.measurereprotoxicity where pack_id IN {tuple(list_pack_repro)};"
+    SQL_request_2 = f"  SELECT measurepoint_fusion_id, expected_C2,expected_D2 FROM biomae.temperature_repro where measurepoint_fusion_id IN {tuple(list_mp_repro)};"
     resultat_molting_stage =  QueryScript(SQL_request).execute()
     resultat_expected_stage =  QueryScript(SQL_request_2).execute()
 
@@ -247,7 +246,7 @@ def number_female_concerned_area(dict_pack_fusion):
             list_pack_repro.append(pack_id)
 
     output = QueryScript(
-        f"SELECT pack_id, female, molting_stage, oocyte_area_pixel, oocyte_area_mm FROM measurereprotoxicity WHERE pack_id IN {tuple(list_pack_repro)};"
+        f"  SELECT pack_id, female, molting_stage, oocyte_area_pixel, oocyte_area_mm   FROM {env.DATABASE_RAW}.measurereprotoxicity WHERE pack_id IN {tuple(list_pack_repro)};"
     ).execute()
 
     # Reformatage des données de la requête
@@ -319,6 +318,7 @@ def binom_inv(n, p, s):
 
 # retourne dict_conform_resultat_mue = {pack_id: 'NA', 'Retard fort', 'Retard modéré' ou 'Conforme'}
 def conform_resultat_mue(dict_pack_fusion):
+     
     nature = 'reproduction'
     list_pack_repro = []
     list_mp_repro = []
@@ -333,7 +333,7 @@ def conform_resultat_mue(dict_pack_fusion):
 
     # Récupération du nombre de retard et du nombre de femelles analysées
     output_molting = QueryScript(
-        f"SELECT pack_id, molting_stage FROM biomae.measurereprotoxicity where pack_id IN {tuple(list_pack_repro)};"
+        f"  SELECT pack_id, molting_stage FROM biomae.measurereprotoxicity where pack_id IN {tuple(list_pack_repro)};"
     ).execute()
 
     dict_molting_stage = {pack_id: [] for pack_id in list_pack_repro}
@@ -357,7 +357,7 @@ def conform_resultat_mue(dict_pack_fusion):
     ## Calcul des valeurs de test unilatéral
     # Récupération du pourcentage attendu en B/C1
     output_expected = QueryScript(
-        f"SELECT measurepoint_fusion_id, expected_C2 FROM temperature_repro WHERE measurepoint_fusion_id IN {tuple(list_mp_repro)};"
+        f"  SELECT measurepoint_fusion_id, expected_C2   FROM {env.DATABASE_TREATED}.temperature_repro WHERE measurepoint_fusion_id IN {tuple(list_mp_repro)} and version={env.VERSION};"
     ).execute()
     dict_expected_BC1 = {pack_id: 0 for pack_id in list_pack_repro}
 
@@ -368,7 +368,7 @@ def conform_resultat_mue(dict_pack_fusion):
 
     # Récupération des seuils de référence
     output_reference = QueryScript(
-        f"SELECT name, value FROM r2_constant WHERE name IN ('Risque 1 Mue', 'Risque 2 Mue');"
+        f"  SELECT name, value   FROM {env.DATABASE_TREATED}.r2_constant WHERE name IN ('Risque 1 Mue', 'Risque 2 Mue') and version={env.VERSION};"
     ).execute()
     for row in output_reference:
         [name, value] = row
@@ -440,11 +440,14 @@ def conform_surface_retard(dict_pack_fusion, dict_surface_femelles_concernees, d
             except ZeroDivisionError:
                 pass
 
+
+
     ## Seuil unilatéral 5%
     # Récupération des références
     names = ['Constante surface des retards 1', 'Moyenne des surfaces de référence C2', 'SD des surfaces de référence C2']
+     
     output_ref = QueryScript(
-        f"SELECT name, value FROM r2_constant WHERE name IN {tuple(names)};"
+        f"  SELECT name, value   FROM {env.DATABASE_TREATED}.r2_constant WHERE name IN {tuple(names)} and version={env.VERSION};"
     ).execute()
     for row in output_ref:
         [name, value] = row
