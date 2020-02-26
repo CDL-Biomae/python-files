@@ -1,6 +1,7 @@
 from tools import QueryScript
-import env
+# import env
 from calcul.toxicity import *
+
 
 def get_dict_pack_fusion(campaign=None):
 
@@ -80,7 +81,7 @@ def run(cas):
 
     values = []
     for mp_fusion in dict_pack_fusion:
-        measurepoint_id_fusion = mp_fusion
+        measurepoint_fusion_id = mp_fusion
         male_survival_7_days = dict_survie_7j_males[mp_fusion]
         alimentation = dict_alimentation[mp_fusion]
         neurotoxicity = dict_neurotoxicity_AChE[mp_fusion]
@@ -93,7 +94,7 @@ def run(cas):
         number_female_concerned_area = dict_nombre_femelles_en_retard[mp_fusion]
         endocrine_disruption = dict_perturbation_endocrinienne[mp_fusion]
 
-        value = (measurepoint_id_fusion,
+        value = (measurepoint_fusion_id,
                  male_survival_7_days,
                  alimentation,
                  neurotoxicity,
@@ -121,14 +122,42 @@ def run(cas):
     if cas == 1:
         # Création d'un table vide s'il n'existe pas
         create_table = QueryScript(
-            "CREATE TABLE IF NOT EXISTS toxtable (id INT AUTO_INCREMENT PRIMARY KEY, measurepoint_fusion_id INT, male_survival_7_days varchar(255), alimentation varchar(255), neurotoxicity varchar(255), female_survivor varchar(255), number_days_exposition varchar(255), number_female_concerned varchar(255),index_fertility_average varchar(255),number_female_analysis varchar(255),molting_cycle varchar(255), number_female_concerned_area varchar(255), endocrine_disruption varchar(255), version int);"
+            f"CREATE TABLE IF NOT EXISTS {env.DATABASE_TREATED}.toxtable (id INT AUTO_INCREMENT PRIMARY KEY, measurepoint_fusion_id INT, male_survival_7_days varchar(255), alimentation varchar(255), neurotoxicity varchar(255), female_survivor varchar(255), number_days_exposition varchar(255), number_female_concerned varchar(255),index_fertility_average varchar(255),number_female_analysis varchar(255),molting_cycle varchar(255), number_female_concerned_area varchar(255), endocrine_disruption varchar(255), version int);"
         ).execute()
 
         fill_table = QueryScript(
-            "INSERT INTO toxtable (measurepoint_fusion_id, male_survival_7_days, alimentation, neurotoxicity, female_survivor, number_days_exposition, number_female_concerned, index_fertility_average, number_female_analysis, molting_cycle, number_female_concerned_area, endocrine_disruption, version) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s,%s, %s, %s)"
+            f"INSERT INTO {env.DATABASE_TREATED}.toxtable (measurepoint_fusion_id, male_survival_7_days, alimentation, neurotoxicity, female_survivor, number_days_exposition, number_female_concerned, index_fertility_average, number_female_analysis, molting_cycle, number_female_concerned_area, endocrine_disruption, version) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s,%s, %s, %s)"
         )
         fill_table.setRows(values)
         fill_table.executemany()
 
     ## Cas 2: Mise à jour de la dernière version connue
     if cas == 2:
+        version = env.VERSION
+        for value in values:
+            [measurepoint_fusion_id,
+            male_survival_7_days,
+            alimentation,
+            neurotoxicity,
+            female_survivor,
+            number_days_exposition,
+            number_female_concerned,
+            index_fertility_average,
+            number_female_analysis,
+            molting_cycle,
+            number_female_concerned_area,
+            endocrine_disruption] = value
+
+            insert_value = list(value + (version,))
+
+            request = QueryScript(
+                f"IF EXISTS (SELECT * FROM {env.DATABASE_TREATED}.toxtable WHERE measurepoint_fusion_id = {measurepoint_fusion_id} AND version = {version}) UPDATE toxtable SET male_survival_7_days = {male_survival_7_days}, alimentation = {alimentation}, neurotoxicity = {neurotoxicity}, female_survivor = {female_survivor}, number_days_exposition = {number_days_exposition}, number_female_concerned = {number_female_concerned}, index_fertility_average = {index_fertility_average}, number_female_analysis = {number_female_analysis}, molting_cycle = {molting_cycle}, number_female_concerned_area = {number_female_concerned_area}, endocrine_disruption = {endocrine_disruption} WHERE measurepoint_fusion_id = {measurepoint_fusion_id} AND version = {version} ELSE INSERT INTO {env.DATABASE_TREATED}.toxtable (measurepoint_fusion_id, male_survival_7_days, alimentation, neurotoxicity, female_survivor, number_days_exposition, number_female_concerned, index_fertility_average, number_female_analysis, molting_cycle, number_female_concerned_area, endocrine_disruption, version) VALUES {tuple(insert_value)};"
+            ).execute()
+
+    ## Cas 3: Ajout d'une nouvelle version
+    if cas == 3:
+        fill_table = QueryScript(
+            f"INSERT INTO {env.DATABASE_TREATED}.toxtable (measurepoint_fusion_id, male_survival_7_days, alimentation, neurotoxicity, female_survivor, number_days_exposition, number_female_concerned, index_fertility_average, number_female_analysis, molting_cycle, number_female_concerned_area, endocrine_disruption, version) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s,%s, %s, %s)"
+        )
+        fill_table.setRows(values)
+        fill_table.executemany()
