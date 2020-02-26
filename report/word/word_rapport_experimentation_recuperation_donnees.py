@@ -1,5 +1,5 @@
 from tools import QueryScript, clean_dict
-from report import measure_points
+from report import measure_points, list_of_list_to_dict
 
 # %% Fonction principale pour tout appeler
 
@@ -138,12 +138,106 @@ def average_temperature(measurepoint_fusion_id_list):
     else:
         measurepoint_fusion_id_list = tuple(measurepoint_fusion_id_list)
     dico_avg_tempe = {}
+    dico_date = {}  # {reference: [date1, date4, date6, date7]}
     tempe = QueryScript(
-        f"SELECT reference, sensor3_min, sensor3_average, sensor3_max FROM average_temperature JOIN measurepoint ON average_temperature.measurepoint_fusion_id = measurepoint.id WHERE average_temperature.measurepoint_fusion_id IN {measurepoint_fusion_id_list}").execute()
+        f"SELECT reference, sensor1_min, sensor1_average, sensor1_max, sensor2_min, sensor2_average, sensor2_max, sensor3_min, sensor3_average, sensor3_max, average_temperature.measurepoint_fusion_id FROM average_temperature JOIN measurepoint ON average_temperature.measurepoint_fusion_id = measurepoint.id WHERE average_temperature.measurepoint_fusion_id IN {measurepoint_fusion_id_list}").execute()
+
+    output_date1 = QueryScript(
+        f"SELECT measurepoint_id, date FROM key_dates WHERE date_id = 1 and measurepoint_fusion_id IN {measurepoint_fusion_id_list}"
+    ).execute()
+    output_date2 = QueryScript(
+        f"SELECT measurepoint_id, date FROM key_dates WHERE date_id = 2 and measurepoint_fusion_id IN {measurepoint_fusion_id_list}"
+    ).execute()
+    output_date4 = QueryScript(
+        f"SELECT measurepoint_id, date FROM key_dates WHERE date_id = 4 and measurepoint_fusion_id IN {measurepoint_fusion_id_list}"
+    ).execute()
+    output_date6 = QueryScript(
+        f"SELECT measurepoint_id, date FROM key_dates WHERE date_id = 6 and measurepoint_fusion_id IN {measurepoint_fusion_id_list}"
+    ).execute()
+    output_date7 = QueryScript(
+        f"SELECT measurepoint_id, date FROM key_dates WHERE date_id = 7 and measurepoint_fusion_id IN {measurepoint_fusion_id_list}"
+    ).execute()
+
+    dict_date1 = list_of_list_to_dict(output_date1)  # {mp: [date]}
+    dict_date2 = list_of_list_to_dict(output_date2)
+    dict_date4 = list_of_list_to_dict(output_date4)
+    dict_date6 = list_of_list_to_dict(output_date6)
+    dict_date7 = list_of_list_to_dict(output_date7)
+
     for elt in tempe:
-        dico_temp_tempe = {'min': elt[1], 'average': elt[2], 'max': elt[3]}
+        mp = elt[10]
+        dico_temp_tempe = {'sensor1': {'min': elt[1], 'average': elt[2], 'max': elt[3]}, 'sensor2': {
+            'min': elt[4], 'average': elt[5], 'max': elt[6]}, 'sensor3': {'min': elt[7], 'average': elt[8], 'max': elt[9]}}
         dico_avg_tempe[elt[0]] = dico_temp_tempe
+
+        try:
+            date1 = dict_date1[mp][0]
+        except KeyError:
+            date1 = None
+        try:
+            date2 = dict_date2[mp][0]
+        except KeyError:
+            date2 = None
+        try:
+            date4 = dict_date4[mp][0]
+        except KeyError:
+            date4 = None
+        try:
+            date6 = dict_date6[mp][0]
+        except KeyError:
+            date6 = None
+        try:
+            date7 = dict_date7[mp][0]
+        except KeyError:
+            date7 = None
+
+        dico_date[elt[0]] = {'date1': date1, 'date2': date2,
+                             'date4': date4, 'date6': date6, 'date7': date7}
+
+    dico_test = {}
+    for key in dico_date.keys():
+        dates = dico_date[key]
+        begin_sensor1, end_sensor1, begin_sensor2, end_sensor2, begin_sensor3, end_sensor3 = dates[
+            date1], dates[date2], dates[date6], dates[date4], dates[date6], dates[date7]
+
+        if begin_sensor1 is None or end_sensor1 is None:
+            delta_sensor1 = None
+        else:
+            delta_sensor1 = (end_sensor1 - begin_sensor1).days
+
+        if begin_sensor2 is None or end_sensor2 is None:
+            delta_sensor2 = None
+        else:
+            delta_sensor2 = (end_sensor2 - begin_sensor2).days
+
+        if begin_sensor3 is None or end_sensor3 is None:
+            delta_sensor3 = None
+        else:
+            delta_sensor3 = (end_sensor3 - begin_sensor3).days
+
+        sensor_delta = [('sensor1', delta_sensor1), ('sensor2',
+                                                     delta_sensor2), ('sensor3', delta_sensor3)]
+        sensor_delta = [elt for elt in sensor_delta if elt[1] is not None]
+
+        if len(sensor_delta) == 0:
+            dico_test[key] = None
+        (max_sensor, max_value) = sensor_delta[0]
+        for elt in sensor_delta[1:]:
+            if elt[1] > max_value:
+                (max_sensor, max_value) = elt
+        dico_test[key] = max_sensor
+
+    for key in dico_test.keys():
+        if dico_test[key] is None:
+            dico_avg_tempe[key] = {'min': None, 'average': None, 'max': None}
+        else:
+            dico_avg_tempe[key] = dico_avg_tempe[key][dico_test[key]]
     return dico_avg_tempe
+
+    # for elt in tempe:  # ancienne version
+    #     dico_temp_tempe = {'min': elt[7], 'average': elt[8], 'max': elt[9]}
+    #     dico_avg_tempe[elt[0]] = dico_temp_tempe
+    # return dico_avg_tempe
 
 # %% Récupération des données géographiques de l'onglet agency
 
