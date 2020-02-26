@@ -1,6 +1,8 @@
 from tools import QueryScript
-# import env
-from calcul.toxicity import *
+import env
+# from calcul import *
+from calcul.toxicity import Alimentation, Neurotoxicity, Reprotoxicity, Reproduction
+
 
 
 def get_dict_pack_fusion(campaign=None):
@@ -27,38 +29,39 @@ def get_dict_pack_fusion(campaign=None):
 
     return dict_pack_fusion
 
+
 def run(cas):
     dict_pack_fusion = get_dict_pack_fusion()
 
     ### Alimentation
     # Survie 7 jours mâles: {mp_fusion: {'average': ..%, ...}}
-    dict_survie_7j_males = survie_alim(dict_pack_fusion)
+    dict_survie_7j_males = Alimentation.survie_alim(dict_pack_fusion)
 
     # Alimentation: {mp_fusion: ..%}
-    dict_alimentation = alimentation(dict_pack_fusion)
+    dict_alimentation = Alimentation.alimentation(dict_pack_fusion)
 
-    ## Neurotoxicité
+    # Neurotoxicité
     # Neurotoxicité AChE: {mp_fusion: ..%}
-    dict_neurotoxicity_AChE = neurotoxicity(dict_pack_fusion)
+    dict_neurotoxicity_AChE = Neurotoxicity.neurotoxicity(dict_pack_fusion)
 
     ## Reproduction
     # Survie femelle: {mp_fusion: ..%}
-    dict_survie_femelle = female_survivor(dict_pack_fusion)
+    dict_survie_femelle = Reproduction.female_survivor(dict_pack_fusion)
 
     ## Reprotoxicité
     # Nombre jours exposition in situ: {mp_fusion: int, None or "NA"}
-    dict_nombre_jours_exposition = number_days_exposition(dict_pack_fusion)
+    dict_nombre_jours_exposition = Reprotoxicity.number_days_exposition(dict_pack_fusion)
 
     ## Fecondité
     # Nombre de femelles concernees - fécondité
-    dict_fecundity = fecundity(dict_pack_fusion)
+    dict_fecundity = Reprotoxicity.fecundity(dict_pack_fusion)
     dict_nombre_femelles_concernees_fecondite = {mp_fusion: dict_fecundity[mp_fusion]['nbr_femelles_concernées'] for mp_fusion in dict_pack_fusion}
     dict_fecondite_moyenne = {mp_fusion: dict_fecundity[mp_fusion]['fécondité_moyenne'] for mp_fusion in dict_pack_fusion}
     dict_nombre_femelles_analysees = {mp_fusion: dict_fecundity[mp_fusion]['nbr_femelles_analysées'] for mp_fusion in dict_pack_fusion}
 
     ## Cycle de mue
     # vvv: {mp_fusion: {'cycle de mue': ..%, 'cycle de mue attendu': ..%, 'nb_femelles_retard': int}}
-    dict_cycle_de_mue = molting_cycle(dict_pack_fusion)
+    dict_cycle_de_mue = Reprotoxicity.molting_cycle(dict_pack_fusion)
     dict_cycle_de_mue_condense = {mp_fusion: '' for mp_fusion in dict_pack_fusion}
     for mp_fusion in dict_pack_fusion:
         cycle_observe = dict_cycle_de_mue[mp_fusion]['cycle de mue']
@@ -69,11 +72,11 @@ def run(cas):
     ## Nombre de femelles en retard
     # dict_nombre_femelles_en_retard = {mp_fusion: nbr_femelles_en_retard}
     # dict_surface_des_retards = {pack_id: [oocyte_area_mm, ...]}
-    dict_nombre_femelles_en_retard, dict_surface_des_retards = number_female_concerned_area(dict_pack_fusion)
+    dict_nombre_femelles_en_retard, dict_surface_des_retards = Reprotoxicity.number_female_concerned_area(dict_pack_fusion)
 
 
     ## Perturbation endocrinienne
-    dict_perturbation_endocrinienne = perturbation_endocrinienne(dict_pack_fusion, dict_nombre_femelles_en_retard, dict_surface_des_retards, dict_fecundity)
+    dict_perturbation_endocrinienne = Reprotoxicity.perturbation_endocrinienne(dict_pack_fusion, dict_nombre_femelles_en_retard, dict_surface_des_retards, dict_fecundity)
 
     ####################################################################################################################
         # CREATION VALUES #
@@ -120,9 +123,9 @@ def run(cas):
 
     ## Cas 1: Création et remplissage de la base de données
     if cas == 1:
-        # Création d'un table vide s'il n'existe pas
+        # Création d'un table vide si elle n'existe pas
         create_table = QueryScript(
-            f"CREATE TABLE IF NOT EXISTS {env.DATABASE_TREATED}.toxtable (id INT AUTO_INCREMENT PRIMARY KEY, measurepoint_fusion_id INT, male_survival_7_days varchar(255), alimentation varchar(255), neurotoxicity varchar(255), female_survivor varchar(255), number_days_exposition varchar(255), number_female_concerned varchar(255),index_fertility_average varchar(255),number_female_analysis varchar(255),molting_cycle varchar(255), number_female_concerned_area varchar(255), endocrine_disruption varchar(255), version int);"
+            f"DROP TABLE IF EXISTS {env.DATABASE_TREATED}.toxtable; CREATE TABLE IF NOT EXISTS {env.DATABASE_TREATED}.toxtable (id INT AUTO_INCREMENT PRIMARY KEY, measurepoint_fusion_id INT, male_survival_7_days varchar(255), alimentation varchar(255), neurotoxicity varchar(255), female_survivor varchar(255), number_days_exposition varchar(255), number_female_concerned varchar(255),index_fertility_average varchar(255),number_female_analysis varchar(255),molting_cycle varchar(255), number_female_concerned_area varchar(255), endocrine_disruption varchar(255), version int);"
         ).execute()
 
         fill_table = QueryScript(
@@ -161,3 +164,4 @@ def run(cas):
         )
         fill_table.setRows(values)
         fill_table.executemany()
+
