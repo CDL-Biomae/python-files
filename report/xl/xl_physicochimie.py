@@ -12,9 +12,6 @@ def list_of_list_to_dict(list_of_list):
 
 
 def test_chimie_superieur_repro(list_mp):
-    output_date1 = QueryScript(
-        f" SELECT measurepoint_id, date   FROM {env.DATABASE_TREATED}.key_dates WHERE version={env.VERSION} AND date_id = 1 and measurepoint_fusion_id IN {tuple(list_mp)}"
-    ).execute()
     output_date4 = QueryScript(
         f" SELECT measurepoint_id, date   FROM {env.DATABASE_TREATED}.key_dates WHERE version={env.VERSION} AND date_id = 4 and measurepoint_fusion_id IN {tuple(list_mp)}"
     ).execute()
@@ -25,18 +22,13 @@ def test_chimie_superieur_repro(list_mp):
         f" SELECT measurepoint_id, date   FROM {env.DATABASE_TREATED}.key_dates WHERE version={env.VERSION} AND date_id = 7 and measurepoint_fusion_id IN {tuple(list_mp)}"
     ).execute()
 
-    dict_date1 = list_of_list_to_dict(output_date1)  # {mp: [date]}
-    dict_date4 = list_of_list_to_dict(output_date4)
+    dict_date4 = list_of_list_to_dict(output_date4) # {mp: [date]}
     dict_date6 = list_of_list_to_dict(output_date6)
     dict_date7 = list_of_list_to_dict(output_date7)
 
     n = len(list_mp)
-    dict_date1467 = {}  # {mp: [date1, date4, date6, date7]}
+    dict_date6467 = {}  # {mp: [date6, date4, date6, date7]}
     for mp in list_mp:
-        try:
-            date1 = dict_date1[mp][0]
-        except KeyError:
-            date1 = None
         try:
             date4 = dict_date4[mp][0]
         except KeyError:
@@ -50,17 +42,17 @@ def test_chimie_superieur_repro(list_mp):
         except KeyError:
             date7 = None
 
-        dict_date1467[mp] = [date1, date4, date6, date7]
+        dict_date6467[mp] = [date6, date4, date6, date7]
 
     list_test = []
     for i in range(n):
         mp = list_mp[i]
-        [R0, RN, debut_chimie, fin_chimie] = dict_date1467[mp]
+        [debut_repro, fin_repro, debut_chimie, fin_chimie] = dict_date6467[mp]
 
-        if RN is None or R0 is None:
+        if fin_repro is None or debut_repro is None:
             delta_repro = None
         else:
-            delta_repro = (RN - R0).days
+            delta_repro = (fin_repro - debut_repro).days
 
         if debut_chimie is None or fin_chimie is None:
             delta_chimie = None

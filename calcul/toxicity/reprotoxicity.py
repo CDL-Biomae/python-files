@@ -35,9 +35,7 @@ def number_days_exposition(dict_pack_fusion):
         dict_dates_debut_fin[mp] = [output_dates_debut[idx_debut][1], output_dates_fin[idx_fin][1]]
 
     # Initialisation du dictionnaire de sortie
-    dict_nbr_days_exposition = {}  # {mp: nbrdays}
-    for mp in dict_pack_fusion:
-        dict_nbr_days_exposition[mp] = None
+    dict_nbr_days_exposition = {mp: None for mp in dict_pack_fusion}  # {mp: nbrdays}
 
     # Calcul
     for mp in list_mp_repro:
@@ -441,6 +439,8 @@ def conform_surface_retard(dict_pack_fusion, dict_surface_femelles_concernees, d
                 dict_surface_moyenne_retards[pack_id] = sum(list_surface_retards)/len(list_surface_retards)
             except ZeroDivisionError:
                 pass
+
+
 
     ## Seuil unilatéral 5%
     # Récupération des références
