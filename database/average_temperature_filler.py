@@ -4,9 +4,9 @@ import env
 
 def run():
     average_temperature_table = QueryScript(
-        f" DROP TABLE IF EXISTS average_temperature; CREATE TABLE average_temperature (id INT AUTO_INCREMENT PRIMARY KEY, measurepoint_fusion_id INT(11), sensor1_average DOUBLE, sensor1_min DOUBLE, sensor1_max DOUBLE, sensor2_average DOUBLE, sensor2_min DOUBLE, sensor2_max DOUBLE, sensor3_average DOUBLE, sensor3_min DOUBLE, sensor3_max DOUBLE, sensor2_average_labo DOUBLE );")
+        f" DROP TABLE IF EXISTS average_temperature; CREATE TABLE average_temperature (id INT AUTO_INCREMENT PRIMARY KEY, measurepoint_fusion_id INT(11), sensor1_average DOUBLE, sensor1_min DOUBLE, sensor1_max DOUBLE, sensor2_average DOUBLE, sensor2_min DOUBLE, sensor2_max DOUBLE, sensor3_average DOUBLE, sensor3_min DOUBLE, sensor3_max DOUBLE, sensor2_average_labo DOUBLE, version INT );")
     average_temperature_table.execute(True)
-    SQL_request = f" INSERT INTO average_temperature (measurepoint_fusion_id, sensor1_average, sensor1_min, sensor1_max, sensor2_average, sensor2_min, sensor2_max, sensor3_average, sensor3_min, sensor3_max, sensor2_average_labo) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
+    SQL_request = f" INSERT INTO average_temperature (measurepoint_fusion_id, sensor1_average, sensor1_min, sensor1_max, sensor2_average, sensor2_min, sensor2_max, sensor3_average, sensor3_min, sensor3_max, sensor2_average_labo, version) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
     values = []
      
     liste_fusion_id = QueryScript(
