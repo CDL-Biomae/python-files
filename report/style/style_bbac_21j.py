@@ -5,7 +5,7 @@ import pandas as pd
 from calcul import chemistry
 from tools import QueryScript
 from termcolor import colored
-
+import env
 
 def add_style_bbac_21j(bbac_dataframe, filename, folder_PATH):
     PATH = f"{folder_PATH}\\{filename}"
@@ -20,8 +20,9 @@ def add_style_bbac_21j(bbac_dataframe, filename, folder_PATH):
                      right=Side(border_style='thin', color='FFFFFF'),
                      top=Side(border_style='thin', color='FFFFFF'),
                      bottom=Side(border_style='thin', color='FFFFFF'))
-    elements_metal = QueryScript("SELECT sandre, parameter, 21j_threshold, 21j_graduate_25, 21j_graduate_50, 21j_graduate_75 FROM r3 WHERE familly='Métaux' AND 21j_threshold IS NOT NULL").execute()
-    elements_organic = QueryScript("SELECT sandre, parameter, 21j_threshold, 21j_graduate_25, 21j_graduate_50, 21j_graduate_75 FROM r3 WHERE familly!='Métaux' AND 21j_threshold IS NOT NULL").execute()
+     
+    elements_metal = QueryScript(f" SELECT sandre, parameter, 21j_threshold, 21j_graduate_25, 21j_graduate_50, 21j_graduate_75   FROM {env.DATABASE_TREATED}.r3 WHERE version={env.VERSION} and familly='Métaux' AND 21j_threshold IS NOT NULL").execute()
+    elements_organic = QueryScript(f" SELECT sandre, parameter, 21j_threshold, 21j_graduate_25, 21j_graduate_50, 21j_graduate_75   FROM {env.DATABASE_TREATED}.r3 WHERE version={env.VERSION} and familly!='Métaux' AND 21j_threshold IS NOT NULL").execute()
     
     for letter in [get_column_letter(col_idx) for col_idx in range(1, nb_columns+5)]:
         for number in range(1, nb_rows+21):
@@ -29,26 +30,33 @@ def add_style_bbac_21j(bbac_dataframe, filename, folder_PATH):
             ws2[letter+str(number)].border = borders
     
     ## UNIT 
-    [unit_metal, sandre_metal] = chemistry.get_unit([int(float(element[0])) for element in elements_metal])
+    [unit_metal, sandre_metal] = chemistry.get_unit([int(float(element[0])) for element in elements_metal]) 
+    parameter_metal = [element[1] for element in elements_metal]
     threshold_metal = [element[2:] for element in elements_metal]
-    [unit_organic, sandre_organic] = chemistry.get_unit([int(float(element[0])) for element in elements_organic])
+    [unit_organic, sandre_organic] = chemistry.get_unit([int(float(element[0])) for element in elements_organic]) 
+    parameter_organic = [element[1] for element in elements_organic]
     threshold_organic = [element[2:] for element in elements_organic]
-    index = 0
-    sandre_checked = sandre_metal
-    unit_checked = unit_metal
     
     for letter in header_columns[5:]:
-        
-        if index<len(sandre_checked):
+        index =None
+        if ws[letter + '4'].value and int(ws[letter + '4'].value) in sandre_metal:
+            index = sandre_metal.index(int(ws[letter + '4'].value))
+            sandre_checked = sandre_metal
+            parameter_checked = parameter_metal
+            unit_checked = unit_metal
+        elif ws[letter + '4'].value and int(ws[letter + '4'].value) in sandre_organic:
+            index = sandre_organic.index(int(ws[letter + '4'].value))
+            sandre_checked = sandre_organic
+            parameter_checked = parameter_organic
+            unit_checked = unit_organic
+        if index!=None:
             ws[letter + '2'].value = unit_checked[index]
             ws2[letter + '2'].value = unit_checked[index]
             ws[letter + '3'].value = sandre_checked[index]
             ws2[letter + '3'].value = sandre_checked[index]
-            index+=1
-        else :
-            index=0
-            sandre_checked = sandre_organic
-            unit_checked = unit_organic
+            ws[letter + '4'].value = parameter_checked[index]
+            ws2[letter + '4'].value = parameter_checked[index]
+
     ## Merge unit
     
     current_unit = ws['G2'].value 

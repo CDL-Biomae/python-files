@@ -1,5 +1,6 @@
-from tools import QueryScript, fusion_id_finder
+from tools import QueryScript
 from math import *
+import env
 
 def survie_alim(dict_pack_fusion):
     pack_dict = {}
@@ -8,7 +9,7 @@ def survie_alim(dict_pack_fusion):
             pack_dict[dict_pack_fusion[element]['alimentation']] = element 
         except KeyError:
             None 
-    survivor_list =  QueryScript(f"SELECT pack_id, scud_survivor, scud_quantity, replicate FROM cage WHERE pack_id IN {tuple([element for element in pack_dict])} AND scud_survivor IS NOT NULL").execute()
+    survivor_list =  QueryScript(f"  SELECT pack_id, scud_survivor, scud_quantity, replicate   FROM {env.DATABASE_RAW}.cage WHERE pack_id IN {tuple([element for element in pack_dict])} AND scud_survivor IS NOT NULL").execute()
     result = {element:None for element in dict_pack_fusion}
     pack_checked = None
     current_quantity = None
@@ -36,7 +37,7 @@ def alimentation(dict_pack_fusion):
     result = {element:None for element in dict_pack_fusion}
     
     ################### Calcul des tailles des spécimens
-    specimen_size_data =  QueryScript(f"SELECT pack_id, individual, size_px, size_mm FROM measuresize WHERE pack_id IN {tuple([element for element in pack_dict])}").execute()
+    specimen_size_data =  QueryScript(f"  SELECT pack_id, individual, size_px, size_mm   FROM {env.DATABASE_RAW}.measuresize WHERE pack_id IN {tuple([element for element in pack_dict])}").execute()
     specimen_size = {element:None for element in dict_pack_fusion}
     pack_checked = None
     ratio = None
@@ -74,14 +75,14 @@ def alimentation(dict_pack_fusion):
     ############################################
     
     ############### Calcul des tailles feuilles ingérées
-    
+     
     standard_leaf_number = QueryScript(
-        "SELECT value FROM r2_constant WHERE name='Nombre de disques (témoin)'").execute()[0]
+        f" SELECT value   FROM {env.DATABASE_TREATED}.r2_constant WHERE name='Nombre de disques (témoin)' WHERE version={env.VERSION}").execute()[0]
     replicate_leaf_number = QueryScript(
-        "SELECT value FROM r2_constant WHERE name='Nombre de disques par réplicat'").execute()[0]
+        f" SELECT value   FROM {env.DATABASE_TREATED}.r2_constant WHERE name='Nombre de disques par réplicat' WHERE version={env.VERSION}").execute()[0]
     test_duration = QueryScript(
-        "SELECT value FROM r2_constant WHERE name='Nombre de jour du test'").execute()[0]
-    remaining_leaves_data =  QueryScript(f"SELECT pack_id, replicate, value FROM measureleaf WHERE pack_id IN {tuple([element for element in pack_dict])}").execute()
+        f" SELECT value   FROM {env.DATABASE_TREATED}.r2_constant WHERE name='Nombre de jour du test' WHERE version={env.VERSION}").execute()[0]
+    remaining_leaves_data =  QueryScript(f"  SELECT pack_id, replicate, value   FROM {env.DATABASE_RAW}.measureleaf WHERE pack_id IN {tuple([element for element in pack_dict])}").execute()
     remaining_leaves = {element:None for element in dict_pack_fusion}
     pack_checked = None
     for leaf in remaining_leaves_data:
@@ -113,9 +114,9 @@ def alimentation(dict_pack_fusion):
     ##################### Calcul de l'inhibition alimentaire
     inhibition = {element:None for element in dict_pack_fusion}
     constant_alim = QueryScript(
-        "SELECT value FROM r2_constant WHERE name LIKE 'Constante alim%'").execute()
+        f" SELECT value   FROM {env.DATABASE_TREATED}.r2_constant WHERE name LIKE 'Constante alim%'").execute()
     average_temperature = {element:None for element in dict_pack_fusion}
-    average_temperature_output = QueryScript(f"SELECT measurepoint_fusion_id, sensor1_average FROM average_temperature WHERE measurepoint_fusion_id IN {tuple(dict_pack_fusion)}").execute()
+    average_temperature_output = QueryScript(f" SELECT measurepoint_fusion_id, sensor1_average   FROM {env.DATABASE_TREATED}.average_temperature WHERE measurepoint_fusion_id IN {tuple(dict_pack_fusion)} AND version={env.VERSION}").execute()
     for element in average_temperature_output:
         average_temperature[element[0]] = element[1]
     for element in dict_pack_fusion :

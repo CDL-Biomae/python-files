@@ -17,23 +17,23 @@ sont compatibles (pas 2 expériences du même type)
 
 #%% ## IMPORT ##
 from tools import QueryScript
-
+import env
 #%% ## TOOLS ##
 
 
 def create_empty_date_table():
     key_dates_table = QueryScript(
-        "DROP TABLE IF EXISTS key_dates; CREATE TABLE key_dates (id INT AUTO_INCREMENT PRIMARY KEY, measurepoint_id INT, date_id INT, date DATETIME, measurepoint_fusion_id INT);")
-    key_dates_table.execute()
+        f"DROP TABLE IF EXISTS key_dates; CREATE TABLE key_dates (id INT AUTO_INCREMENT PRIMARY KEY, measurepoint_id INT, date_id INT, date DATETIME, measurepoint_fusion_id INT);")
+    key_dates_table.execute(True)
     print('Une table key_dates vide a été créée')
 
 
 def key_dates(id_mp):
     exposureconditions = QueryScript(
-        script='SELECT step, recordedAt, barrel FROM measureexposurecondition WHERE measurepoint_id=' + str(
+        script=f'  SELECT step, recordedAt, barrel   FROM {env.DATABASE_RAW}.measureexposurecondition WHERE measurepoint_id=' + str(
             id_mp)).execute()
     natures = QueryScript(
-        f"SELECT nature FROM pack WHERE measurepoint_id = {id_mp}").execute()
+        f"  SELECT nature   FROM {env.DATABASE_RAW}.pack WHERE measurepoint_id = {id_mp}").execute()
     steps_barrels = [(x[0], x[2]) for x in exposureconditions]
 
     # Dictionnaire de dates cles à remplir
@@ -133,19 +133,19 @@ def key_dates(id_mp):
 def key_datesFusion(id_mp_alim, id_mp_chimie, id_mp_repro):
     if id_mp_alim != None:
         exposureconditions_alim = QueryScript(
-            script='SELECT step, recordedAt, barrel FROM measureexposurecondition WHERE measurepoint_id=' + str(id_mp_alim)).execute()
+            script=f'  SELECT step, recordedAt, barrel   FROM {env.DATABASE_RAW}.measureexposurecondition WHERE measurepoint_id=' + str(id_mp_alim)).execute()
     else:
         exposureconditions_alim = []
 
     if id_mp_chimie != None:
         exposureconditions_chimie = QueryScript(
-            script='SELECT step, recordedAt, barrel FROM measureexposurecondition WHERE measurepoint_id=' + str(id_mp_chimie)).execute()
+            script=f'  SELECT step, recordedAt, barrel   FROM {env.DATABASE_RAW}.measureexposurecondition WHERE measurepoint_id=' + str(id_mp_chimie)).execute()
     else:
         exposureconditions_chimie = []
 
     if id_mp_repro != None:
         exposureconditions_repro = QueryScript(
-            script='SELECT step, recordedAt, barrel FROM measureexposurecondition WHERE measurepoint_id=' + str(id_mp_repro)).execute()
+            script=f'  SELECT step, recordedAt, barrel   FROM {env.DATABASE_RAW}.measureexposurecondition WHERE measurepoint_id=' + str(id_mp_repro)).execute()
     else:
         exposureconditions_repro = []
 
@@ -278,9 +278,9 @@ def intersection(liste1, liste2):
 
 def independance(id_mp1, id_mp2):
     natures_mp1 = QueryScript(
-        script='SELECT nature FROM pack WHERE measurepoint_id = ' + str(id_mp1)).execute()
+        script=f'  SELECT nature   FROM {env.DATABASE_RAW}.pack WHERE measurepoint_id = ' + str(id_mp1)).execute()
     natures_mp2 = QueryScript(
-        script='SELECT nature FROM pack WHERE measurepoint_id = ' + str(id_mp2)).execute()
+        script=f'  SELECT nature   FROM {env.DATABASE_RAW}.pack WHERE measurepoint_id = ' + str(id_mp2)).execute()
 
     inter_natures = intersection(natures_mp1, natures_mp2)
     natures = {}
@@ -298,7 +298,7 @@ def independance(id_mp1, id_mp2):
 
 
 def dates_insert(id_mp, dates):
-    SQL_request = f"INSERT INTO key_dates (measurepoint_id, date_id, date, measurepoint_fusion_id) VALUES (%s, %s, %s, %s)"
+    SQL_request = f" INSERT INTO key_dates (measurepoint_id, date_id, date, measurepoint_fusion_id) VALUES (%s, %s, %s, %s)"
     values = []
 
     for i, date in enumerate(dates):
@@ -317,7 +317,7 @@ def dates_insert(id_mp, dates):
 
 def fusion_dates_insert(id_mp_list, dates):
     [id_mp_alim, id_mp_chimie, id_mp_repro, id_mp_fusion] = id_mp_list
-    SQL_request = f"INSERT INTO key_dates (measurepoint_id, date_id, date, measurepoint_fusion_id) VALUES (%s, %s, %s, %s)"
+    SQL_request = ";INSERT INTO key_dates (measurepoint_id, date_id, date, measurepoint_fusion_id) VALUES (%s, %s, %s, %s)"
     values = []
 
     for i, date in enumerate(dates):
@@ -346,16 +346,16 @@ def fusion_dates_insert(id_mp_list, dates):
 
 
 def fill_date_table():
-    id_campaigns = QueryScript(script='SELECT id FROM campaign').execute()
+    id_campaigns = QueryScript(script=f'  SELECT id   FROM {env.DATABASE_RAW}.campaign').execute()
     for id_c in id_campaigns:
         places = QueryScript(
-            script='SELECT id, type FROM place WHERE campaign_id=' + str(id_c)).execute()
+            script=f'  SELECT id, type   FROM {env.DATABASE_RAW}.place WHERE campaign_id=' + str(id_c)).execute()
         n_places = len(places)
         for i in range(n_places):
             id_p, type_p = places[i]
 
             id_measurepoints = QueryScript(
-                script='SELECT id FROM measurepoint WHERE place_id=' + str(id_p)).execute()
+                script=f'  SELECT id   FROM {env.DATABASE_RAW}.measurepoint WHERE place_id=' + str(id_p)).execute()
 
             print('\n[+] id_place = ', id_p)
 

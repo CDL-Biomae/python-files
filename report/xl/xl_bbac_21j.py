@@ -1,68 +1,70 @@
 from calcul import chemistry
 import pandas as pd
 from tools import QueryScript
+import env
 
 ## CREATE DATAFRAME ##
-def create_dataframe(list_mp):
-    elements_metal = QueryScript("SELECT sandre, parameter FROM r3 WHERE 21j_threshold IS NOT NULL AND familly='Métaux'").execute()
-    elements_organic = QueryScript("SELECT sandre, parameter FROM r3 WHERE 21j_threshold IS NOT NULL AND familly!='Métaux'").execute()
+def create_dataframe(dick_pack_fusion):
+    elements_metal = QueryScript(f" SELECT sandre   FROM {env.DATABASE_TREATED}.r3 WHERE version={env.VERSION} AND 21j_threshold IS NOT NULL AND familly='Métaux'").execute()
+    elements_metal = [int(float(element)) for element in elements_metal]
+    elements_PCB = QueryScript(f" SELECT sandre   FROM {env.DATABASE_TREATED}.r3 WHERE version={env.VERSION} AND 21j_threshold IS NOT NULL AND familly LIKE 'PCB%'").execute()
+    elements_PCB = [int(float(element)) for element in elements_PCB]
+    elements_HAP = QueryScript(f" SELECT sandre   FROM {env.DATABASE_TREATED}.r3 WHERE version={env.VERSION} AND 21j_threshold IS NOT NULL AND familly = 'HAP'").execute()
+    elements_HAP = [int(float(element)) for element in elements_HAP]
+    elements_others = QueryScript(f" SELECT sandre   FROM {env.DATABASE_TREATED}.r3 WHERE version={env.VERSION} AND 21j_threshold IS NOT NULL AND familly != 'HAP' AND familly != 'Métaux' AND familly NOT LIKE 'PCB%'").execute()
+    elements_others = [int(float(element)) for element in elements_others]
+    
     matrix = []
 
-    for mp in list_mp:
-        pack = QueryScript(f"SELECT id FROM pack WHERE nature='chemistry' AND measurepoint_id={mp}").execute()
-        if len(pack)>0:
-            metal = chemistry.result_by_pack_and_sandre(pack[0],[int(float(element[0])) for element in elements_metal])
-            organic = chemistry.result_by_pack_and_sandre(pack[0],[int(float(element[0])) for element in elements_organic])
-        else:
-            metal =  [['ND' for el in elements_metal],[int(float(element[0])) for element in elements_metal]]
-            organic =  [['ND' for el in elements_organic],[int(float(element[0])) for element in elements_organic]]
-        matrix.append([''] + metal[0] + [''] + organic[0])
+    data = chemistry.result_by_packs_and_sandre(dick_pack_fusion)
+    for mp in dick_pack_fusion:
+        matrix.append([''] + [data[mp][sandre] for sandre in elements_metal ]+[''] + [data[mp][sandre] for sandre in elements_PCB ]+[''] + [data[mp][sandre] for sandre in elements_HAP ]+[''] + [data[mp][sandre] for sandre in elements_others ])
+ 
+
     df = pd.DataFrame(matrix)
-    df.columns = [''] + [element[1] for element in elements_metal]  + [''] + [element[1] for element in elements_organic]
+    df.columns = [''] + [element for element in elements_metal]  + [''] + [element for element in elements_PCB] + [''] + [element for element in elements_HAP] + [''] + [element for element in elements_others]
+    
     df = df.dropna(how='all', axis='columns')
 
     return df
 
-def create_empty_dataframe(list_mp):
-    elements_metal = QueryScript("SELECT sandre, parameter FROM r3 WHERE 21j_threshold IS NOT NULL AND familly='Métaux'").execute()
-    elements_organic = QueryScript("SELECT sandre, parameter FROM r3 WHERE 21j_threshold IS NOT NULL AND familly!='Métaux'").execute()
+def create_empty_dataframe(dick_pack_fusion):
+    elements_metal = QueryScript(f" SELECT sandre   FROM {env.DATABASE_TREATED}.r3 WHERE version={env.VERSION} AND 21j_threshold IS NOT NULL AND familly='Métaux'").execute()
+    elements_metal = [int(float(element[0])) for element in elements_metal]
+    elements_PCB = QueryScript(f" SELECT sandre   FROM {env.DATABASE_TREATED}.r3 WHERE version={env.VERSION} AND 21j_threshold IS NOT NULL AND familly LIKE 'PCB%'").execute()
+    elements_PCB = [int(float(element[0])) for element in elements_PCB]
+    elements_HAP = QueryScript(f" SELECT sandre   FROM {env.DATABASE_TREATED}.r3 WHERE version={env.VERSION} AND 21j_threshold IS NOT NULL AND familly = 'HAP'").execute()
+    elements_HAP = [int(float(element[0])) for element in elements_HAP]
+    elements_others = QueryScript(f" SELECT sandre   FROM {env.DATABASE_TREATED}.r3 WHERE version={env.VERSION} AND 21j_threshold IS NOT NULL AND familly != 'HAP' AND familly != 'Métaux' AND familly NOT LIKE 'PCB%'").execute()
+    elements_others = [int(float(element[0])) for element in elements_others]
+    
     matrix = []
 
+    data = chemistry.result_by_packs_and_sandre(dick_pack_fusion)
+    for mp in dick_pack_fusion:
+        matrix.append([''] + ['' for sandre in elements_metal ]+[''] + ['' for sandre in elements_PCB ]+[''] + ['' for sandre in elements_HAP ]+[''] + ['' for sandre in elements_others ])
 
-    for mp in list_mp:
-        metal_list = ['' for element in elements_metal]
-        metal = [metal_list, metal_list]
-        organic_list = ['' for element in elements_organic]
-        organic = [organic_list, organic_list]
-        matrix.append([''] + metal[0] + [''] + organic[0])
+ 
+
     df = pd.DataFrame(matrix)
-    df.columns = [''] + [element[1] for element in elements_metal]  + [''] + [element[1] for element in elements_organic]
+    df.columns = [''] + [element for element in elements_metal]  + [''] + [element for element in elements_PCB] + [''] + [element for element in elements_HAP] + [''] + [element for element in elements_others]
     df = df.dropna(how='all', axis='columns')
 
     return df
+
 
 ## MAIN FUNCTION ##
-def create_bbac_21j_dataframe(head_dataframe, list_campaigns, dict_mp):
+def create_bbac_21j_dataframe(head_dataframe, dick_pack_fusion):
     list_dataframe = []
-    for campaign_str in list_campaigns:
-        list_mp = dict_mp[campaign_str]
-        df = create_dataframe(list_mp)
-        list_dataframe.append(df)
-
-    df_values = pd.concat(list_dataframe)
+    df_values = create_dataframe(dick_pack_fusion)
     df_concat = pd.concat([head_dataframe, df_values], axis=1)
     df_campaigns = df_concat.sort_values(['Numéro', 'Campagne'])
 
     return df_campaigns
 
-def create_bbac2_21j_dataframe(head_dataframe, list_campaigns, dict_mp):
+def create_bbac2_21j_dataframe(head_dataframe, dick_pack_fusion):
     list_dataframe = []
-    for campaign_str in list_campaigns:
-        list_mp = dict_mp[campaign_str]
-        df = create_empty_dataframe(list_mp)
-        list_dataframe.append(df)
-
-    df_values = pd.concat(list_dataframe)
+    df_values = create_empty_dataframe(dick_pack_fusion)
     df_concat = pd.concat([head_dataframe, df_values], axis=1)
     df_campaigns = df_concat.sort_values(['Numéro', 'Campagne'])
 

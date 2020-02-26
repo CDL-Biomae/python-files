@@ -1,33 +1,35 @@
 from tools import QueryScript
 from . import elements_fish, elements_crustacean
+import env
 
-
+############## PAS optimisé
 def lyophilisation_pourcent(pack_id):
-    output = QueryScript(f"SELECT prefix, value, unit FROM analysis WHERE sandre='/' AND pack_id={pack_id}").execute()
+    output = QueryScript(f"  SELECT prefix, value, unit   FROM {env.DATABASE_RAW}.analysis WHERE sandre='/' AND pack_id={pack_id}").execute()
     if len(output):
         return f"{output[0][0]}{output[0][1]}{output[0][2]}"
     else:
         return None
 
 def fat(pack_id):
-    output = QueryScript(f"SELECT prefix, value, unit FROM analysis WHERE sandre=1358 AND pack_id={pack_id}").execute()
+    output = QueryScript(f"  SELECT prefix, value, unit   FROM {env.DATABASE_RAW}.analysis WHERE sandre=1358 AND pack_id={pack_id}").execute()
     if len(output):
         return f"{output[0][0] if output[0][0] else ''}{output[0][1] * 100}{output[0][2]}"
     else:
         return None
     
 def weight(pack_id):
-    output = QueryScript(f"SELECT sampling_weight, metal_tare_bottle_weight, sampling_quantity, organic_tare_bottle_weight, organic_total_weight FROM pack WHERE id={pack_id}").execute()
+    output = QueryScript(f"  SELECT sampling_weight, metal_tare_bottle_weight, sampling_quantity, organic_tare_bottle_weight, organic_total_weight   FROM {env.DATABASE_RAW}.pack WHERE id={pack_id}").execute()
     if len(output):
         return [output[0][0]-output[0][1], (output[0][0]-output[0][1])/output[0][2], output[0][4]-output[0][3]]
     else:
         return None
     
+    
 def survival(pack_id):
     if pack_id is None:
         return None
 
-    survival_list = QueryScript(f"SELECT scud_quantity, scud_survivor FROM cage WHERE pack_id={pack_id} AND scud_survivor IS NOT NULL").execute()
+    survival_list = QueryScript(f"  SELECT scud_quantity, scud_survivor   FROM {env.DATABASE_RAW}.cage WHERE pack_id={pack_id} AND scud_survivor IS NOT NULL").execute()
     if len(survival_list):
         quantity = survival_list[0][0]
         average = 0
@@ -37,6 +39,8 @@ def survival(pack_id):
         return str(round(average / quantity * 100)) + '%'
     else:
         return None
+
+############################
     
 def convert_list(list_converted):
     for element in list_converted:
@@ -54,7 +58,8 @@ def convert_list(list_converted):
     return list_converted
 
 def get_unit_NQE(sandre_list):
-    output = QueryScript(f"SELECT familly, sandre, NQE FROM r3 WHERE sandre IN {tuple(sandre_list)}").execute()
+     
+    output = QueryScript(f" SELECT familly, sandre, NQE   FROM {env.DATABASE_TREATED}.r3 WHERE sandre IN {tuple(sandre_list)} AND version={env.VERSION}").execute()
     result=[[],[],[]]
     if len(output):
         for sandre in sandre_list:
@@ -72,7 +77,8 @@ def get_unit_NQE(sandre_list):
     return result
 
 def get_unit(sandre_list):
-    output = QueryScript(f"SELECT familly, sandre FROM r3 WHERE sandre IN {tuple(sandre_list)}").execute()
+     
+    output = QueryScript(f" SELECT familly, sandre   FROM {env.DATABASE_TREATED}.r3 WHERE sandre IN {tuple(sandre_list)} AND version={env.VERSION}").execute()
     result=[[],[]]
     if len(output):
         for sandre in sandre_list:
@@ -87,17 +93,42 @@ def get_unit(sandre_list):
                         result[1].append(int(float(element[1])))
     return result
 
-def result_by_pack_and_sandre(pack_id, sandre_list) :
-    result = [[],[]]
-    output = QueryScript(f"SELECT prefix, value, sandre FROM analysis WHERE pack_id={pack_id} AND sandre IN {tuple(sandre_list)}").execute()
-
-    for sandre in sandre_list:
+def result_by_packs_and_sandre(dict_pack_fusion, sandre_list=None) :
+    pack_dict = {}
+    for element in dict_pack_fusion:
+        try:
+            pack_dict[dict_pack_fusion[element]['chemistry']] = element 
+        except KeyError:
+            None 
+    result = {element:None for element in dict_pack_fusion}
+    if not sandre_list:
+         
+        sandre_list = QueryScript(f" SELECT sandre   FROM {env.DATABASE_TREATED}.r3 WHERE version={env.VERSION}").execute()
+        for index, sandre in enumerate(sandre_list):
+            try :
+                sandre_list[index] = float(sandre)
+            except ValueError:
+                sandre_list[index] = sandre
+    data =  QueryScript(f"SELECT pack_id, prefix, value, sandre FROM {env.DATABASE_RAW}.analysis WHERE pack_id IN {tuple([element for element in pack_dict])} AND sandre IN {tuple(sandre_list)}").execute()
+    for element in data:
         try :
-            index = [int(element[2]) for element in output].index(sandre)
-            result[0].append(str(output[index][1]) if output[index][0]==None else output[index][0] + str(output[index][1]))
-            result[1].append(output[index][2])
-        except :
-            result[0].append("ND")
-            result[1].append(sandre)
-           
+            sandre = int(element[3])
+        except ValueError :
+            sandre = element[3]
+        if result[pack_dict[element[0]]]:
+            result[pack_dict[element[0]]][sandre]= element[1] + str(element[2]) if element[1] else str(element[2])
+        else :
+            result[pack_dict[element[0]]] = {sandre: element[1] + str(element[2]) if element[1] else str(element[2])}
+            
+        
+    for element in result:
+        if result[element]:
+            for sandre in sandre_list:
+                if not sandre in result[element]:
+                    try :
+                        sandre = int(sandre)
+                    except ValueError :
+                        sandre = sandre
+                    result[element][sandre]="ND"        
+
     return result

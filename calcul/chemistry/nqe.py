@@ -1,4 +1,5 @@
 from tools import QueryScript
+import env
 
 elements_crustacean = {
     1115: 'Benzo (a) pyrene',
@@ -27,7 +28,8 @@ elements_fish = {
 code_sandre_elements = tuple(elements_crustacean.keys())
 
 def maximum_freq_quanti(code_sandre):
-    output = QueryScript(f"SELECT maximum, freq_quanti FROM r3 WHERE sandre IN {tuple(code_sandre)}").execute()
+     
+    output = QueryScript(f" SELECT maximum, freq_quanti   FROM {env.DATABASE_TREATED}.r3 WHERE sandre IN {tuple(code_sandre)} AND version={env.VERSION}").execute()
 
     maximum, freq_quanti = [], []
     for couple in output:

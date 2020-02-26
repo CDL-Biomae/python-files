@@ -4,6 +4,7 @@ from openpyxl.utils.cell import get_column_letter
 from termcolor import colored
 from tools import QueryScript
 import math
+import env
 
 
 def add_style_physicochimie(physicochimie_dataframe, filename, folder_PATH):
@@ -168,8 +169,9 @@ def add_style_physicochimie(physicochimie_dataframe, filename, folder_PATH):
 
     ## VALUES COMPARAISON TO REFERENCES ##
     # Récupération des références
+     
     output = QueryScript(
-        f"SELECT parameter, min, max FROM biomae.r1;"
+        f" SELECT parameter, min, max   FROM {env.DATABASE_TREATED}.r1 WHERE version={env.VERSION};"
     ).execute()
     parameters = [x[0] for x in output]
     minimum = [x[1] for x in output]
