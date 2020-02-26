@@ -26,21 +26,34 @@ def add_style_nqe(nqe_dataframe, filename, folder_PATH):
     
     ## UNIT 
     [unit_crustacean, sandre_crustacean, NQE_crustacean] = chemistry.get_unit_NQE(elements_crustacean.keys()) 
+    parameter_crustacean = [elements_crustacean[element] for element in elements_crustacean]
     [unit_fish, sandre_fish, NQE_fish] = chemistry.get_unit_NQE(elements_fish.keys()) 
+    parameter_fish = [elements_fish[element] for element in elements_fish]
+    
     index = 0
     sandre_checked = sandre_crustacean
     unit_checked = unit_crustacean
     
     for letter in header_columns[5:]:
-        
-        if index<len(sandre_checked):
+        index =None
+        if ws[letter + '4'].value and int(ws[letter + '4'].value) in sandre_crustacean:
+            index = sandre_crustacean.index(int(ws[letter + '4'].value))
+            if not index:
+               index = sandre_crustacean.index(ws[letter + '4'].value) 
+            sandre_checked = sandre_crustacean
+            parameter_checked = parameter_crustacean
+            unit_checked = unit_crustacean
+        elif ws[letter + '4'].value and int(ws[letter + '4'].value) in sandre_fish:
+            index = sandre_fish.index(int(ws[letter + '4'].value))
+            if not index:
+               index = sandre_fish.index(ws[letter + '4'].value) 
+            sandre_checked = sandre_fish
+            parameter_checked = parameter_fish
+            unit_checked = unit_fish
+        if index!=None:
             ws[letter + '2'].value = unit_checked[index]
             ws[letter + '3'].value = sandre_checked[index]
-            index+=1
-        else :
-            index=0
-            sandre_checked = sandre_fish
-            unit_checked = unit_fish
+            ws[letter + '4'].value = parameter_checked[index]
 
     ## Merge unit
     
@@ -135,8 +148,7 @@ def add_style_nqe(nqe_dataframe, filename, folder_PATH):
                 index = sandre_crustacean.index(sandre_checked)
                 threshold = NQE_crustacean[index]
             except :
-                index = sandre_fish.index(sandre_checked)
-                threshold = NQE_fish[index]
+                threshold = ''
         for row in body_rows:
             cell = ws[column+row]
             value = cell.value
@@ -145,8 +157,6 @@ def add_style_nqe(nqe_dataframe, filename, folder_PATH):
                 cell.alignment = body_alignment
                 cell.border = borders
                 if (value!="ND" and value!='0.0' and threshold!='') and ((value!='' and value[0]=='<') or float(value)<threshold):
-                    if threshold=='':
-                        print('oui')
                     cell.fill = body_fill_ok
                 elif (value!="ND" and value!='0.0' and threshold!='' and float(value)>=threshold):
                     cell.fill = body_fill_not_ok

@@ -40,7 +40,6 @@ def create_empty_dataframe(dick_pack_fusion):
     matrix = []
 
     data = chemistry.result_by_packs_and_sandre(dick_pack_fusion)
-    print(data[2895][1082])
     for mp in dick_pack_fusion:
         matrix.append([''] + ['' for sandre in elements_metal ]+[''] + ['' for sandre in elements_PCB ]+[''] + ['' for sandre in elements_HAP ]+[''] + ['' for sandre in elements_others ])
 
@@ -54,7 +53,7 @@ def create_empty_dataframe(dick_pack_fusion):
 
 
 ## MAIN FUNCTION ##
-def create_bbac_21j_dataframe(head_dataframe, dick_pack_fusion, dict_mp):
+def create_bbac_21j_dataframe(head_dataframe, dick_pack_fusion):
     list_dataframe = []
     df_values = create_dataframe(dick_pack_fusion)
     df_concat = pd.concat([head_dataframe, df_values], axis=1)
@@ -62,7 +61,7 @@ def create_bbac_21j_dataframe(head_dataframe, dick_pack_fusion, dict_mp):
 
     return df_campaigns
 
-def create_bbac2_21j_dataframe(head_dataframe, dick_pack_fusion, dict_mp):
+def create_bbac2_21j_dataframe(head_dataframe, dick_pack_fusion):
     list_dataframe = []
     df_values = create_empty_dataframe(dick_pack_fusion)
     df_concat = pd.concat([head_dataframe, df_values], axis=1)

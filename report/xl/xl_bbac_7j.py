@@ -54,7 +54,7 @@ def create_empty_dataframe(dick_pack_fusion):
 
 
 ## MAIN FUNCTION ##
-def create_bbac_7j_dataframe(head_dataframe, dick_pack_fusion, dict_mp):
+def create_bbac_7j_dataframe(head_dataframe, dick_pack_fusion):
     list_dataframe = []
     df_values = create_dataframe(dick_pack_fusion)
     df_concat = pd.concat([head_dataframe, df_values], axis=1)
@@ -62,7 +62,7 @@ def create_bbac_7j_dataframe(head_dataframe, dick_pack_fusion, dict_mp):
 
     return df_campaigns
 
-def create_bbac2_7j_dataframe(head_dataframe, dick_pack_fusion, dict_mp):
+def create_bbac2_7j_dataframe(head_dataframe, dick_pack_fusion):
     list_dataframe = []
     df_values = create_empty_dataframe(dick_pack_fusion)
     df_concat = pd.concat([head_dataframe, df_values], axis=1)
