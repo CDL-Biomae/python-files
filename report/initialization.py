@@ -1,6 +1,7 @@
 from tools import QueryScript
 from tools import list_agency_finder
 import pandas as pd
+import env
 
 ## OUTILS ##
 def agency_mp(list_mp):
@@ -14,7 +15,7 @@ def campaign(campaign_ref):
 
 def measure_points(campaign_ref):
     output = QueryScript(
-        f"SELECT DISTINCT(measurepoint_fusion_id) FROM key_dates WHERE measurepoint_id IN (SELECT id FROM measurepoint WHERE reference LIKE '{campaign_ref}%');"
+        f"SELECT DISTINCT(measurepoint_fusion_id) FROM {env.DATABASE_TREATED}.key_dates WHERE measurepoint_id IN (SELECT id FROM {env.DATABASE_RAW}.measurepoint WHERE reference LIKE '{campaign_ref}%');"
     ).execute()
     if len(output) == 0:
         raise NameError('\n\n     /!\\ La référence de campagne demandée n\'existe pas dans la base de donnée /!\\')
@@ -23,7 +24,7 @@ def measure_points(campaign_ref):
 
 def number_name_mp(list_mp):
     output = QueryScript(
-        f"SELECT measurepoint.id, substring(place.reference, -2, 2), measurepoint.name FROM measurepoint JOIN place ON place.id = measurepoint.place_id WHERE measurepoint.id in {tuple(list_mp)}"
+        f"SELECT measurepoint.id, substring(place.reference, -2, 2), measurepoint.name FROM {env.DATABASE_RAW}.measurepoint JOIN {env.DATABASE_RAW}.place ON place.id = measurepoint.place_id WHERE measurepoint.id in {tuple(list_mp)}"
     ).execute()
 
     list_number = []

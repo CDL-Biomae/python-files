@@ -1,9 +1,10 @@
 from tools import QueryScript
 import pandas as pd
+import env
 
 def create_dataframe(list_mp):
     output = QueryScript(
-        f"SELECT agency.network, agency.hydroecoregion, agency.stream, agency.zipcode, agency.city, agency.latitude, agency.longitude, agency.lambertY, agency.lambertX, measurepoint.latitudeSpotted, measurepoint.longitudeSpotted FROM agency JOIN place on agency.id = place.agency_id JOIN measurepoint on place.id = measurepoint.place_id WHERE measurepoint.id IN {tuple(list_mp)};"
+        f"  SELECT agency.network, agency.hydroecoregion, agency.stream, agency.zipcode, agency.city, agency.latitude, agency.longitude, agency.lambertY, agency.lambertX, measurepoint.latitudeSpotted, measurepoint.longitudeSpotted   FROM {env.DATABASE_RAW}.agency JOIN {env.DATABASE_RAW}.place on agency.id = place.agency_id JOIN {env.DATABASE_RAW}.measurepoint on place.id = measurepoint.place_id WHERE measurepoint.id IN {tuple(list_mp)};"
     ).execute()
 
     matrix = []

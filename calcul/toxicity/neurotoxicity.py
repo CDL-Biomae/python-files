@@ -1,9 +1,10 @@
 from tools import QueryScript
+import env
 
 def neurotoxicity(dict_pack_fusion):
     
     constant_AChE = QueryScript(
-        "SELECT value FROM r2_constant WHERE name LIKE 'Constante ache%'").execute()
+        f" SELECT value   FROM {env.DATABASE_TREATED}.r2_constant WHERE name LIKE 'Constante ache%'").execute()
 
     pack_dict = {}
     for element in dict_pack_fusion:
@@ -11,7 +12,7 @@ def neurotoxicity(dict_pack_fusion):
             pack_dict[dict_pack_fusion[element]['neurology']] = element 
         except KeyError:
             None 
-    output =  QueryScript(f"SELECT pack_id, ache, weight FROM cage WHERE pack_id IN {tuple([element for element in pack_dict])}").execute()
+    output =  QueryScript(f"  SELECT pack_id, ache, weight   FROM {env.DATABASE_RAW}.cage WHERE pack_id IN {tuple([element for element in pack_dict])}").execute()
     result = {element:None for element in dict_pack_fusion}
     
     pack_checked = None

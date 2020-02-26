@@ -4,11 +4,11 @@ Permet de récupérer les dates clés d'un point de mesure
 [+] prend en entrée un 'measurepoint_id'
 --> renvoie 1 liste: [J0, J14, JN, N, J21] avec N = (JN-J14)
 '''
-
+import env
 from tools import QueryScript
 
 def contexte(measurepoint_id):
-    measurepoints = QueryScript(f"SELECT DISTINCT measurepoint_id FROM key_dates WHERE measurepoint_fusion_id = {measurepoint_id}").execute()
+    measurepoints = QueryScript(f" SELECT DISTINCT measurepoint_id   FROM {env.DATABASE_TREATED}.key_dates WHERE measurepoint_fusion_id = {measurepoint_id}").execute()
 
     if len(measurepoints) < 2:
         return contexte_simple(measurepoint_id)
@@ -35,7 +35,7 @@ def contexte_fusion(measurepoints):
         else:
             measurepoint = id_mp_second
 
-        output = QueryScript(f"SELECT recordedAt FROM measureexposurecondition WHERE measurepoint_id = {measurepoint} and step = {step} and barrel = {barrel}").execute()
+        output = QueryScript(f"  SELECT recordedAt   FROM {env.DATABASE_RAW}.measureexposurecondition WHERE measurepoint_id = {measurepoint} and step = {step} and barrel = {barrel}").execute()
         if len(output) == 0:
             dates.append(None)
         else:
@@ -60,7 +60,7 @@ def contexte_simple(measurepoint_id):
         step, barrel = steps_barrel[i]
 
         output = QueryScript(
-            f"SELECT recordedAt FROM measureexposurecondition WHERE measurepoint_id = {measurepoint_id} and step = {step} and barrel = {barrel}").execute()
+            f"  SELECT recordedAt   FROM {env.DATABASE_RAW}.measureexposurecondition WHERE measurepoint_id = {measurepoint_id} and step = {step} and barrel = {barrel}").execute()
         if len(output) == 0:
             dates.append(None)
         else:

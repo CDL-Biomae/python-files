@@ -1,7 +1,7 @@
 from tools import QueryScript 
 import pandas as pd
 
-
+import env
 
 
 
@@ -12,9 +12,9 @@ def create_dataframe(list_mp):
 
 
     for mp in list_mp:
-        place_id = QueryScript(f"SELECT place_id FROM measurepoint WHERE id={mp}").execute()
+        place_id = QueryScript(f"  SELECT place_id   FROM {env.DATABASE_RAW}.measurepoint WHERE id={mp}").execute()
         if place_id not in matrixchek:
-             resulat = QueryScript(f"SELECT Male_Survival_7_days, alimentation, neurotoxicity, female_survivor, number_days_exposition, number_female_concerned, index_fertility_average, number_female_analysis, molting_cycle,number_female_concerned_area,endocrine_disruption FROM toxtable WHERE place_id={place_id[0]}").execute()
+             resulat = QueryScript(f" SELECT Male_Survival_7_days, alimentation, neurotoxicity, female_survivor, number_days_exposition, number_female_concerned, index_fertility_average, number_female_analysis, molting_cycle,number_female_concerned_area,endocrine_disruption   FROM {env.DATABASE_TREATED}.toxtable WHERE place_id={place_id[0]}").execute()
              matrixchek.append(place_id)
              matrix.append(['']+resulat[0][:3]+['']+resulat[0][3:])
 

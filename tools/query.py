@@ -28,11 +28,10 @@ class QueryScript() :
   def setScript(self, script=None):
     self.script=script
     
-  def execute(self) :
+  def execute(self, admin=False) :
     try:
       connection = mysql.connector.connect(user=env.DATABASE_USER, password=env.DATABASE_PASSWORD,
-                                    host=env.DATABASE_IP,
-                                    database='biomae')
+                                    host=env.DATABASE_IP, database=env.DATABASE_TREATED if admin else None)
       
       cursor = connection.cursor()
 
@@ -66,19 +65,24 @@ class QueryScript() :
     
     return output
     
-  def executemany(self) :
+  def executemany(self, admin=False) :
     if self.script!=None and self.rows==None :
       return "Rows argument is missing"
     if self.script==None  :
       return "Script argument is missing"
     try:
       connection = mysql.connector.connect(user=env.DATABASE_USER, password=env.DATABASE_PASSWORD,
-                                    host=env.DATABASE_IP,
-                                    database='biomae')
+                                    host=env.DATABASE_IP, database=env.DATABASE_TREATED)
       
       cursor = connection.cursor()
         
       query = (self.__str__())
+      if not admin :
+        cursor.execute(f" SELECT max(id) FROM {env.DATABASE_TREATED}.version")
+        version = tuple([element[0] for element in cursor])
+        new_rows = [row + version for row in self.rows]
+        self.setRows(new_rows)
+        
       cursor.executemany(query, self.rows)
       connection.commit()
       

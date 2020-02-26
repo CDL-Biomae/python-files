@@ -5,7 +5,7 @@ import pandas as pd
 from calcul import chemistry, elements_crustacean, elements_fish
 from termcolor import colored
 from tools import QueryScript
-
+import env
 
 def add_style_tox(tox_dataframe, filename, folder_PATH):
     PATH = f"{folder_PATH}\\{filename}"
@@ -90,7 +90,7 @@ def add_style_tox(tox_dataframe, filename, folder_PATH):
 
     ws.column_dimensions['F'].width = 3
     ws.column_dimensions['J'].width = 3
-    threshold_list = QueryScript("SELECT parameter, threshold FROM r2_threshold WHERE threshold IS NOT NULL").execute()
+    threshold_list = QueryScript(f" SELECT parameter, threshold   FROM {env.DATABASE_TREATED}.r2_threshold WHERE threshold IS NOT NULL").execute()
     for column in columns:
         if ws[column + '5'].value==None or ws[column + '5'].value=='':
             ws.column_dimensions[column].width = 3
