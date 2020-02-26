@@ -37,8 +37,9 @@ def write_in_existing_excel(dataframe, filename, folder_PATH, sheet, startcol=1,
 
 
 def measure_points_fusion(campaign_ref):
+     
     output = QueryScript(
-        f" SELECT DISTINCT(measurepoint_fusion_id)   FROM {env.DATABASE_TREATED}.key_dates WHERE measurepoint_id IN (  SELECT id   FROM {env.DATABASE_RAW}.measurepoint WHERE reference LIKE '{campaign_ref}%');"
+        f" SELECT DISTINCT(measurepoint_fusion_id)   FROM {env.DATABASE_TREATED}.key_dates WHERE measurepoint_id IN (  SELECT id   FROM {env.DATABASE_RAW}.measurepoint WHERE reference LIKE '{campaign_ref}%' and version={env.VERSION});"
     )
     return output.execute()
 

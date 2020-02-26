@@ -75,13 +75,13 @@ def alimentation(dict_pack_fusion):
     ############################################
     
     ############### Calcul des tailles feuilles ingérées
-    
+     
     standard_leaf_number = QueryScript(
-        f" SELECT value   FROM {env.DATABASE_TREATED}.r2_constant WHERE name='Nombre de disques (témoin)'").execute()[0]
+        f" SELECT value   FROM {env.DATABASE_TREATED}.r2_constant WHERE name='Nombre de disques (témoin)' WHERE version={env.VERSION}").execute()[0]
     replicate_leaf_number = QueryScript(
-        f" SELECT value   FROM {env.DATABASE_TREATED}.r2_constant WHERE name='Nombre de disques par réplicat'").execute()[0]
+        f" SELECT value   FROM {env.DATABASE_TREATED}.r2_constant WHERE name='Nombre de disques par réplicat' WHERE version={env.VERSION}").execute()[0]
     test_duration = QueryScript(
-        f" SELECT value   FROM {env.DATABASE_TREATED}.r2_constant WHERE name='Nombre de jour du test'").execute()[0]
+        f" SELECT value   FROM {env.DATABASE_TREATED}.r2_constant WHERE name='Nombre de jour du test' WHERE version={env.VERSION}").execute()[0]
     remaining_leaves_data =  QueryScript(f"  SELECT pack_id, replicate, value   FROM {env.DATABASE_RAW}.measureleaf WHERE pack_id IN {tuple([element for element in pack_dict])}").execute()
     remaining_leaves = {element:None for element in dict_pack_fusion}
     pack_checked = None
@@ -116,7 +116,7 @@ def alimentation(dict_pack_fusion):
     constant_alim = QueryScript(
         f" SELECT value   FROM {env.DATABASE_TREATED}.r2_constant WHERE name LIKE 'Constante alim%'").execute()
     average_temperature = {element:None for element in dict_pack_fusion}
-    average_temperature_output = QueryScript(f" SELECT measurepoint_fusion_id, sensor1_average   FROM {env.DATABASE_TREATED}.average_temperature WHERE measurepoint_fusion_id IN {tuple(dict_pack_fusion)}").execute()
+    average_temperature_output = QueryScript(f" SELECT measurepoint_fusion_id, sensor1_average   FROM {env.DATABASE_TREATED}.average_temperature WHERE measurepoint_fusion_id IN {tuple(dict_pack_fusion)} AND version={env.VERSION}").execute()
     for element in average_temperature_output:
         average_temperature[element[0]] = element[1]
     for element in dict_pack_fusion :

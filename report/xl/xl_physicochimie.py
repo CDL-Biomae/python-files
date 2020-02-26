@@ -13,16 +13,16 @@ def list_of_list_to_dict(list_of_list):
 
 def test_chimie_superieur_repro(list_mp):
     output_date1 = QueryScript(
-        f" SELECT measurepoint_id, date   FROM {env.DATABASE_TREATED}.key_dates WHERE date_id = 1 and measurepoint_fusion_id IN {tuple(list_mp)}"
+        f" SELECT measurepoint_id, date   FROM {env.DATABASE_TREATED}.key_dates WHERE version={env.VERSION} AND date_id = 1 and measurepoint_fusion_id IN {tuple(list_mp)}"
     ).execute()
     output_date4 = QueryScript(
-        f" SELECT measurepoint_id, date   FROM {env.DATABASE_TREATED}.key_dates WHERE date_id = 4 and measurepoint_fusion_id IN {tuple(list_mp)}"
+        f" SELECT measurepoint_id, date   FROM {env.DATABASE_TREATED}.key_dates WHERE version={env.VERSION} AND date_id = 4 and measurepoint_fusion_id IN {tuple(list_mp)}"
     ).execute()
     output_date6 = QueryScript(
-        f" SELECT measurepoint_id, date   FROM {env.DATABASE_TREATED}.key_dates WHERE date_id = 6 and measurepoint_fusion_id IN {tuple(list_mp)}"
+        f" SELECT measurepoint_id, date   FROM {env.DATABASE_TREATED}.key_dates WHERE version={env.VERSION} AND date_id = 6 and measurepoint_fusion_id IN {tuple(list_mp)}"
     ).execute()
     output_date7 = QueryScript(
-        f" SELECT measurepoint_id, date   FROM {env.DATABASE_TREATED}.key_dates WHERE date_id = 7 and measurepoint_fusion_id IN {tuple(list_mp)}"
+        f" SELECT measurepoint_id, date   FROM {env.DATABASE_TREATED}.key_dates WHERE version={env.VERSION} AND date_id = 7 and measurepoint_fusion_id IN {tuple(list_mp)}"
     ).execute()
 
     dict_date1 = list_of_list_to_dict(output_date1)  # {mp: [date]}
@@ -80,7 +80,7 @@ def test_chimie_superieur_repro(list_mp):
 def temperatures_dataframe(list_mp):
     list_test = test_chimie_superieur_repro(list_mp)
     output = QueryScript(
-        f" SELECT measurepoint_fusion_id, sensor2_min, sensor2_average, sensor2_max, sensor3_min, sensor3_average, sensor3_max   FROM {env.DATABASE_TREATED}.average_temperature WHERE measurepoint_fusion_id IN {tuple(list_mp)}"
+        f" SELECT measurepoint_fusion_id, sensor2_min, sensor2_average, sensor2_max, sensor3_min, sensor3_average, sensor3_max   FROM {env.DATABASE_TREATED}.average_temperature WHERE version={env.VERSION} AND measurepoint_fusion_id IN {tuple(list_mp)}"
     ).execute()
 
     dict_output = list_of_list_to_dict(output)  # {mp: [sensor2_min, sensor2_average, sensor2_max, sensor3_min, sensor3_average, sensor3_max]}

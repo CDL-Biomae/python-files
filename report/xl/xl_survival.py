@@ -5,7 +5,7 @@ import env
 
 def list_pack_from_list_mp(list_mp):
     output = QueryScript(
-        f" SELECT DISTINCT key_dates.measurepoint_fusion_id, pack.id   FROM {env.DATABASE_RAW}.pack JOIN {env.DATABASE_TREATED}.key_dates ON key_dates.measurepoint_id = pack.measurepoint_id WHERE key_dates.measurepoint_fusion_id IN {tuple(list_mp)} and pack.nature = 'chemistry';"
+        f" SELECT DISTINCT key_dates.measurepoint_fusion_id, pack.id   FROM {env.DATABASE_RAW}.pack JOIN {env.DATABASE_TREATED}.key_dates ON key_dates.measurepoint_id = pack.measurepoint_id WHERE key_dates.version={env.VERSION} AND key_dates.measurepoint_fusion_id IN {tuple(list_mp)} and pack.nature = 'chemistry';"
     ).execute()
 
     list_pack = []

@@ -6,6 +6,7 @@ import env
 
 # retourne dict_nbr_days_exposition = {mp_fusion: nbrdays}
 def number_days_exposition(dict_pack_fusion):
+     
     nature = 'reproduction'
     list_mp_repro = []
     for mp in dict_pack_fusion:
@@ -18,10 +19,10 @@ def number_days_exposition(dict_pack_fusion):
 
     # Récupération des dates de début et de fin
     output_dates_debut = QueryScript(
-        f" SELECT measurepoint_fusion_id, date   FROM {env.DATABASE_TREATED}.key_dates where date_id=6 and measurepoint_fusion_id IN {tuple(list_mp_repro)};"
+        f" SELECT measurepoint_fusion_id, date   FROM {env.DATABASE_TREATED}.key_dates where date_id=6 and measurepoint_fusion_id IN {tuple(list_mp_repro)} and version={env.VERSION};"
     ).execute()
     output_dates_fin = QueryScript(
-        f" SELECT measurepoint_fusion_id, date   FROM {env.DATABASE_TREATED}.key_dates where date_id=4 and measurepoint_fusion_id IN {tuple(list_mp_repro)};"
+        f" SELECT measurepoint_fusion_id, date   FROM {env.DATABASE_TREATED}.key_dates where date_id=4 and measurepoint_fusion_id IN {tuple(list_mp_repro)} and version={env.VERSION};"
     ).execute()
 
     output_mp_debut = [x[0] for x in output_dates_debut]
@@ -319,6 +320,7 @@ def binom_inv(n, p, s):
 
 # retourne dict_conform_resultat_mue = {pack_id: 'NA', 'Retard fort', 'Retard modéré' ou 'Conforme'}
 def conform_resultat_mue(dict_pack_fusion):
+     
     nature = 'reproduction'
     list_pack_repro = []
     list_mp_repro = []
@@ -357,7 +359,7 @@ def conform_resultat_mue(dict_pack_fusion):
     ## Calcul des valeurs de test unilatéral
     # Récupération du pourcentage attendu en B/C1
     output_expected = QueryScript(
-        f"  SELECT measurepoint_fusion_id, expected_C2   FROM {env.DATABASE_TREATED}.temperature_repro WHERE measurepoint_fusion_id IN {tuple(list_mp_repro)};"
+        f"  SELECT measurepoint_fusion_id, expected_C2   FROM {env.DATABASE_TREATED}.temperature_repro WHERE measurepoint_fusion_id IN {tuple(list_mp_repro)} and version={env.VERSION};"
     ).execute()
     dict_expected_BC1 = {pack_id: 0 for pack_id in list_pack_repro}
 
@@ -368,7 +370,7 @@ def conform_resultat_mue(dict_pack_fusion):
 
     # Récupération des seuils de référence
     output_reference = QueryScript(
-        f"  SELECT name, value   FROM {env.DATABASE_TREATED}.r2_constant WHERE name IN ('Risque 1 Mue', 'Risque 2 Mue');"
+        f"  SELECT name, value   FROM {env.DATABASE_TREATED}.r2_constant WHERE name IN ('Risque 1 Mue', 'Risque 2 Mue') and version={env.VERSION};"
     ).execute()
     for row in output_reference:
         [name, value] = row
@@ -443,8 +445,9 @@ def conform_surface_retard(dict_pack_fusion, dict_surface_femelles_concernees, d
     ## Seuil unilatéral 5%
     # Récupération des références
     names = ['Constante surface des retards 1', 'Moyenne des surfaces de référence C2', 'SD des surfaces de référence C2']
+     
     output_ref = QueryScript(
-        f"  SELECT name, value   FROM {env.DATABASE_TREATED}.r2_constant WHERE name IN {tuple(names)};"
+        f"  SELECT name, value   FROM {env.DATABASE_TREATED}.r2_constant WHERE name IN {tuple(names)} and version={env.VERSION};"
     ).execute()
     for row in output_ref:
         [name, value] = row

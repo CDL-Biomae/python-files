@@ -13,8 +13,9 @@ from tools import QueryScript
 import env
 
 def conditions(measurepoint_id):
+     
     measurepoints = QueryScript(
-        f" SELECT DISTINCT measurepoint_id   FROM {env.DATABASE_TREATED}.key_dates WHERE measurepoint_fusion_id = {measurepoint_id}").execute()
+        f" SELECT DISTINCT measurepoint_id   FROM {env.DATABASE_TREATED}.key_dates WHERE measurepoint_fusion_id = {measurepoint_id} AND version={env.VERSION}").execute()
 
     if len(measurepoints) < 2:
         # Si jamais il n'y a qu'un seul point de mesure

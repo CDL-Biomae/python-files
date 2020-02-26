@@ -317,7 +317,7 @@ def dates_insert(id_mp, dates):
 
 def fusion_dates_insert(id_mp_list, dates):
     [id_mp_alim, id_mp_chimie, id_mp_repro, id_mp_fusion] = id_mp_list
-    SQL_request = f"USE {env.DATABASE_TREATED};INSERT INTO key_dates (measurepoint_id, date_id, date, measurepoint_fusion_id) VALUES (%s, %s, %s, %s)"
+    SQL_request = ";INSERT INTO key_dates (measurepoint_id, date_id, date, measurepoint_fusion_id) VALUES (%s, %s, %s, %s)"
     values = []
 
     for i, date in enumerate(dates):

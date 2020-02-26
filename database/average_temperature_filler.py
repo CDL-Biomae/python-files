@@ -8,9 +8,9 @@ def run():
     average_temperature_table.execute(True)
     SQL_request = f" INSERT INTO average_temperature (measurepoint_fusion_id, sensor1_average, sensor1_min, sensor1_max, sensor2_average, sensor2_min, sensor2_max, sensor3_average, sensor3_min, sensor3_max, sensor2_average_labo) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
     values = []
-
+     
     liste_fusion_id = QueryScript(
-        f" SELECT DISTINCT measurepoint_fusion_id   FROM {env.DATABASE_TREATED}.key_dates").execute()
+        f" SELECT DISTINCT measurepoint_fusion_id   FROM {env.DATABASE_TREATED}.key_dates WHERE version={env.VERSION}").execute()
 
     count = 1
     for elt_mp_id in liste_fusion_id:
@@ -26,7 +26,8 @@ def run():
 
 # prend en argument un measurepoint_fusion_id et le numero de la sensor (1, 2 ou 3 ou 2lab qui correpond a la moyenne in situ+lab)
 def liste_temperature(measurepoint_fusion_id, num_sensor):
-    key_date_list_measurepoint_id = QueryScript(f" SELECT date_id, date, measurepoint_id   FROM {env.DATABASE_TREATED}.key_dates WHERE measurepoint_fusion_id = {measurepoint_fusion_id}").execute()
+     
+    key_date_list_measurepoint_id = QueryScript(f" SELECT date_id, date, measurepoint_id   FROM {env.DATABASE_TREATED}.key_dates WHERE measurepoint_fusion_id = {measurepoint_fusion_id} and version={env.VERSION}").execute()
     # measurepoint_id = QueryScript(  # a optimiser
     #     f" SELECT DISTINCT measurepoint_id   FROM {env.DATABASE_TREATED}.key_dates WHERE measurepoint_fusion_id = {}".format(measurepoint_fusion_id)).execute()
     key_date_list = [elt[:-1] for elt in key_date_list_measurepoint_id]
@@ -47,7 +48,7 @@ def liste_temperature(measurepoint_fusion_id, num_sensor):
 
     SQL_request_temperature_sensor = []
     if (num_sensor == 1) & (dict_key_date_list[1] != None) & (dict_key_date_list[2] != None):
-        SQL_request_temperature_sensor = "SELECT value   FROM {env.DATABASE_RAW}.measuretemperature WHERE ( (recordedAt>= '{}') AND (recordedAt<= '{}')".format(env.DATABASE_TREATED,
+        SQL_request_temperature_sensor = "SELECT value   FROM {}.measuretemperature WHERE ( (recordedAt>= '{}') AND (recordedAt<= '{}')".format(env.DATABASE_RAW,
             dict_key_date_list[1], dict_key_date_list[2])
         valid_output = True
     elif (num_sensor == 2) & (dict_key_date_list[6] != None) & (dict_key_date_list[4] != None):

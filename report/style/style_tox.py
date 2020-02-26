@@ -90,7 +90,8 @@ def add_style_tox(tox_dataframe, filename, folder_PATH):
 
     ws.column_dimensions['F'].width = 3
     ws.column_dimensions['J'].width = 3
-    threshold_list = QueryScript(f" SELECT parameter, threshold   FROM {env.DATABASE_TREATED}.r2_threshold WHERE threshold IS NOT NULL").execute()
+     
+    threshold_list = QueryScript(f" SELECT parameter, threshold   FROM {env.DATABASE_TREATED}.r2_threshold WHERE threshold IS NOT NULL and version={env.VERSION}").execute()
     for column in columns:
         if ws[column + '5'].value==None or ws[column + '5'].value=='':
             ws.column_dimensions[column].width = 3

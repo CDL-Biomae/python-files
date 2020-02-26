@@ -2,9 +2,9 @@ from tools import QueryScript
 import env
 
 def neurotoxicity(dict_pack_fusion):
-    
+     
     constant_AChE = QueryScript(
-        f" SELECT value   FROM {env.DATABASE_TREATED}.r2_constant WHERE name LIKE 'Constante ache%'").execute()
+        f" SELECT value   FROM {env.DATABASE_TREATED}.r2_constant WHERE name LIKE 'Constante ache%' AND version={env.VERSION}").execute()
 
     pack_dict = {}
     for element in dict_pack_fusion:
