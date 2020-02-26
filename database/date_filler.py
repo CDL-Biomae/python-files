@@ -23,7 +23,7 @@ import env
 
 def create_empty_date_table():
     key_dates_table = QueryScript(
-        f"DROP TABLE IF EXISTS key_dates; CREATE TABLE key_dates (id INT AUTO_INCREMENT PRIMARY KEY, measurepoint_id INT, date_id INT, date DATETIME, measurepoint_fusion_id INT);")
+        f"DROP TABLE IF EXISTS key_dates; CREATE TABLE key_dates (id INT AUTO_INCREMENT PRIMARY KEY, measurepoint_id INT, date_id INT, date DATETIME, measurepoint_fusion_id INT, version INT);")
     key_dates_table.execute(True)
     print('Une table key_dates vide a été créée')
 
@@ -265,7 +265,7 @@ def key_datesFusion(id_mp_alim, id_mp_chimie, id_mp_repro):
     except ValueError:
         debuts[id_mp_chimie] = None
 
-    date_debut = min(list(debuts.values()))
+    date_debut = min([value for value in debuts.values() if value])
     id_mp_fusion = list(debuts.keys())[list(debuts.values()).index(date_debut)]
 
     return key_dates_list, id_mp_fusion
@@ -298,11 +298,11 @@ def independance(id_mp1, id_mp2):
 
 
 def dates_insert(id_mp, dates):
-    SQL_request = f" INSERT INTO key_dates (measurepoint_id, date_id, date, measurepoint_fusion_id) VALUES (%s, %s, %s, %s)"
+    SQL_request = f" INSERT INTO key_dates (measurepoint_id, date_id, date, measurepoint_fusion_id, version) VALUES (%s, %s, %s, %s, %s)"
     values = []
 
     for i, date in enumerate(dates):
-        key = date.keys()
+        key = date
         measurepoint_id = id_mp
         date_id = i+1
         date = dates[key]['date']
@@ -317,11 +317,11 @@ def dates_insert(id_mp, dates):
 
 def fusion_dates_insert(id_mp_list, dates):
     [id_mp_alim, id_mp_chimie, id_mp_repro, id_mp_fusion] = id_mp_list
-    SQL_request = ";INSERT INTO key_dates (measurepoint_id, date_id, date, measurepoint_fusion_id) VALUES (%s, %s, %s, %s)"
+    SQL_request = "INSERT INTO key_dates (measurepoint_id, date_id, date, measurepoint_fusion_id, version) VALUES (%s, %s, %s, %s,%s)"
     values = []
 
     for i, date in enumerate(dates):
-        key = date.keys()
+        key = date
 
         if i in [0, 1, 2]:
             measurepoint_id = id_mp_alim
@@ -419,3 +419,7 @@ def fill_date_table():
                                    id_mp_repro, id_mp_fusion]
 
                         fusion_dates_insert(id_list, key_date_list)
+
+def run():
+    create_empty_date_table()
+    fill_date_table()
