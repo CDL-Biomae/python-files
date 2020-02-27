@@ -1,4 +1,4 @@
-from .alimentation import alimentation, survie_alim
-from .neurotoxicity import neurotoxicity
-from .reproduction import female_survivor
-from .reprotoxicity import *
+from .alimentation import Alimentation
+from .neurotoxicity import Neurotoxicity
+from .reproduction import Reproduction
+from .reprotoxicity import Reprotoxicity
