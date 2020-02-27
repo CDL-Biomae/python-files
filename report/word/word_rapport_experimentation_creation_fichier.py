@@ -214,14 +214,17 @@ def word_main(campaign, agence, path_photo="Photos", path_output="output"):
         table_temperature.cell(0, 3).paragraphs[0].add_run(
             "Maximum")  # .bold = True
         table_temperature.cell(0, 3).paragraphs[0].alignment = 1
-        table_temperature.cell(1, 1).paragraphs[0].add_run(str(round(
-            dico_avg_tempe[reference]['min'], 1)))
+        if dico_avg_tempe[reference]['min'] is not None:
+            table_temperature.cell(1, 1).paragraphs[0].add_run(str(round(
+                dico_avg_tempe[reference]['min'], 1)))
         table_temperature.cell(1, 1).paragraphs[0].alignment = 1
-        table_temperature.cell(1, 2).paragraphs[0].add_run(str(round(
-            dico_avg_tempe[reference]['average'], 1)))
+        if dico_avg_tempe[reference]['average'] is not None:
+            table_temperature.cell(1, 2).paragraphs[0].add_run(str(round(
+                dico_avg_tempe[reference]['average'], 1)))
         table_temperature.cell(1, 2).paragraphs[0].alignment = 1
-        table_temperature.cell(1, 3).paragraphs[0].add_run(str(round(
-            dico_avg_tempe[reference]['max'], 1)))
+        if dico_avg_tempe[reference]['max'] is not None:
+            table_temperature.cell(1, 3).paragraphs[0].add_run(str(round(
+                dico_avg_tempe[reference]['max'], 1)))
         table_temperature.cell(1, 3).paragraphs[0].alignment = 1
         for row in range(2):
             for col in range(4):
