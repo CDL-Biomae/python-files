@@ -132,7 +132,7 @@ def word_main(campaign, agence, path_photo="Photos", path_output="output"):
             table_carte.cell(2, 0).paragraphs[0].add_run().add_picture(
                 carte_satellite, width=4500000)
         else:
-            table_carte.cell(0, 0).paragraphs[0].add_run().add_picture(
+            table_carte.cell(2, 0).paragraphs[0].add_run().add_picture(
                 path_ressources + "/carre_blanc.jpg", width=4500000)
         table_carte.cell(2, 0).paragraphs[0].alignment = 1
         table_carte.cell(
@@ -214,14 +214,17 @@ def word_main(campaign, agence, path_photo="Photos", path_output="output"):
         table_temperature.cell(0, 3).paragraphs[0].add_run(
             "Maximum")  # .bold = True
         table_temperature.cell(0, 3).paragraphs[0].alignment = 1
-        table_temperature.cell(1, 1).paragraphs[0].add_run(str(round(
-            dico_avg_tempe[reference]['min'], 1)))
+        if dico_avg_tempe[reference]['min'] is not None:
+            table_temperature.cell(1, 1).paragraphs[0].add_run(str(round(
+                dico_avg_tempe[reference]['min'], 1)))
         table_temperature.cell(1, 1).paragraphs[0].alignment = 1
-        table_temperature.cell(1, 2).paragraphs[0].add_run(str(round(
-            dico_avg_tempe[reference]['average'], 1)))
+        if dico_avg_tempe[reference]['average'] is not None:
+            table_temperature.cell(1, 2).paragraphs[0].add_run(str(round(
+                dico_avg_tempe[reference]['average'], 1)))
         table_temperature.cell(1, 2).paragraphs[0].alignment = 1
-        table_temperature.cell(1, 3).paragraphs[0].add_run(str(round(
-            dico_avg_tempe[reference]['max'], 1)))
+        if dico_avg_tempe[reference]['max'] is not None:
+            table_temperature.cell(1, 3).paragraphs[0].add_run(str(round(
+                dico_avg_tempe[reference]['max'], 1)))
         table_temperature.cell(1, 3).paragraphs[0].alignment = 1
         for row in range(2):
             for col in range(4):
@@ -343,7 +346,7 @@ def recuperation_photo(reference, path_photo, path_ressources):
 
         for typ in list_type:
             try:
-                val = dico_nom[typ]
+                dico_nom[typ]
             except KeyError:
                 dico_nom[typ] = path_ressources + "/carre_blanc.jpg"
     return dico_nom

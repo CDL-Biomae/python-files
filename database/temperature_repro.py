@@ -6,17 +6,19 @@ import env
 def run():
      
     temperature_repro_table = QueryScript(
-        f" DROP TABLE IF EXISTS temperature_repro; CREATE TABLE temperature_repro (id INT AUTO_INCREMENT PRIMARY KEY, measurepoint_fusion_id INT(11), av_cycle_BCD1 DOUBLE, expected_C2 DOUBLE, expected_D1 DOUBLE, expected_D2 DOUBLE, av_cycle_1234 DOUBLE, expected_st3 DOUBLE, expected_st4 DOUBLE, expected_st5 DOUBLE, version INT );")
+        f" DROP TABLE IF EXISTS {env.DATABASE_TREATED}.temperature_repro; CREATE TABLE {env.DATABASE_TREATED}.temperature_repro (id INT AUTO_INCREMENT PRIMARY KEY, measurepoint_fusion_id INT(11), av_cycle_BCD1 DOUBLE, expected_C2 DOUBLE, expected_D1 DOUBLE, expected_D2 DOUBLE, av_cycle_1234 DOUBLE, expected_st3 DOUBLE, expected_st4 DOUBLE, expected_st5 DOUBLE, version INT );")
     temperature_repro_table.execute(True)
-    SQL_request = f" INSERT INTO temperature_repro (measurepoint_fusion_id, av_cycle_BCD1, expected_C2, expected_D1, expected_D2, av_cycle_1234, expected_st3, expected_st4, expected_st5, version) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
+    SQL_request = f" INSERT INTO {env.DATABASE_TREATED}.temperature_repro (measurepoint_fusion_id, av_cycle_BCD1, expected_C2, expected_D1, expected_D2, av_cycle_1234, expected_st3, expected_st4, expected_st5, version) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
     values = []
 
     liste_fusion_id = QueryScript(
-        f" SELECT measurepoint_fusion_id   FROM {env.DATABASE_TREATED}.average_temperature and version={env.VERSION}").execute()
+        f" SELECT measurepoint_fusion_id FROM {env.DATABASE_TREATED}.average_temperature WHERE version={env.VERSION}").execute()
 
     constantes = QueryScript(
-        f" SELECT name,value   FROM {env.DATABASE_TREATED}.r2_constant WHERE nature='temperature_repro' and version={env.VERSION}").execute()
+        f" SELECT name,value FROM {env.DATABASE_TREATED}.r2_constant WHERE nature='Temperature repro' and version={env.VERSION}").execute()
     constantes = list_to_dict(constantes)
+    print(env.VERSION)
+    print(constantes)
 
     count = 1
     for elt_mp_id in liste_fusion_id:

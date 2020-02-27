@@ -204,7 +204,8 @@ class Reprotoxicity:
         # Remplissage du dictionnaire de sortie
         for i, mp_fusion in enumerate(list_mp_repro):
             pack_id = list_pack_repro[i]
-            dict_molting[mp_fusion]['cycle de mue attendu'] = dict_expected_stage[mp_fusion]['expected C2']
+            expected_C2 = dict_expected_stage[mp_fusion]['expected C2']
+            dict_molting[mp_fusion]['cycle de mue attendu'] = expected_C2 if (expected_C2 == 'NA' or expected_C2 is None) else round(expected_C2)
 
             list_molting_stage = dict_molting_stage[pack_id]
             cpt_molting_stage = Counter(list_molting_stage)
@@ -226,7 +227,7 @@ class Reprotoxicity:
             else:
                 molting_percent = nbr_femelles_c2_d1/nbr_femelles_analysees
 
-            dict_molting[mp_fusion]['cycle de mue'] = molting_percent if molting_percent == 'NA' else molting_percent*100
+            dict_molting[mp_fusion]['cycle de mue'] = molting_percent if (molting_percent == 'NA' or molting_percent is None) else round(molting_percent*100)
             dict_molting[mp_fusion]['nb_femelles_retard'] = nbr_femelles_c2_d1
 
         return dict_molting  # {mp_fusion: {'cycle de mue': ..%, 'cycle de mue attendu': ..%, 'nb_femelles_retard': int}}

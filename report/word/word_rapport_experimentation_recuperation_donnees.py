@@ -127,7 +127,7 @@ def geographic_data_measurepoint(measurepoint_fusion_id_list):
         f"SELECT reference, latitudeSpotted, longitudeSpotted, lambertXSpotted, lambertYSpotted, measurepoint.name, measurepoint.city, measurepoint.zipcode, measurepoint.stream FROM {env.DATABASE_TREATED}.average_temperature JOIN {env.DATABASE_RAW}.measurepoint ON average_temperature.measurepoint_fusion_id = measurepoint.id WHERE average_temperature.measurepoint_fusion_id IN {measurepoint_fusion_id_list} and average_temperature.version={env.VERSION}").execute()
     for elt in tempe:
         dico_temp_geo = {'latitudeSpotted': f"{elt[1]}".replace(',', '.'),
-                         'longitudeSpotted': f"{elt[2]}".replace(',', '.'), 'lambertXSpotted': f"{elt[3]}".replace(',', '.'), 'lambertYSpotted': f"{elt[4]}".replace(',', '.'), 'name_mp': elt[4], 'city': elt[6], 'zipcode': elt[7], 'stream': elt[8]}
+                         'longitudeSpotted': f"{elt[2]}".replace(',', '.'), 'lambertXSpotted': f"{elt[3]}".replace(',', '.'), 'lambertYSpotted': f"{elt[4]}".replace(',', '.'), 'name_mp': elt[5], 'city': elt[6], 'zipcode': elt[7], 'stream': elt[8]}
         dico_geo_data[elt[0]] = dico_temp_geo
     return dico_geo_data
 
@@ -144,22 +144,22 @@ def average_temperature(measurepoint_fusion_id_list):
     dico_avg_all_tempe = {}
     dico_date = {}  # {reference: [date1, date4, date6, date7]}
     tempe = QueryScript(
-        f"SELECT reference, sensor1_min, sensor1_average, sensor1_max, sensor2_min, sensor2_average, sensor2_max, sensor3_min, sensor3_average, sensor3_max, average_temperature.measurepoint_fusion_id FROM {env.DATABASE_TREATED}.average_temperature JOIN {env.DATABASE_RAW}.measurepoint ON average_temperature.measurepoint_fusion_id = measurepoint.id WHERE average_temperature.measurepoint_fusion_id IN {measurepoint_fusion_id_list}").execute()
+        f"SELECT reference, sensor1_min, sensor1_average, sensor1_max, sensor2_min, sensor2_average, sensor2_max, sensor3_min, sensor3_average, sensor3_max, average_temperature.measurepoint_fusion_id FROM {env.DATABASE_TREATED}.average_temperature JOIN {env.DATABASE_RAW}.measurepoint ON average_temperature.measurepoint_fusion_id = measurepoint.id WHERE average_temperature.measurepoint_fusion_id IN {measurepoint_fusion_id_list} AND average_temperature.version={env.VERSION}").execute()
 
     output_date1 = QueryScript(
-        f"SELECT measurepoint_id, date FROM {env.DATABASE_TREATED}.key_dates WHERE date_id = 1 and measurepoint_fusion_id IN {measurepoint_fusion_id_list}"
+        f"SELECT measurepoint_id, date FROM {env.DATABASE_TREATED}.key_dates WHERE date_id = 1 and measurepoint_fusion_id IN {measurepoint_fusion_id_list} AND key_dates.version={env.VERSION}"
     ).execute()
     output_date2 = QueryScript(
-        f"SELECT measurepoint_id, date FROM {env.DATABASE_TREATED}.key_dates WHERE date_id = 2 and measurepoint_fusion_id IN {measurepoint_fusion_id_list}"
+        f"SELECT measurepoint_id, date FROM {env.DATABASE_TREATED}.key_dates WHERE date_id = 2 and measurepoint_fusion_id IN {measurepoint_fusion_id_list} AND key_dates.version={env.VERSION}"
     ).execute()
     output_date4 = QueryScript(
-        f"SELECT measurepoint_id, date FROM {env.DATABASE_TREATED}.key_dates WHERE date_id = 4 and measurepoint_fusion_id IN {measurepoint_fusion_id_list}"
+        f"SELECT measurepoint_id, date FROM {env.DATABASE_TREATED}.key_dates WHERE date_id = 4 and measurepoint_fusion_id IN {measurepoint_fusion_id_list} AND key_dates.version={env.VERSION}"
     ).execute()
     output_date6 = QueryScript(
-        f"SELECT measurepoint_id, date FROM {env.DATABASE_TREATED}.key_dates WHERE date_id = 6 and measurepoint_fusion_id IN {measurepoint_fusion_id_list}"
+        f"SELECT measurepoint_id, date FROM {env.DATABASE_TREATED}.key_dates WHERE date_id = 6 and measurepoint_fusion_id IN {measurepoint_fusion_id_list} AND key_dates.version={env.VERSION}"
     ).execute()
     output_date7 = QueryScript(
-        f"SELECT measurepoint_id, date FROM {env.DATABASE_TREATED}.key_dates WHERE date_id = 7 and measurepoint_fusion_id IN {measurepoint_fusion_id_list}"
+        f"SELECT measurepoint_id, date FROM {env.DATABASE_TREATED}.key_dates WHERE date_id = 7 and measurepoint_fusion_id IN {measurepoint_fusion_id_list} AND key_dates.version={env.VERSION}"
     ).execute()
 
     dict_date1 = list_of_list_to_dict(output_date1)  # {mp: [date]}
@@ -222,11 +222,10 @@ def average_temperature(measurepoint_fusion_id_list):
         sensor_delta = [('sensor1', delta_sensor1), ('sensor2',
                                                      delta_sensor2), ('sensor3', delta_sensor3)]
         sensor_delta = [elt for elt in sensor_delta if elt[1] is not None]
-
         if len(sensor_delta) == 0:
             dico_test[key] = None
-        (max_sensor, max_value) = ('', -math.inf)
-        for elt in sensor_delta[1:]:
+        (max_sensor, max_value) = (None, -math.inf)
+        for elt in sensor_delta:
             if (elt[1] > max_value) & (dico_avg_all_tempe[key][elt[0]]['average'] is not None):
                 (max_sensor, max_value) = elt
         dico_test[key] = max_sensor
@@ -282,7 +281,7 @@ def type_biotest(measurepoint_fusion_id):
 
 def scud_survivor_chemistry(measurepoint_fusion_id):
     query = QueryScript(
-        f"SELECT Distinct cage.scud_survivor, pack.scud_quantity, pack.id FROM {env.DATABASE_RAW}.cage JOIN {env.DATABASE_RAW}.pack ON cage.pack_id = pack.id JOIN {env.DATABASE_TREATED}.key_dates ON pack.measurepoint_id = key_dates.measurepoint_id WHERE key_dates.version={env.VERSION} AND pack.nature = 'chemistry' AND cage.scud_survivor IS not null AND key_dates.measurepoint_fusion_id = {measurepoint_fusion_id}").execute()
+        f"SELECT Distinct cage.scud_survivor, pack.scud_quantity, cage.id FROM {env.DATABASE_RAW}.cage JOIN {env.DATABASE_RAW}.pack ON cage.pack_id = pack.id JOIN {env.DATABASE_TREATED}.key_dates ON pack.measurepoint_id = key_dates.measurepoint_id WHERE key_dates.version={env.VERSION} AND pack.nature = 'chemistry' AND cage.scud_survivor IS not null AND key_dates.measurepoint_fusion_id = {measurepoint_fusion_id}").execute()
     total = 0
     for elt in query:
         total += elt[0]/elt[1]

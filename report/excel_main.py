@@ -77,17 +77,17 @@ def excel_main(list_campaigns, folder_PATH = "output"):  # Prend en entrée une 
 
     # ## CREATION DE L'ONGLET VERSION ##
 
-    # print('\n[!] Création de l\'onglet \"Version\"...')
-    # version_dataframe = create_version_dataframe()
-    # write_in_new_excel(version_dataframe, filename, folder_PATH, 'Version', startrow=3)
-    # add_style_version(version_dataframe, list_campaigns, filename, folder_PATH)
+    print('\n[!] Création de l\'onglet \"Version\"...')
+    version_dataframe = create_version_dataframe()
+    write_in_new_excel(version_dataframe, filename, folder_PATH, 'Version', startrow=3)
+    add_style_version(version_dataframe, list_campaigns, filename, folder_PATH)
 
     # # ## CREATION DE L'ONGLET STATIONS ##
 
-    # print('\n[!] Création de l\'onglet \"Stations\"...')
-    # stations_dataframe = create_stations_dataframe(head_dataframe, list_campaigns, dict_mp)
-    # write_in_existing_excel(stations_dataframe, filename, folder_PATH, 'Stations')
-    # add_style_stations(stations_dataframe, filename, folder_PATH)
+    print('\n[!] Création de l\'onglet \"Stations\"...')
+    stations_dataframe = create_stations_dataframe(head_dataframe, list_campaigns, dict_mp)
+    write_in_existing_excel(stations_dataframe, filename, folder_PATH, 'Stations')
+    add_style_stations(stations_dataframe, filename, folder_PATH)
 
     # # ## CREATION DE L'ONGLET CAMPAGNES ##
 
@@ -114,31 +114,33 @@ def excel_main(list_campaigns, folder_PATH = "output"):  # Prend en entrée une 
 
     ## CREATION DE L'ONGLET BBAC ##
 
-    print('\n[!] Création de l\'onglet \"BBAC 7j\"...')
-    bbac_dataframe = create_bbac_7j_dataframe(head_dataframe, get_dict_pack_fusion(list_campaigns[0]))
-    bbac2_dataframe = create_bbac2_7j_dataframe(head_dataframe, get_dict_pack_fusion(list_campaigns[0]))
-    write_in_new_excel(bbac_dataframe, filename, folder_PATH, 'BBAC_7j', startrow=3)
-    write_in_existing_excel(bbac2_dataframe, filename, folder_PATH, 'BBAC2_7j', startrow=3)
-    add_style_bbac_7j(bbac_dataframe, filename, folder_PATH)
+    # print('\n[!] Création de l\'onglet \"BBAC 7j\"...')
+    # bbac_dataframe = create_bbac_7j_dataframe(head_dataframe, get_dict_pack_fusion(list_campaigns[0]))
+    # bbac2_dataframe = create_bbac2_7j_dataframe(head_dataframe, get_dict_pack_fusion(list_campaigns[0]))
+    # write_in_new_excel(bbac_dataframe, filename, folder_PATH, 'BBAC_7j', startrow=3)
+    # write_in_existing_excel(bbac2_dataframe, filename, folder_PATH, 'BBAC2_7j', startrow=3)
+    # add_style_bbac_7j(bbac_dataframe, filename, folder_PATH)
 
-    print('\n[!] Création de l\'onglet \"BBAC 21j\"...')
-    bbac_dataframe = create_bbac_21j_dataframe(head_dataframe, get_dict_pack_fusion(list_campaigns[0]))
-    bbac2_dataframe = create_bbac2_21j_dataframe(head_dataframe, get_dict_pack_fusion(list_campaigns[0]))
-    write_in_existing_excel(bbac_dataframe, filename, folder_PATH, 'BBAC_21j', startrow=3)
-    write_in_existing_excel(bbac2_dataframe, filename, folder_PATH, 'BBAC2_21j', startrow=3)
-    add_style_bbac_21j(bbac_dataframe, filename, folder_PATH)
+    # print('\n[!] Création de l\'onglet \"BBAC 21j\"...')
+    # bbac_dataframe = create_bbac_21j_dataframe(head_dataframe, get_dict_pack_fusion(list_campaigns[0]))
+    # bbac2_dataframe = create_bbac2_21j_dataframe(head_dataframe, get_dict_pack_fusion(list_campaigns[0]))
+    # write_in_existing_excel(bbac_dataframe, filename, folder_PATH, 'BBAC_21j', startrow=3)
+    # write_in_existing_excel(bbac2_dataframe, filename, folder_PATH, 'BBAC2_21j', startrow=3)
+    # add_style_bbac_21j(bbac_dataframe, filename, folder_PATH)
+
     ## CREATION DE L'ONGLET NQE ##
 
-    print('\n[!] Création de l\'onglet \"NQE Biote\"...')
-    nqe_dataframe = create_nqe_dataframe(head_dataframe, get_dict_pack_fusion(list_campaigns[0]))
-    write_in_existing_excel(nqe_dataframe, filename, folder_PATH, 'NQE Biote', startrow=3)
-    add_style_nqe(nqe_dataframe, filename, folder_PATH)
-    # ## CREATION DE L'ONGLET TOX ##
+    # print('\n[!] Création de l\'onglet \"NQE Biote\"...')
+    # nqe_dataframe = create_nqe_dataframe(head_dataframe, get_dict_pack_fusion(list_campaigns[0]))
+    # write_in_existing_excel(nqe_dataframe, filename, folder_PATH, 'NQE Biote', startrow=3)
+    # add_style_nqe(nqe_dataframe, filename, folder_PATH)
 
-    # print('\n[!] Création de l\'onglet \"Tox\"...')
-    # tox_dataframe = create_tox_dataframe(head_dataframe, list_campaigns, dict_mp)
-    # write_in_existing_excel(tox_dataframe, filename, folder_PATH, 'Tox', startrow=3)
-    # add_style_tox(tox_dataframe, filename, folder_PATH)
+    ## CREATION DE L'ONGLET TOX ##
+
+    print('\n[!] Création de l\'onglet \"Tox\"...')
+    tox_dataframe = create_tox_dataframe(head_dataframe, list_campaigns, dict_mp)
+    write_in_existing_excel(tox_dataframe, filename, folder_PATH, 'Tox', startrow=3)
+    add_style_tox(tox_dataframe, filename, folder_PATH)
 
     print(colored('\n --> Rapport terminée', 'green'))
 
