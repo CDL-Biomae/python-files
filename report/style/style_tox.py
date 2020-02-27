@@ -45,9 +45,9 @@ def add_style_tox(tox_dataframe, filename, folder_PATH):
 
     for i in range(len(merging_cells)):
         cells = merging_cells[i]
-        top_left_cell = ws[cells[:2]]
+        top_left_cell = ws[cells[0:2]]
         name = merging_names[i]
-       
+
         ws.merge_cells(cells)
         top_left_cell.value = name
         top_left_cell.font = header_stations_font
@@ -62,7 +62,7 @@ def add_style_tox(tox_dataframe, filename, folder_PATH):
     # Nettoyage entre 2 tableaux
     cell = ws['F4']
     cell.border = Border(top=no_border, bottom=no_border)
-    ws.column_dimensions['F'] = 3
+    ws.column_dimensions['F'].width = 3
 
     ## REFORMATAGE STATIONS DATA
     columns_stations = ['B', 'C', 'D', 'E']
@@ -101,8 +101,8 @@ def add_style_tox(tox_dataframe, filename, folder_PATH):
                           'P': 'Cycle de mue',
                           'Q': 'n',
                           'R': 'Perturbation endocrinienne'}
-    subtitle = ['L', 'N', 'P']
-    n_merge = ['M3:M4', 'O3:O4', 'Q3:Q4']
+    subtitle = ['L', 'N', 'P', 'R', 'G', 'H', 'I', 'K']
+    n_merge = ['L3:L4', 'M3:M4', 'O3:O4', 'Q3:Q4']
 
     ws['N4'].value = "indice"
     ws['P4'].value = "valeur observée (valeur attendue)"
@@ -111,16 +111,15 @@ def add_style_tox(tox_dataframe, filename, folder_PATH):
     # Nettoyage entre 2 tableaux
     cell = ws['J4']
     cell.border = Border(top=no_border, bottom=no_border)
-    ws.column_dimensions['J'] = 3
+    ws.column_dimensions['J'].width = 3
 
-    # Merge et style des colonnes n
+    # Merge et style des colonnes
     for merge_column in n_merge:
         ws.merge_cells(merge_column)
         top_left_cell = ws[merge_column[0:2]]
-        top_left_cell.value = "n"
+        top_left_cell.value = dict_titre_columns[merge_column[0]]
         top_left_cell.font = font_title
         top_left_cell.border = medium_border
-
 
     # Style des titres
     for column in titres_columns:
@@ -139,7 +138,9 @@ def add_style_tox(tox_dataframe, filename, folder_PATH):
 
     # Style des sous-titres
     for column in subtitle:
-        ws[column + "4"].font = font_small_title
+        cell = ws[column + "4"]
+        cell.font = font_small_title
+        cell.border = medium_border
 
 
     ## STYLE VALUE DATA
@@ -153,7 +154,7 @@ def add_style_tox(tox_dataframe, filename, folder_PATH):
     body_fill_not_ok_3 = PatternFill(fill_type='solid', start_color='cc7931', end_color='cc7931')
     body_fill_not_ok_4 = PatternFill(fill_type='solid', start_color='ab2222', end_color='ab2222')
     body_fill_NA = PatternFill(fill_type='solid', start_color='abadb0', end_color='abadb0')
-     
+
     threshold_list = QueryScript(f" SELECT parameter, threshold   FROM {env.DATABASE_TREATED}.r2_threshold WHERE threshold IS NOT NULL and version={env.VERSION}").execute()
     for column in columns:
         if ws[column + '5'].value is None or ws[column + '5'].value == '':
@@ -195,9 +196,9 @@ def add_style_tox(tox_dataframe, filename, folder_PATH):
                         if len(threshold) >= 1 and value >= threshold[1]:
                             if len(threshold) >= 2 and value >= threshold[2]:
                                 if len(threshold) >= 3 and value >= threshold[3]:
-                                    cell.fill = body_fill_not_ok_4  
+                                    cell.fill = body_fill_not_ok_4
                                 else:
-                                    cell.fill = body_fill_not_ok_3  
+                                    cell.fill = body_fill_not_ok_3
                             else:
                                 cell.fill = body_fill_not_ok_2
                         else:
@@ -205,9 +206,8 @@ def add_style_tox(tox_dataframe, filename, folder_PATH):
                     else:
                         cell.fill = body_fill_ok
 
-            cell = ws[column + '4']
-            ws[column+'3'].value = cell.value
             if column == 'G' or column == 'H' or column == 'I' or column == 'K':
+                cell = ws[column + "4"]
                 cell.value = '%'
 
     for column in little_border_columns:
@@ -216,7 +216,7 @@ def add_style_tox(tox_dataframe, filename, folder_PATH):
             ws[column + str(row)].alignment = alignment_center
 
     for row in range(5, nb_rows+5):
-        if float(ws["K" + str(row)].value) == 0:        
+        if float(ws["K" + str(row)].value) == 0:
             for column in na:
                 ws[column + str(row)].value = "NA"
                 if column == "N" or column == "P" or column == "R":
