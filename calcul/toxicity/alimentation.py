@@ -16,7 +16,7 @@ def survie_alim(dict_pack_fusion):
     for cage in survivor_list:
         if pack_checked != cage[0]:
             if pack_checked:
-                result[pack_dict[pack_checked]]['average'] = sum([(result[pack_dict[pack_checked]]['replicate'][replicate]*2-current_quantity)/current_quantity for replicate in result[pack_dict[pack_checked]]['replicate']])
+                result[pack_dict[pack_checked]]['average'] = sum([(result[pack_dict[pack_checked]]['replicate'][replicate]*2-current_quantity)/current_quantity*100 for replicate in result[pack_dict[pack_checked]]['replicate']])/len([replicate for replicate in result[pack_dict[pack_checked]]['replicate'] if replicate])
             pack_checked = cage[0]
             current_quantity = None
             if cage[2]:
@@ -78,11 +78,11 @@ def alimentation(dict_pack_fusion):
     ############### Calcul des tailles feuilles ingérées
 
     standard_leaf_number = QueryScript(
-        f" SELECT value   FROM {env.DATABASE_TREATED}.r2_constant WHERE name='Nombre de disques (témoin)' WHERE version={env.VERSION}").execute()[0]
+        f" SELECT value   FROM {env.DATABASE_TREATED}.r2_constant WHERE name='Nombre de disques (témoin)' AND version={env.VERSION}").execute()[0]
     replicate_leaf_number = QueryScript(
-        f" SELECT value   FROM {env.DATABASE_TREATED}.r2_constant WHERE name='Nombre de disques par réplicat' WHERE version={env.VERSION}").execute()[0]
+        f" SELECT value   FROM {env.DATABASE_TREATED}.r2_constant WHERE name='Nombre de disques par réplicat' AND version={env.VERSION}").execute()[0]
     test_duration = QueryScript(
-        f" SELECT value   FROM {env.DATABASE_TREATED}.r2_constant WHERE name='Nombre de jour du test' WHERE version={env.VERSION}").execute()[0]
+        f" SELECT value   FROM {env.DATABASE_TREATED}.r2_constant WHERE name='Nombre de jour du test' AND version={env.VERSION}").execute()[0]
     remaining_leaves_data =  QueryScript(f"  SELECT pack_id, replicate, value   FROM {env.DATABASE_RAW}.measureleaf WHERE pack_id IN {tuple([element for element in pack_dict])}").execute()
     remaining_leaves = {element:None for element in dict_pack_fusion}
     pack_checked = None
