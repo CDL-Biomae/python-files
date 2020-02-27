@@ -19,7 +19,8 @@ def create_dataframe(dick_pack_fusion):
 
 ## MAIN FUNCTION ##
 def create_nqe_dataframe(head_dataframe, dick_pack_fusion):
-    list_dataframe = []
+    
+    head_dataframe = head_dataframe.reset_index(drop=True)
     df_values = create_dataframe(dick_pack_fusion)
     df_concat = pd.concat([head_dataframe, df_values], axis=1)
     df_campaigns = df_concat.sort_values(['Numéro', 'Campagne'])
