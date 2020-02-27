@@ -132,7 +132,7 @@ def word_main(campaign, agence, path_photo="Photos", path_output="output"):
             table_carte.cell(2, 0).paragraphs[0].add_run().add_picture(
                 carte_satellite, width=4500000)
         else:
-            table_carte.cell(0, 0).paragraphs[0].add_run().add_picture(
+            table_carte.cell(2, 0).paragraphs[0].add_run().add_picture(
                 path_ressources + "/carre_blanc.jpg", width=4500000)
         table_carte.cell(2, 0).paragraphs[0].alignment = 1
         table_carte.cell(
