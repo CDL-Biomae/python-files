@@ -33,7 +33,6 @@ def add_style_tox(tox_dataframe, filename, folder_PATH):
     ## REFORMATAGE STATIONS HEADER ##
     merging_cells = ['B3:B4', 'C3:C4', 'D3:D4', 'E3:E4']
     border_cells = ['B3', 'B4', 'C3', 'C4', 'D3', 'D4', 'E3', 'E4']
-    # a traiter = [ 'G3','H3','I3','J3','K3','L3','M3','N3','O3','P3','Q3','R3']
 
     merging_names = ['Campagne', 'Numéro', 'Station de mesure', 'Code Agence']
 
@@ -60,8 +59,10 @@ def add_style_tox(tox_dataframe, filename, folder_PATH):
 
     ws.row_dimensions[3].height = 45
 
+    # Nettoyage entre 2 tableaux
     cell = ws['F4']
     cell.border = Border(top=no_border, bottom=no_border)
+    ws.column_dimensions['F'] = 3
 
     ## REFORMATAGE STATIONS DATA
     columns_stations = ['B', 'C', 'D', 'E']
@@ -87,18 +88,64 @@ def add_style_tox(tox_dataframe, filename, folder_PATH):
             cell.alignment = center_alignment
 
 
-
     ## REFORMATAGE VALUE HEADER ##
+    titres_columns = ['G', 'H', 'I', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R']
+    dict_titre_columns = {'G': 'Survie Male - 7 jours',
+                          'H': 'Alimentation',
+                          'I': 'Neurotoxicité AChE',
+                          'K': 'Survie Femelle',
+                          'L': 'Nombre jours exposition in situ',
+                          'M': 'n',
+                          'N': 'Fécondité',
+                          'O': 'n',
+                          'P': 'Cycle de mue',
+                          'Q': 'n',
+                          'R': 'Perturbation endocrinienne'}
+    subtitle = ['L', 'N', 'P']
+    n_merge = ['M3:M4', 'O3:O4', 'Q3:Q4']
 
+    ws['N4'].value = "indice"
+    ws['P4'].value = "valeur observée (valeur attendue)"
+    ws['R4'].value = "surface ovocytaire moyenne (µm²)"
+
+    # Nettoyage entre 2 tableaux
+    cell = ws['J4']
+    cell.border = Border(top=no_border, bottom=no_border)
+    ws.column_dimensions['J'] = 3
+
+    # Merge et style des colonnes n
+    for merge_column in n_merge:
+        ws.merge_cells(merge_column)
+        top_left_cell = ws[merge_column[0:2]]
+        top_left_cell.value = "n"
+        top_left_cell.font = font_title
+        top_left_cell.border = medium_border
+
+
+    # Style des titres
+    for column in titres_columns:
+        if column in ['L', 'P', 'R']:
+            ws.column_dimensions[column].width = 35
+        elif column in ['M', 'O', 'Q']:
+            ws.column_dimensions[column].width = 5
+        else:
+            ws.column_dimensions[column].width = 20
+
+        cell = ws[column + "3"]
+        cell.value = dict_titre_columns[column]
+        cell.font = font_title
+        cell.alignment = center_alignment
+        cell.border = medium_border
+
+    # Style des sous-titres
+    for column in subtitle:
+        ws[column + "4"].font = font_small_title
 
 
     ## STYLE VALUE DATA
     columns = [get_column_letter(col_idx) for col_idx in range(6, nb_columns+2)]
     little_border_columns = ['G', 'H', 'I', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R']
-    titres_columns = ['G', 'H', 'I', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R']
     na = ['L', 'M', 'N', 'O', 'P', 'Q', 'R']
-    subtitle = ['M', 'O', 'Q']
-    n_merge = ['M3:M4', 'O3:O4', 'Q3:Q4']
 
     body_fill_ok = PatternFill(fill_type='solid', start_color='027ee3', end_color='027ee3')
     body_fill_not_ok_1 = PatternFill(fill_type='solid', start_color='69a64b', end_color='69a64b')
@@ -106,15 +153,12 @@ def add_style_tox(tox_dataframe, filename, folder_PATH):
     body_fill_not_ok_3 = PatternFill(fill_type='solid', start_color='cc7931', end_color='cc7931')
     body_fill_not_ok_4 = PatternFill(fill_type='solid', start_color='ab2222', end_color='ab2222')
     body_fill_NA = PatternFill(fill_type='solid', start_color='abadb0', end_color='abadb0')
-
-    ws.column_dimensions['F'].width = 3
-    ws.column_dimensions['J'].width = 3
      
     threshold_list = QueryScript(f" SELECT parameter, threshold   FROM {env.DATABASE_TREATED}.r2_threshold WHERE threshold IS NOT NULL and version={env.VERSION}").execute()
     for column in columns:
         if ws[column + '5'].value is None or ws[column + '5'].value == '':
-            ws.column_dimensions[column].width = 3
-        else :
+            pass
+        else:
             threshold = None
             if column == 'H':
                 threshold = []
@@ -129,7 +173,7 @@ def add_style_tox(tox_dataframe, filename, folder_PATH):
             if column == 'N':
                 threshold = []
                 for element in threshold_list:
-                    if element[0]=='reproduction':
+                    if element[0] == 'reproduction':
                         threshold.append(element[1])
             if column == 'P':
                 threshold = []
@@ -156,50 +200,29 @@ def add_style_tox(tox_dataframe, filename, folder_PATH):
                                     cell.fill = body_fill_not_ok_3  
                             else:
                                 cell.fill = body_fill_not_ok_2
-                        else :
+                        else:
                             cell.fill = body_fill_not_ok_1
-                    else :
+                    else:
                         cell.fill = body_fill_ok
-
 
             cell = ws[column + '4']
             ws[column+'3'].value = cell.value
-            ws.column_dimensions[column].width = 20
-            if column=='G' or column=='H' or column=='I' or column=='K':
+            if column == 'G' or column == 'H' or column == 'I' or column == 'K':
                 cell.value = '%'
-
-    for column in titres_columns:
-        if column in ["L","P","R"]:
-            ws.column_dimensions[column].width = 35
-            ws[column + "3"].font = font_title
-        else:
-            ws.column_dimensions[column].width = 20
-            ws[column + "3"].font = font_title
 
     for column in little_border_columns:
         for row in range(5, 5+nb_rows):
             ws[column + str(row)].border = normal_cells_border
             ws[column + str(row)].alignment = alignment_center
 
-    for column in subtitle:
-          ws[column + "5"].font = font_small_title
-    
-    for column in n_merge:
-        ws.merge_cells(column)
-
-
-    for row in range(5,nb_rows+5):
+    for row in range(5, nb_rows+5):
         if float(ws["K" + str(row)].value) == 0:        
-             for column in na:
-                ws[column + str(row)].value="NA"
+            for column in na:
+                ws[column + str(row)].value = "NA"
                 if column == "N" or column == "P" or column == "R":
-                     ws[column + str(row)].fill = body_fill_NA
+                    ws[column + str(row)].fill = body_fill_NA
 
-    ws['N4'].value = "indice"
-    ws['p4'].value = "valeur observée (valeur attendue)"
-    ws['R4'].value = "surface ovocytaire moyenne (µm²)"
-                    
-    
+
     wb.save(PATH)
     wb.close()
     print(colored('[+] La mise en page de l\'onglet \"Tox\" est terminée', 'green'))
