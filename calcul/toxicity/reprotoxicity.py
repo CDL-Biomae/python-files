@@ -14,7 +14,7 @@ class Reprotoxicity:
         list_mp_repro = []
         for mp in dict_pack_fusion:
             try:
-                pack_id = dict_pack_fusion[mp][nature]
+                dict_pack_fusion[mp][nature]
             except KeyError:
                 pass
             else:
