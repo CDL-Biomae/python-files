@@ -281,7 +281,7 @@ def type_biotest(measurepoint_fusion_id):
 
 def scud_survivor_chemistry(measurepoint_fusion_id):
     query = QueryScript(
-        f"SELECT Distinct cage.scud_survivor, pack.scud_quantity, pack.id FROM {env.DATABASE_RAW}.cage JOIN {env.DATABASE_RAW}.pack ON cage.pack_id = pack.id JOIN {env.DATABASE_TREATED}.key_dates ON pack.measurepoint_id = key_dates.measurepoint_id WHERE key_dates.version={env.VERSION} AND pack.nature = 'chemistry' AND cage.scud_survivor IS not null AND key_dates.measurepoint_fusion_id = {measurepoint_fusion_id}").execute()
+        f"SELECT Distinct cage.scud_survivor, pack.scud_quantity, cage.id FROM {env.DATABASE_RAW}.cage JOIN {env.DATABASE_RAW}.pack ON cage.pack_id = pack.id JOIN {env.DATABASE_TREATED}.key_dates ON pack.measurepoint_id = key_dates.measurepoint_id WHERE key_dates.version={env.VERSION} AND pack.nature = 'chemistry' AND cage.scud_survivor IS not null AND key_dates.measurepoint_fusion_id = {measurepoint_fusion_id}").execute()
     total = 0
     for elt in query:
         total += elt[0]/elt[1]
