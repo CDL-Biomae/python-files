@@ -21,7 +21,7 @@ class Alimentation:
         for cage in survivor_list:
             if pack_checked != cage[0]:
                 if pack_checked:
-                    result[pack_dict[pack_checked]]['average'] = sum([(result[pack_dict[pack_checked]]['replicate'][replicate]*2-current_quantity)/current_quantity for replicate in result[pack_dict[pack_checked]]['replicate']])
+                    result[pack_dict[pack_checked]]['average'] = sum([(result[pack_dict[pack_checked]]['replicate'][replicate]*2-current_quantity)/current_quantity*100 for replicate in result[pack_dict[pack_checked]]['replicate']])/len([replicate for replicate in result[pack_dict[pack_checked]]['replicate'] if replicate])
                 pack_checked = cage[0]
                 current_quantity = None
                 if cage[2]:
