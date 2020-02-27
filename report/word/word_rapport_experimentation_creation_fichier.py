@@ -346,7 +346,7 @@ def recuperation_photo(reference, path_photo, path_ressources):
 
         for typ in list_type:
             try:
-                val = dico_nom[typ]
+                dico_nom[typ]
             except KeyError:
                 dico_nom[typ] = path_ressources + "/carre_blanc.jpg"
     return dico_nom
