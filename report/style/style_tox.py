@@ -1,8 +1,6 @@
 from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
 from openpyxl import load_workbook
 from openpyxl.utils.cell import get_column_letter
-import pandas as pd
-from calcul import chemistry, elements_crustacean, elements_fish
 from termcolor import colored
 from tools import QueryScript
 import env
@@ -20,8 +18,8 @@ def add_style_tox(tox_dataframe, filename, folder_PATH):
     no_border = Side(border_style=None)
 
     font_Arial9 = Font(size=9, name='Arial')
-    font_title = Font(name='Arial',size=10,bold=True,color='FF000000')
-    font_small_title = Font(name='Arial',size=8,bold=False ,color='FF000000')
+    font_title = Font(name='Arial', size=10, bold=True, color='FF000000')
+    font_small_title = Font(name='Arial', size=8, bold=False, color='FF000000')
     alignment_center = Alignment(horizontal='center', vertical='center')
 
     ## COLUMN WIDTH ##
@@ -31,24 +29,19 @@ def add_style_tox(tox_dataframe, filename, folder_PATH):
     ws.column_dimensions['D'].width = 45
     ws.column_dimensions['E'].width = 14
 
-   
 
     ## REFORMATAGE STATIONS HEADER ##
     merging_cells = ['B3:B4', 'C3:C4', 'D3:D4', 'E3:E4']
-    border_cells = ['B3', 'B4', 'C3', 'C4', 'D3', 'D4', 'E3', 'E4', 'G3','H3','I3','J3','K3','L3','M3','N3','O3','P3','Q3','R3']
-    little_border_columns = ['B','C','D','E','G','H','I','K','L','M','N','O','P', 'Q', 'R']
-    titres_columns = ['G','H','I','K','L','M','N','O','P', 'Q', 'R']
-    na = ['L','M','N','O','P', 'Q', 'R']
-    subtitle = ['M','O','Q']
-    n_merge = ['M3:M4','O3:O4','Q3:Q4']
+    border_cells = ['B3', 'B4', 'C3', 'C4', 'D3', 'D4', 'E3', 'E4']
+    # a traiter = [ 'G3','H3','I3','J3','K3','L3','M3','N3','O3','P3','Q3','R3']
+
     merging_names = ['Campagne', 'Numéro', 'Station de mesure', 'Code Agence']
 
-    header_stations_border = Border(left=medium, right=medium, top=medium, bottom=medium)
-    normal_cells_border    = Border(left=thin,   right=thin, top=thin, bottom=thin)
+    medium_border = Border(left=medium, right=medium, top=medium, bottom=medium)
+    normal_cells_border = Border(left=thin,   right=thin, top=thin, bottom=thin)
     header_stations_font = Font(size=10, bold=True, name='Arial', color='FFFFFF')
     header_stations_fill = PatternFill(fill_type='solid', start_color='808080', end_color='808080')
-    header_stations_alignment = Alignment(horizontal='center', vertical='center')
- 
+    center_alignment = Alignment(horizontal='center', vertical='center')
 
 
     for i in range(len(merging_cells)):
@@ -60,78 +53,104 @@ def add_style_tox(tox_dataframe, filename, folder_PATH):
         top_left_cell.value = name
         top_left_cell.font = header_stations_font
         top_left_cell.fill = header_stations_fill
-        top_left_cell.alignment = header_stations_alignment
+        top_left_cell.alignment = center_alignment
 
     for cell in border_cells:
-        ws[cell].border = header_stations_border
-
-    for column in little_border_columns:
-        for row in range(3, 5+nb_rows):
-            ws[column + str(row)].border = normal_cells_border
-            ws[column + str(row)].alignment = alignment_center
+        ws[cell].border = medium_border
 
     ws.row_dimensions[3].height = 45
-
-    
 
     cell = ws['F4']
     cell.border = Border(top=no_border, bottom=no_border)
 
-    #  ## REFORMATAGE VALUE HEADER ##
+    ## REFORMATAGE STATIONS DATA
+    columns_stations = ['B', 'C', 'D', 'E']
+    for column in columns_stations:
+        for row in range(5, 5+nb_rows):
+            cell = ws[column + str(row)]
+            if column == 'B':
+                if row == 5+nb_rows-1:
+                    cell.border = Border(left=medium, top=thin, right=thin, bottom=medium)
+                else:
+                    cell.border = Border(left=medium, top=thin, right=thin, bottom=thin)
+            elif column == 'E':
+                if row == 5+nb_rows-1:
+                    cell.border = Border(left=thin, top=thin, right=medium, bottom=medium)
+                else:
+                    cell.border = Border(left=thin, top=thin, right=medium, bottom=thin)
+            elif row == 5+nb_rows-1:
+                cell.border = Border(left=thin, top=thin, right=thin, bottom=medium)
+            else:
+                cell.border = normal_cells_border
 
+            cell.font = font_Arial9
+            cell.alignment = center_alignment
+
+
+
+    ## REFORMATAGE VALUE HEADER ##
+
+
+
+    ## STYLE VALUE DATA
     columns = [get_column_letter(col_idx) for col_idx in range(6, nb_columns+2)]
-   
-    body_fill_ok = PatternFill(fill_type='solid', start_color='1F75FE', end_color='1F75FE')
-    body_fill_not_ok_1 = PatternFill(fill_type='solid', start_color='008000', end_color='008000')
-    body_fill_not_ok_2 = PatternFill(fill_type='solid', start_color='FFFF00', end_color='FFFF00')
-    body_fill_not_ok_3 = PatternFill(fill_type='solid', start_color='FF7F00', end_color='FF7F00')
-    body_fill_not_ok_4 = PatternFill(fill_type='solid', start_color='DE1738', end_color='DE1738')
-    body_fill_NA = PatternFill(fill_type='solid', start_color='eff0f1', end_color='bdbdbd')
+    little_border_columns = ['G', 'H', 'I', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R']
+    titres_columns = ['G', 'H', 'I', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R']
+    na = ['L', 'M', 'N', 'O', 'P', 'Q', 'R']
+    subtitle = ['M', 'O', 'Q']
+    n_merge = ['M3:M4', 'O3:O4', 'Q3:Q4']
+
+    body_fill_ok = PatternFill(fill_type='solid', start_color='027ee3', end_color='027ee3')
+    body_fill_not_ok_1 = PatternFill(fill_type='solid', start_color='69a64b', end_color='69a64b')
+    body_fill_not_ok_2 = PatternFill(fill_type='solid', start_color='d1c452', end_color='d1c452')
+    body_fill_not_ok_3 = PatternFill(fill_type='solid', start_color='cc7931', end_color='cc7931')
+    body_fill_not_ok_4 = PatternFill(fill_type='solid', start_color='ab2222', end_color='ab2222')
+    body_fill_NA = PatternFill(fill_type='solid', start_color='abadb0', end_color='abadb0')
 
     ws.column_dimensions['F'].width = 3
     ws.column_dimensions['J'].width = 3
      
     threshold_list = QueryScript(f" SELECT parameter, threshold   FROM {env.DATABASE_TREATED}.r2_threshold WHERE threshold IS NOT NULL and version={env.VERSION}").execute()
     for column in columns:
-        if ws[column + '5'].value==None or ws[column + '5'].value=='':
+        if ws[column + '5'].value is None or ws[column + '5'].value == '':
             ws.column_dimensions[column].width = 3
         else :
-            threshold =None
-            if column=='H':
+            threshold = None
+            if column == 'H':
                 threshold = []
                 for element in threshold_list:
-                    if element[0]=='alimentation':
+                    if element[0] == 'alimentation':
                         threshold.append(element[1])
-            if column=='I':
+            if column == 'I':
                 threshold = []
                 for element in threshold_list:
-                    if element[0]=='neurotoxicité AChE':
+                    if element[0] == 'neurotoxicité AChE':
                         threshold.append(element[1])
-            if column=='N':
+            if column == 'N':
                 threshold = []
                 for element in threshold_list:
                     if element[0]=='reproduction':
                         threshold.append(element[1])
-            if column=='P':
+            if column == 'P':
                 threshold = []
                 for element in threshold_list:
-                    if element[0]=='mue':
+                    if element[0] == 'mue':
                         threshold.append(element[1])
-            if column=='R':
+            if column == 'R':
                 threshold = []
                 for element in threshold_list:
-                    if element[0]=='perturbation endocrinienne':
+                    if element[0] == 'perturbation endocrinienne':
                         threshold.append(element[1])
 
-            if threshold :
-                for row in range(5,nb_rows+5):
+            if threshold:
+                for row in range(5, nb_rows+5):
                     cell = ws[column+str(row)]
-                    if cell.value != "NA" :
-                         value = -float(cell.value) if cell.value  else None
+                    if cell.value != "NA":
+                        value = -float(cell.value) if cell.value else None
                     if value and value >= threshold[0]:
-                        if len(threshold)>=1 and value >= threshold[1]:
-                            if len(threshold)>=2 and value >= threshold[2]:
-                                if len(threshold)>=3 and value>= threshold[3]:
+                        if len(threshold) >= 1 and value >= threshold[1]:
+                            if len(threshold) >= 2 and value >= threshold[2]:
+                                if len(threshold) >= 3 and value >= threshold[3]:
                                     cell.fill = body_fill_not_ok_4  
                                 else:
                                     cell.fill = body_fill_not_ok_3  
@@ -157,6 +176,10 @@ def add_style_tox(tox_dataframe, filename, folder_PATH):
             ws.column_dimensions[column].width = 20
             ws[column + "3"].font = font_title
 
+    for column in little_border_columns:
+        for row in range(5, 5+nb_rows):
+            ws[column + str(row)].border = normal_cells_border
+            ws[column + str(row)].alignment = alignment_center
 
     for column in subtitle:
           ws[column + "5"].font = font_small_title
