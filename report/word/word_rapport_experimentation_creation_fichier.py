@@ -24,91 +24,94 @@ def word_main(campaign, agence, path_photo="Photos", path_output="output"):
     for reference in liste_reference:
         try:
             doc.add_page_break()
+            table_geo_1 = doc.add_table(rows=3, cols=6)
+
+            table_geo_1.cell(1, 1).merge(table_geo_1.cell(1, 2))
+            table_geo_1.cell(1, 4).merge(table_geo_1.cell(1, 5))
+            table_geo_1.cell(2, 0).merge(table_geo_1.cell(2, 1))
+            table_geo_1.cell(2, 2).merge(table_geo_1.cell(2, 5))
 
             if agence:
-                table_geo = doc.add_table(rows=8, cols=4)
-                for j in range(2, 8):
-                    table_geo.cell(j, 0).merge(table_geo.cell(j, 1))
-                for j in range(2, 5):
-                    table_geo.cell(j, 2).merge(table_geo.cell(j, 3))
+                table_geo_2 = doc.add_table(rows=5, cols=4)
+                for j in range(0, 5):
+                    table_geo_2.cell(j, 0).merge(table_geo_2.cell(j, 1))
+                for j in range(0, 1):
+                    table_geo_2.cell(j, 2).merge(table_geo_2.cell(j, 3))
             else:
-                table_geo = doc.add_table(rows=4, cols=4)
-                for j in range(2, 4):
-                    table_geo.cell(j, 0).merge(table_geo.cell(j, 1))
-                table_geo.cell(2, 2).merge(table_geo.cell(2, 3))
+                table_geo_2 = doc.add_table(rows=1, cols=4)
+                table_geo_2.cell(0, 0).merge(table_geo_2.cell(0, 1))
 
-            header = table_geo.rows[0].cells
+            header = table_geo_1.rows[0].cells
             header[0].merge(header[-1])
             if agence:
-                case_header = table_geo.cell(0, 0).paragraphs[0].add_run(dico_geo_agency[reference]['code'] +
-                                                                         " : " + dico_geo_agency[reference]['name'] + "   " + reference)
+                case_header = table_geo_1.cell(0, 0).paragraphs[0].add_run(dico_geo_agency[reference]['code'] +
+                                                                           " : " + dico_geo_agency[reference]['name'] + "   " + reference)
             else:
-                case_header = table_geo.cell(0, 0).paragraphs[0].add_run("Point " + reference[-5:-3] + " : " +
-                                                                         dico_geo_mp[reference]['name_mp'])
+                case_header = table_geo_1.cell(0, 0).paragraphs[0].add_run("Point " + reference[-5:-3] + " : " +
+                                                                           dico_geo_mp[reference]['name_mp'])
             case_header.bold = True
-            case_header = table_geo.cell(0, 0).paragraphs[0].alignment = 1
+            case_header = table_geo_1.cell(0, 0).paragraphs[0].alignment = 1
 
-            table_geo.cell(1, 0).paragraphs[0].add_run('Commune :').bold = True
-            table_geo.cell(
-                1, 0).paragraphs[0].paragraph_format.line_spacing = Pt(10)
+            table_geo_1.cell(1, 0).paragraphs[0].add_run(
+                'Commune :').bold = True
             if agence:
-                table_geo.cell(1, 1).paragraphs[0].add_run(
+                table_geo_1.cell(1, 1).paragraphs[0].add_run(
                     dico_geo_agency[reference]['city'] + "    " + dico_geo_agency[reference]['zipcode'])
-                table_geo.cell(1, 3).paragraphs[0].add_run(
+                table_geo_1.cell(1, 4).paragraphs[0].add_run(
                     dico_geo_agency[reference]['stream'])
             else:
-                table_geo.cell(1, 1).paragraphs[0].add_run(
+                table_geo_1.cell(1, 1).paragraphs[0].add_run(
                     dico_geo_mp[reference]['city'] + "    " + dico_geo_mp[reference]['zipcode'])
-                table_geo.cell(1, 3).paragraphs[0].add_run(
+                table_geo_1.cell(1, 4).paragraphs[0].add_run(
                     dico_geo_mp[reference]['stream'])
-            table_geo.cell(1, 2).paragraphs[0].add_run(
+            table_geo_1.cell(1, 3).paragraphs[0].add_run(
                 "Cours d'eau : ").bold = True
 
-            table_geo.cell(2, 0).paragraphs[0].add_run(
+            table_geo_1.cell(2, 0).paragraphs[0].add_run(
                 "Biotests :").bold = True
             biotest_francais = traduction_type_biotest(
                 dico_type_biotest[reference]['biotest'])
-            table_geo.cell(2, 2).paragraphs[0].add_run(
+            table_geo_1.cell(2, 2).paragraphs[0].add_run(
                 biotest_francais)
 
             if agence:
-                table_geo.cell(3, 0).paragraphs[0].add_run(
+                table_geo_2.cell(0, 0).paragraphs[0].add_run(
                     "Réseau de surveillance :").bold = True
-                table_geo.cell(3, 2).paragraphs[0].add_run(
+                table_geo_2.cell(0, 2).paragraphs[0].add_run(
                     dico_geo_agency[reference]['network'])
 
-                table_geo.cell(4, 0).paragraphs[0].add_run(
+                table_geo_2.cell(1, 0).paragraphs[0].add_run(
                     "Type d'hydroécorégion :").bold = True
-                table_geo.cell(4, 2).paragraphs[0].add_run(
+                table_geo_2.cell(1, 2).paragraphs[0].add_run(
                     dico_geo_agency[reference]['hydroecoregion'])
 
-                table_geo.cell(5, 0).paragraphs[0].add_run(
+                table_geo_2.cell(2, 0).paragraphs[0].add_run(
                     "Coordonnées Agence Lambert 93 :").bold = True
-                table_geo.cell(5, 2).paragraphs[0].add_run('Y ' +
-                                                           dico_geo_agency[reference]['lambertY'].replace('.', ','))
-                table_geo.cell(5, 3).paragraphs[0].add_run('X ' +
-                                                           dico_geo_agency[reference]['lambertX'].replace('.', ','))
+                table_geo_2.cell(2, 2).paragraphs[0].add_run('Y ' +
+                                                             dico_geo_agency[reference]['lambertY'].replace('.', ','))
+                table_geo_2.cell(2, 3).paragraphs[0].add_run('X ' +
+                                                             dico_geo_agency[reference]['lambertX'].replace('.', ','))
 
-                table_geo.cell(6, 0).paragraphs[0].add_run(
+                table_geo_2.cell(3, 0).paragraphs[0].add_run(
                     "Coordonnées BIOMÆ en degrés décimaux : ").bold = True
-                table_geo.cell(6, 2).paragraphs[0].add_run(
+                table_geo_2.cell(3, 2).paragraphs[0].add_run(
                     str(dico_geo_mp[reference]['longitudeSpotted']))
-                table_geo.cell(6, 3).paragraphs[0].add_run(
+                table_geo_2.cell(3, 3).paragraphs[0].add_run(
                     str(dico_geo_mp[reference]['latitudeSpotted']))
 
-                table_geo.cell(7, 0).paragraphs[0].add_run(
+                table_geo_2.cell(4, 0).paragraphs[0].add_run(
                     "Coordonnées BIOMÆ Lambert 93 : ").bold = True
-                table_geo.cell(7, 2).paragraphs[0].add_run('Y ' +
-                                                           dico_geo_mp[reference]['lambertYSpotted'].replace('.', ','))
-                table_geo.cell(7, 3).paragraphs[0].add_run('X ' +
-                                                           dico_geo_mp[reference]['lambertXSpotted'].replace('.', ','))
+                table_geo_2.cell(4, 2).paragraphs[0].add_run('Y ' +
+                                                             dico_geo_mp[reference]['lambertYSpotted'].replace('.', ','))
+                table_geo_2.cell(4, 3).paragraphs[0].add_run('X ' +
+                                                             dico_geo_mp[reference]['lambertXSpotted'].replace('.', ','))
 
             else:
-                table_geo.cell(3, 0).paragraphs[0].add_run(
+                table_geo_2.cell(0, 0).paragraphs[0].add_run(
                     "Coordonnées BIOMÆ en degrés décimaux : ").bold = True
-                table_geo.cell(3, 2).paragraphs[0].add_run(
+                table_geo_2.cell(0, 2).paragraphs[0].add_run(
                     str(dico_geo_mp[reference]['longitudeSpotted']))
-                table_geo.cell(3, 3).paragraphs[0].add_run(
+                table_geo_2.cell(0, 3).paragraphs[0].add_run(
                     str(dico_geo_mp[reference]['latitudeSpotted']))
 
             table_carte = doc.add_table(rows=4, cols=1)
