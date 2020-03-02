@@ -175,7 +175,7 @@ def run(cas):
 
             insert_value = list(value + (version,))
 
-            request = QueryScript(
+            QueryScript(
                 f"IF EXISTS (SELECT * FROM {env.DATABASE_TREATED}.toxtable WHERE measurepoint_fusion_id = {measurepoint_fusion_id} AND version = {version}) UPDATE toxtable SET male_survival_7_days = {male_survival_7_days}, alimentation = {alimentation}, neurotoxicity = {neurotoxicity}, female_survivor = {female_survivor}, number_days_exposition = {number_days_exposition}, number_female_concerned = {number_female_concerned}, index_fertility_average = {index_fertility_average}, number_female_analysis = {number_female_analysis}, molting_cycle = {molting_cycle}, number_female_concerned_area = {number_female_concerned_area}, endocrine_disruption = {endocrine_disruption} WHERE measurepoint_fusion_id = {measurepoint_fusion_id} AND version = {version} ELSE INSERT INTO {env.DATABASE_TREATED}.toxtable (measurepoint_fusion_id, male_survival_7_days, alimentation, neurotoxicity, female_survivor, number_days_exposition, number_female_concerned, index_fertility_average, number_female_analysis, molting_cycle, number_female_concerned_area, endocrine_disruption, version) VALUES {tuple(insert_value)};"
             ).execute()
 
