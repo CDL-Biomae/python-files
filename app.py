@@ -96,22 +96,12 @@ output_folder_path = tk.StringVar()
 output_folder_button = tk.Button(
     master=frame_folder, text="Choisir une destination ...", command=output_browse_button)
 output_folder_button.pack()
-<<<<<<< HEAD
 tk.Label(master=frame_folder,textvariable=output_folder_path).pack()
-=======
-tk.Label(master=frame_folder,
-         textvariable=output_folder_path).pack()
->>>>>>> bfaa7c8c23d6bf283ad42e8dde3821ffe2cc81dc
 input_folder_path = tk.StringVar()
 input_folder_button = tk.Button(
     master=frame_folder, text="Choisir une source des photos ...", command=input_browse_button)
 input_folder_button.pack()
-<<<<<<< HEAD
 tk.Label(master=frame_folder,textvariable=input_folder_path).pack()
-=======
-tk.Label(master=frame_folder,
-         textvariable=input_folder_path).pack()
->>>>>>> bfaa7c8c23d6bf283ad42e8dde3821ffe2cc81dc
 frame_folder.pack(expand='YES')
 
 window.mainloop()
