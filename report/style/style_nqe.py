@@ -215,6 +215,11 @@ def add_style_nqe(nqe_dataframe, filename, folder_PATH, dict_t0):
                 ws[column + str(5+index)].fill = body_fill_nd
                 ws[column + str(5+index)].font = body_font
     ws.delete_cols(len(header_columns)+1,1)
+    
+    for letter in [get_column_letter(col_idx) for col_idx in range(1, nb_columns+5)]:
+        for number in range(1, nb_rows+21):
+                ws[letter + str(number)].value = str(ws[letter + str(number)].value).replace(".", ",") if ws[letter + str(number)].value else ''
+    
     wb.save(PATH)
     wb.close()
 
