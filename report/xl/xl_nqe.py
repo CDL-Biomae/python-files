@@ -8,7 +8,12 @@ def create_dataframe(dick_pack_fusion):
     matrix = []
     data = chemistry.result_by_packs_and_sandre(dick_pack_fusion)
     for mp in dick_pack_fusion:
-        matrix.append([''] + [data[mp][sandre] for sandre in elements_crustacean ]+[''] + [data[mp][sandre] for sandre in elements_fish ])
+        if data[mp]:
+            matrix.append([''] + [data[mp][sandre] if data[mp][sandre] !='0.0' else 'ND' for sandre in elements_crustacean ]+[''] + [data[mp][sandre] if data[mp][sandre] !='0.0' else 'ND' for sandre in elements_fish ])
+        else :
+            matrix.append([''] + ['ND' for sandre in elements_crustacean ]+[''] + ['ND' for sandre in elements_fish ])
+            
+    
     df = pd.DataFrame(matrix)
     df.columns = [''] + [element for element in elements_crustacean]  + [''] + [element for element in elements_fish]
     df = df.dropna(how='all', axis='columns')

@@ -18,8 +18,13 @@ def create_dataframe(dick_pack_fusion):
 
     data = chemistry.result_by_packs_and_sandre(dick_pack_fusion)
     for mp in dick_pack_fusion:
-        matrix.append([''] + [data[mp][sandre] for sandre in elements_metal ]+[''] + [data[mp][sandre] for sandre in elements_PCB ]+[''] + [data[mp][sandre] for sandre in elements_HAP ]+[''] + [data[mp][sandre] for sandre in elements_others ])
- 
+        if data[mp]:
+            matrix.append([''] + [data[mp][sandre] if data[mp][sandre] !='0.0' else 'ND' for sandre in elements_metal ]+[''] + [data[mp][sandre] if data[mp][sandre] !='0.0' else 'ND' for sandre in elements_PCB ]+[''] + [data[mp][sandre] if data[mp][sandre] !='0.0' else 'ND' for sandre in elements_HAP ]+[''] + [data[mp][sandre] if data[mp][sandre] !='0.0' else 'ND' for sandre in elements_others ])
+        else :
+            matrix.append([''] + ['ND' for sandre in elements_metal ]+[''] + ['ND' for sandre in elements_PCB ]+[''] + ['ND' for sandre in elements_HAP ]+[''] + ['ND' for sandre in elements_others ])
+            
+    associated_t0 = QueryScript(f"SELECT sandre, prefix, value, pack.measurepoint_id FROM {env.DATABASE_RAW}.analysis JOIN {env.DATABASE_RAW}.pack ON pack.id= analysis.pack_id WHERE pack.measurepoint_id IN (SELECT id FROM {env.DATABASE_RAW}.measurepoint where id IN (SELECT code_t0_id FROM {env.DATABASE_RAW}.measurepoint WHERE id IN ({tuple([mp for mp in data])})));").execute()
+    print(associated_t0)
 
     df = pd.DataFrame(matrix)
     df.columns = [''] + [element for element in elements_metal]  + [''] + [element for element in elements_PCB] + [''] + [element for element in elements_HAP] + [''] + [element for element in elements_others]
