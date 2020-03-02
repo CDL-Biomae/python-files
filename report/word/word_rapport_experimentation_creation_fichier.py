@@ -50,7 +50,8 @@ def word_main(campaign, agence, path_photo="Photos", path_output="output"):
                 case_header = table_geo_1.cell(0, 0).paragraphs[0].add_run("Point " + reference[-5:-3] + " : " +
                                                                            dico_geo_mp[reference]['name_mp'])
             case_header.bold = True
-            case_header = table_geo_1.cell(0, 0).paragraphs[0].alignment = 1
+            table_geo_1.cell(0, 0).paragraphs[0].alignment = 1
+            width_table = table_geo_1.cell(0, 0).width
 
             table_geo_1.cell(1, 0).paragraphs[0].add_run(
                 'Commune :').bold = True
@@ -267,6 +268,8 @@ def word_main(campaign, agence, path_photo="Photos", path_output="output"):
                     num_entete, 0).paragraphs[0]
                 paragraph.add_run(liste_entete[num_entete]).italic = True
                 paragraph.alignment = 1
+                table_exposure_condition.cell(
+                    num_entete, 0).width = width_table*0.3
             for num_jour in range(nombre_jours_utiles):
                 paragraph = table_exposure_condition.cell(
                     0, num_jour+1).paragraphs[0]
@@ -283,8 +286,6 @@ def word_main(campaign, agence, path_photo="Photos", path_output="output"):
                         paragraph.add_run(str(round(
                             value)).replace('.', ','))
                     else:
-                        # print(
-                        #     dico_exposure_condition[reference][liste_jours[liste_indice_jours_utiles[num_jour]]][liste_entete_BDD[num_entete]])
                         paragraph.add_run(str(
                             value).replace('.', ','))
 
@@ -308,6 +309,7 @@ def word_main(campaign, agence, path_photo="Photos", path_output="output"):
                     table_exposure_condition.cell(6, nombre_jours_utiles))
                 paragraph_comment = table_exposure_condition.cell(
                     6, 0).paragraphs[0]
+
             comment = ""
             for jour in liste_jours:
                 if dico_exposure_condition[reference][jour]['comment'] != None:
