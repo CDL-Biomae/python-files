@@ -83,9 +83,9 @@ def word_main(campaign, agence, path_photo="Photos", path_output="output"):
                 table_geo.cell(5, 0).paragraphs[0].add_run(
                     "Coordonnées Agence Lambert 93 :").bold = True
                 table_geo.cell(5, 2).paragraphs[0].add_run('Y ' +
-                                                           dico_geo_agency[reference]['lambertY'])
+                                                           dico_geo_agency[reference]['lambertY'].replace('.', ','))
                 table_geo.cell(5, 3).paragraphs[0].add_run('X ' +
-                                                           dico_geo_agency[reference]['lambertX'])
+                                                           dico_geo_agency[reference]['lambertX'].replace('.', ','))
 
                 table_geo.cell(6, 0).paragraphs[0].add_run(
                     "Coordonnées BIOMÆ en degrés décimaux : ").bold = True
@@ -97,9 +97,9 @@ def word_main(campaign, agence, path_photo="Photos", path_output="output"):
                 table_geo.cell(7, 0).paragraphs[0].add_run(
                     "Coordonnées BIOMÆ Lambert 93 : ").bold = True
                 table_geo.cell(7, 2).paragraphs[0].add_run('Y ' +
-                                                           dico_geo_mp[reference]['lambertYSpotted'])
+                                                           dico_geo_mp[reference]['lambertYSpotted'].replace('.', ','))
                 table_geo.cell(7, 3).paragraphs[0].add_run('X ' +
-                                                           dico_geo_mp[reference]['lambertXSpotted'])
+                                                           dico_geo_mp[reference]['lambertXSpotted'].replace('.', ','))
 
             else:
                 table_geo.cell(3, 0).paragraphs[0].add_run(
@@ -220,15 +220,15 @@ def word_main(campaign, agence, path_photo="Photos", path_output="output"):
             table_temperature.cell(0, 3).paragraphs[0].alignment = 1
             if dico_avg_tempe[reference]['min'] is not None:
                 table_temperature.cell(1, 1).paragraphs[0].add_run(str(round(
-                    dico_avg_tempe[reference]['min'], 1)))
+                    dico_avg_tempe[reference]['min'], 1)).replace('.', ','))
             table_temperature.cell(1, 1).paragraphs[0].alignment = 1
             if dico_avg_tempe[reference]['average'] is not None:
                 table_temperature.cell(1, 2).paragraphs[0].add_run(str(round(
-                    dico_avg_tempe[reference]['average'], 1)))
+                    dico_avg_tempe[reference]['average'], 1)).replace('.', ','))
             table_temperature.cell(1, 2).paragraphs[0].alignment = 1
             if dico_avg_tempe[reference]['max'] is not None:
                 table_temperature.cell(1, 3).paragraphs[0].add_run(str(round(
-                    dico_avg_tempe[reference]['max'], 1)))
+                    dico_avg_tempe[reference]['max'], 1)).replace('.', ','))
             table_temperature.cell(1, 3).paragraphs[0].alignment = 1
             for row in range(2):
                 for col in range(4):
@@ -272,8 +272,17 @@ def word_main(campaign, agence, path_photo="Photos", path_output="output"):
                 for num_jour in range(nombre_jours_utiles):
                     paragraph = table_exposure_condition.cell(
                         num_entete+1, num_jour+1).paragraphs[0]
-                    paragraph.add_run(str(
-                        dico_exposure_condition[reference][liste_jours[liste_indice_jours_utiles[num_jour]]][liste_entete_BDD[num_entete]]))
+                    value = dico_exposure_condition[reference][liste_jours[liste_indice_jours_utiles[num_jour]]
+                                                               ][liste_entete_BDD[num_entete]]
+                    if (liste_entete_BDD[num_entete] == "conductivity") & (value is not None):
+                        paragraph.add_run(str(round(
+                            value)).replace('.', ','))
+                    else:
+                        # print(
+                        #     dico_exposure_condition[reference][liste_jours[liste_indice_jours_utiles[num_jour]]][liste_entete_BDD[num_entete]])
+                        paragraph.add_run(str(
+                            value).replace('.', ','))
+
                     paragraph.alignment = 1
 
             if chemistry:
@@ -282,7 +291,7 @@ def word_main(campaign, agence, path_photo="Photos", path_output="output"):
                 paragraph_survie = table_exposure_condition.cell(
                     6, 1).paragraphs[0]
                 paragraph_survie.add_run(str(
-                    round(dico_type_biotest[reference]['survivor_chemistry'], 1)))
+                    round(dico_type_biotest[reference]['survivor_chemistry'], 1)).replace('.', ','))
                 paragraph_survie.alignment = 1
 
                 table_exposure_condition.cell(7, 0).merge(
@@ -306,9 +315,11 @@ def word_main(campaign, agence, path_photo="Photos", path_output="output"):
                     paragraph.paragraph_format.space_after = Pt(4)
                     paragraph.paragraph_format.space_before = Pt(4)
             print(f'Page de la référence {reference} créée ! :D')
-        except:
+        except Exception as e:
             print(reference + " n'a pas été créée")
+            print(e)
             pass
+
     doc.add_page_break()
 
     composer = Composer(doc)
