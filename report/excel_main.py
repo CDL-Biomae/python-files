@@ -63,13 +63,14 @@ def create_dict_mp(list_campaigns):
         dict[c] = list_mp
     return dict
 
-## MAIN FUNCTION ##
-
 def create_general_dict(list_campaigns):
     result = {}
     for campaign in list_campaigns:
         result.update(get_dict_pack_fusion(campaign))
     return result
+
+## MAIN FUNCTION ##
+
 
 def excel_main(list_campaigns, folder_PATH = "output"):  # Prend en entrée une liste de reference de campagne, ex: ['AG-003-01', 'AG-003-02'] et
     filename = create_filename(list_campaigns)
@@ -87,7 +88,7 @@ def excel_main(list_campaigns, folder_PATH = "output"):  # Prend en entrée une 
     write_in_new_excel(version_dataframe, filename, folder_PATH, 'Version', startrow=3)
     add_style_version(version_dataframe, list_campaigns, filename, folder_PATH)
 
-    # # ## CREATION DE L'ONGLET STATIONS ##
+    # ## CREATION DE L'ONGLET STATIONS ##
 
     print('\n[!] Création de l\'onglet \"Stations\"...')
     stations_dataframe = create_stations_dataframe(head_dataframe, list_campaigns, dict_mp)
@@ -119,27 +120,33 @@ def excel_main(list_campaigns, folder_PATH = "output"):  # Prend en entrée une 
 
     # CREATION DE L'ONGLET BBAC ##
     dict_general = create_general_dict(list_campaigns)
-
+    t0_associated = QueryScript(f"SELECT code_t0_id, id  FROM biomae.measurepoint WHERE id IN {tuple([mp for mp in dict_general])};").execute()
+    dict_t0 = {}
+    for mp in dict_general:
+        dict_t0[mp] = dict_general[mp]
+        index = [element[1] for element in t0_associated].index(mp)
+        dict_t0[mp]['code_t0_id'] = t0_associated[index]
+        
     print('\n[!] Création de l\'onglet \"BBAC 7j\"...')
     bbac_dataframe = create_bbac_7j_dataframe(head_dataframe, dict_general)
     bbac2_dataframe = create_bbac2_7j_dataframe(head_dataframe, dict_general)
     write_in_existing_excel(bbac_dataframe, filename, folder_PATH, 'BBAC_7j', startrow=3)
     write_in_existing_excel(bbac2_dataframe, filename, folder_PATH, 'BBAC2_7j', startrow=3)
-    add_style_bbac_7j(bbac_dataframe, filename, folder_PATH)
+    add_style_bbac_7j(bbac_dataframe, filename, folder_PATH, dict_t0)
 
     print('\n[!] Création de l\'onglet \"BBAC 21j\"...')
     bbac_dataframe = create_bbac_21j_dataframe(head_dataframe, dict_general)
     bbac2_dataframe = create_bbac2_21j_dataframe(head_dataframe, dict_general)
     write_in_existing_excel(bbac_dataframe, filename, folder_PATH, 'BBAC_21j', startrow=3)
     write_in_existing_excel(bbac2_dataframe, filename, folder_PATH, 'BBAC2_21j', startrow=3)
-    add_style_bbac_21j(bbac_dataframe, filename, folder_PATH)
+    add_style_bbac_21j(bbac_dataframe, filename, folder_PATH, dict_t0)
 
     # CREATION DE L'ONGLET NQE ##
 
     print('\n[!] Création de l\'onglet \"NQE Biote\"...')
     nqe_dataframe = create_nqe_dataframe(head_dataframe, dict_general)
     write_in_existing_excel(nqe_dataframe, filename, folder_PATH, 'NQE Biote', startrow=3)
-    add_style_nqe(nqe_dataframe, filename, folder_PATH)
+    add_style_nqe(nqe_dataframe, filename, folder_PATH, dict_t0)
 
     ## CREATION DE L'ONGLET TOX ##
 
@@ -148,6 +155,6 @@ def excel_main(list_campaigns, folder_PATH = "output"):  # Prend en entrée une 
     write_in_existing_excel(tox_dataframe, filename, folder_PATH, 'Tox', startrow=3)
     add_style_tox(tox_dataframe, filename, folder_PATH)
 
-    print(colored('\n --> Rapport terminée', 'green'))
+    print(colored('\n --> Rapport terminé', 'green'))
 
 

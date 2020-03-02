@@ -13,7 +13,7 @@ def main_button():
                 input_browse_button()
             for campaign in campaign_list:
                 word_main(campaign, agence.get(), input_folder_path.get(), output_folder_path.get())
-        elif excel_wanted.get():
+        if excel_wanted.get():
             if not output_folder_path.get():
                 output_browse_button()
             excel_main(campaign_list, output_folder_path.get())
