@@ -129,8 +129,8 @@ def add_style_nqe(nqe_dataframe, filename, folder_PATH, dict_t0):
     
     t0_mp = []
     for mp in dict_t0:
-        if not dict_t0[mp]['code_t0_id'][0] in t0_mp:
-            t0_mp.append(dict_t0[mp]['code_t0_id'][0])
+        if not dict_t0[mp]['code_t0_id'] in t0_mp:
+            t0_mp.append(dict_t0[mp]['code_t0_id'])
     t0_result = QueryScript(f"SELECT sandre, prefix, value, pack.measurepoint_id, measurepoint.reference FROM {env.DATABASE_RAW}.analysis JOIN {env.DATABASE_RAW}.pack ON pack.id= analysis.pack_id JOIN {env.DATABASE_RAW}.measurepoint ON pack.measurepoint_id=measurepoint.id WHERE pack.measurepoint_id IN {tuple(t0_mp)};").execute()
     dict_t0_result= {}
     for element in t0_result:
@@ -177,6 +177,7 @@ def add_style_nqe(nqe_dataframe, filename, folder_PATH, dict_t0):
 
     body_font = Font(size=6, name='Arial')
     body_fill_ok = PatternFill(fill_type='solid', start_color='318CE7', end_color='318CE7')
+    body_fill_nd = PatternFill(fill_type='solid', start_color='FFFFFF', end_color='FFFFFF')
     body_fill_not_ok = PatternFill(fill_type='solid', start_color='BB0B0B', end_color='BB0B0B')
     body_alignment = Alignment(horizontal='center', vertical='center')
 
@@ -206,6 +207,14 @@ def add_style_nqe(nqe_dataframe, filename, folder_PATH, dict_t0):
                     cell.fill = body_fill_ok
                 elif (value!="ND" and value!='0.0' and threshold!='' and float(value)>=threshold):
                     cell.fill = body_fill_not_ok
+    for index,mp in enumerate(dict_t0):
+        index_t0_associated = t0_mp.index(dict_t0[ws[header_columns[-1] + str(index+5)].value]['code_t0_id'])
+        for column in header_columns[5:]:
+            t0_ok = True if ws[column + str(5+nb_rows+index_t0_associated)].fill == body_fill_ok else False 
+            if not t0_ok and (ws[column + str(5+nb_rows+index_t0_associated)].value!= None and ws[column + str(5+nb_rows+index_t0_associated)].value!= ''):
+                ws[column + str(5+index)].fill = body_fill_nd
+                ws[column + str(5+index)].font = body_font
+    ws.delete_cols(len(header_columns)+1,1)
     wb.save(PATH)
     wb.close()
 
