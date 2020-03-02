@@ -7,7 +7,7 @@ from tools import QueryScript
 from termcolor import colored
 import env
 
-def add_style_bbac_21j(bbac_dataframe, filename, folder_PATH):
+def add_style_bbac_21j(bbac_dataframe, filename, folder_PATH, dict_t0):
     PATH = f"{folder_PATH}\\{filename}"
     wb = load_workbook(PATH)
     ws = wb['BBAC_21j']
@@ -153,10 +153,70 @@ def add_style_bbac_21j(bbac_dataframe, filename, folder_PATH):
             ws.column_dimensions[letter].width=2
             ws2.column_dimensions[letter].width=2
             
-
+ ## ADD T0
+    
+    t0_mp = []
+    for mp in dict_t0:
+        if not dict_t0[mp]['code_t0_id'] in t0_mp:
+            t0_mp.append(dict_t0[mp]['code_t0_id'])
+    t0_result = QueryScript(f"SELECT sandre, prefix, value, pack.measurepoint_id, measurepoint.reference FROM {env.DATABASE_RAW}.analysis JOIN {env.DATABASE_RAW}.pack ON pack.id= analysis.pack_id JOIN {env.DATABASE_RAW}.measurepoint ON pack.measurepoint_id=measurepoint.id WHERE pack.measurepoint_id IN {tuple(t0_mp)};").execute()
+    dict_t0_result= {}
+    for element in t0_result:
+        if not element[3] in dict_t0_result:
+            dict_t0_result.update({element[3]: {element[0]:element[1] + str(element[2]) if element[1] else str(element[2]), 'reference': element[4]}})
+        else :
+            dict_t0_result[element[3]][element[0]] = element[1] + str(element[2]) if element[1] else str(element[2])
+    
+    t0_font = Font(size=6, name='Arial')
+    t0_border = Border(left=Side(border_style='thin', color='000000'),
+                     right=Side(border_style='thin', color='000000'),
+                     top=Side(border_style='thin', color='000000'),
+                     bottom=Side(border_style='thin', color='000000'))
+    body_alignment = Alignment(horizontal='center', vertical='center')
+    
+    for index, t0 in enumerate(t0_mp):
+        ws['B'+str(nb_rows+5+index)].font = t0_font
+        ws['B'+str(nb_rows+5+index)].border = t0_border
+        ws['C'+str(nb_rows+5+index)].font = t0_font
+        ws['C'+str(nb_rows+5+index)].border = t0_border
+        ws['D'+str(nb_rows+5+index)].font = t0_font
+        ws['D'+str(nb_rows+5+index)].border = t0_border
+        ws['D'+str(nb_rows+5+index)].value = dict_t0_result[t0]['reference']
+        ws['E'+str(nb_rows+5+index)].font = t0_font
+        ws['E'+str(nb_rows+5+index)].border = t0_border
+        ws2['B'+str(nb_rows+5+index)].font = t0_font
+        ws2['B'+str(nb_rows+5+index)].border = t0_border
+        ws2['C'+str(nb_rows+5+index)].font = t0_font
+        ws2['C'+str(nb_rows+5+index)].border = t0_border
+        ws2['D'+str(nb_rows+5+index)].font = t0_font
+        ws2['D'+str(nb_rows+5+index)].border = t0_border
+        ws2['D'+str(nb_rows+5+index)].value = dict_t0_result[t0]['reference']
+        ws2['E'+str(nb_rows+5+index)].font = t0_font
+        ws2['E'+str(nb_rows+5+index)].border = t0_border
+        for letter in header_columns[5:]:
+            sandre = ws[letter +'3'].value
+            if str(sandre) in dict_t0_result[t0]:
+                ws[letter+str(nb_rows+5+index)].value = dict_t0_result[t0][str(sandre)]
+                ws[letter+str(nb_rows+5+index)].font = t0_font
+                ws[letter+str(nb_rows+5+index)].border = t0_border
+                ws[letter+str(nb_rows+5+index)].alignment = body_alignment
+                ws2[letter+str(nb_rows+5+index)].value = dict_t0_result[t0][str(sandre)]
+                ws2[letter+str(nb_rows+5+index)].font = t0_font
+                ws2[letter+str(nb_rows+5+index)].border = t0_border
+                ws2[letter+str(nb_rows+5+index)].alignment = body_alignment
+                
+            elif sandre != None :
+                ws[letter+str(nb_rows+5+index)].value = 'ND'
+                ws[letter+str(nb_rows+5+index)].font = t0_font
+                ws[letter+str(nb_rows+5+index)].border = t0_border
+                ws[letter+str(nb_rows+5+index)].alignment = body_alignment
+                ws2[letter+str(nb_rows+5+index)].font = t0_font
+                ws2[letter+str(nb_rows+5+index)].border = t0_border
+                ws2[letter+str(nb_rows+5+index)].alignment = body_alignment
+        
 
     ## BODY STYLE ##
-    body_rows = [str(r) for r in list(range(5, nb_rows+5))]
+    body_rows = [str(r) for r in list(range(5, nb_rows + 5 + len(t0_mp)))]
     body_columns = header_columns[5:]
 
     body_font = Font(size=6, name='Arial')
@@ -242,6 +302,22 @@ def add_style_bbac_21j(bbac_dataframe, filename, folder_PATH):
                     cell.fill = body_fill_nd
                     cell2.fill = body_fill_nd
                     cell2.value = 'nd'
+    for index,mp in enumerate(dict_t0):
+        index_t0_associated = t0_mp.index(dict_t0[ws[header_columns[-1] + str(index+5)].value]['code_t0_id'])
+        for column in header_columns[5:]:
+            t0_ok = True if ws[column + str(5+nb_rows+index_t0_associated)].fill == body_fill_ok else False 
+            if not t0_ok and (ws[column + str(5+nb_rows+index_t0_associated)].value!= None and ws[column + str(5+nb_rows+index_t0_associated)].value!= ''):
+                ws[column + str(5+index)].fill = body_fill_nd
+                ws[column + str(5+index)].font = body_font
+                ws2[column + str(5+index)].fill = body_fill_nd
+                ws2[column + str(5+index)].font = body_font
+                ws2[column + str(5+index)].value = 'nd'
+    ws.delete_cols(len(header_columns)+1,1)
+    
+    for letter in [get_column_letter(col_idx) for col_idx in range(1, nb_columns+5)]:
+        for number in range(1, nb_rows+21):
+                ws[letter + str(number)].value = str(ws[letter + str(number)].value).replace(".", ",") if ws[letter + str(number)].value else ''
+    
     wb.save(PATH)
     wb.close()
 
