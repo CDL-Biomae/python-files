@@ -49,6 +49,8 @@ def word_main(campaign, agence, path_photo="Photos", path_output="output"):
             case_header = table_geo.cell(0, 0).paragraphs[0].alignment = 1
 
             table_geo.cell(1, 0).paragraphs[0].add_run('Commune :').bold = True
+            table_geo.cell(
+                1, 0).paragraphs[0].paragraph_format.line_spacing = Pt(10)
             if agence:
                 table_geo.cell(1, 1).paragraphs[0].add_run(
                     dico_geo_agency[reference]['city'] + "    " + dico_geo_agency[reference]['zipcode'])
@@ -114,7 +116,7 @@ def word_main(campaign, agence, path_photo="Photos", path_output="output"):
             lat = str(dico_geo_mp[reference]['latitudeSpotted'])
             if (lon != "None") & (lat != "None"):
                 access_token = "pk.eyJ1IjoiamJyb25uZXIiLCJhIjoiY2s2cW5kOWQwMHBybjNtcW8yMXJuYmo3aiJ9.z8Ekf7a0RGTZ4jrbJVpq8g"
-                layer = '{"id":"water","source":{"url":"mapbox://mapbox.mapbox-streets-v8","type":"vector"},"source-layer":"water","type":"fill","paint":{"fill-color":"%2300ffff"}}'
+                # layer = '{"id":"water","source":{"url":"mapbox://mapbox.mapbox-streets-v8","type":"vector"},"source-layer":"water","type":"fill","paint":{"fill-color":"%2300ffff"}}'
                 url_street = f"https://api.mapbox.com/styles/v1/mapbox/streets-v11/static/pin-s+FF0000({lon},{lat})/{lon},{lat},9.21/450x300@2x?access_token={access_token}"
                 response = requests.get(url_street)
                 carte_street = BytesIO(response.content)
@@ -128,7 +130,7 @@ def word_main(campaign, agence, path_photo="Photos", path_output="output"):
             table_carte.cell(1, 0).paragraphs[0].alignment = 1
 
             if (lon != "None") & (lat != "None"):
-                url_satellite = f"https://api.mapbox.com/styles/v1/mapbox/satellite-streets-v11/static/pin-s+FF0000({lon},{lat})/{lon},{lat},13.5/450x300@2x?addlayer={layer}&access_token={access_token}"
+                url_satellite = f"https://api.mapbox.com/styles/v1/mapbox/satellite-streets-v11/static/pin-s+FF0000({lon},{lat})/{lon},{lat},13.5/450x300@2x?access_token={access_token}"
                 response = requests.get(url_satellite)
                 carte_satellite = BytesIO(response.content)
                 table_carte.cell(2, 0).paragraphs[0].add_run().add_picture(
