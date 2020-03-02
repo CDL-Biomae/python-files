@@ -50,7 +50,8 @@ def word_main(campaign, agence, path_photo="Photos", path_output="output"):
                 case_header = table_geo_1.cell(0, 0).paragraphs[0].add_run("Point " + reference[-5:-3] + " : " +
                                                                            dico_geo_mp[reference]['name_mp'])
             case_header.bold = True
-            case_header = table_geo_1.cell(0, 0).paragraphs[0].alignment = 1
+            table_geo_1.cell(0, 0).paragraphs[0].alignment = 1
+            width_table = table_geo_1.cell(0, 0).width
 
             table_geo_1.cell(1, 0).paragraphs[0].add_run(
                 'Commune :').bold = True
@@ -159,10 +160,14 @@ def word_main(campaign, agence, path_photo="Photos", path_output="output"):
                 table_image.cell(0, 0).paragraphs[0].add_run("Point " + reference[-5:-3] + " : " +
                                                              dico_geo_mp[reference]['name_mp']).bold = True
             table_image.cell(0, 0).paragraphs[0].alignment = 1
+            table_image.cell(
+                0, 0).paragraphs[0].paragraph_format.line_spacing = font.size
 
             table_image.cell(1, 0).paragraphs[0].add_run(
                 "Photos de la station de mesure de la qualité des eaux pour la campagne " + campaign[-2:] + "-" + dico_exposure_condition[reference]["J+0"]["date"][6:10]).bold = True  # Mettre que l'année, passage en argument ou autre méthode de récupération ?
             table_image.cell(1, 0).paragraphs[0].alignment = 1
+            table_image.cell(
+                1, 0).paragraphs[0].paragraph_format.line_spacing = font.size
 
             table_image.cell(3, 0).text = "Aval de zone d’encagement"
             table_image.cell(3, 0).paragraphs[0].alignment = 1
@@ -172,6 +177,13 @@ def word_main(campaign, agence, path_photo="Photos", path_output="output"):
             table_image.cell(5, 0).paragraphs[0].alignment = 1
             table_image.cell(5, 1).text = "Panorama encagement"
             table_image.cell(5, 1).paragraphs[0].alignment = 1
+
+            for row in range(3, 8):
+                if row != 4:
+                    table_image.cell(
+                        row, 0).paragraphs[0].paragraph_format.line_spacing = font.size
+                    table_image.cell(
+                        row, 1).paragraphs[0].paragraph_format.line_spacing = font.size
 
             nom_photo = recuperation_photo(
                 reference, path_photo, path_ressources)
@@ -267,6 +279,8 @@ def word_main(campaign, agence, path_photo="Photos", path_output="output"):
                     num_entete, 0).paragraphs[0]
                 paragraph.add_run(liste_entete[num_entete]).italic = True
                 paragraph.alignment = 1
+                table_exposure_condition.cell(
+                    num_entete, 0).width = width_table*0.3
             for num_jour in range(nombre_jours_utiles):
                 paragraph = table_exposure_condition.cell(
                     0, num_jour+1).paragraphs[0]
@@ -283,8 +297,6 @@ def word_main(campaign, agence, path_photo="Photos", path_output="output"):
                         paragraph.add_run(str(round(
                             value)).replace('.', ','))
                     else:
-                        # print(
-                        #     dico_exposure_condition[reference][liste_jours[liste_indice_jours_utiles[num_jour]]][liste_entete_BDD[num_entete]])
                         paragraph.add_run(str(
                             value).replace('.', ','))
 
@@ -308,6 +320,7 @@ def word_main(campaign, agence, path_photo="Photos", path_output="output"):
                     table_exposure_condition.cell(6, nombre_jours_utiles))
                 paragraph_comment = table_exposure_condition.cell(
                     6, 0).paragraphs[0]
+
             comment = ""
             for jour in liste_jours:
                 if dico_exposure_condition[reference][jour]['comment'] != None:
