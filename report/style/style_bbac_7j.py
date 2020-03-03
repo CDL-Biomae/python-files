@@ -316,8 +316,8 @@ def add_style_bbac_7j(bbac_dataframe, filename, folder_PATH, dict_t0):
                 ws2[column + str(5+index)].value = 'nd'
     ws.delete_cols(len(header_columns)+1,1)
     
-    for letter in [get_column_letter(col_idx) for col_idx in range(1, nb_columns+5)]:
-        for number in range(1, nb_rows+21):
+    for letter in header_columns[5:]:
+        for number in range(5, nb_rows+21):
                 ws[letter + str(number)].value = str(ws[letter + str(number)].value).replace(".", ",") if ws[letter + str(number)].value else ''
     
     wb.save(PATH)
