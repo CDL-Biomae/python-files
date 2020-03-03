@@ -58,6 +58,8 @@ def output_browse_button():
 def next_version():
     print('oui')
 
+version_file = open('version.txt','w')
+version_file.write(f'CHOSEN_VERSION={env.LATEST_VERSION}')
 
 window = tk.Tk()
 window.title('Digital Lab App')
@@ -77,8 +79,10 @@ tk.Label(master=frame_campaign, text='Campagne(s) choisie(s) :').grid(
     row=1, column=0)
 tk.Label(master=frame_campaign, textvariable=campaign_input_text).grid(
     row=1, column=1)
-tk.Label(master=frame_campaign, text=env.VERSION).grid(
+tk.Label(master=frame_campaign, text='Version choisie :').grid(
     row=2, column=0)
+tk.Label(master=frame_campaign, text='chosen_version').grid(
+    row=2, column=1)
 version_button = tk.Button(
     master=frame_campaign, text="+", command=next_version)
 version_button.grid(row=2, column=1)
