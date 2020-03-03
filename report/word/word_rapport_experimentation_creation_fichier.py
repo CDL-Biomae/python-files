@@ -9,7 +9,7 @@ from io import BytesIO
 
 
 # campaign correspond au nom de la campagne (ex: AG-003-01) et agence est un booléen qui dit si c'est une agence l'eau ou non
-def word_main(campaign, agence, path_photo="Photos", path_output="output"):
+def word_main(campaign, agence, path_photo="Photos", path_output="output", num_campaign="01"):
     path_ressources = "Ressources/"
     campaign = campaign.upper()
     doc = Document(path_ressources + 'Page_de_garde.docx')
@@ -176,7 +176,7 @@ def word_main(campaign, agence, path_photo="Photos", path_output="output"):
                 0, 0).paragraphs[0].paragraph_format.line_spacing = font.size
 
             table_image.cell(1, 0).paragraphs[0].add_run(
-                "Photos de la station de mesure de la qualité des eaux pour la campagne " + campaign[-2:] + "-" + dico_exposure_condition[reference]["J+0"]["date"][6:10]).bold = True  # Mettre que l'année, passage en argument ou autre méthode de récupération ?
+                "Photos de la station de mesure de la qualité des eaux pour la campagne " + num_campaign + "-" + dico_exposure_condition[reference]["J+0"]["date"][6:10]).bold = True  # Mettre que l'année, passage en argument ou autre méthode de récupération ?
             table_image.cell(1, 0).paragraphs[0].alignment = 1
             table_image.cell(
                 1, 0).paragraphs[0].paragraph_format.line_spacing = font.size
@@ -229,7 +229,7 @@ def word_main(campaign, agence, path_photo="Photos", path_output="output"):
             table_image.cell(6, 1).paragraphs[0].add_run(type_barrel_J0)
             table_image.cell(7, 0).merge(table_image.cell(7, 1))
             table_image.cell(7, 0).paragraphs[0].add_run(
-                "Paramètres physico-chimiques pour la campagne : " + campaign[-2:] + "-" + dico_exposure_condition[reference]["J+0"]["date"][6:10]).bold = True
+                "Paramètres physico-chimiques pour la campagne : " + num_campaign + "-" + dico_exposure_condition[reference]["J+0"]["date"][6:10]).bold = True
 
             table_temperature = doc.add_table(
                 rows=2, cols=4, style="Table Grid")
