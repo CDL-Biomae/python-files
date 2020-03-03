@@ -131,27 +131,36 @@ def excel_main(list_campaigns, folder_PATH = "output"):  # Prend en entrée une 
         dict_t0[mp] = dict_general[mp]
         index = [element[1] for element in t0_associated].index(mp)
         dict_t0[mp]['code_t0_id'] = t0_associated[index][0]
-            
-    print('\n[!] Création de l\'onglet \"BBAC 7j\"...')
-    bbac_dataframe = create_bbac_7j_dataframe(head_dataframe, dict_general)
-    bbac2_dataframe = create_bbac2_7j_dataframe(head_dataframe, dict_general)
-    write_in_existing_excel(bbac_dataframe, filename, folder_PATH, 'BBAC_7j', startrow=3)
-    write_in_existing_excel(bbac2_dataframe, filename, folder_PATH, 'BBAC2_7j', startrow=3)
-    add_style_bbac_7j(bbac_dataframe, filename, folder_PATH, dict_t0)
+    
+    chemistry_existing = False
+    for mp in dict_general:
+        if 'chemistry' in dict_general[mp]:
+            chemistry_existing = True
+            break
+    
+    if chemistry_existing:
+        print('\n[!] Création de l\'onglet \"BBAC 7j\"...')
+        bbac_dataframe = create_bbac_7j_dataframe(head_dataframe, dict_general)
+        bbac2_dataframe = create_bbac2_7j_dataframe(head_dataframe, dict_general)
+        write_in_existing_excel(bbac_dataframe, filename, folder_PATH, 'BBAC_7j', startrow=3)
+        write_in_existing_excel(bbac2_dataframe, filename, folder_PATH, 'BBAC2_7j', startrow=3)
+        add_style_bbac_7j(bbac_dataframe, filename, folder_PATH, dict_t0)
 
-    print('\n[!] Création de l\'onglet \"BBAC 21j\"...')
-    bbac_dataframe = create_bbac_21j_dataframe(head_dataframe, dict_general)
-    bbac2_dataframe = create_bbac2_21j_dataframe(head_dataframe, dict_general)
-    write_in_existing_excel(bbac_dataframe, filename, folder_PATH, 'BBAC_21j', startrow=3)
-    write_in_existing_excel(bbac2_dataframe, filename, folder_PATH, 'BBAC2_21j', startrow=3)
-    add_style_bbac_21j(bbac_dataframe, filename, folder_PATH, dict_t0)
+        print('\n[!] Création de l\'onglet \"BBAC 21j\"...')
+        bbac_dataframe = create_bbac_21j_dataframe(head_dataframe, dict_general)
+        bbac2_dataframe = create_bbac2_21j_dataframe(head_dataframe, dict_general)
+        write_in_existing_excel(bbac_dataframe, filename, folder_PATH, 'BBAC_21j', startrow=3)
+        write_in_existing_excel(bbac2_dataframe, filename, folder_PATH, 'BBAC2_21j', startrow=3)
+        add_style_bbac_21j(bbac_dataframe, filename, folder_PATH, dict_t0)
 
-    # CREATION DE L'ONGLET NQE ##
+        # CREATION DE L'ONGLET NQE ##
 
-    print('\n[!] Création de l\'onglet \"NQE Biote\"...')
-    nqe_dataframe = create_nqe_dataframe(head_dataframe, dict_general)
-    write_in_existing_excel(nqe_dataframe, filename, folder_PATH, 'NQE Biote', startrow=3)
-    add_style_nqe(nqe_dataframe, filename, folder_PATH, dict_t0)
+        print('\n[!] Création de l\'onglet \"NQE Biote\"...')
+        nqe_dataframe = create_nqe_dataframe(head_dataframe, dict_general)
+        write_in_existing_excel(nqe_dataframe, filename, folder_PATH, 'NQE Biote', startrow=3)
+        add_style_nqe(nqe_dataframe, filename, folder_PATH, dict_t0)
+    else :
+        print('\n[!] Pas de chimie détectée ! ')
 
     ## CREATION DE L'ONGLET TOX ##
 
