@@ -16,11 +16,8 @@ def create_dataframe(list_mp):
 
     dict_output_agency = list_to_dict(output_agency)
     dict_output_measurepoint = list_to_dict(output_measurepoint)
-    print(dict_output_agency)
-    print(dict_output_measurepoint)
     matrix = []
     for mp in list_mp:
-        print(mp)
         try:
             data_agency = dict_output_agency[mp]
         except KeyError:
