@@ -155,7 +155,7 @@ def add_style_tox(tox_dataframe, filename, folder_PATH):
     body_fill_not_ok_4 = PatternFill(fill_type='solid', start_color='ab2222', end_color='ab2222')
     body_fill_NA = PatternFill(fill_type='solid', start_color='abadb0', end_color='abadb0')
 
-    threshold_list = QueryScript(f" SELECT parameter, threshold   FROM {env.DATABASE_TREATED}.r2_threshold WHERE threshold IS NOT NULL and version={env.VERSION}").execute()
+    threshold_list = QueryScript(f" SELECT parameter, threshold   FROM {env.DATABASE_TREATED}.r2_threshold WHERE threshold IS NOT NULL and version=  {env.CHOSEN_VERSION()}").execute()
     for column in columns:
         if ws[column + '5'].value is None or ws[column + '5'].value == '':
             pass

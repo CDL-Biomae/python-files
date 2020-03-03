@@ -70,7 +70,7 @@ def convert_list(list_converted):
 def get_unit_NQE(sandre_list):
 
     output = QueryScript(
-        f" SELECT familly, sandre, NQE   FROM {env.DATABASE_TREATED}.r3 WHERE sandre IN {tuple(sandre_list)} AND version={env.VERSION}").execute()
+        f" SELECT familly, sandre, NQE   FROM {env.DATABASE_TREATED}.r3 WHERE sandre IN {tuple(sandre_list)} AND version=  {env.CHOSEN_VERSION()}").execute()
     result = [[], [], []]
     if len(output):
         for sandre in sandre_list:
@@ -93,7 +93,7 @@ def get_unit_NQE(sandre_list):
 def get_unit(sandre_list):
 
     output = QueryScript(
-        f" SELECT familly, sandre   FROM {env.DATABASE_TREATED}.r3 WHERE sandre IN {tuple(sandre_list)} AND version={env.VERSION}").execute()
+        f" SELECT familly, sandre   FROM {env.DATABASE_TREATED}.r3 WHERE sandre IN {tuple(sandre_list)} AND version=  {env.CHOSEN_VERSION()}").execute()
     result = [[], []]
     if len(output):
         for sandre in sandre_list:
@@ -120,7 +120,7 @@ def result_by_packs_and_sandre(dict_pack_fusion, sandre_list=None):
     if not sandre_list:
 
         sandre_list = QueryScript(
-            f" SELECT sandre   FROM {env.DATABASE_TREATED}.r3 WHERE version={env.VERSION}").execute()
+            f" SELECT sandre   FROM {env.DATABASE_TREATED}.r3 WHERE version=  {env.CHOSEN_VERSION()}").execute()
         for index, sandre in enumerate(sandre_list):
             try:
                 sandre_list[index] = float(sandre)

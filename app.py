@@ -1,11 +1,13 @@
 import tkinter as tk
 from tkinter import filedialog
-from report import excel_main, word_main
 from tools import QueryScript
 import env
 
 
 def main_button():
+    import env
+    from report import excel_main, word_main
+    change_chosen_version()
     if len(campaign_list):
         if word_wanted.get():
             if not output_folder_path.get():
@@ -20,7 +22,12 @@ def main_button():
                 output_browse_button()
             excel_main(campaign_list, output_folder_path.get())
 
-        reset()
+
+def change_chosen_version():
+    version_file = open('version.txt','w')
+    version_file.write(f'CHOSEN_VERSION={version_choice.get()}')
+    print(version_choice.get())
+    version_file.close()
 
 
 def add_campaign():
@@ -55,11 +62,10 @@ def output_browse_button():
     output_folder_path.set(filename)
 
 
-def next_version():
-    print('oui')
 
 version_file = open('version.txt','w')
-version_file.write(f'CHOSEN_VERSION={env.VERSION}')
+version_file.write(f'CHOSEN_VERSION={env.LATEST_VERSION}')
+version_file.close()
 
 window = tk.Tk()
 window.title('Digital Lab App')
@@ -81,11 +87,9 @@ tk.Label(master=frame_campaign, textvariable=campaign_input_text).grid(
     row=1, column=1)
 tk.Label(master=frame_campaign, text='Version choisie :').grid(
     row=2, column=0)
-tk.Label(master=frame_campaign, text='chosen_version').grid(
-    row=2, column=1)
-version_button = tk.Button(
-    master=frame_campaign, text="+", command=next_version)
-version_button.grid(row=2, column=1)
+version_choice = tk.StringVar()
+version_choice.set(env.LATEST_VERSION)
+version_menu = tk.OptionMenu(frame_campaign, version_choice, *env.ALL_VERSIONS).grid(row=2, column=1)
 
 frame_campaign.pack(expand='YES')
 window.bind('<Return>', enter)

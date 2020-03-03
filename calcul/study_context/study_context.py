@@ -12,7 +12,7 @@ from datetime import date
 def contexte(measurepoint_id):
 
     measurepoints = QueryScript(
-        f" SELECT DISTINCT measurepoint_id   FROM {env.DATABASE_TREATED}.key_dates WHERE measurepoint_fusion_id = {measurepoint_id} AND version = {env.VERSION}").execute()
+        f" SELECT DISTINCT measurepoint_id   FROM {env.DATABASE_TREATED}.key_dates WHERE measurepoint_fusion_id = {measurepoint_id} AND version =   {env.CHOSEN_VERSION()}").execute()
 
     if len(measurepoints) < 2:
         return contexte_simple(measurepoint_id)

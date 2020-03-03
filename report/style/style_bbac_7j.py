@@ -21,8 +21,8 @@ def add_style_bbac_7j(bbac_dataframe, filename, folder_PATH, dict_t0):
                      top=Side(border_style='thin', color='FFFFFF'),
                      bottom=Side(border_style='thin', color='FFFFFF'))
      
-    elements_metal = QueryScript(f" SELECT sandre, parameter, 7j_threshold, 7j_graduate_25, 7j_graduate_50, 7j_graduate_75   FROM {env.DATABASE_TREATED}.r3 WHERE version={env.VERSION} and familly='Métaux' AND 7j_threshold IS NOT NULL").execute()
-    elements_organic = QueryScript(f" SELECT sandre, parameter, 7j_threshold, 7j_graduate_25, 7j_graduate_50, 7j_graduate_75   FROM {env.DATABASE_TREATED}.r3 WHERE version={env.VERSION} and familly!='Métaux' AND 7j_threshold IS NOT NULL").execute()
+    elements_metal = QueryScript(f" SELECT sandre, parameter, 7j_threshold, 7j_graduate_25, 7j_graduate_50, 7j_graduate_75   FROM {env.DATABASE_TREATED}.r3 WHERE version=  {env.CHOSEN_VERSION()} and familly='Métaux' AND 7j_threshold IS NOT NULL").execute()
+    elements_organic = QueryScript(f" SELECT sandre, parameter, 7j_threshold, 7j_graduate_25, 7j_graduate_50, 7j_graduate_75   FROM {env.DATABASE_TREATED}.r3 WHERE version=  {env.CHOSEN_VERSION()} and familly!='Métaux' AND 7j_threshold IS NOT NULL").execute()
     
     for letter in [get_column_letter(col_idx) for col_idx in range(1, nb_columns+5)]:
         for number in range(1, nb_rows+21):

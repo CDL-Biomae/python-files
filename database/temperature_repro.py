@@ -20,10 +20,10 @@ def fill_temperature_repro(cas):
     values = []
 
     liste_fusion_id = QueryScript(
-        f" SELECT measurepoint_fusion_id FROM {env.DATABASE_TREATED}.average_temperature WHERE version={env.VERSION}").execute()
+        f" SELECT measurepoint_fusion_id FROM {env.DATABASE_TREATED}.average_temperature WHERE version=  {env.LATEST_VERSION}").execute()
 
     constantes = QueryScript(
-        f" SELECT name,value FROM {env.DATABASE_TREATED}.r2_constant WHERE nature='Temperature repro' and version={env.VERSION}").execute()
+        f" SELECT name,value FROM {env.DATABASE_TREATED}.r2_constant WHERE nature='Temperature repro' and version=  {env.LATEST_VERSION}").execute()
     constantes = list_to_dict(constantes)
     print(env.VERSION)
     print(constantes)

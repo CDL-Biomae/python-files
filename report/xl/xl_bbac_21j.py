@@ -5,13 +5,13 @@ import env
 
 ## CREATE DATAFRAME ##
 def create_dataframe(dick_pack_fusion):
-    elements_metal = QueryScript(f" SELECT sandre   FROM {env.DATABASE_TREATED}.r3 WHERE version={env.VERSION} AND 21j_threshold IS NOT NULL AND familly='Métaux'").execute()
+    elements_metal = QueryScript(f" SELECT sandre   FROM {env.DATABASE_TREATED}.r3 WHERE version=  {env.CHOSEN_VERSION()} AND 21j_threshold IS NOT NULL AND familly='Métaux'").execute()
     elements_metal = [int(float(element)) for element in elements_metal]
-    elements_PCB = QueryScript(f" SELECT sandre   FROM {env.DATABASE_TREATED}.r3 WHERE version={env.VERSION} AND 21j_threshold IS NOT NULL AND familly LIKE 'PCB%'").execute()
+    elements_PCB = QueryScript(f" SELECT sandre   FROM {env.DATABASE_TREATED}.r3 WHERE version=  {env.CHOSEN_VERSION()} AND 21j_threshold IS NOT NULL AND familly LIKE 'PCB%'").execute()
     elements_PCB = [int(float(element)) for element in elements_PCB]
-    elements_HAP = QueryScript(f" SELECT sandre   FROM {env.DATABASE_TREATED}.r3 WHERE version={env.VERSION} AND 21j_threshold IS NOT NULL AND familly = 'HAP'").execute()
+    elements_HAP = QueryScript(f" SELECT sandre   FROM {env.DATABASE_TREATED}.r3 WHERE version=  {env.CHOSEN_VERSION()} AND 21j_threshold IS NOT NULL AND familly = 'HAP'").execute()
     elements_HAP = [int(float(element)) for element in elements_HAP]
-    elements_others = QueryScript(f" SELECT sandre   FROM {env.DATABASE_TREATED}.r3 WHERE version={env.VERSION} AND 21j_threshold IS NOT NULL AND familly != 'HAP' AND familly != 'Métaux' AND familly NOT LIKE 'PCB%'").execute()
+    elements_others = QueryScript(f" SELECT sandre   FROM {env.DATABASE_TREATED}.r3 WHERE version=  {env.CHOSEN_VERSION()} AND 21j_threshold IS NOT NULL AND familly != 'HAP' AND familly != 'Métaux' AND familly NOT LIKE 'PCB%'").execute()
     elements_others = [int(float(element)) for element in elements_others]
     
     matrix = []
@@ -32,13 +32,13 @@ def create_dataframe(dick_pack_fusion):
     return df
 
 def create_empty_dataframe(dick_pack_fusion):
-    elements_metal = QueryScript(f" SELECT sandre   FROM {env.DATABASE_TREATED}.r3 WHERE version={env.VERSION} AND 21j_threshold IS NOT NULL AND familly='Métaux'").execute()
+    elements_metal = QueryScript(f" SELECT sandre   FROM {env.DATABASE_TREATED}.r3 WHERE version=  {env.CHOSEN_VERSION()} AND 21j_threshold IS NOT NULL AND familly='Métaux'").execute()
     elements_metal = [int(float(element[0])) for element in elements_metal]
-    elements_PCB = QueryScript(f" SELECT sandre   FROM {env.DATABASE_TREATED}.r3 WHERE version={env.VERSION} AND 21j_threshold IS NOT NULL AND familly LIKE 'PCB%'").execute()
+    elements_PCB = QueryScript(f" SELECT sandre   FROM {env.DATABASE_TREATED}.r3 WHERE version=  {env.CHOSEN_VERSION()} AND 21j_threshold IS NOT NULL AND familly LIKE 'PCB%'").execute()
     elements_PCB = [int(float(element[0])) for element in elements_PCB]
-    elements_HAP = QueryScript(f" SELECT sandre   FROM {env.DATABASE_TREATED}.r3 WHERE version={env.VERSION} AND 21j_threshold IS NOT NULL AND familly = 'HAP'").execute()
+    elements_HAP = QueryScript(f" SELECT sandre   FROM {env.DATABASE_TREATED}.r3 WHERE version=  {env.CHOSEN_VERSION()} AND 21j_threshold IS NOT NULL AND familly = 'HAP'").execute()
     elements_HAP = [int(float(element[0])) for element in elements_HAP]
-    elements_others = QueryScript(f" SELECT sandre   FROM {env.DATABASE_TREATED}.r3 WHERE version={env.VERSION} AND 21j_threshold IS NOT NULL AND familly != 'HAP' AND familly != 'Métaux' AND familly NOT LIKE 'PCB%'").execute()
+    elements_others = QueryScript(f" SELECT sandre   FROM {env.DATABASE_TREATED}.r3 WHERE version=  {env.CHOSEN_VERSION()} AND 21j_threshold IS NOT NULL AND familly != 'HAP' AND familly != 'Métaux' AND familly NOT LIKE 'PCB%'").execute()
     elements_others = [int(float(element[0])) for element in elements_others]
     
     matrix = []
