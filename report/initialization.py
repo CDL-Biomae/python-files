@@ -24,8 +24,12 @@ def measure_points(campaign_ref):
 
 
 def number_name_mp(list_mp):
+    if len(list_mp) > 1:
+        query_tuple_mp = tuple(list_mp)
+    else:
+        query_tuple_mp = f"({list_mp[0]})"
     output = QueryScript(
-        f"SELECT measurepoint.id, substring(place.reference, -2, 2), measurepoint.name FROM {env.DATABASE_RAW}.measurepoint JOIN {env.DATABASE_RAW}.place ON place.id = measurepoint.place_id WHERE measurepoint.id in {tuple(list_mp)}"
+        f"SELECT measurepoint.id, substring(place.reference, -2, 2), measurepoint.name FROM {env.DATABASE_RAW}.measurepoint JOIN {env.DATABASE_RAW}.place ON place.id = measurepoint.place_id WHERE measurepoint.id in {query_tuple_mp}"
     ).execute()
 
     list_number = []
@@ -68,7 +72,7 @@ def create_dataframe(campaign_str):
 
     df = pd.DataFrame(matrix)
     df.columns = ['Campagne', 'Numéro', 'Station de mesure', 'Code Agence']
-
+    print(df)
     return df
 
 
@@ -80,6 +84,6 @@ def create_head_dataframe(list_campaigns):
         list_dataframe.append(df)
 
     df_concat = pd.concat(list_dataframe)
-    df_cleaned = clean(df_concat)
+    df_cleaned = df_concat
     return df_cleaned
 

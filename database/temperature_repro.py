@@ -3,12 +3,20 @@ from database import liste_temperature
 from math import exp
 import env
 
-def run():
-     
-    temperature_repro_table = QueryScript(
-        f" DROP TABLE IF EXISTS {env.DATABASE_TREATED}.temperature_repro; CREATE TABLE {env.DATABASE_TREATED}.temperature_repro (id INT AUTO_INCREMENT PRIMARY KEY, measurepoint_fusion_id INT(11), av_cycle_BCD1 DOUBLE, expected_C2 DOUBLE, expected_D1 DOUBLE, expected_D2 DOUBLE, av_cycle_1234 DOUBLE, expected_st3 DOUBLE, expected_st4 DOUBLE, expected_st5 DOUBLE, version INT );")
-    temperature_repro_table.execute(True)
-    SQL_request = f" INSERT INTO {env.DATABASE_TREATED}.temperature_repro (measurepoint_fusion_id, av_cycle_BCD1, expected_C2, expected_D1, expected_D2, av_cycle_1234, expected_st3, expected_st4, expected_st5, version) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
+def fill_temperature_repro(cas):
+    ## Cas 1: Création et remplissage de la base de données
+    if cas == 1:
+        temperature_repro_table = QueryScript(
+            f" DROP TABLE IF EXISTS {env.DATABASE_TREATED}.temperature_repro; CREATE TABLE {env.DATABASE_TREATED}.temperature_repro (id INT AUTO_INCREMENT PRIMARY KEY, measurepoint_fusion_id INT(11), av_cycle_BCD1 DOUBLE, expected_C2 DOUBLE, expected_D1 DOUBLE, expected_D2 DOUBLE, av_cycle_1234 DOUBLE, expected_st3 DOUBLE, expected_st4 DOUBLE, expected_st5 DOUBLE, version INT );")
+        temperature_repro_table.execute(True)
+    ## Cas 2: Mise à jour de la dernière version connue
+    if cas == 2:
+        version = env.VERSION
+        db_treated = env.DATABASE_TREATED
+        delete_query = QueryScript(f"DELETE FROM {db_treated}.temperature_repro WHERE version = {version};")
+        delete_query.execute()
+
+    SQL_request = QueryScript(f" INSERT INTO {env.DATABASE_TREATED}.temperature_repro (measurepoint_fusion_id, av_cycle_BCD1, expected_C2, expected_D1, expected_D2, av_cycle_1234, expected_st3, expected_st4, expected_st5, version) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)")
     values = []
 
     liste_fusion_id = QueryScript(
@@ -22,7 +30,6 @@ def run():
 
     count = 1
     for elt_mp_id in liste_fusion_id:
-        #elt_mp_id = 2895
         print(elt_mp_id, count)
         elt_insert = [elt_mp_id]
         liste_tempe = liste_temperature(elt_mp_id, "2lab")
@@ -51,9 +58,8 @@ def run():
             values.append(tuple(elt_insert))
         count += 1
 
-    temperature_repro_table.setScript(SQL_request)
-    temperature_repro_table.setRows(values)
-    temperature_repro_table.executemany()
+    SQL_request.setRows(values)
+    SQL_request.executemany()
 
 
 def calcul_av_cycle(alpha, beta, gamme, delta, liste_tempe):
@@ -68,10 +74,19 @@ def calcul_av_cycle(alpha, beta, gamme, delta, liste_tempe):
 
 def fct_aux_expected_percent(alpha, beta, x):
     expo = exp(-(alpha + beta*x))
-    return (100/(1+expo))
+    return 100/(1+expo)
 
 
 def fct_aux_av_cycle(alpha, beta, gamma, delta, temp):
     numerateur = alpha + beta*temp
     denominateur = gamma + delta*temp
-    return((100*numerateur) / (24*denominateur))
+    return (100*numerateur) / (24*denominateur)
+
+
+def run(cas):
+    ## On a 3 cas pour les requêtes SQL
+    # Cas 1: 'première_version'
+    # Cas 2: 'update_version'
+    # Cas 3: 'nouvelle_version'
+
+    fill_temperature_repro(cas)

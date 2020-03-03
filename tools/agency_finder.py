@@ -13,8 +13,12 @@ def agency_finder(measurepoint_id):
 
 
 def list_agency_finder(list_mp):
+    if len(list_mp) > 1:
+        query_tuple_mp = tuple(list_mp)
+    else:
+        query_tuple_mp = f"({list_mp[0]})"
     output = QueryScript(
-        f"  SELECT measurepoint.id, code   FROM {env.DATABASE_RAW}.agency JOIN {env.DATABASE_RAW}.place ON agency.id = place.agency_id JOIN {env.DATABASE_RAW}.measurepoint ON place.id = measurepoint.place_id WHERE measurepoint.id IN {tuple(list_mp)};"
+        f"  SELECT measurepoint.id, code   FROM {env.DATABASE_RAW}.agency JOIN {env.DATABASE_RAW}.place ON agency.id = place.agency_id JOIN {env.DATABASE_RAW}.measurepoint ON place.id = measurepoint.place_id WHERE measurepoint.id IN {query_tuple_mp};"
     ).execute()
     list_agency = []
     list_mp_output = [x[0] for x in output]

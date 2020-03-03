@@ -126,8 +126,15 @@ def result_by_packs_and_sandre(dict_pack_fusion, sandre_list=None):
                 sandre_list[index] = float(sandre)
             except ValueError:
                 sandre_list[index] = sandre
+
+    list_pack = [element for element in pack_dict]
+    if len(list_pack) > 1:
+        query_tuple_pack = tuple(list_pack)
+    else:
+        query_tuple_pack = f"({list_pack[0]})"
+
     data = QueryScript(
-        f"SELECT pack_id, prefix, value, sandre FROM {env.DATABASE_RAW}.analysis WHERE pack_id IN {tuple([element for element in pack_dict])} AND sandre IN {tuple(sandre_list)}").execute()
+        f"SELECT pack_id, prefix, value, sandre FROM {env.DATABASE_RAW}.analysis WHERE pack_id IN {query_tuple_pack} AND sandre IN {tuple(sandre_list)}").execute()
     for element in data:
         try:
             sandre = int(element[3])
