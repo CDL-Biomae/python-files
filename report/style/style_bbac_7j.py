@@ -159,7 +159,7 @@ def add_style_bbac_7j(bbac_dataframe, filename, folder_PATH, dict_t0):
     
     t0_mp = []
     for mp in dict_t0:
-        if not dict_t0[mp]['code_t0_id'] in t0_mp:
+        if not dict_t0[mp]['code_t0_id'] in t0_mp and dict_t0[mp]['code_t0_id']:
             t0_mp.append(dict_t0[mp]['code_t0_id'])
     if len(t0_mp) > 1:
         query_tuple_t0 = tuple(t0_mp)
@@ -310,16 +310,20 @@ def add_style_bbac_7j(bbac_dataframe, filename, folder_PATH, dict_t0):
                     cell2.fill = body_fill_nd
                     cell2.value = 'nd'
     for index,mp in enumerate(dict_t0):
-        index_t0_associated = t0_mp.index(dict_t0[ws[header_columns[-1] + str(index+5)].value]['code_t0_id'])
-        for column in header_columns[5:]:
-            t0_ok = True if ws[column + str(5+nb_rows+index_t0_associated)].fill == body_fill_ok else False 
-            if not t0_ok and (ws[column + str(5+nb_rows+index_t0_associated)].value!= None and ws[column + str(5+nb_rows+index_t0_associated)].value!= ''):
-                ws[column + str(5+index)].fill = body_fill_nd
-                ws[column + str(5+index)].font = body_font
-                ws2[column + str(5+index)].fill = body_fill_nd
-                ws2[column + str(5+index)].font = body_font
-                ws2[column + str(5+index)].value = 'nd'
+        try :
+            index_t0_associated = t0_mp.index(dict_t0[ws[header_columns[-1] + str(index+5)].value]['code_t0_id'])
+            for column in header_columns[5:]:
+                t0_ok = True if ws[column + str(5+nb_rows+index_t0_associated)].fill == body_fill_ok else False 
+                if not t0_ok and (ws[column + str(5+nb_rows+index_t0_associated)].value!= None and ws[column + str(5+nb_rows+index_t0_associated)].value!= ''):
+                    ws[column + str(5+index)].fill = body_fill_nd
+                    ws[column + str(5+index)].font = body_font
+                    ws2[column + str(5+index)].fill = body_fill_nd
+                    ws2[column + str(5+index)].font = body_font
+                    ws2[column + str(5+index)].value = 'nd'
+        except ValueError :
+            None
     ws.delete_cols(len(header_columns)+1,1)
+    ws2.delete_cols(len(header_columns)+1,1)
     
     for letter in header_columns[5:]:
         for number in range(5, nb_rows+21):

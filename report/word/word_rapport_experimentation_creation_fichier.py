@@ -95,10 +95,16 @@ def word_main(campaign, agence, path_photo="Photos", path_output="output"):
 
                 table_geo_2.cell(3, 0).paragraphs[0].add_run(
                     "Coordonnées BIOMÆ en degrés décimaux : ").bold = True
+                longitude = dico_geo_mp[reference]['longitudeSpotted']
+                latitude = dico_geo_mp[reference]['latitudeSpotted']
+                if longitude == None:
+                    longitude = dico_geo_agency[reference]['longitudeTh']
+                if latitude == None:
+                    latitude = dico_geo_agency[reference]['latitudeTh']
                 table_geo_2.cell(3, 2).paragraphs[0].add_run(
-                    str(dico_geo_mp[reference]['longitudeSpotted']))
+                    str(longitude))
                 table_geo_2.cell(3, 3).paragraphs[0].add_run(
-                    str(dico_geo_mp[reference]['latitudeSpotted']))
+                    str(latitude))
 
                 table_geo_2.cell(4, 0).paragraphs[0].add_run(
                     "Coordonnées BIOMÆ Lambert 93 : ").bold = True
@@ -110,6 +116,12 @@ def word_main(campaign, agence, path_photo="Photos", path_output="output"):
             else:
                 table_geo_2.cell(0, 0).paragraphs[0].add_run(
                     "Coordonnées BIOMÆ en degrés décimaux : ").bold = True
+                longitude = dico_geo_mp[reference]['longitudeSpotted']
+                latitude = dico_geo_mp[reference]['latitudeSpotted']
+                if longitude == None:
+                    longitude = dico_geo_mp[reference]['longitudeTh']
+                if latitude == None:
+                    latitude = dico_geo_mp[reference]['latitudeTh']
                 table_geo_2.cell(0, 2).paragraphs[0].add_run(
                     str(dico_geo_mp[reference]['longitudeSpotted']))
                 table_geo_2.cell(0, 3).paragraphs[0].add_run(

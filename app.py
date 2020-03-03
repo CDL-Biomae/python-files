@@ -30,8 +30,8 @@ def add_campaign():
         if len(campaign_list):
             campaign_input_text.set(campaign_input_text.get() + '\n')
         campaign_input_text.set(
-            campaign_input_text.get() + campaign_input.get())
-        campaign_list.append(campaign_input.get())
+            campaign_input_text.get() + campaign_input.get().upper())
+        campaign_list.append(campaign_input.get().upper())
     reset()
 
 
@@ -53,7 +53,8 @@ def output_browse_button():
     global output_folder_path
     filename = tk.filedialog.askdirectory()
     output_folder_path.set(filename)
-    
+
+
 def next_version():
     print('oui')
 
@@ -105,12 +106,12 @@ output_folder_path = tk.StringVar()
 output_folder_button = tk.Button(
     master=frame_folder, text="Choisir une destination ...", command=output_browse_button)
 output_folder_button.pack()
-tk.Label(master=frame_folder,textvariable=output_folder_path).pack()
+tk.Label(master=frame_folder, textvariable=output_folder_path).pack()
 input_folder_path = tk.StringVar()
 input_folder_button = tk.Button(
     master=frame_folder, text="Choisir une source des photos ...", command=input_browse_button)
 input_folder_button.pack()
-tk.Label(master=frame_folder,textvariable=input_folder_path).pack()
+tk.Label(master=frame_folder, textvariable=input_folder_path).pack()
 frame_folder.pack(expand='YES')
 
 window.mainloop()
