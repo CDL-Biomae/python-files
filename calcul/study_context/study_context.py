@@ -80,10 +80,15 @@ def contexte_simple(measurepoint_id):
 
     return cleaned_dates
 
+
 def parser(date):
-    if date == None:
+    if date is None:
         return None
     year = date.year
     month = date.month
     day = date.day
+
+    day = '0' + str(day) if day < 10 else str(day)
+    month = '0' + str(month) if month < 10 else str(month)
+
     return f"{day}/{month}/{year}"
