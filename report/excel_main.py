@@ -88,34 +88,34 @@ def excel_main(list_campaigns, folder_PATH = "output"):  # Prend en entrée une 
     write_in_new_excel(version_dataframe, filename, folder_PATH, 'Version', startrow=3)
     add_style_version(version_dataframe, list_campaigns, filename, folder_PATH)
 
-    # ## CREATION DE L'ONGLET STATIONS ##
+    ## CREATION DE L'ONGLET STATIONS ##
 
-    # print('\n[!] Création de l\'onglet \"Stations\"...')
-    # stations_dataframe = create_stations_dataframe(head_dataframe, list_campaigns, dict_mp)
-    # write_in_existing_excel(stations_dataframe, filename, folder_PATH, 'Stations')
-    # add_style_stations(stations_dataframe, filename, folder_PATH)
+    print('\n[!] Création de l\'onglet \"Stations\"...')
+    stations_dataframe = create_stations_dataframe(head_dataframe, list_campaigns, dict_mp)
+    write_in_existing_excel(stations_dataframe, filename, folder_PATH, 'Stations')
+    add_style_stations(stations_dataframe, filename, folder_PATH)
 
-    # # ## CREATION DE L'ONGLET CAMPAGNES ##
+    # ## CREATION DE L'ONGLET CAMPAGNES ##
 
-    # print('\n[!] Création de l\'onglet \"Campagnes\"...')
-    # campagnes_dataframe = create_campagnes_dataframe(head_dataframe, list_campaigns, dict_mp)
-    # write_in_existing_excel(campagnes_dataframe, filename, folder_PATH, 'Campagnes')
-    # add_style_campagnes(campagnes_dataframe, filename, folder_PATH)
+    print('\n[!] Création de l\'onglet \"Campagnes\"...')
+    campagnes_dataframe = create_campagnes_dataframe(head_dataframe, list_campaigns, dict_mp)
+    write_in_existing_excel(campagnes_dataframe, filename, folder_PATH, 'Campagnes')
+    add_style_campagnes(campagnes_dataframe, filename, folder_PATH)
 
-    # # ## CREATION DE L'ONGLET SURVIE ##
+    # ## CREATION DE L'ONGLET SURVIE ##
 
-    # print('\n[!] Création de l\'onglet \"Survie\"...')
-    # survie_dataframe = create_survie_dataframe(head_dataframe, list_campaigns, dict_mp)
-    # write_in_existing_excel(survie_dataframe, filename, folder_PATH, 'Survie', startcol=2, startrow=2)
-    # add_style_survie(survie_dataframe, filename, folder_PATH)
+    print('\n[!] Création de l\'onglet \"Survie\"...')
+    survie_dataframe = create_survie_dataframe(head_dataframe, list_campaigns, dict_mp)
+    write_in_existing_excel(survie_dataframe, filename, folder_PATH, 'Survie', startcol=2, startrow=2)
+    add_style_survie(survie_dataframe, filename, folder_PATH)
 
-    # # ## CREATION DE L'ONGLET PHYSICO-CHIMIE ##
+    # ## CREATION DE L'ONGLET PHYSICO-CHIMIE ##
 
-    # print('\n[!] Création de l\'onglet \"Physico-chimie\"...')
-    # physicochimie_dataframe = create_physicochimie_dataframe(head_dataframe, list_campaigns, dict_mp)
-    # write_in_existing_excel(physicochimie_dataframe, filename, folder_PATH, 'Physico-chimie_refChimie', startrow=2)
-    # write_in_existing_excel(physicochimie_dataframe, filename, folder_PATH, 'Physico-chimie_refToxicité', startrow=2)
-    # add_style_physicochimie(physicochimie_dataframe, filename, folder_PATH)
+    print('\n[!] Création de l\'onglet \"Physico-chimie\"...')
+    physicochimie_dataframe = create_physicochimie_dataframe(head_dataframe, list_campaigns, dict_mp)
+    write_in_existing_excel(physicochimie_dataframe, filename, folder_PATH, 'Physico-chimie_refChimie', startrow=2)
+    write_in_existing_excel(physicochimie_dataframe, filename, folder_PATH, 'Physico-chimie_refToxicité', startrow=2)
+    add_style_physicochimie(physicochimie_dataframe, filename, folder_PATH)
 
 
     # CREATION DE L'ONGLET BBAC ##
