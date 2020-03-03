@@ -159,25 +159,15 @@ def run(cas):
     ## Cas 2: Mise à jour de la dernière version connue
     if cas == 2:
         version = env.VERSION
-        for value in values:
-            [measurepoint_fusion_id,
-            male_survival_7_days,
-            alimentation,
-            neurotoxicity,
-            female_survivor,
-            number_days_exposition,
-            number_female_concerned,
-            index_fertility_average,
-            number_female_analysis,
-            molting_cycle,
-            number_female_concerned_area,
-            endocrine_disruption] = value
+        db_treated = env.DATABASE_TREATED
+        delete_query = QueryScript(f"DELETE FROM {db_treated}.toxtable WHERE version = {version};")
+        delete_query.execute()
 
-            insert_value = list(value + (version,))
-
-            request = QueryScript(
-                f"IF EXISTS (SELECT * FROM {env.DATABASE_TREATED}.toxtable WHERE measurepoint_fusion_id = {measurepoint_fusion_id} AND version = {version}) UPDATE toxtable SET male_survival_7_days = {male_survival_7_days}, alimentation = {alimentation}, neurotoxicity = {neurotoxicity}, female_survivor = {female_survivor}, number_days_exposition = {number_days_exposition}, number_female_concerned = {number_female_concerned}, index_fertility_average = {index_fertility_average}, number_female_analysis = {number_female_analysis}, molting_cycle = {molting_cycle}, number_female_concerned_area = {number_female_concerned_area}, endocrine_disruption = {endocrine_disruption} WHERE measurepoint_fusion_id = {measurepoint_fusion_id} AND version = {version} ELSE INSERT INTO {env.DATABASE_TREATED}.toxtable (measurepoint_fusion_id, male_survival_7_days, alimentation, neurotoxicity, female_survivor, number_days_exposition, number_female_concerned, index_fertility_average, number_female_analysis, molting_cycle, number_female_concerned_area, endocrine_disruption, version) VALUES {tuple(insert_value)};"
-            ).execute()
+        fill_table = QueryScript(
+            f"INSERT INTO {env.DATABASE_TREATED}.toxtable (measurepoint_fusion_id, male_survival_7_days, alimentation, neurotoxicity, female_survivor, number_days_exposition, number_female_concerned, index_fertility_average, number_female_analysis, molting_cycle, number_female_concerned_area, endocrine_disruption, version) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s,%s, %s, %s)"
+        )
+        fill_table.setRows(values)
+        fill_table.executemany()
 
     ## Cas 3: Ajout d'une nouvelle version
     if cas == 3:
@@ -187,4 +177,3 @@ def run(cas):
         fill_table.setRows(values)
         fill_table.executemany()
 
-    return dict_survie_7j_males

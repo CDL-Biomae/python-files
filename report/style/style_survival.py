@@ -56,7 +56,10 @@ def add_style_survie(survie_dataframe, filename, folder_PATH):
 
     for cell_str in body_cells:
         cell = ws[cell_str]
+        value = cell.value
 
+        if value == '' or value is None:
+            cell.value = 'ND'
         if cell_str[0] == 'H':
             cell.font = Font(size=9, name='Arial', italic=True)
         else:
