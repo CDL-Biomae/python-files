@@ -117,7 +117,6 @@ class Reprotoxicity:
                             dict_index_fecundity[pack_id]['list_index_fecundity'].append(embryo_total/(specimen_size_mm-5))
                     else:
                         dict_index_fecundity[pack_id]['list_index_fecundity'].append(0)
-        print(f"Il y a eu des erreurs pour les calculs de fécondité des packs suivants: {list(set(pack_errors))}")
         return dict_index_fecundity  # {pack_id: {'list_molting_stage': [...], 'list_index_fecundity': [...]}
 
     @staticmethod
@@ -293,7 +292,6 @@ class Reprotoxicity:
 
                     if molting_stage in ['c1', 'b'] and oocyte_area_pixel is not None:
                         if px_to_mm is None:
-                            print('Pas de surface en mm ni d\'étalon pour calculer depuis le pixel: ', pack_id)
                             continue
                         surface_retard = oocyte_area_pixel * px_to_mm
                         dict_surface_des_retards[pack_id].append(surface_retard)

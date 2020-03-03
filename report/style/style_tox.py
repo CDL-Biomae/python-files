@@ -3,6 +3,9 @@ from openpyxl import load_workbook
 from openpyxl.utils.cell import get_column_letter
 from termcolor import colored
 from tools import QueryScript
+from database import get_dict_pack_fusion
+from calcul.toxicity.reprotoxicity import Reprotoxicity
+
 import env
 
 def add_style_tox(tox_dataframe, filename, folder_PATH):
@@ -148,12 +151,12 @@ def add_style_tox(tox_dataframe, filename, folder_PATH):
     little_border_columns = ['G', 'H', 'I', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R']
     na = ['L', 'M', 'N', 'O', 'P', 'Q', 'R']
 
-    body_fill_ok = PatternFill(fill_type='solid', start_color='027ee3', end_color='027ee3')
-    body_fill_not_ok_1 = PatternFill(fill_type='solid', start_color='69a64b', end_color='69a64b')
-    body_fill_not_ok_2 = PatternFill(fill_type='solid', start_color='d1c452', end_color='d1c452')
-    body_fill_not_ok_3 = PatternFill(fill_type='solid', start_color='cc7931', end_color='cc7931')
-    body_fill_not_ok_4 = PatternFill(fill_type='solid', start_color='ab2222', end_color='ab2222')
-    body_fill_NA = PatternFill(fill_type='solid', start_color='abadb0', end_color='abadb0')
+    body_fill_ok = PatternFill(fill_type='solid', start_color='027ee3', end_color='027ee3') #bleu
+    body_fill_not_ok_1 = PatternFill(fill_type='solid', start_color='69a64b', end_color='69a64b') #green
+    body_fill_not_ok_2 = PatternFill(fill_type='solid', start_color='d1c452', end_color='d1c452') #yellow
+    body_fill_not_ok_3 = PatternFill(fill_type='solid', start_color='cc7931', end_color='cc7931') #orange
+    body_fill_not_ok_4 = PatternFill(fill_type='solid', start_color='ab2222', end_color='ab2222') #red
+    body_fill_NA = PatternFill(fill_type='solid', start_color='abadb0', end_color='abadb0')  # grey
 
     threshold_list = QueryScript(f" SELECT parameter, threshold   FROM {env.DATABASE_TREATED}.r2_threshold WHERE threshold IS NOT NULL and version=  {env.CHOSEN_VERSION()}").execute()
     for column in columns:
@@ -215,6 +218,44 @@ def add_style_tox(tox_dataframe, filename, folder_PATH):
             ws[column + str(row)].border = normal_cells_border
             ws[column + str(row)].alignment = alignment_center
 
+    
+
+
+    # MAKE STYLE OF molting_cycle get all result of conforme or not of molting_cycle
+    pack_fusion = get_dict_pack_fusion()
+    confrm_mue  = Reprotoxicity.conform_resultat_mue(pack_fusion)
+
+    # get all conform surface_retard 
+    b =Reprotoxicity.number_female_concerned_area(pack_fusion)
+    c =Reprotoxicity.fecundity(pack_fusion)
+
+    dict_conform_surface_retard = Reprotoxicity.conform_surface_retard(pack_fusion,b[0],b[1],c)[0]
+    
+    
+
+    for row in range(5, nb_rows+5): 
+          pack = pack_fusion.get(ws["S"+ str(row)].value)
+          repro_pack = pack.get("reproduction")
+
+          mue=confrm_mue.get(repro_pack)
+          surface_retard = dict_conform_surface_retard.get(repro_pack)
+
+          if ws["R"+ str(row)].value == "NA" or  surface_retard == "Conforme BC1":
+               ws["R"+ str(row)].fill = body_fill_ok
+          if ws["R"+ str(row)].value != "NA":
+              ws["R"+ str(row)].fill =  body_fill_not_ok_4
+
+          if mue=="NA":
+                ws["P"+ str(row)].fill = body_fill_NA
+          if mue == "Conforme":
+                ws["P"+ str(row)].fill = body_fill_ok
+          if mue == "Retard modéré":
+                ws["P"+ str(row)].fill = body_fill_NA
+          if mue == "Retard fort":
+                ws["P"+ str(row)].fill = body_fill_not_ok_4
+        
+          ws["S"+ str(row)].value = ""    
+
     for row in range(5, nb_rows+5):
         value = ws["K" + str(row)].value
         if value is None or float(value) == 0:
@@ -222,7 +263,6 @@ def add_style_tox(tox_dataframe, filename, folder_PATH):
                 ws[column + str(row)].value = "NA"
                 if column == "N" or column == "P" or column == "R":
                     ws[column + str(row)].fill = body_fill_NA
-
 
     wb.save(PATH)
     wb.close()
