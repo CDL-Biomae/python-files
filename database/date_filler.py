@@ -89,22 +89,15 @@ def key_dates(id_mp):
     key_dates_list['Arret Reprotoxicite'] = {
         'date': temp_date, 'step': 170, 'barrel': None}
 
-    # (step 50, C0 ou T0) Lancement Chimie (=Lancement reprotoxicité)
+    # (step 50, R0) Lancement Chimie (=Lancement reprotoxicité)
     try:
-        idx = steps_barrels.index((50, 'C0'))
-        barrel = 'C0'
+        idx = steps_barrels.index((50, 'R0'))
         temp_date = exposureconditions[idx][1]
     except ValueError:
-        try:
-            idx = steps_barrels.index((50, 'T0'))
-            barrel = 'T0'
-            temp_date = exposureconditions[idx][1]
-        except ValueError:
-            temp_date = None
-            barrel = 'C0'
+        temp_date = None
 
     key_dates_list['Lancement Chimie'] = {
-        'date': temp_date, 'step': 50, 'barrel': barrel}
+        'date': temp_date, 'step': 50, 'barrel': 'R0'}
 
     # (step 100, R21) Récupération Chimie
     try:
@@ -211,20 +204,13 @@ def key_datesFusion(id_mp_alim, id_mp_chimie, id_mp_repro):
 
     # (step 50, C0 ou T0) Lancement Chimie (=Lancement reprotoxicité)
     try:
-        idx = steps_barrels_chimie.index((50, 'C0'))
-        barrel = 'C0'
+        idx = steps_barrels_chimie.index((50, 'R0'))
         temp_date = exposureconditions_chimie[idx][1]
     except ValueError:
-        try:
-            idx = steps_barrels_repro.index((50, 'T0'))
-            barrel = 'T0'
-            temp_date = exposureconditions_repro[idx][1]
-        except ValueError:
-            temp_date = None
-            barrel = 'C0'
+        temp_date = None
 
     key_dates_list['Lancement Chimie'] = {
-        'date': temp_date, 'step': 50, 'barrel': barrel}
+        'date': temp_date, 'step': 50, 'barrel': 'R0'}
 
     # (step 100, R21) Récupération Chimie
     try:
@@ -420,6 +406,25 @@ def fill_date_table():
 
                         fusion_dates_insert(id_list, key_date_list)
 
-def run():
-    create_empty_date_table()
-    fill_date_table()
+def run(cas):
+    ## On a 3 cas pour les requêtes SQL
+    # Cas 1: 'première_version'
+    # Cas 2: 'update_version'
+    # Cas 3: 'nouvelle_version'
+
+    ## Cas 1: Création et remplissage de la base de données
+    if cas == 1:
+        create_empty_date_table()
+        fill_date_table()
+
+    ## Cas 2: Mise à jour de la dernière version connue
+    if cas == 2:
+        version = env.VERSION
+        db_treated = env.DATABASE_TREATED
+        delete_query = QueryScript(f"DELETE FROM {db_treated}.key_dates WHERE version = {version};")
+        delete_query.execute()
+        fill_date_table()
+
+    ## Cas 3: Ajout d'une nouvelle version
+    if cas == 3:
+        fill_date_table()

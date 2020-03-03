@@ -2,6 +2,7 @@ from tools import QueryScript
 from math import *
 from scipy.stats import binom
 from collections import Counter
+from datetime import date
 import env
 
 class Reprotoxicity:
@@ -47,7 +48,9 @@ class Reprotoxicity:
                 if date_debut is None and date_fin is None:
                     dict_nbr_days_exposition[mp] = "NA"
                 else:
-                    nbrdays = (date_fin - date_debut).days
+                    date_fin_sans_heure = date(date_fin.year, date_fin.month, date_fin.day)
+                    date_debut_sans_heure = date(date_debut.year, date_debut.month, date_debut.day)
+                    nbrdays = (date_fin_sans_heure - date_debut_sans_heure).days
                     dict_nbr_days_exposition[mp] = nbrdays
             else:
                 dict_nbr_days_exposition[mp] = "NA"
@@ -114,7 +117,6 @@ class Reprotoxicity:
                             dict_index_fecundity[pack_id]['list_index_fecundity'].append(embryo_total/(specimen_size_mm-5))
                     else:
                         dict_index_fecundity[pack_id]['list_index_fecundity'].append(0)
-        print(f"Il y a eu des erreurs pour les calculs de fécondité des packs suivants: {list(set(pack_errors))}")
         return dict_index_fecundity  # {pack_id: {'list_molting_stage': [...], 'list_index_fecundity': [...]}
 
     @staticmethod
@@ -290,7 +292,6 @@ class Reprotoxicity:
 
                     if molting_stage in ['c1', 'b'] and oocyte_area_pixel is not None:
                         if px_to_mm is None:
-                            print('Pas de surface en mm ni d\'étalon pour calculer depuis le pixel: ', pack_id)
                             continue
                         surface_retard = oocyte_area_pixel * px_to_mm
                         dict_surface_des_retards[pack_id].append(surface_retard)

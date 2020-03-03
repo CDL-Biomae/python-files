@@ -12,23 +12,35 @@ def list_of_list_to_dict(list_of_list):
 
 
 def test_chimie_superieur_repro(list_mp):
+    if len(list_mp) > 1:
+        query_tuple_mp = tuple(list_mp)
+    else:
+        query_tuple_mp = f"({list_mp[0]})"
+    output_date1 = QueryScript(
+        f" SELECT measurepoint_id, date   FROM {env.DATABASE_TREATED}.key_dates WHERE version={env.VERSION} AND date_id = 1 and measurepoint_fusion_id IN {query_tuple_mp}"
+    ).execute()
     output_date4 = QueryScript(
-        f" SELECT measurepoint_id, date   FROM {env.DATABASE_TREATED}.key_dates WHERE version={env.VERSION} AND date_id = 4 and measurepoint_fusion_id IN {tuple(list_mp)}"
+        f" SELECT measurepoint_id, date   FROM {env.DATABASE_TREATED}.key_dates WHERE version={env.VERSION} AND date_id = 4 and measurepoint_fusion_id IN {query_tuple_mp}"
     ).execute()
     output_date6 = QueryScript(
-        f" SELECT measurepoint_id, date   FROM {env.DATABASE_TREATED}.key_dates WHERE version={env.VERSION} AND date_id = 6 and measurepoint_fusion_id IN {tuple(list_mp)}"
+        f" SELECT measurepoint_id, date   FROM {env.DATABASE_TREATED}.key_dates WHERE version={env.VERSION} AND date_id = 6 and measurepoint_fusion_id IN {query_tuple_mp}"
     ).execute()
     output_date7 = QueryScript(
-        f" SELECT measurepoint_id, date   FROM {env.DATABASE_TREATED}.key_dates WHERE version={env.VERSION} AND date_id = 7 and measurepoint_fusion_id IN {tuple(list_mp)}"
+        f" SELECT measurepoint_id, date   FROM {env.DATABASE_TREATED}.key_dates WHERE version={env.VERSION} AND date_id = 7 and measurepoint_fusion_id IN {query_tuple_mp}"
     ).execute()
 
-    dict_date4 = list_of_list_to_dict(output_date4) # {mp: [date]}
+    dict_date1 = list_of_list_to_dict(output_date1)  # {mp: [date]}
+    dict_date4 = list_of_list_to_dict(output_date4)
     dict_date6 = list_of_list_to_dict(output_date6)
     dict_date7 = list_of_list_to_dict(output_date7)
 
     n = len(list_mp)
     dict_date6467 = {}  # {mp: [date6, date4, date6, date7]}
     for mp in list_mp:
+        try:
+            date1 = dict_date1[mp][0]
+        except KeyError:
+            date1 = None
         try:
             date4 = dict_date4[mp][0]
         except KeyError:
@@ -42,9 +54,17 @@ def test_chimie_superieur_repro(list_mp):
         except KeyError:
             date7 = None
 
-        dict_date6467[mp] = [date6, date4, date6, date7]
+        if date6 is None:
+            dates = [date6, date4, date1, date7]
+        else:
+            dates = [date6, date4, date6, date7]
 
-    list_test = []
+        dict_date6467[mp] = dates
+
+        if mp == 1639:
+            print(dates)
+
+    list_test = []  # Vrai si la chimie dure plus longtemps que la repro, faux sinon
     for i in range(n):
         mp = list_mp[i]
         [debut_repro, fin_repro, debut_chimie, fin_chimie] = dict_date6467[mp]
@@ -64,6 +84,9 @@ def test_chimie_superieur_repro(list_mp):
         except TypeError:
             boolean = (delta_chimie is not None)
 
+        if mp == 1639:
+            print('boolean', boolean)
+
         list_test.append(boolean)
 
     return list_test
@@ -71,8 +94,12 @@ def test_chimie_superieur_repro(list_mp):
 
 def temperatures_dataframe(list_mp):
     list_test = test_chimie_superieur_repro(list_mp)
+    if len(list_mp) > 1:
+        query_tuple_mp = tuple(list_mp)
+    else:
+        query_tuple_mp = f"({list_mp[0]})"
     output = QueryScript(
-        f" SELECT measurepoint_fusion_id, sensor2_min, sensor2_average, sensor2_max, sensor3_min, sensor3_average, sensor3_max   FROM {env.DATABASE_TREATED}.average_temperature WHERE version={env.VERSION} AND measurepoint_fusion_id IN {tuple(list_mp)}"
+        f" SELECT measurepoint_fusion_id, sensor2_min, sensor2_average, sensor2_max, sensor3_min, sensor3_average, sensor3_max   FROM {env.DATABASE_TREATED}.average_temperature WHERE version={env.VERSION} AND measurepoint_fusion_id IN {query_tuple_mp}"
     ).execute()
 
     dict_output = list_of_list_to_dict(output)  # {mp: [sensor2_min, sensor2_average, sensor2_max, sensor3_min, sensor3_average, sensor3_max]}
@@ -87,6 +114,9 @@ def temperatures_dataframe(list_mp):
             data = dict_output[mp]
         except KeyError:
             data = [None, None, None, None, None, None]
+
+        if mp == 1639:
+            print(data)
 
         [sensor2_min, sensor2_average, sensor2_max, sensor3_min, sensor3_average, sensor3_max] = data
 

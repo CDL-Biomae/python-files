@@ -47,7 +47,7 @@ def word_main(campaign, agence, path_photo="Photos", path_output="output"):
                 case_header = table_geo_1.cell(0, 0).paragraphs[0].add_run(dico_geo_agency[reference]['code'] +
                                                                            " : " + dico_geo_agency[reference]['name'] + "   " + reference)
             else:
-                case_header = table_geo_1.cell(0, 0).paragraphs[0].add_run("Point " + reference[-5:-3] + " : " +
+                case_header = table_geo_1.cell(0, 0).paragraphs[0].add_run("Point " + reference[-5:] + " : " +
                                                                            dico_geo_mp[reference]['name_mp'])
             case_header.bold = True
             table_geo_1.cell(0, 0).paragraphs[0].alignment = 1
@@ -95,10 +95,16 @@ def word_main(campaign, agence, path_photo="Photos", path_output="output"):
 
                 table_geo_2.cell(3, 0).paragraphs[0].add_run(
                     "Coordonnées BIOMÆ en degrés décimaux : ").bold = True
+                longitude = dico_geo_mp[reference]['longitudeSpotted']
+                latitude = dico_geo_mp[reference]['latitudeSpotted']
+                if longitude == None:
+                    longitude = dico_geo_agency[reference]['longitudeTh']
+                if latitude == None:
+                    latitude = dico_geo_agency[reference]['latitudeTh']
                 table_geo_2.cell(3, 2).paragraphs[0].add_run(
-                    str(dico_geo_mp[reference]['longitudeSpotted']))
+                    str(longitude))
                 table_geo_2.cell(3, 3).paragraphs[0].add_run(
-                    str(dico_geo_mp[reference]['latitudeSpotted']))
+                    str(latitude))
 
                 table_geo_2.cell(4, 0).paragraphs[0].add_run(
                     "Coordonnées BIOMÆ Lambert 93 : ").bold = True
@@ -110,6 +116,12 @@ def word_main(campaign, agence, path_photo="Photos", path_output="output"):
             else:
                 table_geo_2.cell(0, 0).paragraphs[0].add_run(
                     "Coordonnées BIOMÆ en degrés décimaux : ").bold = True
+                longitude = dico_geo_mp[reference]['longitudeSpotted']
+                latitude = dico_geo_mp[reference]['latitudeSpotted']
+                if longitude == None:
+                    longitude = dico_geo_mp[reference]['longitudeTh']
+                if latitude == None:
+                    latitude = dico_geo_mp[reference]['latitudeTh']
                 table_geo_2.cell(0, 2).paragraphs[0].add_run(
                     str(dico_geo_mp[reference]['longitudeSpotted']))
                 table_geo_2.cell(0, 3).paragraphs[0].add_run(
@@ -157,7 +169,7 @@ def word_main(campaign, agence, path_photo="Photos", path_output="output"):
                 table_image.cell(0, 0).paragraphs[0].add_run(dico_geo_agency[reference]['code'] +
                                                              " : " + dico_geo_agency[reference]['name']).bold = True
             else:
-                table_image.cell(0, 0).paragraphs[0].add_run("Point " + reference[-5:-3] + " : " +
+                table_image.cell(0, 0).paragraphs[0].add_run("Point " + reference[-5:] + " : " +
                                                              dico_geo_mp[reference]['name_mp']).bold = True
             table_image.cell(0, 0).paragraphs[0].alignment = 1
             table_image.cell(
@@ -345,6 +357,7 @@ def word_main(campaign, agence, path_photo="Photos", path_output="output"):
     composer.append(page_fin)
     name_doc = campaign + "_Rapport_d_expérimentation.docx"
     composer.save(path_output + "/" + name_doc)
+    print("Fichier de la campagne " + campaign + " créé")
 
 
 def traduction_type_biotest(biotest_anglais):
