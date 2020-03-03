@@ -16,7 +16,7 @@ def main_button():
                 input_browse_button()
             for campaign in campaign_list:
                 word_main(campaign, agence.get(),
-                          input_folder_path.get(), output_folder_path.get())
+                          input_folder_path.get(), output_folder_path.get(), num_campaign_text.get())
         if excel_wanted.get():
             if not output_folder_path.get():
                 output_browse_button()
@@ -24,7 +24,7 @@ def main_button():
 
 
 def change_chosen_version():
-    version_file = open('version.txt','w')
+    version_file = open('version.txt', 'w')
     version_file.write(f'CHOSEN_VERSION={version_choice.get()}')
     print(version_choice.get())
     version_file.close()
@@ -62,8 +62,12 @@ def output_browse_button():
     output_folder_path.set(filename)
 
 
+def choose_num_campaign():
+    num_campaign_text.set(num_campaign_input.get())
+    print(num_campaign_text.get())
 
-version_file = open('version.txt','w')
+
+version_file = open('version.txt', 'w')
 version_file.write(f'CHOSEN_VERSION={env.LATEST_VERSION}')
 version_file.close()
 
@@ -89,10 +93,20 @@ tk.Label(master=frame_campaign, text='Version choisie :').grid(
     row=2, column=0)
 version_choice = tk.StringVar()
 version_choice.set(env.LATEST_VERSION)
-version_menu = tk.OptionMenu(frame_campaign, version_choice, *env.ALL_VERSIONS).grid(row=2, column=1)
+version_menu = tk.OptionMenu(
+    frame_campaign, version_choice, *env.ALL_VERSIONS).grid(row=2, column=1)
 
 frame_campaign.pack(expand='YES')
 window.bind('<Return>', enter)
+
+tk.Label(master=frame_campaign, text='Numéro de la campagne').grid(
+    row=3, column=0)
+num_campaign_input = tk.Entry(frame_campaign)
+num_campaign_input.grid(row=3, column=1)
+num_campaign_button = tk.Button(
+    master=frame_campaign, text="Choisir", command=choose_num_campaign).grid(row=3, column=2)
+num_campaign_text = tk.StringVar()
+num_campaign_text.set("XX")
 
 frame_choice = tk.Frame(master=window)
 agence = tk.IntVar(0)
