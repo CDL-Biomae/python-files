@@ -31,7 +31,7 @@ def recuperation_donnee(campaign):
 def data_exposure_condition(measurepoint_fusion_id):
 
     query = QueryScript(
-        f"SELECT DISTINCT reference, measurepoint_id FROM {env.DATABASE_TREATED}.key_dates JOIN {env.DATABASE_RAW}.measurepoint ON measurepoint.id = key_dates.measurepoint_fusion_id WHERE measurepoint_fusion_id = {measurepoint_fusion_id} and version={env.VERSION}").execute()
+        f"SELECT DISTINCT reference, measurepoint_id FROM {env.DATABASE_TREATED}.key_dates JOIN {env.DATABASE_RAW}.measurepoint ON measurepoint.id = key_dates.measurepoint_fusion_id WHERE measurepoint_fusion_id = {measurepoint_fusion_id} and version=  {env.CHOSEN_VERSION()}").execute()
     measurepoints = [elt[1] for elt in query]
     if len(measurepoints) < 2:
         return query[0][0], data_exposure_condition_simple(measurepoint_fusion_id), False
@@ -124,7 +124,7 @@ def geographic_data_measurepoint(measurepoint_fusion_id_list):
     dico_geo_data = {}
 
     tempe = QueryScript(
-        f"SELECT reference, latitudeSpotted, longitudeSpotted, lambertXSpotted, lambertYSpotted, measurepoint.name, measurepoint.city, measurepoint.zipcode, measurepoint.stream, measurepoint.latitude, measurepoint.longitude FROM {env.DATABASE_TREATED}.average_temperature JOIN {env.DATABASE_RAW}.measurepoint ON average_temperature.measurepoint_fusion_id = measurepoint.id WHERE average_temperature.measurepoint_fusion_id IN {measurepoint_fusion_id_list} and average_temperature.version={env.VERSION}").execute()
+        f"SELECT reference, latitudeSpotted, longitudeSpotted, lambertXSpotted, lambertYSpotted, measurepoint.name, measurepoint.city, measurepoint.zipcode, measurepoint.stream, measurepoint.latitude, measurepoint.longitude FROM {env.DATABASE_TREATED}.average_temperature JOIN {env.DATABASE_RAW}.measurepoint ON average_temperature.measurepoint_fusion_id = measurepoint.id WHERE average_temperature.measurepoint_fusion_id IN {measurepoint_fusion_id_list} and average_temperature.version=  {env.CHOSEN_VERSION()}").execute()
     for elt in tempe:
         dico_temp_geo = {'latitudeSpotted': f"{elt[1]}".replace(',', '.'),
                          'longitudeSpotted': f"{elt[2]}".replace(',', '.'), 'lambertXSpotted': f"{elt[3]}".replace(',', '.'), 'lambertYSpotted': f"{elt[4]}".replace(',', '.'), 'name_mp': elt[5], 'city': elt[6], 'zipcode': elt[7], 'stream': elt[8], 'latitudeTh': elt[9], 'longitudeTh': elt[10]}
@@ -144,22 +144,22 @@ def average_temperature(measurepoint_fusion_id_list):
     dico_avg_all_tempe = {}
     dico_date = {}  # {reference: [date1, date4, date6, date7]}
     tempe = QueryScript(
-        f"SELECT reference, sensor1_min, sensor1_average, sensor1_max, sensor2_min, sensor2_average, sensor2_max, sensor3_min, sensor3_average, sensor3_max, average_temperature.measurepoint_fusion_id FROM {env.DATABASE_TREATED}.average_temperature JOIN {env.DATABASE_RAW}.measurepoint ON average_temperature.measurepoint_fusion_id = measurepoint.id WHERE average_temperature.measurepoint_fusion_id IN {measurepoint_fusion_id_list} AND average_temperature.version={env.VERSION}").execute()
+        f"SELECT reference, sensor1_min, sensor1_average, sensor1_max, sensor2_min, sensor2_average, sensor2_max, sensor3_min, sensor3_average, sensor3_max, average_temperature.measurepoint_fusion_id FROM {env.DATABASE_TREATED}.average_temperature JOIN {env.DATABASE_RAW}.measurepoint ON average_temperature.measurepoint_fusion_id = measurepoint.id WHERE average_temperature.measurepoint_fusion_id IN {measurepoint_fusion_id_list} AND average_temperature.version=  {env.CHOSEN_VERSION()}").execute()
 
     output_date1 = QueryScript(
-        f"SELECT measurepoint_id, date FROM {env.DATABASE_TREATED}.key_dates WHERE date_id = 1 and measurepoint_fusion_id IN {measurepoint_fusion_id_list} AND key_dates.version={env.VERSION}"
+        f"SELECT measurepoint_id, date FROM {env.DATABASE_TREATED}.key_dates WHERE date_id = 1 and measurepoint_fusion_id IN {measurepoint_fusion_id_list} AND key_dates.version=  {env.CHOSEN_VERSION()}"
     ).execute()
     output_date2 = QueryScript(
-        f"SELECT measurepoint_id, date FROM {env.DATABASE_TREATED}.key_dates WHERE date_id = 2 and measurepoint_fusion_id IN {measurepoint_fusion_id_list} AND key_dates.version={env.VERSION}"
+        f"SELECT measurepoint_id, date FROM {env.DATABASE_TREATED}.key_dates WHERE date_id = 2 and measurepoint_fusion_id IN {measurepoint_fusion_id_list} AND key_dates.version=  {env.CHOSEN_VERSION()}"
     ).execute()
     output_date4 = QueryScript(
-        f"SELECT measurepoint_id, date FROM {env.DATABASE_TREATED}.key_dates WHERE date_id = 4 and measurepoint_fusion_id IN {measurepoint_fusion_id_list} AND key_dates.version={env.VERSION}"
+        f"SELECT measurepoint_id, date FROM {env.DATABASE_TREATED}.key_dates WHERE date_id = 4 and measurepoint_fusion_id IN {measurepoint_fusion_id_list} AND key_dates.version=  {env.CHOSEN_VERSION()}"
     ).execute()
     output_date6 = QueryScript(
-        f"SELECT measurepoint_id, date FROM {env.DATABASE_TREATED}.key_dates WHERE date_id = 6 and measurepoint_fusion_id IN {measurepoint_fusion_id_list} AND key_dates.version={env.VERSION}"
+        f"SELECT measurepoint_id, date FROM {env.DATABASE_TREATED}.key_dates WHERE date_id = 6 and measurepoint_fusion_id IN {measurepoint_fusion_id_list} AND key_dates.version=  {env.CHOSEN_VERSION()}"
     ).execute()
     output_date7 = QueryScript(
-        f"SELECT measurepoint_id, date FROM {env.DATABASE_TREATED}.key_dates WHERE date_id = 7 and measurepoint_fusion_id IN {measurepoint_fusion_id_list} AND key_dates.version={env.VERSION}"
+        f"SELECT measurepoint_id, date FROM {env.DATABASE_TREATED}.key_dates WHERE date_id = 7 and measurepoint_fusion_id IN {measurepoint_fusion_id_list} AND key_dates.version=  {env.CHOSEN_VERSION()}"
     ).execute()
 
     dict_date1 = list_of_list_to_dict(output_date1)  # {mp: [date]}
@@ -260,7 +260,7 @@ def average_temperature(measurepoint_fusion_id_list):
 # on entre le nom de la campagne, cela nous ressort les informations géographiques
 def geographic_data_agency(campaign):
     query = QueryScript(
-        f"  SELECT DISTINCT measurepoint.reference, agency.code, agency.name, agency.zipcode, agency.city, agency.stream, agency.lambertX, agency.lambertY, agency.network, agency.hydroecoregion, agency.latitude, agency.longitude FROM {env.DATABASE_RAW}.agency JOIN {env.DATABASE_RAW}.place ON agency.id=place.agency_id JOIN {env.DATABASE_RAW}.campaign ON place.campaign_id=campaign.id JOIN {env.DATABASE_RAW}.measurepoint ON measurepoint.place_id=place.id JOIN {env.DATABASE_TREATED}.key_dates ON measurepoint.id=key_dates.measurepoint_fusion_id WHERE campaign.reference='{campaign}' and key_dates.version={env.VERSION}").execute()
+        f"  SELECT DISTINCT measurepoint.reference, agency.code, agency.name, agency.zipcode, agency.city, agency.stream, agency.lambertX, agency.lambertY, agency.network, agency.hydroecoregion, agency.latitude, agency.longitude FROM {env.DATABASE_RAW}.agency JOIN {env.DATABASE_RAW}.place ON agency.id=place.agency_id JOIN {env.DATABASE_RAW}.campaign ON place.campaign_id=campaign.id JOIN {env.DATABASE_RAW}.measurepoint ON measurepoint.place_id=place.id JOIN {env.DATABASE_TREATED}.key_dates ON measurepoint.id=key_dates.measurepoint_fusion_id WHERE campaign.reference='{campaign}' and key_dates.version=  {env.CHOSEN_VERSION()}").execute()
     dico = {}
     for elt in query:
         dico_temp = {'code': elt[1], 'name': elt[2], 'zipcode': elt[3], 'city': elt[4], 'stream': elt[5],
@@ -273,7 +273,7 @@ def geographic_data_agency(campaign):
 
 def type_biotest(measurepoint_fusion_id):
     query = QueryScript(
-        f"  SELECT DISTINCT pack.nature FROM {env.DATABASE_RAW}.pack JOIN {env.DATABASE_TREATED}.key_dates ON pack.measurepoint_id = key_dates.measurepoint_id JOIN {env.DATABASE_RAW}.cage ON pack.id = cage.pack_id WHERE key_dates.version={env.VERSION} AND key_dates.measurepoint_fusion_id = {measurepoint_fusion_id}").execute()
+        f"  SELECT DISTINCT pack.nature FROM {env.DATABASE_RAW}.pack JOIN {env.DATABASE_TREATED}.key_dates ON pack.measurepoint_id = key_dates.measurepoint_id JOIN {env.DATABASE_RAW}.cage ON pack.id = cage.pack_id WHERE key_dates.version=  {env.CHOSEN_VERSION()} AND key_dates.measurepoint_fusion_id = {measurepoint_fusion_id}").execute()
     return query
 
 # %% Récupération Survie Chimie
@@ -281,7 +281,7 @@ def type_biotest(measurepoint_fusion_id):
 
 def scud_survivor_chemistry(measurepoint_fusion_id):
     query = QueryScript(
-        f"SELECT Distinct cage.scud_survivor, pack.scud_quantity, cage.id FROM {env.DATABASE_RAW}.cage JOIN {env.DATABASE_RAW}.pack ON cage.pack_id = pack.id JOIN {env.DATABASE_TREATED}.key_dates ON pack.measurepoint_id = key_dates.measurepoint_id WHERE key_dates.version={env.VERSION} AND pack.nature = 'chemistry' AND cage.scud_survivor IS not null AND key_dates.measurepoint_fusion_id = {measurepoint_fusion_id}").execute()
+        f"SELECT Distinct cage.scud_survivor, pack.scud_quantity, cage.id FROM {env.DATABASE_RAW}.cage JOIN {env.DATABASE_RAW}.pack ON cage.pack_id = pack.id JOIN {env.DATABASE_TREATED}.key_dates ON pack.measurepoint_id = key_dates.measurepoint_id WHERE key_dates.version=  {env.CHOSEN_VERSION()} AND pack.nature = 'chemistry' AND cage.scud_survivor IS not null AND key_dates.measurepoint_fusion_id = {measurepoint_fusion_id}").execute()
     total = 0
     for elt in query:
         total += elt[0]/elt[1]
