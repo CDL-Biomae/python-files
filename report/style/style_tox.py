@@ -230,11 +230,9 @@ def add_style_tox(tox_dataframe, filename, folder_PATH):
     c =Reprotoxicity.fecundity(pack_fusion)
 
     dict_conform_surface_retard = Reprotoxicity.conform_surface_retard(pack_fusion,b[0],b[1],c)[0]
-    
-    
 
     for row in range(5, nb_rows+5): 
-          pack = pack_fusion.get(ws["S"+ str(row)].value)
+          pack = pack_fusion.get(ws["S" + str(row)].value)
           repro_pack = pack.get("reproduction")
 
           mue=confrm_mue.get(repro_pack)
@@ -258,7 +256,11 @@ def add_style_tox(tox_dataframe, filename, folder_PATH):
 
     for row in range(5, nb_rows+5):
         value = ws["K" + str(row)].value
-        if value is None or float(value) == 0:
+
+        testNone = value is None
+        testInt = isinstance(value, int) and float(value) == 0
+        testStr = isinstance(value, str) and value[:4] == 'None'
+        if testNone or testInt or testStr:
             for column in na:
                 ws[column + str(row)].value = "NA"
                 if column == "N" or column == "P" or column == "R":

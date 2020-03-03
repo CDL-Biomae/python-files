@@ -24,7 +24,6 @@ def create_dataframe(list_mp):
         else:
             matrix.append(['']+data[0:3]+['']+data[3:])
 
-  
     df = pd.DataFrame(matrix)
     df.columns = ['','Survie Male - 7 jours', 'Alimentation',
                 'Neurotoxicité AChE','', 'Survie Femelle','Nombre jours exposition in situ',
@@ -45,7 +44,3 @@ def create_tox_dataframe(head_dataframe, list_campaigns, dict_mp):
     df_concat = pd.concat([head_dataframe, df_values], axis=1)
     df_campaigns = df_concat.sort_values(['Numéro', 'Campagne'])
     return df_campaigns
-
-   
-
-          
