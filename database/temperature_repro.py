@@ -74,13 +74,13 @@ def calcul_av_cycle(alpha, beta, gamme, delta, liste_tempe):
 
 def fct_aux_expected_percent(alpha, beta, x):
     expo = exp(-(alpha + beta*x))
-    return (100/(1+expo))
+    return 100/(1+expo)
 
 
 def fct_aux_av_cycle(alpha, beta, gamma, delta, temp):
     numerateur = alpha + beta*temp
     denominateur = gamma + delta*temp
-    return((100*numerateur) / (24*denominateur))
+    return (100*numerateur) / (24*denominateur)
 
 
 def run(cas):

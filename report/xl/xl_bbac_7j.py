@@ -46,7 +46,7 @@ def create_empty_dataframe(dick_pack_fusion):
     data = chemistry.result_by_packs_and_sandre(dick_pack_fusion)
     for mp in dick_pack_fusion:
         if data[mp]:
-            matrix.append([''] + ['' for sandre in elements_metal ]+[''] + ['' for sandre in elements_PCB ]+[''] + ['' for sandre in elements_HAP ]+[''] + ['' for sandre in elements_others ])
+            matrix.append([''] + ['' for sandre in elements_metal ]+[''] + ['' for sandre in elements_PCB ]+[''] + ['' for sandre in elements_HAP ]+[''] + ['' for sandre in elements_others ] + [mp])
         else :
             matrix.append([''] + ['ND' for sandre in elements_metal ]+[''] + ['ND' for sandre in elements_PCB ]+[''] + ['ND' for sandre in elements_HAP ]+[''] + ['ND' for sandre in elements_others ] + [mp])
  
