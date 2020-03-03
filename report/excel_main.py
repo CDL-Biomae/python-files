@@ -120,7 +120,12 @@ def excel_main(list_campaigns, folder_PATH = "output"):  # Prend en entrée une 
 
     # CREATION DE L'ONGLET BBAC ##
     dict_general = create_general_dict(list_campaigns)
-    t0_associated = QueryScript(f"SELECT code_t0_id, id  FROM biomae.measurepoint WHERE id IN {tuple([mp for mp in dict_general])};").execute()
+    list_mp = [mp for mp in dict_general]
+    if len(list_mp) > 1:
+        query_tuple_mp = tuple(list_mp)
+    else:
+        query_tuple_mp = f"({list_mp[0]})"
+    t0_associated = QueryScript(f"SELECT code_t0_id, id  FROM biomae.measurepoint WHERE id IN {query_tuple_mp};").execute()
     dict_t0 = {}
     for mp in dict_general:
         dict_t0[mp] = dict_general[mp]

@@ -3,20 +3,35 @@ import pandas as pd
 import env
 
 def create_dataframe(list_mp):
-    output = QueryScript(
-        f"  SELECT measurepoint.id, agency.network, agency.hydroecoregion, agency.stream, agency.zipcode, agency.city, agency.latitude, agency.longitude, agency.lambertY, agency.lambertX, measurepoint.latitudeSpotted, measurepoint.longitudeSpotted   FROM {env.DATABASE_RAW}.agency JOIN {env.DATABASE_RAW}.place on agency.id = place.agency_id JOIN {env.DATABASE_RAW}.measurepoint on place.id = measurepoint.place_id WHERE measurepoint.id IN {tuple(list_mp)};"
+    if len(list_mp) > 1:
+        query_tuple_mp = tuple(list_mp)
+    else:
+        query_tuple_mp = f"({list_mp[0]})"
+    output_agency = QueryScript(
+        f"  SELECT measurepoint.id, agency.network, agency.hydroecoregion FROM {env.DATABASE_RAW}.agency JOIN {env.DATABASE_RAW}.place on agency.id = place.agency_id JOIN {env.DATABASE_RAW}.measurepoint on place.id = measurepoint.place_id WHERE measurepoint.id IN {query_tuple_mp};"
+    ).execute()
+    output_measurepoint = QueryScript(
+        f"  SELECT id, stream, zipcode, city, latitude, longitude, lambertY, lambertX, latitudeSpotted, longitudeSpotted   FROM {env.DATABASE_RAW}.measurepoint WHERE id IN {query_tuple_mp};"
     ).execute()
 
-    dict_output = list_to_dict(output)
-
+    dict_output_agency = list_to_dict(output_agency)
+    dict_output_measurepoint = list_to_dict(output_measurepoint)
+    print(dict_output_agency)
+    print(dict_output_measurepoint)
     matrix = []
     for mp in list_mp:
+        print(mp)
         try:
-            data = dict_output[mp]
+            data_agency = dict_output_agency[mp]
         except KeyError:
-            data = ['ND']*11
+            data_agency = ['ND']*2
+        try:
+            data_measurepoint = dict_output_measurepoint[mp]
+        except KeyError:
+            data_measurepoint = ['ND']*9
 
-        [network, hydroecoregion, stream, zipcode, city, latitude, longitude, lambertY, lambertX, real_latitude, real_longitude] = data
+        [network, hydroecoregion, ] = data_agency
+        [stream, zipcode, city, latitude, longitude, lambertY, lambertX, real_latitude, real_longitude] = data_measurepoint
 
         address = f"{zipcode} {city}"
         coor_ref = f"{latitude}, {longitude}"
