@@ -2,6 +2,7 @@ from tools import QueryScript
 from math import *
 from scipy.stats import binom
 from collections import Counter
+from datetime import date
 import env
 
 class Reprotoxicity:
@@ -47,7 +48,9 @@ class Reprotoxicity:
                 if date_debut is None and date_fin is None:
                     dict_nbr_days_exposition[mp] = "NA"
                 else:
-                    nbrdays = (date_fin - date_debut).days
+                    date_fin_sans_heure = date(date_fin.year, date_fin.month, date_fin.day)
+                    date_debut_sans_heure = date(date_debut.year, date_debut.month, date_debut.day)
+                    nbrdays = (date_fin_sans_heure - date_debut_sans_heure).days
                     dict_nbr_days_exposition[mp] = nbrdays
             else:
                 dict_nbr_days_exposition[mp] = "NA"
