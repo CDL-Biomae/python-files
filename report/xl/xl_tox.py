@@ -29,7 +29,7 @@ def create_dataframe(list_mp):
                 'Neurotoxicité AChE','', 'Survie Femelle','Nombre jours exposition in situ',
                 'n','Fécondité','n','Cycle de mue','n','Perturbation endocrinienne','']
 
-    df = df.dropna(how='all', axis='columns')
+   
     return df
 
    
