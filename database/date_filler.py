@@ -420,8 +420,11 @@ def run(cas):
     ## Cas 2: Mise à jour de la dernière version connue
     if cas == 2:
         version = env.VERSION
-        ############################################à finir ici
+        db_treated = env.DATABASE_TREATED
+        delete_query = QueryScript(f"DELETE FROM {db_treated}.key_dates WHERE version = {version};")
+        delete_query.execute()
+        fill_date_table()
 
-    ## Cas 1: Création et remplissage de la base de données
+    ## Cas 3: Ajout d'une nouvelle version
     if cas == 3:
         fill_date_table()
