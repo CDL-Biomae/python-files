@@ -190,7 +190,7 @@ def add_style_tox(tox_dataframe, filename, folder_PATH):
             if threshold:
                 for row in range(5, nb_rows+5):
                     cell = ws[column+str(row)]
-                    if cell.value != "NA":
+                    if isinstance(cell.value,float) or (isinstance(cell.value,str) and cell.value[:2] != "NA"):
                         value = -float(cell.value) if cell.value else None
                     if value and value >= threshold[0]:
                         if len(threshold) >= 1 and value >= threshold[1]:
