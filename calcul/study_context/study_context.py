@@ -7,14 +7,17 @@ Permet de récupérer les dates clés d'un point de mesure
 import env
 from tools import QueryScript
 
+
 def contexte(measurepoint_id):
-     
-    measurepoints = QueryScript(f" SELECT DISTINCT measurepoint_id   FROM {env.DATABASE_TREATED}.key_dates WHERE measurepoint_fusion_id = {measurepoint_id} AND version = {env.VERSION}").execute()
+
+    measurepoints = QueryScript(
+        f" SELECT DISTINCT measurepoint_id   FROM {env.DATABASE_TREATED}.key_dates WHERE measurepoint_fusion_id = {measurepoint_id} AND version = {env.VERSION}").execute()
 
     if len(measurepoints) < 2:
         return contexte_simple(measurepoint_id)
     else:
         return contexte_fusion(measurepoints)
+
 
 def contexte_fusion(measurepoints):
     [id_mp_1, id_mp_2] = measurepoints
@@ -27,7 +30,8 @@ def contexte_fusion(measurepoints):
 
     dates = []
 
-    steps_barrel = [(50, "\'R0\'"), (50, "\'R0\'"), (140, "\'RN\'"), (60, "\'R7\'")]
+    steps_barrel = [(50, "\'R0\'"), (50, "\'R0\'"),
+                    (140, "\'RN\'"), (60, "\'R7\'")]
 
     for i in range(4):
         step, barrel = steps_barrel[i]
@@ -36,13 +40,17 @@ def contexte_fusion(measurepoints):
         else:
             measurepoint = id_mp_second
 
-        output = QueryScript(f"  SELECT recordedAt   FROM {env.DATABASE_RAW}.measureexposurecondition WHERE measurepoint_id = {measurepoint} and step = {step} and barrel = {barrel}").execute()
+        output = QueryScript(
+            f"  SELECT recordedAt   FROM {env.DATABASE_RAW}.measureexposurecondition WHERE measurepoint_id = {measurepoint} and step = {step} and barrel = {barrel}").execute()
         if len(output) == 0:
             dates.append(None)
         else:
             dates.append(output[0])
 
-    N = (dates[2] - dates[0]).days
+    try:
+        N = str((dates[2] - dates[0]).days)
+    except TypeError:
+        N = None
 
     cleaned_dates = [parser(dates[0]),
                      parser(dates[1]),
@@ -52,10 +60,12 @@ def contexte_fusion(measurepoints):
 
     return cleaned_dates
 
+
 def contexte_simple(measurepoint_id):
     dates = []
 
-    steps_barrel = [(50, "\'R0\'"), (60, "\'R7\'"), (140, "\'RN\'"), (100, "\'R21\'")]
+    steps_barrel = [(50, "\'R0\'"), (60, "\'R7\'"),
+                    (140, "\'RN\'"), (100, "\'R21\'")]
 
     for i in range(4):
         step, barrel = steps_barrel[i]
@@ -92,3 +102,7 @@ def parser(date):
     month = '0' + str(month) if month < 10 else str(month)
 
     return f"{day}/{month}/{year}"
+
+
+def calcul_N(date1, date2):  # date de type datetime
+    return []
