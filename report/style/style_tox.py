@@ -217,7 +217,7 @@ def add_style_tox(tox_dataframe, filename, folder_PATH):
 
     for row in range(5, nb_rows+5):
         value = ws["K" + str(row)].value
-        if value is None or float(value) == 0:
+        if value is None or value[:4] == 'None' or float(value) == 0:
             for column in na:
                 ws[column + str(row)].value = "NA"
                 if column == "N" or column == "P" or column == "R":
