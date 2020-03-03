@@ -6,6 +6,7 @@ Permet de récupérer les dates clés d'un point de mesure
 '''
 import env
 from tools import QueryScript
+from datetime import date
 
 
 def contexte(measurepoint_id):
@@ -105,4 +106,7 @@ def parser(date):
 
 
 def calcul_N(date1, date2):  # date de type datetime
-    return []
+    date1_without_time = date(date1.year, date1.month, date1.day)
+    date2_without_time = date(date2.year, date2.month, date2.day)
+    delta_days = (date2_without_time - date1_without_time).days
+    return delta_days
