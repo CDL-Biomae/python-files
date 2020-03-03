@@ -48,10 +48,14 @@ def contexte_fusion(measurepoints):
         else:
             dates.append(output[0])
 
-    try:
-        N = str((dates[2] - dates[0]).days)
-    except TypeError:
+    if (dates[2] != None) & (dates[0] != None):
+        N = calcul_N(dates[0], dates[2])
+    else:
         N = None
+    # try:
+    #     N = str((dates[2] - dates[0]).days)
+    # except TypeError:
+    #     N = None
 
     cleaned_dates = [parser(dates[0]),
                      parser(dates[1]),
@@ -78,10 +82,14 @@ def contexte_simple(measurepoint_id):
         else:
             dates.append(output[0])
 
-    try:
-        N = str((dates[2] - dates[0]).days)
-    except TypeError:
+    if (dates[2] != None) & (dates[0] != None):
+        N = calcul_N(dates[0], dates[2])
+    else:
         N = None
+    # try:
+    #     N = str((dates[2] - dates[0]).days)
+    # except TypeError:
+    #     N = None
 
     cleaned_dates = [parser(dates[0]),
                      parser(dates[1]),

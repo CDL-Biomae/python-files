@@ -72,7 +72,6 @@ def create_dataframe(campaign_str):
 
     df = pd.DataFrame(matrix)
     df.columns = ['Campagne', 'Numéro', 'Station de mesure', 'Code Agence']
-    print(df)
     return df
 
 
