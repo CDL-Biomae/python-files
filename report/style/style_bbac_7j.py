@@ -161,11 +161,11 @@ def add_style_bbac_7j(bbac_dataframe, filename, folder_PATH, dict_t0):
     for mp in dict_t0:
         if not dict_t0[mp]['code_t0_id'] in t0_mp and dict_t0[mp]['code_t0_id']:
             t0_mp.append(dict_t0[mp]['code_t0_id'])
-    if len(t0_mp) > 1:
+    if len(t0_mp) > 1 or len(t0_mp) == 0:
         query_tuple_t0 = tuple(t0_mp)
     else:
         query_tuple_t0 = f"({t0_mp[0]})"
-    print(query_tuple_t0)
+
     t0_result = QueryScript(f"SELECT sandre, prefix, value, pack.measurepoint_id, measurepoint.reference FROM {env.DATABASE_RAW}.analysis JOIN {env.DATABASE_RAW}.pack ON pack.id= analysis.pack_id JOIN {env.DATABASE_RAW}.measurepoint ON pack.measurepoint_id=measurepoint.id WHERE pack.measurepoint_id IN {query_tuple_t0};").execute()
     dict_t0_result= {}
     for element in t0_result:
