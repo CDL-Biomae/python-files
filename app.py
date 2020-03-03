@@ -59,7 +59,7 @@ def next_version():
     print('oui')
 
 version_file = open('version.txt','w')
-version_file.write(f'CHOSEN_VERSION={env.LATEST_VERSION}')
+version_file.write(f'CHOSEN_VERSION={env.VERSION}')
 
 window = tk.Tk()
 window.title('Digital Lab App')
