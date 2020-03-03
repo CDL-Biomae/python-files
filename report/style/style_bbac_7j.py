@@ -165,8 +165,9 @@ def add_style_bbac_7j(bbac_dataframe, filename, folder_PATH, dict_t0):
         query_tuple_t0 = tuple(t0_mp)
     else:
         query_tuple_t0 = f"({t0_mp[0]})"
-
-    t0_result = QueryScript(f"SELECT sandre, prefix, value, pack.measurepoint_id, measurepoint.reference FROM {env.DATABASE_RAW}.analysis JOIN {env.DATABASE_RAW}.pack ON pack.id= analysis.pack_id JOIN {env.DATABASE_RAW}.measurepoint ON pack.measurepoint_id=measurepoint.id WHERE pack.measurepoint_id IN {query_tuple_t0};").execute()
+    t0_result=[]
+    if len(t0_mp):
+        t0_result = QueryScript(f"SELECT sandre, prefix, value, pack.measurepoint_id, measurepoint.reference FROM {env.DATABASE_RAW}.analysis JOIN {env.DATABASE_RAW}.pack ON pack.id= analysis.pack_id JOIN {env.DATABASE_RAW}.measurepoint ON pack.measurepoint_id=measurepoint.id WHERE pack.measurepoint_id IN {query_tuple_t0};").execute()
     dict_t0_result= {}
     for element in t0_result:
         if not element[3] in dict_t0_result:
