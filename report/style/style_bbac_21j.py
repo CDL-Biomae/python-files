@@ -163,6 +163,10 @@ def add_style_bbac_21j(bbac_dataframe, filename, folder_PATH, dict_t0):
         query_tuple_t0 = tuple(t0_mp)
     else:
         query_tuple_t0 = f"({t0_mp[0]})"
+    reference_dict = {}
+    reference_result = QueryScript(f"SELECT reference, id FROM {env.DATABASE_RAW}.measurepoint WHERE id IN {query_tuple_t0}").execute()
+    for reference in reference_result:
+        reference_dict.update({reference[1]:reference[0]})
     t0_result=[]
     if len(t0_mp):
         t0_result = QueryScript(f"SELECT sandre, prefix, value, pack.measurepoint_id, measurepoint.reference FROM {env.DATABASE_RAW}.analysis JOIN {env.DATABASE_RAW}.pack ON pack.id= analysis.pack_id JOIN {env.DATABASE_RAW}.measurepoint ON pack.measurepoint_id=measurepoint.id WHERE pack.measurepoint_id IN {query_tuple_t0};").execute()
@@ -187,7 +191,12 @@ def add_style_bbac_21j(bbac_dataframe, filename, folder_PATH, dict_t0):
         ws['C'+str(nb_rows+5+index)].border = t0_border
         ws['D'+str(nb_rows+5+index)].font = t0_font
         ws['D'+str(nb_rows+5+index)].border = t0_border
-        ws['D'+str(nb_rows+5+index)].value = dict_t0_result[t0]['reference']
+        if t0 in dict_t0_result :
+            ws['D'+str(nb_rows+5+index)].value = dict_t0_result[t0]['reference']
+            ws2['D'+str(nb_rows+5+index)].value = dict_t0_result[t0]['reference']
+        else :
+            ws['D'+str(nb_rows+5+index)].value = reference_dict[t0]
+            ws2['D'+str(nb_rows+5+index)].value = reference_dict[t0]
         ws['E'+str(nb_rows+5+index)].font = t0_font
         ws['E'+str(nb_rows+5+index)].border = t0_border
         ws2['B'+str(nb_rows+5+index)].font = t0_font
@@ -196,12 +205,11 @@ def add_style_bbac_21j(bbac_dataframe, filename, folder_PATH, dict_t0):
         ws2['C'+str(nb_rows+5+index)].border = t0_border
         ws2['D'+str(nb_rows+5+index)].font = t0_font
         ws2['D'+str(nb_rows+5+index)].border = t0_border
-        ws2['D'+str(nb_rows+5+index)].value = dict_t0_result[t0]['reference']
         ws2['E'+str(nb_rows+5+index)].font = t0_font
         ws2['E'+str(nb_rows+5+index)].border = t0_border
         for letter in header_columns[5:]:
             sandre = ws[letter +'3'].value
-            if str(sandre) in dict_t0_result[t0]:
+            if t0 in dict_t0_result and  str(sandre) in dict_t0_result[t0]:
                 ws[letter+str(nb_rows+5+index)].value = dict_t0_result[t0][str(sandre)]
                 ws[letter+str(nb_rows+5+index)].font = t0_font
                 ws[letter+str(nb_rows+5+index)].border = t0_border
