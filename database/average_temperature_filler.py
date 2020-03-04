@@ -41,14 +41,14 @@ def liste_temperature(measurepoint_fusion_id, num_sensor):
     key_date_list_measurepoint_id = QueryScript(
         f" SELECT date_id, date, measurepoint_id   FROM {env.DATABASE_TREATED}.key_dates WHERE measurepoint_fusion_id = {measurepoint_fusion_id} and version=  {env.LATEST_VERSION()}").execute()
     key_date_list = [elt[:-1] for elt in key_date_list_measurepoint_id]
-    measurepoint_id = [elt[-1] for elt in key_date_list_measurepoint_id]
-    measurepoint_id = list(set(measurepoint_id))
+    list_measurepoint_id = [elt[-1] for elt in key_date_list_measurepoint_id]
+    list_measurepoint_id = list(set(list_measurepoint_id))
 
-    if None in measurepoint_id:
-        measurepoint_id.remove(None)
+    if None in list_measurepoint_id:
+        list_measurepoint_id.remove(None)
 
     pack_id = []
-    for mp_id in measurepoint_id:
+    for mp_id in list_measurepoint_id:
         pack_id += QueryScript(
             f"  SELECT id   FROM {env.DATABASE_RAW}.pack WHERE measurepoint_id={mp_id}").execute()
     if len(pack_id) == 0:
@@ -76,10 +76,10 @@ def liste_temperature(measurepoint_fusion_id, num_sensor):
                                                                                                                                                 dict_key_date_list[6] + timedelta(0, 3600), dict_key_date_list[7])
         valid_output = True
 
-    if len(measurepoint_id) > 1:
-        SQL_request_temperature_sensor += f" AND ( measurepoint_id IN{tuple(measurepoint_id)}"
+    if len(list_measurepoint_id) > 1:
+        SQL_request_temperature_sensor += f" AND ( measurepoint_id IN{tuple(list_measurepoint_id)}"
     else:
-        SQL_request_temperature_sensor += f" AND ( measurepoint_id IN({measurepoint_id[0]})"
+        SQL_request_temperature_sensor += f" AND ( measurepoint_id IN({list_measurepoint_id[0]})"
 
     if len(pack_id) > 1:
         SQL_request_temperature_sensor += f" OR pack_id IN{tuple(pack_id)} )"
