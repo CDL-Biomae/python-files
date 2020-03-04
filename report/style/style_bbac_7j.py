@@ -166,17 +166,20 @@ def add_style_bbac_7j(bbac_dataframe, filename, folder_PATH, dict_t0):
     else:
         query_tuple_t0 = f"({t0_mp[0]})"
     reference_dict = {}
-    reference_result = QueryScript(f"SELECT reference, id FROM {env.DATABASE_RAW}.measurepoint WHERE id IN {query_tuple_t0}").execute()
+    if len(t0_mp):
+        reference_result = QueryScript(f"SELECT reference, id FROM {env.DATABASE_RAW}.measurepoint WHERE id IN {query_tuple_t0}").execute()
+    else:
+        reference_result = []
     for reference in reference_result:
-        reference_dict.update({reference[1]:reference[0]})
-    t0_result=[]
+        reference_dict.update({reference[1]: reference[0]})
+    t0_result = []
     if len(t0_mp):
         t0_result = QueryScript(f"SELECT sandre, prefix, value, pack.measurepoint_id, measurepoint.reference FROM {env.DATABASE_RAW}.analysis JOIN {env.DATABASE_RAW}.pack ON pack.id= analysis.pack_id JOIN {env.DATABASE_RAW}.measurepoint ON pack.measurepoint_id=measurepoint.id WHERE pack.measurepoint_id IN {query_tuple_t0};").execute()
-    dict_t0_result= {}
+    dict_t0_result = {}
     for element in t0_result:
         if not element[3] in dict_t0_result:
-            dict_t0_result.update({element[3]: {element[0]:element[1] + str(element[2]) if element[1] else str(element[2]), 'reference': element[4]}})
-        else :
+            dict_t0_result.update({element[3]: {element[0]: element[1] + str(element[2]) if element[1] else str(element[2]), 'reference': element[4]}})
+        else:
             dict_t0_result[element[3]][element[0]] = element[1] + str(element[2]) if element[1] else str(element[2])
     
     t0_font = Font(size=6, name='Arial')

@@ -136,7 +136,10 @@ def add_style_nqe(nqe_dataframe, filename, folder_PATH, dict_t0):
     else:
         query_tuple_t0 = f"({t0_mp[0]})"
     reference_dict = {}
-    reference_result = QueryScript(f"SELECT reference, id FROM {env.DATABASE_RAW}.measurepoint WHERE id IN {query_tuple_t0}").execute()
+    if len(t0_mp):
+        reference_result = QueryScript(f"SELECT reference, id FROM {env.DATABASE_RAW}.measurepoint WHERE id IN {query_tuple_t0}").execute()
+    else:
+        reference_result = []
     for reference in reference_result:
         reference_dict.update({reference[1]:reference[0]})
     t0_result=[]
