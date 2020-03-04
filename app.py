@@ -2,11 +2,10 @@ import tkinter as tk
 from tkinter import filedialog
 from tools import QueryScript
 import env
+from report import excel_main, word_main
 
 
 def main_button():
-    import env
-    from report import excel_main, word_main
     change_chosen_version()
     if len(campaign_list):
         if word_wanted.get():
@@ -29,7 +28,6 @@ def main_button():
 def change_chosen_version():
     version_file = open('version.txt', 'w')
     version_file.write(f'CHOSEN_VERSION={version_choice.get()}')
-    print(version_choice.get())
     version_file.close()
 
 

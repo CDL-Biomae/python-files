@@ -11,7 +11,7 @@ def fill_temperature_repro(cas):
         temperature_repro_table.execute(True)
     ## Cas 2: Mise à jour de la dernière version connue
     if cas == 2:
-        version = env.VERSION
+        version = env.LATEST_VERSION
         db_treated = env.DATABASE_TREATED
         delete_query = QueryScript(f"DELETE FROM {db_treated}.temperature_repro WHERE version = {version};")
         delete_query.execute()
