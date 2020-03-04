@@ -61,9 +61,6 @@ def test_chimie_superieur_repro(list_mp):
 
         dict_date6467[mp] = dates
 
-        if mp == 1639:
-            print(dates)
-
     list_test = []  # Vrai si la chimie dure plus longtemps que la repro, faux sinon
     for i in range(n):
         mp = list_mp[i]
@@ -83,9 +80,6 @@ def test_chimie_superieur_repro(list_mp):
             boolean = delta_chimie > delta_repro
         except TypeError:
             boolean = (delta_chimie is not None)
-
-        if mp == 1639:
-            print('boolean', boolean)
 
         list_test.append(boolean)
 
@@ -114,9 +108,6 @@ def temperatures_dataframe(list_mp):
             data = dict_output[mp]
         except KeyError:
             data = [None, None, None, None, None, None]
-
-        if mp == 1639:
-            print(data)
 
         [sensor2_min, sensor2_average, sensor2_max, sensor3_min, sensor3_average, sensor3_max] = data
 
@@ -162,6 +153,12 @@ def values_dataframe(list_mp):
                   'pH J0', 'pH J14', 'pH JN', 'pH J21',
                   'Oxygène J0', 'Oxygène J14', 'Oxygène JN', 'Oxygène J21']
     df = df.dropna(how='all', axis='columns')
+
+    if df.empty:
+        df = pd.DataFrame(matrix)
+        df.columns = ['Conductivité J0', 'Conductivité J14', 'Conductivité JN', 'Conductivité J21',
+                      'pH J0', 'pH J14', 'pH JN', 'pH J21',
+                      'Oxygène J0', 'Oxygène J14', 'Oxygène JN', 'Oxygène J21']
 
     return df
 

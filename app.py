@@ -13,6 +13,9 @@ def main_button():
                 output_browse_button()
             if not input_folder_path.get():
                 input_browse_button()
+            num_campaign_text.set(num_campaign_input.get())
+            if num_campaign_text.get() == "":
+                num_campaign_text.set("XX")
             for campaign in campaign_list:
                 word_main(campaign, agence.get(),
                           input_folder_path.get(), output_folder_path.get(), num_campaign_text.get())
@@ -60,11 +63,6 @@ def output_browse_button():
     output_folder_path.set(filename)
 
 
-def choose_num_campaign():
-    num_campaign_text.set(num_campaign_input.get())
-    print(num_campaign_text.get())
-
-
 version_file = open('version.txt', 'w')
 version_file.write(f'CHOSEN_VERSION={env.LATEST_VERSION}')
 version_file.close()
@@ -101,10 +99,7 @@ tk.Label(master=frame_campaign, text='Numéro de la campagne').grid(
     row=3, column=0)
 num_campaign_input = tk.Entry(frame_campaign)
 num_campaign_input.grid(row=3, column=1)
-num_campaign_button = tk.Button(
-    master=frame_campaign, text="Choisir", command=choose_num_campaign).grid(row=3, column=2)
 num_campaign_text = tk.StringVar()
-num_campaign_text.set("XX")
 
 frame_choice = tk.Frame(master=window)
 agence = tk.IntVar(0)
@@ -114,7 +109,7 @@ excel_wanted = tk.IntVar(0)
 tk.Checkbutton(frame_choice, text="Annexe du Rapport d'étude (Excel)",
                variable=excel_wanted).pack()
 word_wanted = tk.IntVar(0)
-tk.Checkbutton(frame_choice, text="Rapport d'étude (Word)",
+tk.Checkbutton(frame_choice, text="Rapport d'expérimentation (Word)",
                variable=word_wanted).pack()
 launch_button = tk.Button(
     master=frame_choice, text="Lancer", command=main_button)

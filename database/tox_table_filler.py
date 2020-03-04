@@ -72,7 +72,21 @@ def run(cas):
     dict_nombre_femelles_concernees_fecondite = {mp_fusion: dict_fecundity[mp_fusion]['nbr_femelles_concernées'] for mp_fusion in dict_pack_fusion}
     dict_fecondite_moyenne = {mp_fusion: dict_fecundity[mp_fusion]['fécondité_moyenne'] for mp_fusion in dict_pack_fusion}
     dict_nombre_femelles_analysees = {mp_fusion: dict_fecundity[mp_fusion]['nbr_femelles_analysées'] for mp_fusion in dict_pack_fusion}
+
+    # Transformation de "indice de fecondité - moyenne" en "%Inhibition fecondité - Résultat attendu"
+    ref_calcul = QueryScript(f"SELECT value FROM {env.DATABASE_TREATED}.r2_constant WHERE name = 'indice de fertilité attendu - moyenne' AND version = {env.LATEST_VERSION};").execute()[0]
+    dict_percent_inhibition_fecondite = {}
+    for mp_fusion in dict_fecondite_moyenne:
+        value = dict_fecondite_moyenne[mp_fusion]
+        if isinstance(value, float):
+            percent_inhibition = -100 * (ref_calcul-value)/ref_calcul
+            dict_percent_inhibition_fecondite[mp_fusion] = percent_inhibition
+        else:
+            dict_percent_inhibition_fecondite[mp_fusion] = value
+
+
     print('dict_fecundity')
+    print(dict_fecondite_moyenne)
 
     ## Cycle de mue
     # vvv: {mp_fusion: {'cycle de mue': ..%, 'cycle de mue attendu': ..%, 'nb_femelles_retard': int}}
@@ -109,7 +123,7 @@ def run(cas):
         female_survivor = dict_survie_femelle[mp_fusion]
         number_days_exposition = dict_nombre_jours_exposition[mp_fusion]
         number_female_concerned = dict_nombre_femelles_concernees_fecondite[mp_fusion]
-        index_fertility_average = dict_fecondite_moyenne[mp_fusion]
+        percent_inhibition_fecondite = dict_percent_inhibition_fecondite[mp_fusion]
         number_female_analysis = dict_nombre_femelles_analysees[mp_fusion]
         molting_cycle = dict_cycle_de_mue_condense[mp_fusion]
         number_female_concerned_area = dict_nombre_femelles_en_retard[mp_fusion]
@@ -122,14 +136,11 @@ def run(cas):
                  female_survivor,
                  number_days_exposition,
                  number_female_concerned,
-                 index_fertility_average,
+                 percent_inhibition_fecondite,
                  number_female_analysis,
                  molting_cycle,
                  number_female_concerned_area,
                  endocrine_disruption)
-
-        if measurepoint_fusion_id == 2895:
-            print(value)
 
         values.append(value)
     print('values créé')
@@ -147,24 +158,24 @@ def run(cas):
     if cas == 1:
         # Création d'un table vide si elle n'existe pas
         create_table = QueryScript(
-            f"DROP TABLE IF EXISTS {env.DATABASE_TREATED}.toxtable; CREATE TABLE IF NOT EXISTS {env.DATABASE_TREATED}.toxtable (id INT AUTO_INCREMENT PRIMARY KEY, measurepoint_fusion_id INT, male_survival_7_days varchar(255), alimentation varchar(255), neurotoxicity varchar(255), female_survivor varchar(255), number_days_exposition varchar(255), number_female_concerned varchar(255),index_fertility_average varchar(255),number_female_analysis varchar(255),molting_cycle varchar(255), number_female_concerned_area varchar(255), endocrine_disruption varchar(255), version int);"
+            f"DROP TABLE IF EXISTS {env.DATABASE_TREATED}.toxtable; CREATE TABLE IF NOT EXISTS {env.DATABASE_TREATED}.toxtable (id INT AUTO_INCREMENT PRIMARY KEY, measurepoint_fusion_id INT, male_survival_7_days varchar(255), alimentation varchar(255), neurotoxicity varchar(255), female_survivor varchar(255), number_days_exposition varchar(255), number_female_concerned varchar(255),percent_inhibition_fecondite varchar(255),number_female_analysis varchar(255),molting_cycle varchar(255), number_female_concerned_area varchar(255), endocrine_disruption varchar(255), version int);"
         ).execute()
 
         fill_table = QueryScript(
-            f"INSERT INTO {env.DATABASE_TREATED}.toxtable (measurepoint_fusion_id, male_survival_7_days, alimentation, neurotoxicity, female_survivor, number_days_exposition, number_female_concerned, index_fertility_average, number_female_analysis, molting_cycle, number_female_concerned_area, endocrine_disruption, version) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s,%s, %s, %s)"
+            f"INSERT INTO {env.DATABASE_TREATED}.toxtable (measurepoint_fusion_id, male_survival_7_days, alimentation, neurotoxicity, female_survivor, number_days_exposition, number_female_concerned, percent_inhibition_fecondite, number_female_analysis, molting_cycle, number_female_concerned_area, endocrine_disruption, version) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s,%s, %s, %s)"
         )
         fill_table.setRows(values)
         fill_table.executemany()
 
     ## Cas 2: Mise à jour de la dernière version connue
     if cas == 2:
-        version = env.VERSION
+        version = env.LATEST_VERSION
         db_treated = env.DATABASE_TREATED
         delete_query = QueryScript(f"DELETE FROM {db_treated}.toxtable WHERE version = {version};")
         delete_query.execute()
 
         fill_table = QueryScript(
-            f"INSERT INTO {env.DATABASE_TREATED}.toxtable (measurepoint_fusion_id, male_survival_7_days, alimentation, neurotoxicity, female_survivor, number_days_exposition, number_female_concerned, index_fertility_average, number_female_analysis, molting_cycle, number_female_concerned_area, endocrine_disruption, version) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s,%s, %s, %s)"
+            f"INSERT INTO {env.DATABASE_TREATED}.toxtable (measurepoint_fusion_id, male_survival_7_days, alimentation, neurotoxicity, female_survivor, number_days_exposition, number_female_concerned, percent_inhibition_fecondite, number_female_analysis, molting_cycle, number_female_concerned_area, endocrine_disruption, version) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s,%s, %s, %s)"
         )
         fill_table.setRows(values)
         fill_table.executemany()
@@ -172,7 +183,7 @@ def run(cas):
     ## Cas 3: Ajout d'une nouvelle version
     if cas == 3:
         fill_table = QueryScript(
-            f"INSERT INTO {env.DATABASE_TREATED}.toxtable (measurepoint_fusion_id, male_survival_7_days, alimentation, neurotoxicity, female_survivor, number_days_exposition, number_female_concerned, index_fertility_average, number_female_analysis, molting_cycle, number_female_concerned_area, endocrine_disruption, version) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s,%s, %s, %s)"
+            f"INSERT INTO {env.DATABASE_TREATED}.toxtable (measurepoint_fusion_id, male_survival_7_days, alimentation, neurotoxicity, female_survivor, number_days_exposition, number_female_concerned, percent_inhibition_fecondite, number_female_analysis, molting_cycle, number_female_concerned_area, endocrine_disruption, version) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s,%s, %s, %s)"
         )
         fill_table.setRows(values)
         fill_table.executemany()
