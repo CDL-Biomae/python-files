@@ -161,8 +161,7 @@ def add_style_tox(tox_dataframe, filename, folder_PATH):
     threshold_list = QueryScript(f" SELECT parameter, threshold   FROM {env.DATABASE_TREATED}.r2_threshold WHERE threshold IS NOT NULL and version=  {env.CHOSEN_VERSION()}").execute()
     for column in columns:
             
-            threshold = None
-            print(column)
+            threshold = None        
             if column == 'H':
                 threshold = []
                 for element in threshold_list:
@@ -262,7 +261,7 @@ def add_style_tox(tox_dataframe, filename, folder_PATH):
                         ws["P"+ str(row)].fill = body_fill_not_ok_4
                 
           ws["S"+ str(row)].value = ""    
-          
+          ws["S4"].fill
         
 
     for row in range(5, nb_rows+5):
