@@ -20,6 +20,7 @@ def run(cas):
     ## Cas 1: Création et remplissage de la base de données
     if cas == 1:
         create_version_table()
+        create_new_version()
 
     ## Cas 2: Mise à jour de la dernière version connue
     if cas == 2:
