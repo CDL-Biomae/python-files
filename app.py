@@ -109,7 +109,7 @@ excel_wanted = tk.IntVar(0)
 tk.Checkbutton(frame_choice, text="Annexe du Rapport d'étude (Excel)",
                variable=excel_wanted).pack()
 word_wanted = tk.IntVar(0)
-tk.Checkbutton(frame_choice, text="Rapport d'étude (Word)",
+tk.Checkbutton(frame_choice, text="Rapport d'expérimentation (Word)",
                variable=word_wanted).pack()
 launch_button = tk.Button(
     master=frame_choice, text="Lancer", command=main_button)
