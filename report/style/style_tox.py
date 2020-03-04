@@ -195,8 +195,8 @@ def add_style_tox(tox_dataframe, filename, folder_PATH):
                 for row in range(5, nb_rows+5):
                     cell = ws[column+str(row)]
                     
-                    if isinstance(cell.value,float) or (isinstance(cell.value,str) and cell.value[:2] != "NA"):
-                        value = -float(cell.value)  if cell.value else None  
+                    if isinstance(cell.value, float) or (isinstance(cell.value,str) and cell.value[:2] != "NA"):
+                        value = -float(cell.value) if cell.value else None
 
                     if value and value >= threshold[0]:
                         if len(threshold) >= 1 and value >= threshold[1]:
@@ -221,16 +221,13 @@ def add_style_tox(tox_dataframe, filename, folder_PATH):
             ws[column + str(row)].border = normal_cells_border
             ws[column + str(row)].alignment = alignment_center
 
-    
-
-
     # MAKE STYLE OF molting_cycle get all result of conforme or not of molting_cycle
     pack_fusion = get_dict_pack_fusion()
-    confrm_mue  = Reprotoxicity.conform_resultat_mue(pack_fusion)
+    confrm_mue = Reprotoxicity.conform_resultat_mue(pack_fusion)
 
     # get all conform surface_retard 
-    b =Reprotoxicity.number_female_concerned_area(pack_fusion)
-    c =Reprotoxicity.fecundity(pack_fusion)
+    b = Reprotoxicity.number_female_concerned_area(pack_fusion)
+    c = Reprotoxicity.fecundity(pack_fusion)
 
     dict_conform_surface_retard = Reprotoxicity.conform_surface_retard(pack_fusion,b[0],b[1],c)[0]
 
