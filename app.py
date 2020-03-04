@@ -58,7 +58,7 @@ class App(tk.Tk):
             row=3, column=0)
         self.reset_button = tk.Button(master=self.frame_campaign,
                                     text="Annuler", command=self.reset_campaign)
-        self.reset_button.grid(row=3, column=2)
+        self.reset_button.grid(row=2, column=2)
 
         self.version_choice = tk.StringVar()
         self.version_choice.set(env.LATEST_VERSION())
@@ -67,27 +67,40 @@ class App(tk.Tk):
 
         self.frame_campaign.pack(expand='YES')
         self.bind('<Return>', self.enter)
-
-        tk.Label(master=self.frame_campaign, text='Numéro de la campagne').grid(
-            row=4, column=0)
-        self.num_campaign_input = tk.Entry(self.frame_campaign)
-        self.num_campaign_input.grid(row=4, column=1)
-        self.num_campaign_text = tk.StringVar()
+        ############## Frame des words
+        def show_word():
+            try :
+                if self.frame_word :
+                    self.frame_word.destroy()
+            except AttributeError:
+                self.frame_word = tk.Frame(master=self) 
+                tk.Label(master=self.frame_word, text='Numéro de la campagne').grid(
+                    row=0, column=0)
+                self.num_campaign_input = tk.Entry(self.frame_word)
+                self.num_campaign_input.grid(row=0, column=1)
+                self.num_campaign_text = tk.StringVar()
+                self.agence = tk.IntVar(0)
+                tk.Checkbutton(self.frame_word, text="Agence de l'eau", variable=self.agence).grid(row=1)
+                self.input_folder_path = tk.StringVar()
+                self.input_folder_button = tk.Button(
+                    master=self.frame_word, text="Choisir une source des photos ...", command=self.input_browse_button)
+                self.input_folder_button.grid(row=2)
+                tk.Label(master=self.frame_word, textvariable=self.input_folder_path).grid(row=3)
+                self.frame_word.pack(expand='YES')
+                
         
         ############################################
         
         
-        ########### Frame dex checkbox des livrables
+        ########### Frame des checkbox des livrables
 
         self.frame_choice = tk.Frame(master=self)
-        self.agence = tk.IntVar(0)
-        tk.Checkbutton(self.frame_choice, text="Agence de l'eau", variable=self.agence).pack()
         self.excel_wanted = tk.IntVar(0)
         tk.Checkbutton(self.frame_choice, text="Annexe du Rapport d'étude (Excel)",
                     variable=self.excel_wanted).pack()
         self.word_wanted = tk.IntVar(0)
         tk.Checkbutton(self.frame_choice, text="Rapport d'expérimentation (Word)",
-                    variable=self.word_wanted).pack()
+                    variable=self.word_wanted, command=show_word).pack()
         self.launch_button = tk.Button(
             master=self.frame_choice, text="Lancer", background='#32CD32', command=self.main_button)
         self.launch_button.pack()
@@ -103,11 +116,6 @@ class App(tk.Tk):
             master=self.frame_folder, text="Choisir une destination ...", command=self.output_browse_button)
         self.output_folder_button.pack()
         tk.Label(master=self.frame_folder, textvariable=self.output_folder_path).pack()
-        self.input_folder_path = tk.StringVar()
-        self.input_folder_button = tk.Button(
-            master=self.frame_folder, text="Choisir une source des photos ...", command=self.input_browse_button)
-        self.input_folder_button.pack()
-        tk.Label(master=self.frame_folder, textvariable=self.input_folder_path).pack()
         self.frame_folder.pack(expand='YES')
     
         #################################
@@ -145,11 +153,8 @@ class App(tk.Tk):
             if self.campaign_input_text.get() != '':
                 self.campaign_input_text.set(self.campaign_input_text.get() + '\n')
                 self.campaign_input_text.set(self.campaign_input_text.get() + self.campaign_input.get().upper())
-                print( self.campaign_input_text.get())
             else :
-                print('oui')
                 self.campaign_input_text.set(self.campaign_input.get().upper())
-                print( self.campaign_input_text.get())
             self.campaign_list.append(self.campaign_input.get().upper())
             self.reset_input()
 
@@ -217,11 +222,7 @@ class App(tk.Tk):
         fill.run(2)
     
     def add_new_version(self):
-        if self.reference_xl_path.get() != '':
-            # fill.run(3, xl_path=self.reference_xl_path.get(), date=self.version_date.get(), comment=self.version_comment.get())
-            print(self.reference_xl_path.get())
-            print(self.version_date.get())
-            print(self.version_comment.get())
+        fill.run(3, xl_path=self.reference_xl_path.get(), date=date.today().strftime("%d/%m/%Y"), comment=self.version_comment.get())
         
 
 

@@ -5,7 +5,7 @@ from tools import QueryScript
 
 def fill_reference_tables(cas, xl_path):
     # To open Workbook
-    wb = xlrd.open_workbook(file_name)
+    wb = xlrd.open_workbook(xl_path)
 
     # Constants   FROM {env.DATABASE_TREATED}.r1 sheet
     sheet = wb.sheet_by_name('r1')
