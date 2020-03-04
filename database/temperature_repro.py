@@ -25,8 +25,6 @@ def fill_temperature_repro(cas):
     constantes = QueryScript(
         f" SELECT name,value FROM {env.DATABASE_TREATED}.r2_constant WHERE nature='Temperature repro' and version=  {env.LATEST_VERSION}").execute()
     constantes = list_to_dict(constantes)
-    print(env.VERSION)
-    print(constantes)
 
     count = 1
     for elt_mp_id in liste_fusion_id:
