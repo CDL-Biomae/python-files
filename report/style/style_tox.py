@@ -99,7 +99,7 @@ def add_style_tox(tox_dataframe, filename, folder_PATH):
                           'K': 'Survie Femelle',
                           'L': 'Nombre jours exposition in situ',
                           'M': 'n',
-                          'N': 'Inhibition Fécondité',
+                          'N': 'Fécondité',
                           'O': 'n',
                           'P': 'Cycle de mue',
                           'Q': 'n',
@@ -107,7 +107,7 @@ def add_style_tox(tox_dataframe, filename, folder_PATH):
     subtitle = ['L', 'N', 'P', 'R', 'G', 'H', 'I', 'K']
     n_merge = ['L3:L4', 'M3:M4', 'O3:O4', 'Q3:Q4']
 
-    ws['N4'].value = "%"
+    ws['N4'].value = "indice"
     ws['P4'].value = "valeur observée (valeur attendue)"
     ws['R4'].value = "surface ovocytaire moyenne (µm²)"
 
@@ -126,7 +126,7 @@ def add_style_tox(tox_dataframe, filename, folder_PATH):
 
     # Style des titres
     for column in titres_columns:
-        if column in ['N', 'L', 'P', 'R']:
+        if column in ['L', 'P', 'R']:
             ws.column_dimensions[column].width = 35
         elif column in ['M', 'O', 'Q']:
             ws.column_dimensions[column].width = 5
@@ -190,24 +190,23 @@ def add_style_tox(tox_dataframe, filename, folder_PATH):
                         threshold.append(element[1])
 
             if threshold:
-                
+                value=None
                 for row in range(5, nb_rows+5):
                     cell = ws[column+str(row)]
-                    print(cell.value) 
-                    value = cell.value
-                    if isinstance(cell.value,float)  or (isinstance(cell.value,str) and cell.value[:2] != "NA") :
+                    
+                    if isinstance(cell.value,float) or isinstance(cell.value,int) or (isinstance(cell.value,str) and cell.value[:2] != "NA"):
                         value = -float(cell.value)  if cell.value else None  
-                        print( "dkhal l if")
+                      
                     if cell.value != None :
-                        print(value)   
+                           
                         if value and value >= threshold[0]:
-                            print( "1")
+                           
                             if len(threshold) >= 1 and value >= threshold[1]:
-                                print( "2")
+                                
                                 if len(threshold) >= 2 and value >= threshold[2]:
-                                    print( "3")
+                                   
                                     if len(threshold) >= 3 and value >= threshold[3]:
-                                        print( "4")
+                                        
                                         cell.fill = body_fill_not_ok_4
                                     else:
                                         cell.fill = body_fill_not_ok_3
@@ -227,13 +226,16 @@ def add_style_tox(tox_dataframe, filename, folder_PATH):
             ws[column + str(row)].border = normal_cells_border
             ws[column + str(row)].alignment = alignment_center
 
+    
+
+
     # MAKE STYLE OF molting_cycle get all result of conforme or not of molting_cycle
     pack_fusion = get_dict_pack_fusion()
-    confrm_mue = Reprotoxicity.conform_resultat_mue(pack_fusion)
+    confrm_mue  = Reprotoxicity.conform_resultat_mue(pack_fusion)
 
     # get all conform surface_retard 
-    b = Reprotoxicity.number_female_concerned_area(pack_fusion)
-    c = Reprotoxicity.fecundity(pack_fusion)
+    b =Reprotoxicity.number_female_concerned_area(pack_fusion)
+    c =Reprotoxicity.fecundity(pack_fusion)
 
     dict_conform_surface_retard = Reprotoxicity.conform_surface_retard(pack_fusion,b[0],b[1],c)[0]
 
