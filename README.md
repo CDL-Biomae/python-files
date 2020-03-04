@@ -36,8 +36,11 @@ main(<NOM DE/DES CAMPAGNE/S OU CONTRAT/S>)
 ## Création du Rapport d'expérimentation (Word) - Application
 
 Pour créer un rapport d'expérimentation, il faut entrer le nom de la campagne et faire ajouter. Il est possible d'en ajouter plusieurs, que l'on voit en dessous. On précise en cochant ou non la case "Agence de l'eau" si c'en est une, la case étant coché initialement. Ensuite, on choisit la version que l'on souhaite utiliser pour les références, la dernière étant sélectionnée par défaut. Ensuite, on précise dans le champ "Numéro de la campagne", le numéro de celle-ci dans l'année. Si rien n'est renseigné, il y aura des "XX" à la place. Ce choix s'applique pour tous les rapports sélectionnés, donc si ce nombre est différent pour chacun, il faut les lancer un par un.
+
 Puis on coche "Rapport d'expérimentation (Word)". On peut choisir ensuite le dossier de destinatation où sera enregistré le rapport, et le dosser où sont les photos. 
+
 Dans le dossier il faut qu'il y ait des dossiers nommés en fonction d'un point de mesure (ex : AG-003-01-01-01), et que dans chacun de ces dossiers il y ait 4 photos, de 4 natures différentes (amont, aval, panorama, zoom). Les photos doivent respecter la nomenclature suivant : "stepXX_PDA1_AG-003-01-01-01_Amont_5445664_65454.png". Les éléments importants sont la séparation par des Underscores (_, touche 8), que le 3e élément (ainsi séparé) soit la référence du point de mesure (ex : AG-003-01-01-01) et le 4e soit le point de vue de la photo (amont, aval, panorama, zoom). 
+
 Si on oublie de renseigner ces dossiers, lorsque l'on clique sur lancer, les fenêtres de sélection s'ouvriront, d'abord pour choisir la destination d'enregistrement, puis le dossier de photos.
 
 
