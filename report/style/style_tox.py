@@ -160,10 +160,9 @@ def add_style_tox(tox_dataframe, filename, folder_PATH):
 
     threshold_list = QueryScript(f" SELECT parameter, threshold   FROM {env.DATABASE_TREATED}.r2_threshold WHERE threshold IS NOT NULL and version=  {env.CHOSEN_VERSION()}").execute()
     for column in columns:
-        if ws[column + '5'].value is None or ws[column + '5'].value == '':
-            pass
-        else:
+            
             threshold = None
+            print(column)
             if column == 'H':
                 threshold = []
                 for element in threshold_list:
@@ -195,22 +194,28 @@ def add_style_tox(tox_dataframe, filename, folder_PATH):
                 for row in range(5, nb_rows+5):
                     cell = ws[column+str(row)]
                     
-                    if isinstance(cell.value, float) or (isinstance(cell.value,str) and cell.value[:2] != "NA"):
-                        value = -float(cell.value) if cell.value else None
-
-                    if value and value >= threshold[0]:
-                        if len(threshold) >= 1 and value >= threshold[1]:
-                            if len(threshold) >= 2 and value >= threshold[2]:
-                                if len(threshold) >= 3 and value >= threshold[3]:
-                                    cell.fill = body_fill_not_ok_4
+                    if isinstance(cell.value,float) or isinstance(cell.value,int) or (isinstance(cell.value,str) and cell.value[:2] != "NA"):
+                        value = -float(cell.value)  if cell.value else None  
+                      
+                    if cell.value != None :
+                           
+                        if value and value >= threshold[0]:
+                           
+                            if len(threshold) >= 1 and value >= threshold[1]:
+                                
+                                if len(threshold) >= 2 and value >= threshold[2]:
+                                   
+                                    if len(threshold) >= 3 and value >= threshold[3]:
+                                        
+                                        cell.fill = body_fill_not_ok_4
+                                    else:
+                                        cell.fill = body_fill_not_ok_3
                                 else:
-                                    cell.fill = body_fill_not_ok_3
+                                    cell.fill = body_fill_not_ok_2
                             else:
-                                cell.fill = body_fill_not_ok_2
+                                cell.fill = body_fill_not_ok_1
                         else:
-                            cell.fill = body_fill_not_ok_1
-                    else:
-                        cell.fill = body_fill_ok
+                            cell.fill = body_fill_ok
 
             if column == 'G' or column == 'H' or column == 'I' or column == 'K':
                 cell = ws[column + "4"]
@@ -221,13 +226,16 @@ def add_style_tox(tox_dataframe, filename, folder_PATH):
             ws[column + str(row)].border = normal_cells_border
             ws[column + str(row)].alignment = alignment_center
 
+    
+
+
     # MAKE STYLE OF molting_cycle get all result of conforme or not of molting_cycle
     pack_fusion = get_dict_pack_fusion()
-    confrm_mue = Reprotoxicity.conform_resultat_mue(pack_fusion)
+    confrm_mue  = Reprotoxicity.conform_resultat_mue(pack_fusion)
 
     # get all conform surface_retard 
-    b = Reprotoxicity.number_female_concerned_area(pack_fusion)
-    c = Reprotoxicity.fecundity(pack_fusion)
+    b =Reprotoxicity.number_female_concerned_area(pack_fusion)
+    c =Reprotoxicity.fecundity(pack_fusion)
 
     dict_conform_surface_retard = Reprotoxicity.conform_surface_retard(pack_fusion,b[0],b[1],c)[0]
 
@@ -254,6 +262,8 @@ def add_style_tox(tox_dataframe, filename, folder_PATH):
                         ws["P"+ str(row)].fill = body_fill_not_ok_4
                 
           ws["S"+ str(row)].value = ""    
+          
+        
 
     for row in range(5, nb_rows+5):
         value = ws["K" + str(row)].value
