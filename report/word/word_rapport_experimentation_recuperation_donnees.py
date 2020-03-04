@@ -1,4 +1,4 @@
-from tools import QueryScript, clean_dict
+from tools import QueryScript, clean_dict, translate
 from report import measure_points, list_of_list_to_dict
 import env
 import math
@@ -64,7 +64,7 @@ def data_exposure_condition_fusion(measurepoints):
         if len(output) != 0:
             output = output[0]
             dico_temp = {'date': parser(output[0]), 'temperature': output[1],
-                         'conductivity': output[2], 'oxygen': output[3], 'ph': output[4], 'type': output[5], 'comment': output[6]}
+                         'conductivity': output[2], 'oxygen': output[3], 'ph': output[4], 'type': output[5], 'comment': translate(output[6])}
         else:
             dico_temp = {'date': None, 'temperature': None,
                          'conductivity': None, 'oxygen': None, 'ph': None, 'type': None, 'comment': None}
@@ -85,7 +85,7 @@ def data_exposure_condition_simple(measurepoint_id):
         if len(output) != 0:
             output = output[0]
             dico_temp = {'date': parser(output[0]), 'temperature': output[1],
-                         'conductivity': output[2], 'oxygen': output[3], 'ph': output[4], 'type': output[5], 'comment': output[6]}
+                         'conductivity': output[2], 'oxygen': output[3], 'ph': output[4], 'type': output[5], 'comment': translate(output[6])}
         else:
             dico_temp = {'date': None, 'temperature': None,
                          'conductivity': None, 'oxygen': None, 'ph': None, 'type': None, 'comment': None}
@@ -127,7 +127,7 @@ def geographic_data_measurepoint(measurepoint_fusion_id_list):
         f"SELECT reference, latitudeSpotted, longitudeSpotted, lambertXSpotted, lambertYSpotted, measurepoint.name, measurepoint.city, measurepoint.zipcode, measurepoint.stream, measurepoint.latitude, measurepoint.longitude FROM {env.DATABASE_TREATED}.average_temperature JOIN {env.DATABASE_RAW}.measurepoint ON average_temperature.measurepoint_fusion_id = measurepoint.id WHERE average_temperature.measurepoint_fusion_id IN {measurepoint_fusion_id_list} and average_temperature.version=  {env.CHOSEN_VERSION()}").execute()
     for elt in tempe:
         dico_temp_geo = {'latitudeSpotted': f"{elt[1]}".replace(',', '.'),
-                         'longitudeSpotted': f"{elt[2]}".replace(',', '.'), 'lambertXSpotted': f"{elt[3]}".replace(',', '.'), 'lambertYSpotted': f"{elt[4]}".replace(',', '.'), 'name_mp': elt[5], 'city': elt[6], 'zipcode': elt[7], 'stream': elt[8], 'latitudeTh': elt[9], 'longitudeTh': elt[10]}
+                         'longitudeSpotted': f"{elt[2]}".replace(',', '.'), 'lambertXSpotted': f"{elt[3]}".replace(',', '.'), 'lambertYSpotted': f"{elt[4]}".replace(',', '.'), 'name_mp': translate(elt[5]), 'city': translate(elt[6]), 'zipcode': translate(elt[7]), 'stream': translate(elt[8]), 'latitudeTh': elt[9], 'longitudeTh': elt[10]}
         dico_geo_data[elt[0]] = dico_temp_geo
     return dico_geo_data
 
@@ -263,8 +263,8 @@ def geographic_data_agency(campaign):
         f"  SELECT DISTINCT measurepoint.reference, agency.code, agency.name, agency.zipcode, agency.city, agency.stream, agency.lambertX, agency.lambertY, agency.network, agency.hydroecoregion, agency.latitude, agency.longitude FROM {env.DATABASE_RAW}.agency JOIN {env.DATABASE_RAW}.place ON agency.id=place.agency_id JOIN {env.DATABASE_RAW}.campaign ON place.campaign_id=campaign.id JOIN {env.DATABASE_RAW}.measurepoint ON measurepoint.place_id=place.id JOIN {env.DATABASE_TREATED}.key_dates ON measurepoint.id=key_dates.measurepoint_fusion_id WHERE campaign.reference='{campaign}' and key_dates.version=  {env.CHOSEN_VERSION()}").execute()
     dico = {}
     for elt in query:
-        dico_temp = {'code': elt[1], 'name': elt[2], 'zipcode': elt[3], 'city': elt[4], 'stream': elt[5],
-                     'lambertX': elt[6], 'lambertY': elt[7], 'network': elt[8], 'hydroecoregion': elt[9], 'latitudeTh': elt[10], 'longitudeTh': elt[11]}
+        dico_temp = {'code': elt[1], 'name': translate(elt[2]), 'zipcode': translate(elt[3]), 'city': translate(elt[4]), 'stream': translate(elt[5]),
+                     'lambertX': elt[6], 'lambertY': elt[7], 'network': translate(elt[8]), 'hydroecoregion': translate(elt[9]), 'latitudeTh': elt[10], 'longitudeTh': elt[11]}
         dico[elt[0]] = dico_temp
     return dico
 
