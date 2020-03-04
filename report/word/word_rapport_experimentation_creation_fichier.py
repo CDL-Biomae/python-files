@@ -6,6 +6,7 @@ import os
 from PIL import Image, ExifTags
 import requests
 from io import BytesIO
+import env
 
 
 # campaign correspond au nom de la campagne (ex: AG-003-01) et agence est un booléen qui dit si c'est une agence l'eau ou non
@@ -131,7 +132,7 @@ def word_main(campaign, agence, path_photo="Photos", path_output="output", num_c
             lon = str(dico_geo_mp[reference]['longitudeSpotted'])
             lat = str(dico_geo_mp[reference]['latitudeSpotted'])
             if (lon != "None") & (lat != "None"):
-                access_token = "pk.eyJ1IjoiamJyb25uZXIiLCJhIjoiY2s2cW5kOWQwMHBybjNtcW8yMXJuYmo3aiJ9.z8Ekf7a0RGTZ4jrbJVpq8g"
+                access_token = env.ACCESS_TOKEN_MAPBOX
                 # layer = '{"id":"water","source":{"url":"mapbox://mapbox.mapbox-streets-v8","type":"vector"},"source-layer":"water","type":"fill","paint":{"fill-color":"%2300ffff"}}'
                 url_street = f"https://api.mapbox.com/styles/v1/mapbox/streets-v11/static/pin-s+FF0000({lon},{lat})/{lon},{lat},9.21/450x300@2x?access_token={access_token}"
                 response = requests.get(url_street)
