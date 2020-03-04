@@ -62,6 +62,10 @@ def add_style_tox(tox_dataframe, filename, folder_PATH):
 
     ws.row_dimensions[3].height = 45
 
+    # Nettoyage Fin du tableau
+    cell = ws['S4']
+    cell.border = no_border
+
     # Nettoyage entre 2 tableaux
     cell = ws['F4']
     cell.border = Border(top=no_border, bottom=no_border)
