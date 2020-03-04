@@ -1,5 +1,4 @@
-from tools import QueryScript
-from tools import list_agency_finder
+from tools import QueryScript, list_agency_finder, translate
 import pandas as pd
 import env
 
@@ -67,7 +66,7 @@ def create_dataframe(campaign_str):
         name = list_name[i]
         agency = list_agency[i]
 
-        temp = [campaign_id, number, name, agency]
+        temp = [campaign_id, number, translate(name), agency]
         matrix.append(temp)
 
     df = pd.DataFrame(matrix)
