@@ -12,7 +12,7 @@ def fill_average_temperature(cas):
         average_temperature_table.execute(True)
     # Cas 2: Mise à jour de la dernière version connue
     if cas == 2:
-        version = env.LATEST_VERSION
+        version = env.LATEST_VERSION()
         db_treated = env.DATABASE_TREATED
         delete_query = QueryScript(
             f"DELETE FROM {db_treated}.average_temperature WHERE version = {version};")
@@ -22,7 +22,7 @@ def fill_average_temperature(cas):
     values = []
 
     liste_fusion_id = QueryScript(
-        f" SELECT DISTINCT measurepoint_fusion_id   FROM {env.DATABASE_TREATED}.key_dates WHERE version=  {env.LATEST_VERSION}").execute()
+        f" SELECT DISTINCT measurepoint_fusion_id   FROM {env.DATABASE_TREATED}.key_dates WHERE version=  {env.LATEST_VERSION()}").execute()
 
     count = 1
     for elt_mp_id in liste_fusion_id:
@@ -39,7 +39,7 @@ def fill_average_temperature(cas):
 def liste_temperature(measurepoint_fusion_id, num_sensor):
 
     key_date_list_measurepoint_id = QueryScript(
-        f" SELECT date_id, date, measurepoint_id   FROM {env.DATABASE_TREATED}.key_dates WHERE measurepoint_fusion_id = {measurepoint_fusion_id} and version=  {env.LATEST_VERSION}").execute()
+        f" SELECT date_id, date, measurepoint_id   FROM {env.DATABASE_TREATED}.key_dates WHERE measurepoint_fusion_id = {measurepoint_fusion_id} and version=  {env.LATEST_VERSION()}").execute()
     key_date_list = [elt[:-1] for elt in key_date_list_measurepoint_id]
     measurepoint_id = [elt[-1] for elt in key_date_list_measurepoint_id]
     measurepoint_id = list(set(measurepoint_id))

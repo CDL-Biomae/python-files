@@ -11,7 +11,7 @@ def create_new_version(date=None, comment=None):
     query.executemany(True)
 
 
-def run(cas):
+def run(cas, date, comment):
     ## On a 3 cas pour les requêtes SQL
     # Cas 1: 'première_version'
     # Cas 2: 'update_version'
@@ -20,6 +20,7 @@ def run(cas):
     ## Cas 1: Création et remplissage de la base de données
     if cas == 1:
         create_version_table()
+        create_new_version()
 
     ## Cas 2: Mise à jour de la dernière version connue
     if cas == 2:
@@ -27,4 +28,4 @@ def run(cas):
 
     ## Cas 3: Ajout d'une nouvelle version
     if cas == 3:
-        create_new_version()
+        create_new_version(date, comment)

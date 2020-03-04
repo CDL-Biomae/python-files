@@ -1,9 +1,9 @@
 from . import *
 
 
-def run(cas):
-    version_filler.run(cas)
-    reference_filler.run(cas)
+def run(cas, xl_path=None, date=None, comment=None):
+    version_filler.run(cas, date, comment)
+    reference_filler.run(cas, xl_path)
 
     reference_date_filler.run(cas)
     date_filler.run(cas)

@@ -2,9 +2,8 @@ import env
 import xlrd
 from tools import QueryScript
 
-file_name = env.REFERENCE_EXCEL
 
-def fill_reference_tables(cas):
+def fill_reference_tables(cas, xl_path):
     # To open Workbook
     wb = xlrd.open_workbook(file_name)
 
@@ -110,7 +109,7 @@ def fill_reference_tables(cas):
     SQL_request.executemany()
 
 
-def run(cas):
+def run(cas, xl_path):
     ## On a 3 cas pour les requêtes SQL
     # Cas 1: 'première_version'
     # Cas 2: 'update_version'
@@ -118,7 +117,7 @@ def run(cas):
 
     ## Cas 1: Création et remplissage de la base de données
     if cas == 1:
-        fill_reference_tables(1)
+        fill_reference_tables(1, xl_path)
 
     ## Cas 2: Mise à jour de la dernière version connue
     if cas == 2:
@@ -126,6 +125,6 @@ def run(cas):
 
     ## Cas 3: Ajout d'une nouvelle version
     if cas == 3:
-        fill_reference_tables(3)
+        fill_reference_tables(3, xl_path)
 
 

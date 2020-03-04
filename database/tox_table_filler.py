@@ -9,11 +9,11 @@ def get_dict_pack_fusion(campaign=None):
 
     if campaign:
         output = QueryScript(
-            f"SELECT DISTINCT pack.id, key_dates.measurepoint_fusion_id, pack.nature FROM {env.DATABASE_RAW}.pack JOIN {env.DATABASE_TREATED}.key_dates ON key_dates.measurepoint_id=pack.measurepoint_id JOIN {env.DATABASE_RAW}.measurepoint ON measurepoint.id=pack.measurepoint_id WHERE measurepoint.reference LIKE '{campaign}%' and key_dates.version=  {env.LATEST_VERSION};"
+            f"SELECT DISTINCT pack.id, key_dates.measurepoint_fusion_id, pack.nature FROM {env.DATABASE_RAW}.pack JOIN {env.DATABASE_TREATED}.key_dates ON key_dates.measurepoint_id=pack.measurepoint_id JOIN {env.DATABASE_RAW}.measurepoint ON measurepoint.id=pack.measurepoint_id WHERE measurepoint.reference LIKE '{campaign}%' and key_dates.version=  {env.LATEST_VERSION()};"
         ).execute()
     else:
         output = QueryScript(
-            f"  SELECT DISTINCT pack.id, key_dates.measurepoint_fusion_id, pack.nature FROM {env.DATABASE_RAW}.pack JOIN {env.DATABASE_TREATED}.key_dates ON key_dates.measurepoint_id=pack.measurepoint_id WHERE key_dates.version=  {env.LATEST_VERSION};"
+            f"  SELECT DISTINCT pack.id, key_dates.measurepoint_fusion_id, pack.nature FROM {env.DATABASE_RAW}.pack JOIN {env.DATABASE_TREATED}.key_dates ON key_dates.measurepoint_id=pack.measurepoint_id WHERE key_dates.version=  {env.LATEST_VERSION()};"
         ).execute()
 
     dict_pack_fusion = {}
@@ -158,7 +158,7 @@ def run(cas):
 
     ## Cas 2: Mise à jour de la dernière version connue
     if cas == 2:
-        version = env.LATEST_VERSION
+        version = env.LATEST_VERSION()
         db_treated = env.DATABASE_TREATED
         delete_query = QueryScript(f"DELETE FROM {db_treated}.toxtable WHERE version = {version};")
         delete_query.execute()

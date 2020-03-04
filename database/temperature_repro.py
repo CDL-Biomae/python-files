@@ -11,7 +11,7 @@ def fill_temperature_repro(cas):
         temperature_repro_table.execute(True)
     ## Cas 2: Mise à jour de la dernière version connue
     if cas == 2:
-        version = env.LATEST_VERSION
+        version = env.LATEST_VERSION()
         db_treated = env.DATABASE_TREATED
         delete_query = QueryScript(f"DELETE FROM {db_treated}.temperature_repro WHERE version = {version};")
         delete_query.execute()
@@ -20,12 +20,11 @@ def fill_temperature_repro(cas):
     values = []
 
     liste_fusion_id = QueryScript(
-        f" SELECT measurepoint_fusion_id FROM {env.DATABASE_TREATED}.average_temperature WHERE version=  {env.LATEST_VERSION}").execute()
+        f" SELECT measurepoint_fusion_id FROM {env.DATABASE_TREATED}.average_temperature WHERE version=  {env.LATEST_VERSION()}").execute()
 
     constantes = QueryScript(
-        f" SELECT name,value FROM {env.DATABASE_TREATED}.r2_constant WHERE nature='Temperature repro' and version=  {env.LATEST_VERSION}").execute()
+        f" SELECT name,value FROM {env.DATABASE_TREATED}.r2_constant WHERE nature='Temperature repro' and version=  {env.LATEST_VERSION()}").execute()
     constantes = list_to_dict(constantes)
-    print(env.VERSION)
     print(constantes)
 
     count = 1
