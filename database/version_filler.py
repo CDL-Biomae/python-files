@@ -1,5 +1,4 @@
 from tools import QueryScript
-import env
 
 def create_version_table():
     QueryScript(f"DROP TABLE IF EXISTS version; CREATE TABLE version (id INT AUTO_INCREMENT PRIMARY KEY, date VARCHAR(255), comment VARCHAR(255))").execute(True)
