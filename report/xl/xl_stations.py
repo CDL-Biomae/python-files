@@ -1,4 +1,4 @@
-from tools import QueryScript, list_to_dict
+from tools import QueryScript, list_to_dict, translate
 import pandas as pd
 import env
 
@@ -27,8 +27,8 @@ def create_dataframe(list_mp):
         except KeyError:
             data_measurepoint = ['ND']*9
 
-        [network, hydroecoregion, ] = data_agency
-        [stream, zipcode, city, latitude, longitude, lambertY, lambertX, real_latitude, real_longitude] = data_measurepoint
+        [network, hydroecoregion, ] = [translate(x) for x in data_agency]
+        [stream, zipcode, city, latitude, longitude, lambertY, lambertX, real_latitude, real_longitude] = [translate(x) for x in data_measurepoint]
 
         address = f"{zipcode} {city}"
         coor_ref = f"{latitude}, {longitude}"

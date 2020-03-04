@@ -99,7 +99,7 @@ def add_style_tox(tox_dataframe, filename, folder_PATH):
                           'K': 'Survie Femelle',
                           'L': 'Nombre jours exposition in situ',
                           'M': 'n',
-                          'N': 'Fécondité',
+                          'N': 'Inhibition Fécondité',
                           'O': 'n',
                           'P': 'Cycle de mue',
                           'Q': 'n',
@@ -107,7 +107,7 @@ def add_style_tox(tox_dataframe, filename, folder_PATH):
     subtitle = ['L', 'N', 'P', 'R', 'G', 'H', 'I', 'K']
     n_merge = ['L3:L4', 'M3:M4', 'O3:O4', 'Q3:Q4']
 
-    ws['N4'].value = "indice"
+    ws['N4'].value = "%"
     ws['P4'].value = "valeur observée (valeur attendue)"
     ws['R4'].value = "surface ovocytaire moyenne (µm²)"
 
@@ -126,7 +126,7 @@ def add_style_tox(tox_dataframe, filename, folder_PATH):
 
     # Style des titres
     for column in titres_columns:
-        if column in ['L', 'P', 'R']:
+        if column in ['N', 'L', 'P', 'R']:
             ws.column_dimensions[column].width = 35
         elif column in ['M', 'O', 'Q']:
             ws.column_dimensions[column].width = 5
