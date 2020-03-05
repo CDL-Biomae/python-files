@@ -45,7 +45,7 @@ def add_style_tox(tox_dataframe, filename, folder_PATH):
     header_stations_fill = PatternFill(fill_type='solid', start_color='808080', end_color='808080')
     center_alignment = Alignment(horizontal='center', vertical='center')
 
-
+    # merger les cellules selon la taille de l'entete d'excel
     for i in range(len(merging_cells)):
         cells = merging_cells[i]
         top_left_cell = ws[cells[0:2]]
@@ -162,6 +162,9 @@ def add_style_tox(tox_dataframe, filename, folder_PATH):
     body_fill_not_ok_4 = PatternFill(fill_type='solid', start_color='ab2222', end_color='ab2222') #red
     body_fill_NA = PatternFill(fill_type='solid', start_color='abadb0', end_color='abadb0')  # grey
 
+
+
+    # la requete qui retourne les resultats des constantes r2 selon le paramétre
     threshold_list = QueryScript(f" SELECT parameter, threshold   FROM {env.DATABASE_TREATED}.r2_threshold WHERE threshold IS NOT NULL and version=  {env.CHOSEN_VERSION()}").execute()
     for column in columns:
             
@@ -224,6 +227,7 @@ def add_style_tox(tox_dataframe, filename, folder_PATH):
                 cell = ws[column + "4"]
                 cell.value = '%'
 
+    # pour faire les bordures des colones et ligne selon les case et les centrer
     for column in little_border_columns:
         for row in range(5, 5+nb_rows):
             ws[column + str(row)].border = normal_cells_border
@@ -241,7 +245,7 @@ def add_style_tox(tox_dataframe, filename, folder_PATH):
     c =Reprotoxicity.fecundity(pack_fusion)
 
     dict_conform_surface_retard = Reprotoxicity.conform_surface_retard(pack_fusion,b[0],b[1],c)[0]
-
+    # colorer les cycle de mue et la Perturbation endocrinienne
     for row in range(5, nb_rows+5): 
           pack = pack_fusion.get(ws["S" + str(row)].value)
           if "reproduction" in pack:  
@@ -264,10 +268,10 @@ def add_style_tox(tox_dataframe, filename, folder_PATH):
                 if mue == "Retard fort":
                         ws["P" + str(row)].fill = body_fill_not_ok_4
                 
-          ws["S" + str(row)].value = ""
-          ws["S4"].fill
-        
+          ws["S"+ str(row)].value = ""    
 
+
+    #si la survie femelle est egale à 0 ou bien il y'a pas donner la coloration de la ligne sera grise
     for row in range(5, nb_rows+5):
         value = ws["K" + str(row)].value
 

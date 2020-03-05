@@ -14,7 +14,8 @@ def word_main(campaign, agence, path_photo="Photos", path_output="output", num_c
     agence est un booléen qui dit si c'est une agence l'eau ou non,
     path_photo est le chemin d'accès vers le dossier où sont stockées les photos,
     path_output est le chemin d'accès vers le dossier où l'on veut enregistrer le fichier word,
-    num_campaign est le numéro de la campagne dans l'année'''
+    num_campaign est le numéro de la campagne dans l'année
+    Cette fonction créer un rapport d'expérimentation au format docx'''
     path_ressources = "Ressources/"
     campaign = campaign.upper()
     doc = Document(path_ressources + 'Page_de_garde.docx')
@@ -366,7 +367,8 @@ def word_main(campaign, agence, path_photo="Photos", path_output="output", num_c
 
 
 def traduction_type_biotest(biotest_anglais):
-    '''Fonction pour traduire les noms des biotests anglais présent dans la base de données, en français'''
+    '''Fonction pour traduire les noms des biotests anglais présent dans la base de données, en français
+    Ils sont donnés sous forme de liste et retournés sous forme de liste'''
     biotest_francais = []
     for elt in biotest_anglais:
         if elt == "neurology":
@@ -388,7 +390,8 @@ def recuperation_photo(reference, path_photo, path_ressources):
     '''Fonction de récupération des photos à partir de path_photo, et de la référence du point de mesure
     Path_ressources est initialisé dans word_main, il précise un fichier contenant "carre_blanc.png" qui permet de garder la mise en page même en l'absence de photo
     Attention il faut que les noms de photos soit de la bonne nomenclature (ex : "stepXX_PDA1_AG-003-01-01-01_Amont_5445664_65454.pngstepXX_PDA1_AG-003-01-01-01_Amont_5445664_65454.png")
-    avec en 3e position (séparée par des underscores) la référence du point de mesure, et en 4e le type de photo (Amont, Aval, Panorama, Zoom)'''
+    avec en 3e position (séparée par des underscores) la référence du point de mesure, et en 4e le type de photo (Amont, Aval, Panorama, Zoom).
+    Retourne un dictionnaire avec comme clé le type de photo et en valeur le path de la photo'''
     prefixe = path_photo + "/" + reference
     list_type = ["amont", "aval", "zoom", "panorama"]
     dico_nom = {}
@@ -413,7 +416,8 @@ def recuperation_photo(reference, path_photo, path_ressources):
 
 def rotation_image(path_photo):
     '''Fonction pour tourner les images dans le fichier word, car la rotation dans l'explorateur windows est enregistré en metadonnée, on applique cette métadonnée
-    à l'image elle même dans cette fonction '''
+    à l'image elle même dans cette fonction 
+    Ne retourne rien, modifie en dur la rotation de l'image'''
     try:
         image = Image.open(path_photo)
         for orientation in ExifTags.TAGS.keys():
