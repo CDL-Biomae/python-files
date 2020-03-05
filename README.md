@@ -1,4 +1,4 @@
-### Description du fonctionnement de l'application utilisée par Biomae pour gérer ces données et la création de livrable
+# Description du fonctionnement de l'application utilisée par Biomae pour gérer ces données et la création de livrable
 
 Pour lancer le programme, il faut au préalable installer les dépendances indiquées dans requires.txt.
 Pour les installer, écrire les commandes suivantes dans un invite de commandes (il faut avoir au minimum python installé sur votre appareil ainsi que dans le PATH):
@@ -9,7 +9,7 @@ pip install -r requires.txt
 Assurez-vous d'avoir le fichier env.py dans le même dossier que requires.txt. Il doit figurer dans env.py les identifiants de la base de données à laquelle vous souhaitez vous connectez. DATABASE_USER, DATABASE_PASSWORD ET DATABASE_IP sont ces identifiants.
 DATABASE_RAW et DATABASE_TREATED sont fournis par Zabé comme étant le nom de base respectivement de la base de données brutes et traitées.
 
-### Application Centrale Digital App
+# Application Centrale Digital App
 
 ## Onglet créateur de livrables
 
@@ -24,7 +24,7 @@ Pour ajouter une campagne dans la création de livrable, écrivez son nom du typ
 Un menu déroulant permet de choisir la version de la base de données traitées voulue pour la génération de rapport. Par défaut, la version choisie est la dernière en date. 
 Le bouton "Lancer" apparaît lorsqu'une option Excel ou Word est sélectionnée. Les différentes options qui en dépendent s'affichent lorsque l'option du livrable voulu est choisie. Le dossier de destination correspond à l'endroit où vont atterrir les livrables. La source des photos correspond au dossier contenant les phtos nécessaires.
 
-# Précision sur l'onglet word
+### Précision sur l'onglet word
 
 Pour créer un rapport d'expérimentation, il faut entrer le nom de la campagne et faire ajouter. Il est possible d'en ajouter plusieurs, que l'on voit en dessous. On précise en cochant ou non la case "Agence de l'eau" si c'en est une, la case étant coché initialement. Ensuite, on choisit la version que l'on souhaite utiliser pour les références, la dernière étant sélectionnée par défaut. Ensuite, on précise dans le champ "Numéro de la campagne", le numéro de celle-ci dans l'année. Si rien n'est renseigné, il y aura des "XX" à la place. Ce choix s'applique pour tous les rapports sélectionnés, donc si ce nombre est différent pour chacun, il faut les lancer un par un.
 
@@ -36,7 +36,7 @@ Si on oublie de renseigner ces dossiers, lorsque l'on clique sur lancer, les fen
 
 Par ailleurs, pour faire les cartes il faut un compte sur Mapbox, lorsque ceci est fait il faut changer la variable 'ACCESS_TOKEN_MAPBOX' dans env.py par la clef du compte. Celle-ci se trouve sur le site Mapbox.com, dans Account, il faut copier la Default public token.
 
-# Lancement
+### Lancement
 
 Lorsque tous les informations désirées sont sélectionnées, appuyer sur le bouton "Lancer". Cela va geler l'application tant que le(s) livrable(s) ne sont terminés d'être créés. 
 L'avancée de la création des livrables est maintenant affichée dans la console que vous avez lancé pour allumer l'application (ainsi que les éventuelles erreurs).
