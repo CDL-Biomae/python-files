@@ -6,7 +6,7 @@ def create_version_table():
 def create_new_version(date=None, comment=None):
     query = QueryScript(f" INSERT INTO version (date, comment) VALUES (%s, %s)")
     
-    query.setRows([(date,comment)])
+    query.setRows([(date, comment)])
     query.executemany(True)
 
 

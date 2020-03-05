@@ -7,6 +7,11 @@ import env
 
 
 def create_filename(list_campaigns):
+    '''
+    Créé un nom de fichier à partir d'une liste de campagnes
+    :param list_campaigns: ex: ['AG-003-01', 'AG-003-02']
+    :return: filename: 'Rapport_pour_AG-003-01_AG-003-02.xlsx'
+    '''
     filename = 'Rapport_pour'
     for c in list_campaigns:
         filename += f"_{c}"
@@ -16,6 +21,15 @@ def create_filename(list_campaigns):
 
 
 def write_in_new_excel(dataframe, filename, folder_PATH, sheet, startcol=1, startrow=1):
+    '''
+    Créé un nouveau fichier excel et rempli un onglet avec des données
+    :param dataframe: données
+    :param filename: nom du fichier
+    :param folder_PATH: chemin vers le fichier
+    :param sheet: nom de l'onglet
+    :param startcol: colonne de démarrage de l'écriture
+    :param startrow:  ligne de démarrage de l'écriture
+    '''
     PATH = f"{folder_PATH}\\{filename}"
     writer = pd.ExcelWriter(path=PATH, engine='openpyxl')
     dataframe.to_excel(writer, sheet_name=f"{sheet}", index=False, startcol=startcol, startrow=startrow)
@@ -26,6 +40,15 @@ def write_in_new_excel(dataframe, filename, folder_PATH, sheet, startcol=1, star
 
 
 def write_in_existing_excel(dataframe, filename, folder_PATH, sheet, startcol=1, startrow=1):
+    '''
+    Ajoute un onglet avec des données dans un fichier excel existant
+    :param dataframe: données
+    :param filename: nom du fichier
+    :param folder_PATH: chemin vers le fichier
+    :param sheet: nom de l'onglet
+    :param startcol: colonne de démarrage de l'écriture
+    :param startrow:  ligne de démarrage de l'écriture
+    '''
     PATH = f"{folder_PATH}\\{filename}"
     book = load_workbook(PATH)
     writer = pd.ExcelWriter(path=PATH, engine='openpyxl')
@@ -37,19 +60,33 @@ def write_in_existing_excel(dataframe, filename, folder_PATH, sheet, startcol=1,
 
 
 def measure_points_fusion(campaign_ref):
-     
+    '''
+    Renvoie la liste de points de mesures (ou leur fusion s'il y en a eu) associés à une référence de campagne
+    :param campaign_ref:
+    :return: une liste de points de mesures
+    '''
     output = QueryScript(
         f" SELECT DISTINCT(measurepoint_fusion_id)   FROM {env.DATABASE_TREATED}.key_dates WHERE measurepoint_id IN (  SELECT id   FROM {env.DATABASE_RAW}.measurepoint WHERE reference LIKE '{campaign_ref}%' and version=  {env.CHOSEN_VERSION()});"
     )
     return output.execute()
 
 def all_measure_points(campaign_ref):
+    '''
+    Renvoie la liste de points de mesures associés à une référence sans prendre en compte la fusion
+    :param campaign_ref:
+    :return: une liste de points de mesures
+    '''
     output = QueryScript(
         f"  SELECT id   FROM {env.DATABASE_RAW}.measurepoint WHERE reference LIKE '{campaign_ref}%';"
     )
     return output.execute()
 
 def create_dict_mp2(list_campaigns):
+    '''
+    Créé un dictionnaire avec comme clé une référence de campagne et comme valeur all_mesure_points(campaign_ref)
+    :param list_campaigns:
+    :return: dictionnaire: {'campagne_ref': [mp, ...], ...}
+    '''
     dict = {}
     for c in list_campaigns:
         list_mp = all_measure_points(c)
@@ -57,6 +94,11 @@ def create_dict_mp2(list_campaigns):
     return dict
 
 def create_dict_mp(list_campaigns):
+    '''
+    Créé un dictionnaire avec comme clé une référence de campagne et comme valeur mesure_points_fusion(campaign_ref)
+    :param list_campaigns:
+    :return: dictionnaire: {'campagne_ref': [mp, ...], ...}
+    '''
     dict = {}
     for c in list_campaigns:
         list_mp = measure_points_fusion(c)
@@ -64,6 +106,12 @@ def create_dict_mp(list_campaigns):
     return dict
 
 def create_general_dict(list_campaigns):
+    '''
+    Créé un dictionnaire dict_pack_fusion (cf tox_table_filler dans le dossier database) à partir d'une list de
+    référence de campagnes
+    :param list_campaigns:
+    :return: dictionnaire de type dict_pack_fusion
+    '''
     result = {}
     for campaign in list_campaigns:
         result.update(get_dict_pack_fusion(campaign))
@@ -72,14 +120,18 @@ def create_general_dict(list_campaigns):
 ## MAIN FUNCTION ##
 
 
-def excel_main(list_campaigns, folder_PATH = "output"):  # Prend en entrée une liste de reference de campagne, ex: ['AG-003-01', 'AG-003-02'] et
+def excel_main(list_campaigns, folder_PATH = "output"):
+    '''
+    Créé un fichier excel annexe pour le rapport d'étude
+    :param list_campaigns: ex: ['AG-003-01', 'AG-003-02']
+    :param folder_PATH:
+    :return:
+    '''
     filename = create_filename(list_campaigns)
     print('[+] Starting initialisation...')
     head_dataframe = create_head_dataframe(list_campaigns)
-    # print(head_dataframe.head())
     dict_mp = create_dict_mp(list_campaigns)
 
-    # create_tox_dataframe(head_dataframe, list_campaigns, dict_mp)
 
     # ## CREATION DE L'ONGLET VERSION ##
 
@@ -119,6 +171,7 @@ def excel_main(list_campaigns, folder_PATH = "output"):  # Prend en entrée une 
 
 
     # CREATION DE L'ONGLET BBAC ##
+    # Récupération des codes t0
     dict_general = create_general_dict(list_campaigns)
     list_mp = [mp for mp in dict_general]
     if len(list_mp) > 1:
@@ -131,7 +184,8 @@ def excel_main(list_campaigns, folder_PATH = "output"):  # Prend en entrée une 
         dict_t0[mp] = dict_general[mp]
         index = [element[1] for element in t0_associated].index(mp)
         dict_t0[mp]['code_t0_id'] = t0_associated[index][0]
-    
+
+    # Test pour savoir s'il y a eu de la chimie
     chemistry_existing = False
     for mp in dict_general:
         if 'chemistry' in dict_general[mp]:
@@ -159,7 +213,7 @@ def excel_main(list_campaigns, folder_PATH = "output"):  # Prend en entrée une 
         nqe_dataframe = create_nqe_dataframe(head_dataframe, dict_general)
         write_in_existing_excel(nqe_dataframe, filename, folder_PATH, 'NQE Biote', startrow=3)
         add_style_nqe(nqe_dataframe, filename, folder_PATH, dict_t0)
-    else :
+    else:
         print('\n[!] Pas de chimie détectée ! ')
 
     ## CREATION DE L'ONGLET TOX ##

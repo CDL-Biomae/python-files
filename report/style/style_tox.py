@@ -250,21 +250,21 @@ def add_style_tox(tox_dataframe, filename, folder_PATH):
                 mue=confrm_mue.get(repro_pack)
                 surface_retard = dict_conform_surface_retard.get(repro_pack)
 
-                if ws["R"+ str(row)].value == "NA" or  surface_retard == "Conforme BC1":
-                    ws["R"+ str(row)].fill = body_fill_ok
-                if ws["R"+ str(row)].value != "NA":
-                    ws["R"+ str(row)].fill =  body_fill_not_ok_4
+                if ws["R" + str(row)].value == "NA" or surface_retard == "Conforme BC1":
+                    ws["R" + str(row)].fill = body_fill_ok
+                if ws["R" + str(row)].value != "NA":
+                    ws["R" + str(row)].fill = body_fill_not_ok_4
 
-                if mue=="NA":
-                        ws["P"+ str(row)].fill = body_fill_NA
+                if mue == "NA":
+                        ws["P" + str(row)].fill = body_fill_NA
                 if mue == "Conforme":
-                        ws["P"+ str(row)].fill = body_fill_ok
+                        ws["P" + str(row)].fill = body_fill_ok
                 if mue == "Retard modéré":
-                        ws["P"+ str(row)].fill = body_fill_NA
+                        ws["P" + str(row)].fill = body_fill_NA
                 if mue == "Retard fort":
-                        ws["P"+ str(row)].fill = body_fill_not_ok_4
+                        ws["P" + str(row)].fill = body_fill_not_ok_4
                 
-          ws["S"+ str(row)].value = ""    
+          ws["S" + str(row)].value = ""
           ws["S4"].fill
         
 
