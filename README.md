@@ -38,7 +38,7 @@ Par ailleurs, pour faire les cartes il faut un compte sur Mapbox, lorsque ceci e
 
 ### Lancement
 
-Lorsque tous les informations désirées sont sélectionnées, appuyer sur le bouton "Lancer". Cela va geler l'application tant que le(s) livrable(s) ne sont terminés d'être créés. 
+Lorsque tous les informations désirées sont sélectionnées, appuyer sur le bouton "Lancer". Cela va geler l'application tant que le(s) livrable(s) ne sont pas terminés d'être créés. 
 L'avancée de la création des livrables est maintenant affichée dans la console que vous avez lancé pour allumer l'application (ainsi que les éventuelles erreurs).
 
 ## Onglet Gestionnaire de base de données
