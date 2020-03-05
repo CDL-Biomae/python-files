@@ -452,7 +452,7 @@ class Reprotoxicity:
         names = ['Constante surface des retards 1', 'Moyenne des surfaces de référence C2', 'SD des surfaces de référence C2']
 
         output_ref = QueryScript(
-            f"  SELECT name, value   FROM {env.DATABASE_TREATED}.r2_constant WHERE name IN {tuple(names)} and version=  {envLATESTN_VERSION()};"
+            f"  SELECT name, value   FROM {env.DATABASE_TREATED}.r2_constant WHERE name IN {tuple(names)} and version=  {env.LATEST_VERSION()};"
         ).execute()
         for row in output_ref:
             [name, value] = row

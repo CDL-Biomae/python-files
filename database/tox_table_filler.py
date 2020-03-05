@@ -74,7 +74,7 @@ def run(cas):
     dict_nombre_femelles_analysees = {mp_fusion: dict_fecundity[mp_fusion]['nbr_femelles_analysées'] for mp_fusion in dict_pack_fusion}
 
     # Transformation de "indice de fecondité - moyenne" en "%Inhibition fecondité - Résultat attendu"
-    ref_calcul = QueryScript(f"SELECT value FROM {env.DATABASE_TREATED}.r2_constant WHERE name = 'indice de fertilité attendu - moyenne' AND version = {env.LATEST_VERSION};").execute()[0]
+    ref_calcul = QueryScript(f"SELECT value FROM {env.DATABASE_TREATED}.r2_constant WHERE name = 'indice de fertilité attendu - moyenne' AND version = {env.LATEST_VERSION()};").execute()[0]
     dict_percent_inhibition_fecondite = {}
     for mp_fusion in dict_fecondite_moyenne:
         value = dict_fecondite_moyenne[mp_fusion]
