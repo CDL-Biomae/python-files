@@ -1,10 +1,17 @@
 from tools import QueryScript, list_to_dict
 import pandas as pd
-
 import env
 
-# creation  la structure et la remplir avec les données de toxtable pour l'excel qu'on vas remplir  
 def create_dataframe(list_mp):
+    '''
+    Créé une dataframe à partir d'une liste de points de mesures
+    Les colonnes de la dataframe sont ['','Survie Male - 7 jours', 'Alimentation',
+                                       'Neurotoxicité AChE','', 'Survie Femelle','Nombre jours exposition in situ',
+                                       'n','Fécondité','n','Cycle de mue','n','Perturbation endocrinienne','']
+    Les colonnes '' sont utilisées pour faire des séparations de tableau
+    :param list_mp:
+    :return: dataframe:
+    '''
     matrix = []
     if len(list_mp) > 1:
         query_tuple_mp = tuple(list_mp)
@@ -36,6 +43,13 @@ def create_dataframe(list_mp):
    
 # creation final de l'excel ou il y'a les agnces et les ligne de toxtable qui correspend 
 def create_tox_dataframe(head_dataframe, list_campaigns, dict_mp):
+    '''
+    Créé une dataframe qui contient les données de l'onglet 'Tox' de l'Excel
+    :param head_dataframe: cf initialization.py
+    :param list_campaigns: list des references de campagne
+    :param dict_mp: {'ref_campagne': [mp, ...], ...}
+    :return:
+    '''
     list_dataframe = []
     for campaign_str in list_campaigns:
         list_mp = dict_mp[campaign_str]

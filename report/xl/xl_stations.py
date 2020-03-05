@@ -3,6 +3,13 @@ import pandas as pd
 import env
 
 def create_dataframe(list_mp):
+    '''
+    Créé une dataframe à partir d'une liste de points de mesures
+    Les colonnes de la dataframe sont ['Type de réseau', 'Hydroécorégion', 'Masse d\'eau', 'Adresse', 'Coordonnées de référence', 'Coordonnées de référence (Lambert)', 'Coordonnées réelles']
+    Les colonnes vides sont supprimées
+    :param list_mp:
+    :return: dataframe:
+    '''
     if len(list_mp) > 1:
         query_tuple_mp = tuple(list_mp)
     else:
@@ -43,6 +50,13 @@ def create_dataframe(list_mp):
     return df
 
 def create_stations_dataframe(head_dataframe, list_campaigns, dict_mp):
+    '''
+    Créé une dataframe qui contient les données de l'onglet 'stations' de l'Excel
+    :param head_dataframe: cf initialization.py
+    :param list_campaigns: list des references de campagne
+    :param dict_mp: {'ref_campagne': [mp, ...], ...}
+    :return:
+    '''
     campaign_str = list_campaigns[0]
     list_mp = dict_mp[campaign_str]
     nb_mp = len(list_mp)

@@ -4,6 +4,11 @@ from calcul.exposure_conditions.exposure_conditions import conditions
 import env
 
 def list_of_list_to_dict(list_of_list):
+    '''
+    Créé un dictionnaire à partir d'une liste de liste. Le premier élément d'une liste sert de clé et le reste de valeur
+    :param list_of_list:
+    :return: dictionnaire:
+    '''
     dictionnary = {}
     for line in list_of_list:
         key, value = line[0], line[1:]
@@ -12,6 +17,12 @@ def list_of_list_to_dict(list_of_list):
 
 
 def test_chimie_superieur_repro(list_mp):
+    '''
+    Renvoie d'une liste de résultat du test "durée_chimie > durée_repro" à partir d'une liste de points de mesures.
+    S'il manque au moins 3 dates dans la base de données pour un point de mesure le résultat sera False à son emplacement dans la liste.
+    :param list_mp:
+    :return: list_test: [bool, ...]
+    '''
     if len(list_mp) > 1:
         query_tuple_mp = tuple(list_mp)
     else:
@@ -87,6 +98,14 @@ def test_chimie_superieur_repro(list_mp):
 
 
 def temperatures_dataframe(list_mp):
+    '''
+    Créé une dataframe des températures à partir d'une liste de points de mesures
+    Les données utilisées dans cette fonction ne sont que celles des sensor 2 et 3.
+    Les colonnes de la dataframe sont ['', 'Temperature minimum', 'Temperature moyenne', 'Temperature maximum']
+    Les colonnes vides sont supprimées.
+    :param list_mp:
+    :return: dataframe:
+    '''
     list_test = test_chimie_superieur_repro(list_mp)
     if len(list_mp) > 1:
         query_tuple_mp = tuple(list_mp)
@@ -141,6 +160,15 @@ def temperatures_dataframe(list_mp):
 
 
 def values_dataframe(list_mp):
+    '''
+    Créé une dataframe des données de conductivité, pH, oxygène à partir d'une liste de points de mesures
+    Les colonnes de la dataframe sont ['Conductivité J0', 'Conductivité J14', 'Conductivité JN', 'Conductivité J21',
+                                        'pH J0', 'pH J14', 'pH JN', 'pH J21',
+                                        'Oxygène J0', 'Oxygène J14', 'Oxygène JN', 'Oxygène J21']
+    Les colonnes vides sont supprimées.
+    :param list_mp:
+    :return:
+    '''
     matrix = []
 
     for mp in list_mp:
@@ -164,6 +192,13 @@ def values_dataframe(list_mp):
 
 
 def create_physicochimie_dataframe(head_dataframe, list_campaigns, dict_mp):
+    '''
+    Créé une dataframe qui contient les données de l'onglet 'physicochimie' de l'Excel
+    :param head_dataframe: cf initialization.py
+    :param list_campaigns: list des references de campagne
+    :param dict_mp: {'ref_campagne': [mp, ...], ...}
+    :return:
+    '''
     list_dataframe = []
     for campaign_str in list_campaigns:
         list_mp = dict_mp[campaign_str]
