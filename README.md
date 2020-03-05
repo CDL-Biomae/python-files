@@ -1,4 +1,19 @@
-# Description du fonctionnement de l'application utilisée par Biomae pour gérer ces données et la création de livrable
+# Prérequis avant lancement de l'application
+
+Pour lancer l'application, il faut au préalable avoir le dossier sur son ordinateur. Pour cela deux choix possibles :
+- l'avoir sur une clé et le copier coller
+- cloner le projet de github. Pour cela, il faut télécharger git sur son appareil et lancer dans une invite de commande :
+```
+git clone https://github.com/CDL-Biomae/python-files
+```
+Cela va créer le dossier là où l'invite de commande a été lancé. Ensuite il faut placer le fichier env.py qui ne peut se transmettre par github mais par particulier. 
+Dans ce même fichier ajouter les coordonnées de la base de données telle que vous le souhaitez pour vous connectez (les variables commençant par DATABASE).
+A partir de ce moment, pour lancer le programme, il faut au préalable installer les dépendances indiquées dans requires.txt.
+Pour les installer, écrire les commandes suivantes dans un invite de commandes (il faut avoir au minimum python installé sur votre appareil ainsi que dans le PATH):
+```
+pip install --upgrade pip
+pip install -r requires.txt
+```
 
 Assurez-vous d'avoir le fichier env.py dans le même dossier que requires.txt. Il doit figurer dans env.py les identifiants de la base de données à laquelle vous souhaitez vous connectez. DATABASE_USER, DATABASE_PASSWORD ET DATABASE_IP sont ces identifiants.
 DATABASE_RAW et DATABASE_TREATED sont fournis par Zabé comme étant le nom de base respectivement de la base de données brutes et traitées.
@@ -41,20 +56,3 @@ Cet onglet permet de changer de mettre à jour la base de données traitées ou 
 Si vous avez connaissance d'ajout de données brutes (point de mesure, résultats divers, modifications ...) vous pouvez rafraîchir la base de données traitées avec le bouton "Rafraîchir la base de données traitées" qui gèlera l'application le temps de mettre à jour l'entièreté des données traitées. Cela va automatiquement modifier la dernière version inscrite. 
 Si vous avez besoin de créer une nouvelle version, veuillez renseigner le ficher excel contenant les références de calculs et de seuils dans en cliquant sur "Choisir le fichier excel de référence". Cela va automatiquement inscrire les deux informations possibles de la version à savoir la date (celle du jour actuel) ainsi qu'un éventuel commentaire que vous voulez préciser à la nouvelle version. Il ne reste plus qu'à cliquer sur "Ajouter cette version" qui remplira dans la base de données traitées une nouvelle série de données traitées calculées à partir des références précisées ave le fichier excel. Cela peut prendre une dizaine de minutes en fonction de la vitesse de connection de vogtre appareil.
 
-
-# Prérequis avant lancement de l'application
-
-Pour lancer l'application, il faut au préalable avoir le dossier sur son ordinateur. Pour cela deux choix possibles :
-- l'avoir sur une clé et le copier coller
-- cloner le projet de github. Pour cela, il faut télécharger git sur son appareil et lancer dans une invite de commande :
-```
-git clone https://github.com/CDL-Biomae/python-files
-```
-Cela va créer le dossier là où l'invite de commande a été lancé. Ensuite il faut placer le fichier env.py qui ne peut se transmettre par github mais par particulier. 
-Dans ce même fichier ajouter les coordonnées de la base de données telle que vous le souhaitez pour vous connectez (les variables commençant par DATABASE).
-A partir de ce moment, pour lancer le programme, il faut au préalable installer les dépendances indiquées dans requires.txt.
-Pour les installer, écrire les commandes suivantes dans un invite de commandes (il faut avoir au minimum python installé sur votre appareil ainsi que dans le PATH):
-```
-pip install --upgrade pip
-pip install -r requires.txt
-```
