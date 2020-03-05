@@ -6,6 +6,8 @@ import math
 
 
 def recuperation_donnee(campaign):
+    '''Fonction principale appelant toutes les autres du fichier, pour regrouper la récupération de toutes les donnés
+    Retourne plusieurs dictionnaires regroupant les différentes données, avec à chaque fois en clé la référence du point de mesure'''
     measurepoints_fusion_id_list = measure_points(campaign)
     dico_exposure_condition = {}
     dico_type_biotest = {}
@@ -29,7 +31,8 @@ def recuperation_donnee(campaign):
 
 
 def data_exposure_condition(measurepoint_fusion_id):
-
+    '''Récupération des données de conditions d'exposition, calculée à partir d'un measurepoint (fusion), retourne la référence du point de mesure,
+    le dictionnaire de données et si c'était une fusion ou non (ces informations sont restockées dans un autre dictionnaire dans recuperation_donnee) '''
     query = QueryScript(
         f"SELECT DISTINCT reference, measurepoint_id FROM {env.DATABASE_TREATED}.key_dates JOIN {env.DATABASE_RAW}.measurepoint ON measurepoint.id = key_dates.measurepoint_fusion_id WHERE measurepoint_fusion_id = {measurepoint_fusion_id} and version=  {env.CHOSEN_VERSION()}").execute()
     measurepoints = [elt[1] for elt in query]
@@ -40,6 +43,8 @@ def data_exposure_condition(measurepoint_fusion_id):
 
 
 def data_exposure_condition_fusion(measurepoints):
+    ''' Récupération des données de conditions d'exposition dans le cas d'un measurepoint fusion, prend en entrée une liste avec les deux id des points de mesures
+    et retourne un dictionnaire des données'''
     [id_mp_1, id_mp_2] = measurepoints
     if id_mp_1 < id_mp_2:
         id_mp_premier = id_mp_1
@@ -74,6 +79,8 @@ def data_exposure_condition_fusion(measurepoints):
 
 
 def data_exposure_condition_simple(measurepoint_id):
+    ''' Récupération des données de conditions d'exposition dans le cas d'un measurepoint simple, prend en entrée un id de point de mesure
+    et retourne un dictionnaire des données'''
     dico = {}
     days = ["J+0", "J+7", "J+N", "J+21"]
     steps_barrel = [(50, "\'R0\'"), (60, "\'R7\'"),
@@ -95,6 +102,8 @@ def data_exposure_condition_simple(measurepoint_id):
 
 
 def parser(date):
+    '''Permet d'écrire sous forme de string les dates au bon format, en gardant un 0 s'il n'y qu'un chiffre (pour les minutes, heures, jours et moi)
+    Prend en entrée un datetime et retourne un string '''
     if date == None:
         return None
     year = date.year
@@ -116,6 +125,10 @@ def parser(date):
 
 
 def geographic_data_measurepoint(measurepoint_fusion_id_list):
+    '''Prend en entrée la liste des id des points de mesures fusion dont l'on souhaite les données
+    Retourne un dictionnaire contenant les données géographiques récupérées dans la table measurepoint, sous forme de dictionnaire de dictionnaire,
+    avec comme première clé la référence du point de mesure, et en deuxième le type de donnée (longitude, latitude, lambert, etc)
+    Les données sont déjà formatées comme elles doivent apparaitre dans le word (virgule comme séparateur de chiffre comme en français, caractère spéciaux corrigés) '''
     if len(measurepoint_fusion_id_list) == 1:
         measurepoint_fusion_id_list = "(" + \
             str(measurepoint_fusion_id_list[0]) + ")"
@@ -135,6 +148,12 @@ def geographic_data_measurepoint(measurepoint_fusion_id_list):
 
 
 def average_temperature(measurepoint_fusion_id_list):
+    '''Prend en entrée la liste des id des points de mesures fusion que l'on souhaite
+    Retourne un dictionnaire contenant les données de température (min, max, moyenne) de la table average_temperature, sous forme de dictionnaire de dictionnaire,
+    avec comme première clé la référence du point de mesure, et en deuxième le type de donnée (min, max, average)
+    Puisqu'il y a (potentiellement) trois sondes, on prend le minimum de tous les minimums (sachant que celui ci est déjà calculé), le maximum des maximum,
+    et la température moyenne de la sonde qui est restée le plus longtemps
+    Cette étape est longue, puisqu'il faut récupérer les données de dates correspondantes et trouver la période la plus longue '''
     if len(measurepoint_fusion_id_list) == 1:
         measurepoint_fusion_id_list = "(" + \
             str(measurepoint_fusion_id_list[0]) + ")"
@@ -249,16 +268,17 @@ def average_temperature(measurepoint_fusion_id_list):
             dico_avg_tempe_result[key] = temp
     return dico_avg_tempe_result
 
-    # for elt in tempe:  # ancienne version
-    #     dico_temp_tempe = {'min': elt[7], 'average': elt[8], 'max': elt[9]}
-    #     dico_avg_tempe[elt[0]] = dico_temp_tempe
-    # return dico_avg_tempe
 
 # %% Récupération des données géographiques de l'onglet agency
 
 
 # on entre le nom de la campagne, cela nous ressort les informations géographiques
 def geographic_data_agency(campaign):
+    '''Prend en entrée la référence de campagne dont l'on souhaite les données
+    Retourne un dictionnaire contenant les données géographiques récupérées dans la table agency, sous forme de dictionnaire de dictionnaire,
+    avec comme première clé la référence du point de mesure, et en deuxième le type de donnée (longitude, latitude, lambert, etc)
+    Les données sont déjà formatées comme elles doivent apparaitre dans le word (virgule comme séparateur de chiffre comme en français, caractère spéciaux corrigés) 
+    Celles-ci ne sont utilisées que dans le cas d'une agence de l'eau'''
     query = QueryScript(
         f"  SELECT DISTINCT measurepoint.reference, agency.code, agency.name, agency.zipcode, agency.city, agency.stream, agency.lambertX, agency.lambertY, agency.network, agency.hydroecoregion, agency.latitude, agency.longitude FROM {env.DATABASE_RAW}.agency JOIN {env.DATABASE_RAW}.place ON agency.id=place.agency_id JOIN {env.DATABASE_RAW}.campaign ON place.campaign_id=campaign.id JOIN {env.DATABASE_RAW}.measurepoint ON measurepoint.place_id=place.id JOIN {env.DATABASE_TREATED}.key_dates ON measurepoint.id=key_dates.measurepoint_fusion_id WHERE campaign.reference='{campaign}' and key_dates.version=  {env.CHOSEN_VERSION()}").execute()
     dico = {}
@@ -272,6 +292,8 @@ def geographic_data_agency(campaign):
 
 
 def type_biotest(measurepoint_fusion_id):
+    '''Prend en argument un id de measurepoint fusion
+    Retourne la liste des biotests en anglais (nom de la base de données) sous forme de liste'''
     query = QueryScript(
         f"  SELECT DISTINCT pack.nature FROM {env.DATABASE_RAW}.pack JOIN {env.DATABASE_TREATED}.key_dates ON pack.measurepoint_id = key_dates.measurepoint_id JOIN {env.DATABASE_RAW}.cage ON pack.id = cage.pack_id WHERE key_dates.version=  {env.CHOSEN_VERSION()} AND key_dates.measurepoint_fusion_id = {measurepoint_fusion_id}").execute()
     return query
@@ -280,6 +302,8 @@ def type_biotest(measurepoint_fusion_id):
 
 
 def scud_survivor_chemistry(measurepoint_fusion_id):
+    '''Prend en argument un id de measurepoint fusion
+    Retourne la valeur de la moyenne de la survie des gamares pour la chimie '''
     query = QueryScript(
         f"SELECT Distinct cage.scud_survivor, pack.scud_quantity, cage.id FROM {env.DATABASE_RAW}.cage JOIN {env.DATABASE_RAW}.pack ON cage.pack_id = pack.id JOIN {env.DATABASE_TREATED}.key_dates ON pack.measurepoint_id = key_dates.measurepoint_id WHERE key_dates.version=  {env.CHOSEN_VERSION()} AND pack.nature = 'chemistry' AND cage.scud_survivor IS not null AND key_dates.measurepoint_fusion_id = {measurepoint_fusion_id}").execute()
     total = 0
