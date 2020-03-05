@@ -1,39 +1,30 @@
-### Description du fonctionnement de l'application 
+# Description du fonctionnement de l'application utilisée par Biomae pour gérer ces données et la création de livrable
 
 Pour lancer le programme, il faut au préalable installer les dépendances indiquées dans requires.txt.
-Pour les installer, écrire les commandes suivantes dans un invite de commandes :
+Pour les installer, écrire les commandes suivantes dans un invite de commandes (il faut avoir au minimum python installé sur votre appareil ainsi que dans le PATH):
 ```
 pip install --upgrade pip
 pip install -r requires.txt
 ```
-Assurez-vous d'avoir le fichier env.py dans le même dossier que requires.txt
+Assurez-vous d'avoir le fichier env.py dans le même dossier que requires.txt. Il doit figurer dans env.py les identifiants de la base de données à laquelle vous souhaitez vous connectez. DATABASE_USER, DATABASE_PASSWORD ET DATABASE_IP sont ces identifiants.
+DATABASE_RAW et DATABASE_TREATED sont fournis par Zabé comme étant le nom de base respectivement de la base de données brutes et traitées.
 
-## Remplissage de la base de données
+# Application Centrale Digital App
 
-Les coordonnées de vos bases de données sont précisées dans le fichier env.py sous les noms DATABASE_RAW (données brutes) et DATABASE_TREATED (données traitées) ... Il faut ajouter les différents identifiants et adresses IP à cet endroit
+## Onglet créateur de livrables
 
-Pour remplir la base de données par les références et les résultats des moyennes de températures et autres dates clés, il faut avoir le fichier reference.xlsx dans le dossier principal (le même que celui contenant requires.txt)
-Pour inforamtion : les différents noms de colonne du excel ne doivent pas changer car le remplissage est calibré sur les noms et le nombre de colonne précisé à la fin du projet Digital Lab de 2020.
-
-Ensuite lancer la commande suivante :
+Pour lancer l'application, écrivez dans un terminal de commande la ligne suivante :
 ```
-python database.py
+python app.py
 ```
-Si aucun message d'erreur n'est apparu, la base de données a été remplie avec succès !!
+Cela peut prendre de 2sec à 30 sec en fonction de la vitesse de votre appareil.
 
+Vous arrivez donc sur une interface qui vous permet de créer des livrables. 
+Pour ajouter une campagne dans la création de livrable, écrivez son nom du type 'AG-003-01', puis "Ajouter" cette référence (la touche Enter fonctionne aussi). Une sécurité est placée pour éviter les erreurs : si la référence précisée n'est pas dans la base de données ou a déjà été ajoutée, rien ne se passera.
+Un menu déroulant permet de choisir la version de la base de données traitées voulue pour la génération de rapport. Par défaut, la version choisie est la dernière en date. 
+Le bouton "Lancer" apparaît lorsqu'une option Excel ou Word est sélectionnée. Les différentes options qui en dépendent s'affichent lorsque l'option du livrable voulu est choisie. Le dossier de destination correspond à l'endroit où vont atterrir les livrables. La source des photos correspond au dossier contenant les phtos nécessaires.
 
-## Création des livrables excel et word
-
-L'écriture des différents livrables se fait à partir du fichier main.py du dossier report.
-Pour l'appeler il suffit de l'importer et lui donner un nom de campagne ou de contrat:
-
-Dans create_xl_annexes.py
-```
-from report import main
-main(<NOM DE/DES CAMPAGNE/S OU CONTRAT/S>)
-```
-
-## Création du Rapport d'expérimentation (Word) - Application
+### Précision sur l'onglet word
 
 Pour créer un rapport d'expérimentation, il faut entrer le nom de la campagne et faire ajouter. Il est possible d'en ajouter plusieurs, que l'on voit en dessous. On précise en cochant ou non la case "Agence de l'eau" si c'en est une, la case étant coché initialement. Ensuite, on choisit la version que l'on souhaite utiliser pour les références, la dernière étant sélectionnée par défaut. Ensuite, on précise dans le champ "Numéro de la campagne", le numéro de celle-ci dans l'année. Si rien n'est renseigné, il y aura des "XX" à la place. Ce choix s'applique pour tous les rapports sélectionnés, donc si ce nombre est différent pour chacun, il faut les lancer un par un.
 
@@ -43,7 +34,15 @@ Dans le dossier il faut qu'il y ait des dossiers nommés en fonction d'un point 
 
 Si on oublie de renseigner ces dossiers, lorsque l'on clique sur lancer, les fenêtres de sélection s'ouvriront, d'abord pour choisir la destination d'enregistrement, puis le dossier de photos.
 
-
-##  Création du Rapport d'expérimentation (Word) - Comppréhension du code
-
 Par ailleurs, pour faire les cartes il faut un compte sur Mapbox, lorsque ceci est fait il faut changer la variable 'ACCESS_TOKEN_MAPBOX' dans env.py par la clef du compte. Celle-ci se trouve sur le site Mapbox.com, dans Account, il faut copier la Default public token.
+
+### Lancement
+
+Lorsque tous les informations désirées sont sélectionnées, appuyer sur le bouton "Lancer". Cela va geler l'application tant que le(s) livrable(s) ne sont terminés d'être créés. 
+L'avancée de la création des livrables est maintenant affichée dans la console que vous avez lancé pour allumer l'application (ainsi que les éventuelles erreurs).
+
+## Onglet Gestionnaire de base de données
+
+Cet onglet permet de changer de mettre à jour la base de données traitées ou de changer totalement de version.
+Si vous avez connaissance d'ajout de données brutes (point de mesure, résultats divers, modifications ...) vous pouvez rafraîchir la base de données traitées avec le bouton "Rafraîchir la base de données traitées" qui gèlera l'application le temps de mettre à jour l'entièreté des données traitées. Cela va automatiquement modifier la dernière version inscrite. 
+Si vous avez besoin de créer une nouvelle version, veuillez renseigner le ficher excel contenant les références de calculs et de seuils dans en cliquant sur "Choisir le fichier excel de référence". Cela va automatiquement inscrire les deux informations possibles de la version à savoir la date (celle du jour actuel) ainsi qu'un éventuel commentaire que vous voulez préciser à la nouvelle version. Il ne reste plus qu'à cliquer sur "Ajouter cette version" qui remplira dans la base de données traitées une nouvelle série de données traitées calculées à partir des références précisées ave le fichier excel. Cela peut prendre une dizaine de minutes en fonction de la vitesse de connection de vogtre appareil.
