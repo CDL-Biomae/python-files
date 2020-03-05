@@ -13,11 +13,16 @@ class App(tk.Tk):
         self.mode = tk.StringVar()
         self.mode.set("creator")
         self.version_file = open("version.txt", "w")
-        self.version_file.write(f"CHOSEN_VERSION={env.LATEST_VERSION()}")
-        self.version_file.close()
-        self.other_mode = tk.StringVar()
-        self.other_mode.set("Gestionnaire de base de données")
-        self.init_creator()
+        try :
+            self.version_file.write(f"CHOSEN_VERSION={env.LATEST_VERSION()}")
+            self.version_file.close()
+            self.other_mode = tk.StringVar()
+            self.other_mode.set("Gestionnaire de base de données")
+            self.init_creator()
+            self.has_to_quit = False
+        except AttributeError:
+            self.has_to_quit = True
+
     
     def switch_mode(self):
         if self.mode.get() == "creator":
@@ -266,4 +271,5 @@ if __name__ == "__main__":
     app.title("Digital Lab App")
     app.geometry("540x360")
     app.minsize(480, 360)
-    app.mainloop()
+    if not app.has_to_quit:
+        app.mainloop()
