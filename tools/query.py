@@ -3,6 +3,11 @@ import mysql.connector
 from mysql.connector import errorcode
 
 class QueryScript() :
+  '''
+  Prend deux arguments facultatif: script et rows. Script est la requête SQL désirée écrite en string. Rows est une liste de tuples contenant les lignes qui peuvent être insérées dans une table.
+  Pour lancer une requête du type SELECT lancer execute(). Si vous lancer DROP ou CREATE, lancer execute(admin=True) qui va spécifié que vous travailler sur la base de données brut.
+  Si vous lancer une INSERT, lancer executemany().
+  '''
   def __init__(self, script='', rows=None):
     if script!='':
       self.script = script
