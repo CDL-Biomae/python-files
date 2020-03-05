@@ -5,6 +5,13 @@ from tools import QueryScript
 
 ## CREATE DATAFRAME ##
 def create_dataframe(dick_pack_fusion):
+    '''
+    Créé une dataframe à partir d'un référence de campagne.
+    Les colonnes de la dataframe sont les sandres précisés dans /calcul/chemistry/nqe
+    Les colonnes vides sont supprimées
+    :param dict_pack_fusion:
+    :return: dataframe:
+    '''
     matrix = []
     data = chemistry.result_by_packs_and_sandre(dick_pack_fusion)
     for mp in dick_pack_fusion:

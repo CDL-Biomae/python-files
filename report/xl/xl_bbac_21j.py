@@ -5,6 +5,13 @@ import env
 
 ## CREATE DATAFRAME ##
 def create_dataframe(dick_pack_fusion):
+    '''
+    Créé une dataframe à partir d'un référence de campagne.
+    Les colonnes de la dataframe sont les sandres dont les seuils 21j sont non nuls dans r3 (table reference)
+    Les colonnes vides sont supprimées
+    :param dict_pack_fusion:
+    :return: dataframe:
+    '''
     elements_metal = QueryScript(f" SELECT sandre   FROM {env.DATABASE_TREATED}.r3 WHERE version=  {env.CHOSEN_VERSION()} AND 21j_threshold IS NOT NULL AND familly='Métaux'").execute()
     elements_metal = [int(float(element)) for element in elements_metal]
     elements_PCB = QueryScript(f" SELECT sandre   FROM {env.DATABASE_TREATED}.r3 WHERE version=  {env.CHOSEN_VERSION()} AND 21j_threshold IS NOT NULL AND familly LIKE 'PCB%'").execute()
