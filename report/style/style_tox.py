@@ -256,7 +256,7 @@ def add_style_tox(tox_dataframe, filename, folder_PATH):
 
                 if ws["R" + str(row)].value == "NA" or surface_retard == "Conforme BC1":
                     ws["R" + str(row)].fill = body_fill_ok
-                if ws["R" + str(row)].value != "NA":
+                else:
                     ws["R" + str(row)].fill = body_fill_not_ok_4
 
                 if mue == "NA":

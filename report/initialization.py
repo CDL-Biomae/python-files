@@ -9,6 +9,11 @@ def agency_mp(list_mp):
 
 
 def campaign(campaign_ref):
+    '''
+    Permet de récupérer le numéro de campagne, càd les deux derniers numéros quand on lit sa référence
+    :param campaign_ref:
+    :return: numéro: numéro de campagne
+    '''
     return int(campaign_ref[-2:])
 
 
