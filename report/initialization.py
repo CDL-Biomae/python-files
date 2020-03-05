@@ -18,7 +18,11 @@ def campaign(campaign_ref):
 
 
 def measure_points(campaign_ref):
-     
+    '''
+    Récupère les points de mesure (fusion s'il y en a) associés à une référence de campagne
+    :param campaign_ref:
+    :return: list_mp: Liste de points de mesures
+    '''
     output = QueryScript(
         f"SELECT DISTINCT(measurepoint_fusion_id) FROM {env.DATABASE_TREATED}.key_dates WHERE measurepoint_id IN (SELECT id FROM {env.DATABASE_RAW}.measurepoint WHERE reference LIKE '{campaign_ref}%') and version=  {env.CHOSEN_VERSION()};"
     ).execute()
@@ -28,6 +32,11 @@ def measure_points(campaign_ref):
 
 
 def number_name_mp(list_mp):
+    '''
+    Renvoie les numéro et les noms associés à une liste de points de mesure
+    :param list_mp:
+    :return: list_number, list_name: Liste des numéro et liste des noms
+    '''
     if len(list_mp) > 1:
         query_tuple_mp = tuple(list_mp)
     else:
@@ -54,11 +63,22 @@ def number_name_mp(list_mp):
 
 ## CREATION D'UNE DATAFRAME POUR UNE REFERENCE DE CAMPAGNE ##
 def clean(dataframe):
+    '''
+    Enlève les colonnes vides d'une dataframe
+    :param dataframe:
+    :return: dataframe_cleaned:
+    '''
     df = dataframe.dropna(how='all', axis='columns')
     return df
 
 
 def create_dataframe(campaign_str):
+    '''
+    Créé une dataframe à partir d'un référence de campagne.
+    Les colonnes de la dataframe sont ['Campagne', 'Numéro', 'Station de mesure', 'Code Agence']
+    :param campaign_str:
+    :return: dataframe:
+    '''
     campaign_id = campaign(campaign_str)
     list_mp = measure_points(campaign_str)
     list_number, list_name = number_name_mp(list_mp)
@@ -81,6 +101,12 @@ def create_dataframe(campaign_str):
 
 ## DONNE LE DEBUT DE CHAQUE TABLEAU DU EXCEL ##
 def create_head_dataframe(list_campaigns):
+    '''
+    Créé une dataframe qui correspond au premières colonnes de chaque excel.
+    Cette dataframe est réalisé grâce à une concaténation des résultats des appels à la fonction create_dataframe.
+    :param list_campaigns:
+    :return:
+    '''
     list_dataframe = []
     for campaign_str in list_campaigns:
         df = create_dataframe(campaign_str)
