@@ -3,6 +3,7 @@ import pandas as pd
 
 import env
 
+# creation  la structure et la remplir avec les données de toxtable pour l'excel qu'on vas remplir  
 def create_dataframe(list_mp):
     matrix = []
     if len(list_mp) > 1:
@@ -33,7 +34,7 @@ def create_dataframe(list_mp):
     return df
 
    
-
+# creation final de l'excel ou il y'a les agnces et les ligne de toxtable qui correspend 
 def create_tox_dataframe(head_dataframe, list_campaigns, dict_mp):
     list_dataframe = []
     for campaign_str in list_campaigns:
