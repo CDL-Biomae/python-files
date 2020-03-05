@@ -2,6 +2,11 @@ from tools import QueryScript
 import env
 
 def agency_finder(measurepoint_id):
+    '''
+    Permet de récupérer le code agence associé à un point de mesure
+    :param measurepoint_id:
+    :return: code_agence:
+    '''
     try:
         agency = QueryScript(
             f"  SELECT code   FROM {env.DATABASE_RAW}.agency JOIN {env.DATABASE_RAW}.place ON agency.id = place.agency_id JOIN {env.DATABASE_RAW}.measurepoint ON place.id = measurepoint.place_id WHERE measurepoint.id = {measurepoint_id};"
@@ -13,6 +18,11 @@ def agency_finder(measurepoint_id):
 
 
 def list_agency_finder(list_mp):
+    '''
+    Permet de récupérer les codes agences associés à une liste de points de mesure
+    :param list_mp: liste d'id de points de mesure
+    :return: list_agency: liste de codes agences
+    '''
     if len(list_mp) > 1:
         query_tuple_mp = tuple(list_mp)
     else:

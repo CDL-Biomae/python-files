@@ -17,6 +17,7 @@ def add_style_tox(tox_dataframe, filename, folder_PATH):
 
     thin = Side(border_style='thin', color='FF000000')
     medium = Side(border_style='medium', color='FF000000')
+    double = Side(border_style='double', color='FF000000')
     no_border = Side(border_style=None)
 
     font_Arial9 = Font(size=9, name='Arial')
@@ -44,7 +45,7 @@ def add_style_tox(tox_dataframe, filename, folder_PATH):
     header_stations_fill = PatternFill(fill_type='solid', start_color='808080', end_color='808080')
     center_alignment = Alignment(horizontal='center', vertical='center')
 
-    # merger les cellules selon la taille de l'entete d'exel
+    # merger les cellules selon la taille de l'entete d'excel
     for i in range(len(merging_cells)):
         cells = merging_cells[i]
         top_left_cell = ws[cells[0:2]]
@@ -163,7 +164,7 @@ def add_style_tox(tox_dataframe, filename, folder_PATH):
 
 
 
-    # la requete qui retourne les resultats des constantes r2 selon le paramétre 
+    # la requete qui retourne les resultats des constantes r2 selon le paramétre
     threshold_list = QueryScript(f" SELECT parameter, threshold   FROM {env.DATABASE_TREATED}.r2_threshold WHERE threshold IS NOT NULL and version=  {env.CHOSEN_VERSION()}").execute()
     for column in columns:
             
@@ -235,7 +236,7 @@ def add_style_tox(tox_dataframe, filename, folder_PATH):
     
 
 
-    # MAKE STYLE OF molting_cycle get all result of conforme or not of molting_cycle 
+    # MAKE STYLE OF molting_cycle get all result of conforme or not of molting_cycle
     pack_fusion = get_dict_pack_fusion()
     confrm_mue  = Reprotoxicity.conform_resultat_mue(pack_fusion)
 
@@ -244,7 +245,7 @@ def add_style_tox(tox_dataframe, filename, folder_PATH):
     c =Reprotoxicity.fecundity(pack_fusion)
 
     dict_conform_surface_retard = Reprotoxicity.conform_surface_retard(pack_fusion,b[0],b[1],c)[0]
-    # colorer les cycle de mue et la Perturbation endocrinienne 
+    # colorer les cycle de mue et la Perturbation endocrinienne
     for row in range(5, nb_rows+5): 
           pack = pack_fusion.get(ws["S" + str(row)].value)
           if "reproduction" in pack:  
@@ -253,24 +254,24 @@ def add_style_tox(tox_dataframe, filename, folder_PATH):
                 mue=confrm_mue.get(repro_pack)
                 surface_retard = dict_conform_surface_retard.get(repro_pack)
 
-                if ws["R"+ str(row)].value == "NA" or  surface_retard == "Conforme BC1":
-                    ws["R"+ str(row)].fill = body_fill_ok
-                if ws["R"+ str(row)].value != "NA":
-                    ws["R"+ str(row)].fill =  body_fill_not_ok_4
+                if ws["R" + str(row)].value == "NA" or surface_retard == "Conforme BC1":
+                    ws["R" + str(row)].fill = body_fill_ok
+                else:
+                    ws["R" + str(row)].fill = body_fill_not_ok_4
 
-                if mue=="NA":
-                        ws["P"+ str(row)].fill = body_fill_NA
+                if mue == "NA":
+                        ws["P" + str(row)].fill = body_fill_NA
                 if mue == "Conforme":
-                        ws["P"+ str(row)].fill = body_fill_ok
+                        ws["P" + str(row)].fill = body_fill_ok
                 if mue == "Retard modéré":
-                        ws["P"+ str(row)].fill = body_fill_NA
+                        ws["P" + str(row)].fill = body_fill_NA
                 if mue == "Retard fort":
-                        ws["P"+ str(row)].fill = body_fill_not_ok_4
+                        ws["P" + str(row)].fill = body_fill_not_ok_4
                 
           ws["S"+ str(row)].value = ""    
-         
-        
-    #si la survie femmel egale à 0 ou bien il y'a pas donner la coloration de la ligne sera grise
+
+
+    #si la survie femelle est egale à 0 ou bien il y'a pas donner la coloration de la ligne sera grise
     for row in range(5, nb_rows+5):
         value = ws["K" + str(row)].value
 

@@ -5,6 +5,7 @@ from datetime import timedelta
 
 
 def fill_average_temperature(cas):
+    '''Remplissage de la table average_temperature qui met le minimum, maximum et moyenne pour chaque sonde prise en compte sur les durées respectives '''
     # Cas 1: Création et remplissage de la base de données
     if cas == 1:
         average_temperature_table = QueryScript(
@@ -37,7 +38,8 @@ def fill_average_temperature(cas):
 
 # prend en argument un measurepoint_fusion_id et le numero de la sensor (1, 2 ou 3 ou 2lab qui correpond a la moyenne in situ+lab)
 def liste_temperature(measurepoint_fusion_id, num_sensor):
-
+    '''Prend en entrée un measurepoint fusion id, et le numéro d'une sonde (sensor) qui correspond à 1, 2, 3 ou 2lab
+    Retourne la liste des températures correspondantes à la sonde, pour la bonne durée (date de début et fin correspondantes) '''
     key_date_list_measurepoint_id = QueryScript(
         f" SELECT date_id, date, measurepoint_id   FROM {env.DATABASE_TREATED}.key_dates WHERE measurepoint_fusion_id = {measurepoint_fusion_id} and version=  {env.LATEST_VERSION()}").execute()
     key_date_list = [elt[:-1] for elt in key_date_list_measurepoint_id]
@@ -99,6 +101,8 @@ def liste_temperature(measurepoint_fusion_id, num_sensor):
 
 
 def average_temperature_list(measurepoint_fusion_id):
+    '''Prend en entrée un measurepoint fusion id, et retourne les 10 valeurs : min, max et moyenne des sondes 1, 2 et 3, et la moyenne pour la "sonde 2lab"
+    qui est une moyenne sur les températures de la sonde 2 mais calculée sur une autre période '''
     elt_insert = [measurepoint_fusion_id]
     for num_sensor in [1, 2, 3]:
         list_temp = liste_temperature(
