@@ -141,8 +141,12 @@ class Reprotoxicity:
         dict_fecundity = {mp_fusion: {'nbr_femelles_analysées': None, 'nbr_femelles_concernées': None, 'fécondité_moyenne': None} for mp_fusion in dict_pack_fusion.keys()}
 
         for pack_id in dict_index_fecundity.keys():
-            list_index_fecundity = dict_index_fecundity[pack_id]['list_index_fecundity']
-            list_molting_stage = dict_index_fecundity[pack_id]['list_molting_stage']
+            list_index_fecundity_not_clean = dict_index_fecundity[pack_id]['list_index_fecundity']
+            list_molting_stage_not_clean = dict_index_fecundity[pack_id]['list_molting_stage']
+
+            list_index_fecundity = [x for x in list_index_fecundity_not_clean if x != 0]
+            list_molting_stage = [x for x in list_molting_stage_not_clean if x is not None]
+
             mp_fusion = list_mp_repro[list_pack_repro.index(pack_id)]
 
             nbr_femelles_concernees = len(list_index_fecundity) - list_index_fecundity.count(0)
