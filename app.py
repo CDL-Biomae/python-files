@@ -220,8 +220,8 @@ class App(tk.Tk):
         self.frame_main = tk.Frame(master=self)
         self.frame_main.pack(expand='YES')
         tk.Button(master=self.frame_main, textvariable=self.other_mode, command=self.switch_mode, background="#87CEFA").grid(row=0)
-        tk.Label(master=self.frame_main, text="Des nouvelles données ont\n été insérées récemment ?").grid(row=1, column=0)
-        tk.Button(master=self.frame_main, text="Rafraîchir la base données", command=self.refresh).grid(row=1,column=1)
+        tk.Label(master=self.frame_main, text="Des nouvelles données ont\n été insérées récemment dans \n la base de données brutes ?").grid(row=1, column=0)
+        tk.Button(master=self.frame_main, text="Rafraîchir la base données traitées", command=self.refresh).grid(row=1,column=1)
         
         self.frame_reference = tk.Frame(master=self)
         self.frame_reference_1 = tk.Frame(master=self.frame_reference)
@@ -245,6 +245,7 @@ class App(tk.Tk):
         tk.Button(master=self.frame_reference_2, text="Ajouter cette version", background="#32CD32", command=self.add_new_version).grid(row=1)
         self.version_date = tk.Label(master=self.frame_reference_1, text=date.today().strftime("%d/%m/%Y")).grid(row=1, column=0)
         self.version_comment = tk.Entry(master=self.frame_reference_1)
+        self.version_comment.insert(0,'Commentaire...')
         self.version_comment.grid(row=1, column=1)
         
         
