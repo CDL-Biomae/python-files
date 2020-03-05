@@ -3,8 +3,10 @@ import env
 
 
 class Alimentation:
-
-
+    '''
+    Permet le calcul de la survie alimentation (survie_alim) et de l'inhibition alimentaire (alimentation).
+    Elles prennent toutes les deux un dictionnaire de point de mesures de fusion et renvoient le même complété par les résultats.
+    '''
 
     @staticmethod
     def survie_alim(dict_pack_fusion):
