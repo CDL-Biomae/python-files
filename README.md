@@ -60,5 +60,5 @@ Si vous voulez changer les éléments sélectionnées dans l'onglet NQE Biote, v
 
 # Fonctions optimisables
 
-Certaines fonctions n'ont pas pu être optimisée en regroupant les appels à la base de données (ce qui prend le plus de temps) en un seul. Cela concerne surtout le dossier database, et par exemple "tox_table_filler.py" a été optimisé. Les fonctions à optimiser sont "average_temperature_filler.py" et "temperature_repro.py".
+Certaines fonctions n'ont pas pu être optimisée en regroupant les appels à la base de données (ce qui prend le plus de temps) en un seul. Cela concerne surtout le dossier database, et par exemple "tox_table_filler.py" a été optimisé. Les fonctions à optimiser sont "average_temperature_filler.py", "temperature_repro.py" et "date_filler.py".
 Pour améliorer la vitesse d'exécution, il faut regrouper les appels (INSERT et SELECT) par campagne et non plus par measurepoint.
