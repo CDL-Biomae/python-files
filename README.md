@@ -6,7 +6,7 @@ Pour lancer l'application, il faut au préalable avoir le dossier sur son ordina
 ```
 git clone https://github.com/CDL-Biomae/python-files
 ```
-Cela va créer le dossier là où l'invite de commande a été lancé. Ensuite il faut placer le fichier env.py qui ne peut se transmettre par github mais par particulier. 
+Cela va créer le dossier là où l'invite de commande a été lancé. Ensuite il faut placer le fichier env.py qui ne peut se transmettre par github mais entre particulier (clé USB, mail ...). 
 Dans ce même fichier ajouter les coordonnées de la base de données telle que vous le souhaitez pour vous connectez (les variables commençant par DATABASE).
 A partir de ce moment, pour lancer le programme, il faut au préalable installer les dépendances indiquées dans requires.txt.
 Pour les installer, écrire les commandes suivantes dans un invite de commandes (il faut avoir au minimum python installé sur votre appareil ainsi que dans le PATH):
@@ -57,3 +57,18 @@ Si vous avez connaissance d'ajout de données brutes (point de mesure, résultat
 Si vous avez besoin de créer une nouvelle version, veuillez renseigner le ficher excel contenant les références de calculs et de seuils dans en cliquant sur "Choisir le fichier excel de référence". Cela va automatiquement inscrire les deux informations possibles de la version à savoir la date (celle du jour actuel) ainsi qu'un éventuel commentaire que vous voulez préciser à la nouvelle version. Il ne reste plus qu'à cliquer sur "Ajouter cette version" qui remplira dans la base de données traitées une nouvelle série de données traitées calculées à partir des références précisées ave le fichier excel. Cela peut prendre une dizaine de minutes en fonction de la vitesse de connection de vogtre appareil.
 
 Si vous voulez changer les éléments sélectionnées dans l'onglet NQE Biote, veuillez les renseigner dans /calcul/chemistry/nqe dans les dictionnaires correspondants
+
+# Architecture des dossiers
+
+Le projet se découpe en cinq dossiers principales :
+- calcul : il regroupe les différentes fonctions nécessaires au calcul des données traitées. Il est découpé en 2 dossiers principales que sont /toxicity pour les calculs et appels à la base de données brutes pour l'alimentation, la neurotoxicité et la reprotoxicité, /chemistry pour les calculs et appels à la base de données pour la chimie.
+- database : il regroupe les fonctions qui vont remplir la base de données traitées. fill.py est la fonction qui lance tout le proccessus.
+- report : il regroupe les fonctions qui créent les différents rapports excel(xl) et word, la création d'excel se décompose en /xl pour la création des données et /style pour l'ajout des couleurs et des métadonnées.
+- tools : il regroupe les différents outils utils dans les différents fonctions du projet
+
+Deux fichiers python sont indispensables en plus des dossiers :
+- app.py : l'application 
+- env.py : contient les identifiants, tokens et l'appel des versions (pas sur le GitHub)
+
+requires.txt permet l'installation rapide des dépendances du projet
+version.txt permet de stocker la version choisie pour tout le projet
