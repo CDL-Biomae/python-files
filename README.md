@@ -72,3 +72,8 @@ Deux fichiers python sont indispensables en plus des dossiers :
 
 requires.txt permet l'installation rapide des dépendances du projet
 version.txt permet de stocker la version choisie pour tout le projet
+
+# Fonctions optimisables
+
+Certaines fonctions n'ont pas pu être optimisée en regroupant les appels à la base de données (ce qui prend le plus de temps) en un seul. Cela concerne surtout le dossier database, et par exemple "tox_table_filler.py" a été optimisé. Les fonctions à optimiser sont "average_temperature_filler.py", "temperature_repro.py" et "date_filler.py".
+Pour améliorer la vitesse d'exécution, il faut regrouper les appels (INSERT et SELECT) par campagne et non plus par measurepoint.

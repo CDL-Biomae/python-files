@@ -211,7 +211,8 @@ class Reprotoxicity:
         for i, mp_fusion in enumerate(list_mp_repro):
             pack_id = list_pack_repro[i]
             expected_C2 = dict_expected_stage[mp_fusion]['expected C2']
-            dict_molting[mp_fusion]['cycle de mue attendu'] = expected_C2 if (expected_C2 == 'NA' or expected_C2 is None) else round(expected_C2)
+            expected_D2 = dict_expected_stage[mp_fusion]['expected D2']
+            dict_molting[mp_fusion]['cycle de mue attendu'] = expected_C2 if (expected_C2 == 'NA' or expected_C2 is None) else round(expected_C2-expected_D2)
 
             list_molting_stage = dict_molting_stage[pack_id]
             cpt_molting_stage = Counter(list_molting_stage)
