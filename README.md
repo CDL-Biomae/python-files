@@ -57,3 +57,8 @@ Si vous avez connaissance d'ajout de données brutes (point de mesure, résultat
 Si vous avez besoin de créer une nouvelle version, veuillez renseigner le ficher excel contenant les références de calculs et de seuils dans en cliquant sur "Choisir le fichier excel de référence". Cela va automatiquement inscrire les deux informations possibles de la version à savoir la date (celle du jour actuel) ainsi qu'un éventuel commentaire que vous voulez préciser à la nouvelle version. Il ne reste plus qu'à cliquer sur "Ajouter cette version" qui remplira dans la base de données traitées une nouvelle série de données traitées calculées à partir des références précisées ave le fichier excel. Cela peut prendre une dizaine de minutes en fonction de la vitesse de connection de vogtre appareil.
 
 Si vous voulez changer les éléments sélectionnées dans l'onglet NQE Biote, veuillez les renseigner dans /calcul/chemistry/nqe dans les dictionnaires correspondants
+
+# Fonctions optimisables
+
+Certaines fonctions n'ont pas pu être optimisée en regroupant les appels à la base de données (ce qui prend le plus de temps) en un seul. Cela concerne surtout le dossier database, et par exemple "tox_table_filler.py" a été optimisé. Les fonctions à optimiser sont "average_temperature_filler.py" et "temperature_repro.py".
+Pour améliorer la vitesse d'exécution, il faut regrouper les appels (INSERT et SELECT) par campagne et non plus par measurepoint.
