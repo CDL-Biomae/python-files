@@ -185,7 +185,7 @@ class App(tk.Tk):
 
     def add_campaign(self):
         is_existing = QueryScript(
-            f"SELECT * FROM {env.DATABASE_RAW}.campaign WHERE reference='{self.campaign_input.get()}'").execute()
+            f"SELECT * FROM {env.DATABASE_RAW}.Campaign WHERE reference='{self.campaign_input.get()}'").execute()
         if len(is_existing) and not self.campaign_input.get() in self.campaign_list :
             if self.campaign_input_text.get() != "":
                 self.campaign_input_text.set(self.campaign_input_text.get() + "\n")

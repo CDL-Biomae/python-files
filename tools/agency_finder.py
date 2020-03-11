@@ -9,7 +9,7 @@ def agency_finder(measurepoint_id):
     '''
     try:
         agency = QueryScript(
-            f"  SELECT code   FROM {env.DATABASE_RAW}.agency JOIN {env.DATABASE_RAW}.place ON agency.id = place.agency_id JOIN {env.DATABASE_RAW}.measurepoint ON place.id = measurepoint.place_id WHERE measurepoint.id = {measurepoint_id};"
+            f"  SELECT code   FROM {env.DATABASE_RAW}.agency JOIN {env.DATABASE_RAW}.Place ON agency.id = place.agency_id JOIN {env.DATABASE_RAW}.measurepoint ON place.id = measurepoint.place_id WHERE measurepoint.id = {measurepoint_id};"
         ).execute()[0]
     except IndexError:
         agency = None
@@ -28,7 +28,7 @@ def list_agency_finder(list_mp):
     else:
         query_tuple_mp = f"({list_mp[0]})"
     output = QueryScript(
-        f"  SELECT measurepoint.id, code   FROM {env.DATABASE_RAW}.agency JOIN {env.DATABASE_RAW}.place ON agency.id = place.agency_id JOIN {env.DATABASE_RAW}.measurepoint ON place.id = measurepoint.place_id WHERE measurepoint.id IN {query_tuple_mp};"
+        f"  SELECT measurepoint.id, code   FROM {env.DATABASE_RAW}.agency JOIN {env.DATABASE_RAW}.Place ON agency.id = place.agency_id JOIN {env.DATABASE_RAW}.measurepoint ON place.id = measurepoint.place_id WHERE measurepoint.id IN {query_tuple_mp};"
     ).execute()
     list_agency = []
     list_mp_output = [x[0] for x in output]

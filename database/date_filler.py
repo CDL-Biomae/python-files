@@ -332,10 +332,10 @@ def fusion_dates_insert(id_mp_list, dates):
 
 
 def fill_date_table():
-    id_campaigns = QueryScript(script=f'  SELECT id   FROM {env.DATABASE_RAW}.campaign').execute()
+    id_campaigns = QueryScript(script=f'  SELECT id   FROM {env.DATABASE_RAW}.Campaign').execute()
     for id_c in id_campaigns:
         places = QueryScript(
-            script=f'  SELECT id, type   FROM {env.DATABASE_RAW}.place WHERE campaign_id=' + str(id_c)).execute()
+            script=f'  SELECT id, type   FROM {env.DATABASE_RAW}.Place WHERE campaign_id=' + str(id_c)).execute()
         n_places = len(places)
         for i in range(n_places):
             id_p, type_p = places[i]

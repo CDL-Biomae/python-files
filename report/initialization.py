@@ -42,7 +42,7 @@ def number_name_mp(list_mp):
     else:
         query_tuple_mp = f"({list_mp[0]})"
     output = QueryScript(
-        f"SELECT measurepoint.id, substring(place.reference, -2, 2), measurepoint.name FROM {env.DATABASE_RAW}.measurepoint JOIN {env.DATABASE_RAW}.place ON place.id = measurepoint.place_id WHERE measurepoint.id in {query_tuple_mp}"
+        f"SELECT measurepoint.id, substring(place.reference, -2, 2), measurepoint.name FROM {env.DATABASE_RAW}.measurepoint JOIN {env.DATABASE_RAW}.Place ON place.id = measurepoint.place_id WHERE measurepoint.id in {query_tuple_mp}"
     ).execute()
 
     list_number = []
