@@ -370,7 +370,7 @@ def fill_date_table():
 
                 # Dernier cas: S'il y a exactement 2 points de mesure à un endroit <=> possibles biotests effectués à des périodes différentes donc fusion des dates
                 # sinon voir les points comme indépendants
-                else:
+                elif len(id_measurepoints) == 2:
                     [id_mp1, id_mp2] = id_measurepoints
                     resultat, natures = independance(id_mp1, id_mp2)
 
