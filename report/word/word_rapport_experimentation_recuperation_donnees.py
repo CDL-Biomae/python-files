@@ -34,7 +34,7 @@ def data_exposure_condition(measurepoint_fusion_id):
     '''Récupération des données de conditions d'exposition, calculée à partir d'un measurepoint (fusion), retourne la référence du point de mesure,
     le dictionnaire de données et si c'était une fusion ou non (ces informations sont restockées dans un autre dictionnaire dans recuperation_donnee) '''
     query = QueryScript(
-        f"SELECT DISTINCT reference, measurepoint_id FROM {env.DATABASE_TREATED}.key_dates JOIN {env.DATABASE_RAW}.measurepoint ON measurepoint.id = key_dates.measurepoint_fusion_id WHERE measurepoint_fusion_id = {measurepoint_fusion_id} and version=  {env.CHOSEN_VERSION()}").execute()
+        f"SELECT DISTINCT reference, measurepoint_id FROM {env.DATABASE_TREATED}.key_dates JOIN {env.DATABASE_RAW}.Measurepoint ON measurepoint.id = key_dates.measurepoint_fusion_id WHERE measurepoint_fusion_id = {measurepoint_fusion_id} and version=  {env.CHOSEN_VERSION()}").execute()
     measurepoints = [elt[1] for elt in query]
     if len(measurepoints) < 2:
         return query[0][0], data_exposure_condition_simple(measurepoint_fusion_id), False
@@ -65,7 +65,7 @@ def data_exposure_condition_fusion(measurepoints):
             measurepoint = id_mp_second
 
         output = QueryScript(
-            f"  SELECT recordedAt, temperature, conductivity, oxygen, ph, type, comment   FROM {env.DATABASE_RAW}.measureexposurecondition WHERE measurepoint_id = {measurepoint} and step = {step} and barrel = {barrel}").execute()
+            f"  SELECT recordedAt, temperature, conductivity, oxygen, ph, type, comment   FROM {env.DATABASE_RAW}.Measureexposurecondition WHERE measurepoint_id = {measurepoint} and step = {step} and barrel = {barrel}").execute()
         if len(output) != 0:
             output = output[0]
             dico_temp = {'date': parser(output[0]), 'temperature': output[1],
@@ -88,7 +88,7 @@ def data_exposure_condition_simple(measurepoint_id):
     for i in range(4):
         step, barrel = steps_barrel[i]
         output = QueryScript(
-            f"  SELECT recordedAt, temperature, conductivity, oxygen, ph, type, comment   FROM {env.DATABASE_RAW}.measureexposurecondition WHERE measurepoint_id = {measurepoint_id} and step = {step} and barrel = {barrel}").execute()
+            f"  SELECT recordedAt, temperature, conductivity, oxygen, ph, type, comment   FROM {env.DATABASE_RAW}.Measureexposurecondition WHERE measurepoint_id = {measurepoint_id} and step = {step} and barrel = {barrel}").execute()
         if len(output) != 0:
             output = output[0]
             dico_temp = {'date': parser(output[0]), 'temperature': output[1],
@@ -137,7 +137,7 @@ def geographic_data_measurepoint(measurepoint_fusion_id_list):
     dico_geo_data = {}
 
     tempe = QueryScript(
-        f"SELECT reference, latitudeSpotted, longitudeSpotted, lambertXSpotted, lambertYSpotted, measurepoint.name, measurepoint.city, measurepoint.zipcode, measurepoint.stream, measurepoint.latitude, measurepoint.longitude FROM {env.DATABASE_TREATED}.average_temperature JOIN {env.DATABASE_RAW}.measurepoint ON average_temperature.measurepoint_fusion_id = measurepoint.id WHERE average_temperature.measurepoint_fusion_id IN {measurepoint_fusion_id_list} and average_temperature.version=  {env.CHOSEN_VERSION()}").execute()
+        f"SELECT reference, latitudeSpotted, longitudeSpotted, lambertXSpotted, lambertYSpotted, measurepoint.name, measurepoint.city, measurepoint.zipcode, measurepoint.stream, measurepoint.latitude, measurepoint.longitude FROM {env.DATABASE_TREATED}.average_temperature JOIN {env.DATABASE_RAW}.Measurepoint ON average_temperature.measurepoint_fusion_id = measurepoint.id WHERE average_temperature.measurepoint_fusion_id IN {measurepoint_fusion_id_list} and average_temperature.version=  {env.CHOSEN_VERSION()}").execute()
     for elt in tempe:
         dico_temp_geo = {'latitudeSpotted': f"{elt[1]}".replace(',', '.'),
                          'longitudeSpotted': f"{elt[2]}".replace(',', '.'), 'lambertXSpotted': f"{elt[3]}".replace(',', '.'), 'lambertYSpotted': f"{elt[4]}".replace(',', '.'), 'name_mp': translate(elt[5]), 'city': translate(elt[6]), 'zipcode': translate(elt[7]), 'stream': translate(elt[8]), 'latitudeTh': elt[9], 'longitudeTh': elt[10]}
@@ -163,7 +163,7 @@ def average_temperature(measurepoint_fusion_id_list):
     dico_avg_all_tempe = {}
     dico_date = {}  # {reference: [date1, date4, date6, date7]}
     tempe = QueryScript(
-        f"SELECT reference, sensor1_min, sensor1_average, sensor1_max, sensor2_min, sensor2_average, sensor2_max, sensor3_min, sensor3_average, sensor3_max, average_temperature.measurepoint_fusion_id FROM {env.DATABASE_TREATED}.average_temperature JOIN {env.DATABASE_RAW}.measurepoint ON average_temperature.measurepoint_fusion_id = measurepoint.id WHERE average_temperature.measurepoint_fusion_id IN {measurepoint_fusion_id_list} AND average_temperature.version=  {env.CHOSEN_VERSION()}").execute()
+        f"SELECT reference, sensor1_min, sensor1_average, sensor1_max, sensor2_min, sensor2_average, sensor2_max, sensor3_min, sensor3_average, sensor3_max, average_temperature.measurepoint_fusion_id FROM {env.DATABASE_TREATED}.average_temperature JOIN {env.DATABASE_RAW}.Measurepoint ON average_temperature.measurepoint_fusion_id = measurepoint.id WHERE average_temperature.measurepoint_fusion_id IN {measurepoint_fusion_id_list} AND average_temperature.version=  {env.CHOSEN_VERSION()}").execute()
 
     output_date1 = QueryScript(
         f"SELECT measurepoint_id, date FROM {env.DATABASE_TREATED}.key_dates WHERE date_id = 1 and measurepoint_fusion_id IN {measurepoint_fusion_id_list} AND key_dates.version=  {env.CHOSEN_VERSION()}"
@@ -280,7 +280,7 @@ def geographic_data_agency(campaign):
     Les données sont déjà formatées comme elles doivent apparaitre dans le word (virgule comme séparateur de chiffre comme en français, caractère spéciaux corrigés) 
     Celles-ci ne sont utilisées que dans le cas d'une agence de l'eau'''
     query = QueryScript(
-        f"  SELECT DISTINCT measurepoint.reference, agency.code, agency.name, agency.zipcode, agency.city, agency.stream, agency.lambertX, agency.lambertY, agency.network, agency.hydroecoregion, agency.latitude, agency.longitude FROM {env.DATABASE_RAW}.agency JOIN {env.DATABASE_RAW}.Place ON agency.id=place.agency_id JOIN {env.DATABASE_RAW}.Campaign ON place.campaign_id=campaign.id JOIN {env.DATABASE_RAW}.measurepoint ON measurepoint.place_id=place.id JOIN {env.DATABASE_TREATED}.key_dates ON measurepoint.id=key_dates.measurepoint_fusion_id WHERE campaign.reference='{campaign}' and key_dates.version=  {env.CHOSEN_VERSION()}").execute()
+        f"  SELECT DISTINCT measurepoint.reference, agency.code, agency.name, agency.zipcode, agency.city, agency.stream, agency.lambertX, agency.lambertY, agency.network, agency.hydroecoregion, agency.latitude, agency.longitude FROM {env.DATABASE_RAW}.agency JOIN {env.DATABASE_RAW}.Place ON agency.id=place.agency_id JOIN {env.DATABASE_RAW}.Campaign ON place.campaign_id=campaign.id JOIN {env.DATABASE_RAW}.Measurepoint ON measurepoint.place_id=place.id JOIN {env.DATABASE_TREATED}.key_dates ON measurepoint.id=key_dates.measurepoint_fusion_id WHERE campaign.reference='{campaign}' and key_dates.version=  {env.CHOSEN_VERSION()}").execute()
     dico = {}
     for elt in query:
         dico_temp = {'code': elt[1], 'name': translate(elt[2]), 'zipcode': translate(elt[3]), 'city': translate(elt[4]), 'stream': translate(elt[5]),

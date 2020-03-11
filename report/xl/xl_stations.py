@@ -15,10 +15,10 @@ def create_dataframe(list_mp):
     else:
         query_tuple_mp = f"({list_mp[0]})"
     output_agency = QueryScript(
-        f"  SELECT measurepoint.id, agency.network, agency.hydroecoregion FROM {env.DATABASE_RAW}.agency JOIN {env.DATABASE_RAW}.Place on agency.id = place.agency_id JOIN {env.DATABASE_RAW}.measurepoint on place.id = measurepoint.place_id WHERE measurepoint.id IN {query_tuple_mp};"
+        f"  SELECT measurepoint.id, agency.network, agency.hydroecoregion FROM {env.DATABASE_RAW}.agency JOIN {env.DATABASE_RAW}.Place on agency.id = place.agency_id JOIN {env.DATABASE_RAW}.Measurepoint on place.id = measurepoint.place_id WHERE measurepoint.id IN {query_tuple_mp};"
     ).execute()
     output_measurepoint = QueryScript(
-        f"  SELECT id, stream, zipcode, city, latitude, longitude, lambertY, lambertX, latitudeSpotted, longitudeSpotted   FROM {env.DATABASE_RAW}.measurepoint WHERE id IN {query_tuple_mp};"
+        f"  SELECT id, stream, zipcode, city, latitude, longitude, lambertY, lambertX, latitudeSpotted, longitudeSpotted   FROM {env.DATABASE_RAW}.Measurepoint WHERE id IN {query_tuple_mp};"
     ).execute()
 
     dict_output_agency = list_to_dict(output_agency)

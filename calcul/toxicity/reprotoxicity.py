@@ -257,7 +257,7 @@ class Reprotoxicity:
                 list_pack_repro.append(pack_id)
 
         output = QueryScript(
-            f"  SELECT pack_id, female, molting_stage, oocyte_area_pixel, oocyte_area_mm   FROM {env.DATABASE_RAW}.measurereprotoxicity WHERE pack_id IN {tuple(list_pack_repro)};"
+            f"  SELECT pack_id, female, molting_stage, oocyte_area_pixel, oocyte_area_mm   FROM {env.DATABASE_RAW}.Measurereprotoxicity WHERE pack_id IN {tuple(list_pack_repro)};"
         ).execute()
 
         # Reformatage des données de la requête

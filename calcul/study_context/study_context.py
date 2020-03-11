@@ -42,7 +42,7 @@ def contexte_fusion(measurepoints):
             measurepoint = id_mp_second
 
         output = QueryScript(
-            f"  SELECT recordedAt   FROM {env.DATABASE_RAW}.measureexposurecondition WHERE measurepoint_id = {measurepoint} and step = {step} and barrel = {barrel}").execute()
+            f"  SELECT recordedAt   FROM {env.DATABASE_RAW}.Measureexposurecondition WHERE measurepoint_id = {measurepoint} and step = {step} and barrel = {barrel}").execute()
         if len(output) == 0:
             dates.append(None)
         else:
@@ -76,7 +76,7 @@ def contexte_simple(measurepoint_id):
         step, barrel = steps_barrel[i]
 
         output = QueryScript(
-            f"  SELECT recordedAt   FROM {env.DATABASE_RAW}.measureexposurecondition WHERE measurepoint_id = {measurepoint_id} and step = {step} and barrel = {barrel}").execute()
+            f"  SELECT recordedAt   FROM {env.DATABASE_RAW}.Measureexposurecondition WHERE measurepoint_id = {measurepoint_id} and step = {step} and barrel = {barrel}").execute()
         if len(output) == 0:
             dates.append(None)
         else:

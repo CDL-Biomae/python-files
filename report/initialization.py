@@ -24,7 +24,7 @@ def measure_points(campaign_ref):
     :return: list_mp: Liste de points de mesures
     '''
     output = QueryScript(
-        f"SELECT DISTINCT(measurepoint_fusion_id) FROM {env.DATABASE_TREATED}.key_dates WHERE measurepoint_id IN (SELECT id FROM {env.DATABASE_RAW}.measurepoint WHERE reference LIKE '{campaign_ref}%') and version=  {env.CHOSEN_VERSION()};"
+        f"SELECT DISTINCT(measurepoint_fusion_id) FROM {env.DATABASE_TREATED}.key_dates WHERE measurepoint_id IN (SELECT id FROM {env.DATABASE_RAW}.Measurepoint WHERE reference LIKE '{campaign_ref}%') and version=  {env.CHOSEN_VERSION()};"
     ).execute()
     if len(output) == 0:
         raise NameError('\n\n     /!\\ La référence de campagne demandée n\'existe pas dans la base de donnée /!\\')
@@ -42,7 +42,7 @@ def number_name_mp(list_mp):
     else:
         query_tuple_mp = f"({list_mp[0]})"
     output = QueryScript(
-        f"SELECT measurepoint.id, substring(place.reference, -2, 2), measurepoint.name FROM {env.DATABASE_RAW}.measurepoint JOIN {env.DATABASE_RAW}.Place ON place.id = measurepoint.place_id WHERE measurepoint.id in {query_tuple_mp}"
+        f"SELECT measurepoint.id, substring(place.reference, -2, 2), measurepoint.name FROM {env.DATABASE_RAW}.Measurepoint JOIN {env.DATABASE_RAW}.Place ON place.id = measurepoint.place_id WHERE measurepoint.id in {query_tuple_mp}"
     ).execute()
 
     list_number = []

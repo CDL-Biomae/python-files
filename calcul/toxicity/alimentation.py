@@ -45,7 +45,7 @@ class Alimentation:
         result = {element: None for element in dict_pack_fusion}
 
         ################### Calcul des tailles des spécimens
-        specimen_size_data =  QueryScript(f"  SELECT pack_id, individual, size_px, size_mm   FROM {env.DATABASE_RAW}.measuresize WHERE pack_id IN {tuple([element for element in pack_dict])}").execute()
+        specimen_size_data =  QueryScript(f"  SELECT pack_id, individual, size_px, size_mm   FROM {env.DATABASE_RAW}.Measuresize WHERE pack_id IN {tuple([element for element in pack_dict])}").execute()
         specimen_size = {element:None for element in dict_pack_fusion}
         pack_checked = None
         ratio = None
@@ -90,7 +90,7 @@ class Alimentation:
             f" SELECT value   FROM {env.DATABASE_TREATED}.r2_constant WHERE name='Nombre de disques par réplicat' AND version=  {env.LATEST_VERSION()}").execute()[0]
         test_duration = QueryScript(
             f" SELECT value   FROM {env.DATABASE_TREATED}.r2_constant WHERE name='Nombre de jour du test' AND version=  {env.LATEST_VERSION()}").execute()[0]
-        remaining_leaves_data =  QueryScript(f"  SELECT pack_id, replicate, value   FROM {env.DATABASE_RAW}.measureleaf WHERE pack_id IN {tuple([element for element in pack_dict])}").execute()
+        remaining_leaves_data =  QueryScript(f"  SELECT pack_id, replicate, value   FROM {env.DATABASE_RAW}.Measureleaf WHERE pack_id IN {tuple([element for element in pack_dict])}").execute()
         remaining_leaves = {element:None for element in dict_pack_fusion}
         pack_checked = None
         for leaf in remaining_leaves_data:

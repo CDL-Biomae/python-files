@@ -30,7 +30,7 @@ def create_empty_date_table():
 
 def key_dates(id_mp):
     exposureconditions = QueryScript(
-        script=f'  SELECT step, recordedAt, barrel   FROM {env.DATABASE_RAW}.measureexposurecondition WHERE measurepoint_id=' + str(
+        script=f'  SELECT step, recordedAt, barrel   FROM {env.DATABASE_RAW}.Measureexposurecondition WHERE measurepoint_id=' + str(
             id_mp)).execute()
     natures = QueryScript(
         f"  SELECT nature   FROM {env.DATABASE_RAW}.pack WHERE measurepoint_id = {id_mp}").execute()
@@ -126,19 +126,19 @@ def key_dates(id_mp):
 def key_datesFusion(id_mp_alim, id_mp_chimie, id_mp_repro):
     if id_mp_alim != None:
         exposureconditions_alim = QueryScript(
-            script=f'  SELECT step, recordedAt, barrel   FROM {env.DATABASE_RAW}.measureexposurecondition WHERE measurepoint_id=' + str(id_mp_alim)).execute()
+            script=f'  SELECT step, recordedAt, barrel   FROM {env.DATABASE_RAW}.Measureexposurecondition WHERE measurepoint_id=' + str(id_mp_alim)).execute()
     else:
         exposureconditions_alim = []
 
     if id_mp_chimie != None:
         exposureconditions_chimie = QueryScript(
-            script=f'  SELECT step, recordedAt, barrel   FROM {env.DATABASE_RAW}.measureexposurecondition WHERE measurepoint_id=' + str(id_mp_chimie)).execute()
+            script=f'  SELECT step, recordedAt, barrel   FROM {env.DATABASE_RAW}.Measureexposurecondition WHERE measurepoint_id=' + str(id_mp_chimie)).execute()
     else:
         exposureconditions_chimie = []
 
     if id_mp_repro != None:
         exposureconditions_repro = QueryScript(
-            script=f'  SELECT step, recordedAt, barrel   FROM {env.DATABASE_RAW}.measureexposurecondition WHERE measurepoint_id=' + str(id_mp_repro)).execute()
+            script=f'  SELECT step, recordedAt, barrel   FROM {env.DATABASE_RAW}.Measureexposurecondition WHERE measurepoint_id=' + str(id_mp_repro)).execute()
     else:
         exposureconditions_repro = []
 
@@ -341,7 +341,7 @@ def fill_date_table():
             id_p, type_p = places[i]
 
             id_measurepoints = QueryScript(
-                script=f'  SELECT id   FROM {env.DATABASE_RAW}.measurepoint WHERE place_id=' + str(id_p)).execute()
+                script=f'  SELECT id   FROM {env.DATABASE_RAW}.Measurepoint WHERE place_id=' + str(id_p)).execute()
 
             print('\n[+] id_place = ', id_p)
 

@@ -66,7 +66,7 @@ def measure_points_fusion(campaign_ref):
     :return: une liste de points de mesures
     '''
     output = QueryScript(
-        f" SELECT DISTINCT(measurepoint_fusion_id)   FROM {env.DATABASE_TREATED}.key_dates WHERE measurepoint_id IN (  SELECT id   FROM {env.DATABASE_RAW}.measurepoint WHERE reference LIKE '{campaign_ref}%' and version=  {env.CHOSEN_VERSION()});"
+        f" SELECT DISTINCT(measurepoint_fusion_id)   FROM {env.DATABASE_TREATED}.key_dates WHERE measurepoint_id IN (  SELECT id   FROM {env.DATABASE_RAW}.Measurepoint WHERE reference LIKE '{campaign_ref}%' and version=  {env.CHOSEN_VERSION()});"
     )
     return output.execute()
 
@@ -77,7 +77,7 @@ def all_measure_points(campaign_ref):
     :return: une liste de points de mesures
     '''
     output = QueryScript(
-        f"  SELECT id   FROM {env.DATABASE_RAW}.measurepoint WHERE reference LIKE '{campaign_ref}%';"
+        f"  SELECT id   FROM {env.DATABASE_RAW}.Measurepoint WHERE reference LIKE '{campaign_ref}%';"
     )
     return output.execute()
 
