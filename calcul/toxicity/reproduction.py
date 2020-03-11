@@ -18,7 +18,7 @@ class Reproduction:
                 list_pack_repro.append(pack_id)
 
         output = QueryScript(
-            f"  SELECT pack_id, scud_survivor_female, scud_quantity   FROM {env.DATABASE_RAW}.cage WHERE pack_id IN {tuple(list_pack_repro)};"
+            f"  SELECT pack_id, scud_survivor_female, scud_quantity   FROM {env.DATABASE_RAW}.Cage WHERE pack_id IN {tuple(list_pack_repro)};"
         ).execute()
 
         # Reformatage des données de la requête

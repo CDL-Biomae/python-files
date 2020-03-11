@@ -7,7 +7,7 @@ import env
 
 def lyophilisation_pourcent(pack_id):
     output = QueryScript(
-        f"  SELECT prefix, value, unit   FROM {env.DATABASE_RAW}.analysis WHERE sandre='/' AND pack_id={pack_id}").execute()
+        f"  SELECT prefix, value, unit   FROM {env.DATABASE_RAW}.Analysis WHERE sandre='/' AND pack_id={pack_id}").execute()
     if len(output):
         return f"{output[0][0]}{output[0][1]}{output[0][2]}"
     else:
@@ -16,7 +16,7 @@ def lyophilisation_pourcent(pack_id):
 
 def fat(pack_id):
     output = QueryScript(
-        f"  SELECT prefix, value, unit   FROM {env.DATABASE_RAW}.analysis WHERE sandre=1358 AND pack_id={pack_id}").execute()
+        f"  SELECT prefix, value, unit   FROM {env.DATABASE_RAW}.Analysis WHERE sandre=1358 AND pack_id={pack_id}").execute()
     if len(output):
         return f"{output[0][0] if output[0][0] else ''}{output[0][1] * 100}{output[0][2]}"
     else:
@@ -25,7 +25,7 @@ def fat(pack_id):
 
 def weight(pack_id):
     output = QueryScript(
-        f"  SELECT sampling_weight, metal_tare_bottle_weight, sampling_quantity, organic_tare_bottle_weight, organic_total_weight   FROM {env.DATABASE_RAW}.pack WHERE id={pack_id}").execute()
+        f"  SELECT sampling_weight, metal_tare_bottle_weight, sampling_quantity, organic_tare_bottle_weight, organic_total_weight   FROM {env.DATABASE_RAW}.Pack WHERE id={pack_id}").execute()
     if len(output):
         return [output[0][0]-output[0][1], (output[0][0]-output[0][1])/output[0][2], output[0][4]-output[0][3]]
     else:
@@ -37,7 +37,7 @@ def survival(pack_id):
         return None
 
     survival_list = QueryScript(
-        f"  SELECT scud_quantity, scud_survivor   FROM {env.DATABASE_RAW}.cage WHERE pack_id={pack_id} AND scud_survivor IS NOT NULL").execute()
+        f"  SELECT scud_quantity, scud_survivor   FROM {env.DATABASE_RAW}.Cage WHERE pack_id={pack_id} AND scud_survivor IS NOT NULL").execute()
     if len(survival_list):
         quantity = survival_list[0][0]
         average = 0
@@ -134,7 +134,7 @@ def result_by_packs_and_sandre(dict_pack_fusion, sandre_list=None):
         query_tuple_pack = f"({list_pack[0]})"
 
     data = QueryScript(
-        f"SELECT pack_id, prefix, value, sandre FROM {env.DATABASE_RAW}.analysis WHERE pack_id IN {query_tuple_pack} AND sandre IN {tuple(sandre_list)}").execute()
+        f"SELECT pack_id, prefix, value, sandre FROM {env.DATABASE_RAW}.Analysis WHERE pack_id IN {query_tuple_pack} AND sandre IN {tuple(sandre_list)}").execute()
     for element in data:
         try:
             sandre = int(element[3])

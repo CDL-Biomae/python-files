@@ -33,7 +33,7 @@ def key_dates(id_mp):
         script=f'  SELECT step, recordedAt, barrel   FROM {env.DATABASE_RAW}.MeasureExposureCondition WHERE measurepoint_id=' + str(
             id_mp)).execute()
     natures = QueryScript(
-        f"  SELECT nature   FROM {env.DATABASE_RAW}.pack WHERE measurepoint_id = {id_mp}").execute()
+        f"  SELECT nature   FROM {env.DATABASE_RAW}.Pack WHERE measurepoint_id = {id_mp}").execute()
     steps_barrels = [(x[0], x[2]) for x in exposureconditions]
 
     # Dictionnaire de dates cles à remplir
@@ -264,9 +264,9 @@ def intersection(liste1, liste2):
 
 def independance(id_mp1, id_mp2):
     natures_mp1 = QueryScript(
-        script=f'  SELECT nature   FROM {env.DATABASE_RAW}.pack WHERE measurepoint_id = ' + str(id_mp1)).execute()
+        script=f'  SELECT nature   FROM {env.DATABASE_RAW}.Pack WHERE measurepoint_id = ' + str(id_mp1)).execute()
     natures_mp2 = QueryScript(
-        script=f'  SELECT nature   FROM {env.DATABASE_RAW}.pack WHERE measurepoint_id = ' + str(id_mp2)).execute()
+        script=f'  SELECT nature   FROM {env.DATABASE_RAW}.Pack WHERE measurepoint_id = ' + str(id_mp2)).execute()
 
     inter_natures = intersection(natures_mp1, natures_mp2)
     natures = {}

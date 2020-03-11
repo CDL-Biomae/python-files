@@ -60,7 +60,7 @@ class Reprotoxicity:
     @staticmethod
     # retourne dict_index_fecundity = {pack_id: {'list_molting_stage': [...], 'list_index_fecundity': [...]}
     def index_fecundity_female(list_pack_repro):
-        SQL_request = f"  SELECT pack_id, female, molting_stage, embryo_stage, specimen_size_mm, specimen_size_px, embryo_total FROM biomae.measurereprotoxicity where pack_id IN {tuple(list_pack_repro)};"
+        SQL_request = f"  SELECT pack_id, female, molting_stage, embryo_stage, specimen_size_mm, specimen_size_px, embryo_total FROM {env.DATABASE_RAW}.MeasureReprotoxicity where pack_id IN {tuple(list_pack_repro)};"
         output = QueryScript(SQL_request).execute()
 
         # Initialisation du dictionnaire de la requête mise en forme
@@ -188,8 +188,8 @@ class Reprotoxicity:
                 list_mp_repro.append(mp)
                 list_pack_repro.append(pack_id)
 
-        SQL_request = f"  SELECT pack_id, molting_stage FROM biomae.measurereprotoxicity where pack_id IN {tuple(list_pack_repro)};"
-        SQL_request_2 = f"  SELECT measurepoint_fusion_id, expected_C2,expected_D2 FROM biomae.temperature_repro where measurepoint_fusion_id IN {tuple(list_mp_repro)};"
+        SQL_request = f"  SELECT pack_id, molting_stage FROM {env.DATABASE_RAW}.MeasureReprotoxicity where pack_id IN {tuple(list_pack_repro)};"
+        SQL_request_2 = f"  SELECT measurepoint_fusion_id, expected_C2,expected_D2 FROM {env.DATABASE_TREATED}.temperature_repro where measurepoint_fusion_id IN {tuple(list_mp_repro)};"
         resultat_molting_stage =  QueryScript(SQL_request).execute()
         resultat_expected_stage =  QueryScript(SQL_request_2).execute()
 
@@ -257,7 +257,7 @@ class Reprotoxicity:
                 list_pack_repro.append(pack_id)
 
         output = QueryScript(
-            f"  SELECT pack_id, female, molting_stage, oocyte_area_pixel, oocyte_area_mm   FROM {env.DATABASE_RAW}.Measurereprotoxicity WHERE pack_id IN {tuple(list_pack_repro)};"
+            f"  SELECT pack_id, female, molting_stage, oocyte_area_pixel, oocyte_area_mm   FROM {env.DATABASE_RAW}.MeasureReprotoxicity WHERE pack_id IN {tuple(list_pack_repro)};"
         ).execute()
 
         # Reformatage des données de la requête
@@ -343,7 +343,7 @@ class Reprotoxicity:
 
         # Récupération du nombre de retard et du nombre de femelles analysées
         output_molting = QueryScript(
-            f"  SELECT pack_id, molting_stage FROM biomae.measurereprotoxicity where pack_id IN {tuple(list_pack_repro)};"
+            f"  SELECT pack_id, molting_stage FROM {env.DATABASE_RAW}.MeasureReprotoxicity where pack_id IN {tuple(list_pack_repro)};"
         ).execute()
 
         dict_molting_stage = {pack_id: [] for pack_id in list_pack_repro}

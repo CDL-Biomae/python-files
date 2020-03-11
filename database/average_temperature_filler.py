@@ -52,7 +52,7 @@ def liste_temperature(measurepoint_fusion_id, num_sensor):
     pack_id = []
     for mp_id in list_measurepoint_id:
         pack_id += QueryScript(
-            f"  SELECT id   FROM {env.DATABASE_RAW}.pack WHERE measurepoint_id={mp_id}").execute()
+            f"  SELECT id   FROM {env.DATABASE_RAW}.Pack WHERE measurepoint_id={mp_id}").execute()
     if len(pack_id) == 0:
         return []
 
@@ -62,19 +62,19 @@ def liste_temperature(measurepoint_fusion_id, num_sensor):
     # Demande de rémi de rajouter une heure pour calculer la moyenne au début
     SQL_request_temperature_sensor = []
     if (num_sensor == 1) & (dict_key_date_list[1] != None) & (dict_key_date_list[2] != None):
-        SQL_request_temperature_sensor = "SELECT value   FROM {}.Measuretemperature WHERE ( (recordedAt>= '{}') AND (recordedAt<= '{}')".format(env.DATABASE_RAW,
+        SQL_request_temperature_sensor = "SELECT value   FROM {}.MeasureTemperature WHERE ( (recordedAt>= '{}') AND (recordedAt<= '{}')".format(env.DATABASE_RAW,
                                                                                                                                                 dict_key_date_list[1] + timedelta(0, 3600), dict_key_date_list[2])
         valid_output = True
     elif (num_sensor == 2) & (dict_key_date_list[6] != None) & (dict_key_date_list[4] != None):
-        SQL_request_temperature_sensor = "SELECT value   FROM {}.Measuretemperature WHERE ( (recordedAt>= '{}') AND (recordedAt<= '{}')".format(env.DATABASE_RAW,
+        SQL_request_temperature_sensor = "SELECT value   FROM {}.MeasureTemperature WHERE ( (recordedAt>= '{}') AND (recordedAt<= '{}')".format(env.DATABASE_RAW,
                                                                                                                                                 dict_key_date_list[6] + timedelta(0, 3600), dict_key_date_list[4])
         valid_output = True
     elif (num_sensor == "2lab") & (dict_key_date_list[6] != None) & (dict_key_date_list[5] != None):
-        SQL_request_temperature_sensor = "SELECT value   FROM {}.Measuretemperature WHERE ( (recordedAt>= '{}') AND (recordedAt<= '{}')".format(env.DATABASE_RAW,
+        SQL_request_temperature_sensor = "SELECT value   FROM {}.MeasureTemperature WHERE ( (recordedAt>= '{}') AND (recordedAt<= '{}')".format(env.DATABASE_RAW,
                                                                                                                                                 dict_key_date_list[6] + timedelta(0, 3600), dict_key_date_list[5])
         valid_output = True
     elif (num_sensor == 3) & (dict_key_date_list[6] != None) & (dict_key_date_list[7] != None):
-        SQL_request_temperature_sensor = "SELECT value   FROM {}.Measuretemperature WHERE ( (recordedAt>= '{}') AND (recordedAt<= '{}')".format(env.DATABASE_RAW,
+        SQL_request_temperature_sensor = "SELECT value   FROM {}.MeasureTemperature WHERE ( (recordedAt>= '{}') AND (recordedAt<= '{}')".format(env.DATABASE_RAW,
                                                                                                                                                 dict_key_date_list[6] + timedelta(0, 3600), dict_key_date_list[7])
         valid_output = True
 

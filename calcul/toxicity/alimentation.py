@@ -16,7 +16,7 @@ class Alimentation:
                 pack_dict[dict_pack_fusion[element]['alimentation']] = element
             except KeyError:
                 None
-        survivor_list =  QueryScript(f"  SELECT pack_id, scud_survivor, scud_quantity, replicate   FROM {env.DATABASE_RAW}.cage WHERE pack_id IN {tuple([element for element in pack_dict])} AND scud_survivor IS NOT NULL").execute()
+        survivor_list =  QueryScript(f"  SELECT pack_id, scud_survivor, scud_quantity, replicate   FROM {env.DATABASE_RAW}.Cage WHERE pack_id IN {tuple([element for element in pack_dict])} AND scud_survivor IS NOT NULL").execute()
         result = {element:None for element in dict_pack_fusion}
         pack_checked = None
         current_quantity = None
@@ -45,7 +45,7 @@ class Alimentation:
         result = {element: None for element in dict_pack_fusion}
 
         ################### Calcul des tailles des spécimens
-        specimen_size_data =  QueryScript(f"  SELECT pack_id, individual, size_px, size_mm   FROM {env.DATABASE_RAW}.Measuresize WHERE pack_id IN {tuple([element for element in pack_dict])}").execute()
+        specimen_size_data =  QueryScript(f"  SELECT pack_id, individual, size_px, size_mm   FROM {env.DATABASE_RAW}.MeasureSize WHERE pack_id IN {tuple([element for element in pack_dict])}").execute()
         specimen_size = {element:None for element in dict_pack_fusion}
         pack_checked = None
         ratio = None
@@ -90,7 +90,7 @@ class Alimentation:
             f" SELECT value   FROM {env.DATABASE_TREATED}.r2_constant WHERE name='Nombre de disques par réplicat' AND version=  {env.LATEST_VERSION()}").execute()[0]
         test_duration = QueryScript(
             f" SELECT value   FROM {env.DATABASE_TREATED}.r2_constant WHERE name='Nombre de jour du test' AND version=  {env.LATEST_VERSION()}").execute()[0]
-        remaining_leaves_data =  QueryScript(f"  SELECT pack_id, replicate, value   FROM {env.DATABASE_RAW}.Measureleaf WHERE pack_id IN {tuple([element for element in pack_dict])}").execute()
+        remaining_leaves_data =  QueryScript(f"  SELECT pack_id, replicate, value   FROM {env.DATABASE_RAW}.MeasureLeaf WHERE pack_id IN {tuple([element for element in pack_dict])}").execute()
         remaining_leaves = {element:None for element in dict_pack_fusion}
         pack_checked = None
         for leaf in remaining_leaves_data:

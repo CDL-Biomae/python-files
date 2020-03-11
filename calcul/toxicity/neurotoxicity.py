@@ -18,7 +18,7 @@ class Neurotoxicity:
                 pack_dict[dict_pack_fusion[element]['neurology']] = element
             except KeyError:
                 None
-        output =  QueryScript(f"  SELECT pack_id, ache, weight   FROM {env.DATABASE_RAW}.cage WHERE pack_id IN {tuple([element for element in pack_dict])}").execute()
+        output =  QueryScript(f"  SELECT pack_id, ache, weight   FROM {env.DATABASE_RAW}.Cage WHERE pack_id IN {tuple([element for element in pack_dict])}").execute()
         result = {element:None for element in dict_pack_fusion}
 
         pack_checked = None
