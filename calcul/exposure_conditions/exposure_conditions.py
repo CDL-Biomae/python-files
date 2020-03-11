@@ -49,7 +49,7 @@ def conditions_fusion(measurepoints):
 
         try:
             output = QueryScript(
-                f"  SELECT conductivity, ph, oxygen   FROM {env.DATABASE_RAW}.Measureexposurecondition WHERE measurepoint_id = {measurepoint} and step = {step} and barrel = {barrel}").execute()
+                f"  SELECT conductivity, ph, oxygen   FROM {env.DATABASE_RAW}.MeasureExposureCondition WHERE measurepoint_id = {measurepoint} and step = {step} and barrel = {barrel}").execute()
             output = output[0]
         except IndexError:
             output = [None, None, None]
@@ -73,7 +73,7 @@ def conditions_simple(measurepoint_id):
 
         try:
             output = QueryScript(
-                f"  SELECT conductivity, ph, oxygen   FROM {env.DATABASE_RAW}.Measureexposurecondition WHERE measurepoint_id = {measurepoint_id} and step = {step} and barrel = {barrel}").execute()
+                f"  SELECT conductivity, ph, oxygen   FROM {env.DATABASE_RAW}.MeasureExposureCondition WHERE measurepoint_id = {measurepoint_id} and step = {step} and barrel = {barrel}").execute()
             output = output[0]
         except IndexError:
             output = [None, None, None]

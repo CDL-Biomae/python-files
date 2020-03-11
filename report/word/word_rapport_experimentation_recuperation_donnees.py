@@ -65,7 +65,7 @@ def data_exposure_condition_fusion(measurepoints):
             measurepoint = id_mp_second
 
         output = QueryScript(
-            f"  SELECT recordedAt, temperature, conductivity, oxygen, ph, type, comment   FROM {env.DATABASE_RAW}.Measureexposurecondition WHERE measurepoint_id = {measurepoint} and step = {step} and barrel = {barrel}").execute()
+            f"  SELECT recordedAt, temperature, conductivity, oxygen, ph, type, comment   FROM {env.DATABASE_RAW}.MeasureExposureCondition WHERE measurepoint_id = {measurepoint} and step = {step} and barrel = {barrel}").execute()
         if len(output) != 0:
             output = output[0]
             dico_temp = {'date': parser(output[0]), 'temperature': output[1],
@@ -88,7 +88,7 @@ def data_exposure_condition_simple(measurepoint_id):
     for i in range(4):
         step, barrel = steps_barrel[i]
         output = QueryScript(
-            f"  SELECT recordedAt, temperature, conductivity, oxygen, ph, type, comment   FROM {env.DATABASE_RAW}.Measureexposurecondition WHERE measurepoint_id = {measurepoint_id} and step = {step} and barrel = {barrel}").execute()
+            f"  SELECT recordedAt, temperature, conductivity, oxygen, ph, type, comment   FROM {env.DATABASE_RAW}.MeasureExposureCondition WHERE measurepoint_id = {measurepoint_id} and step = {step} and barrel = {barrel}").execute()
         if len(output) != 0:
             output = output[0]
             dico_temp = {'date': parser(output[0]), 'temperature': output[1],
