@@ -9,7 +9,7 @@ def agency_finder(measurepoint_id):
     '''
     try:
         agency = QueryScript(
-            f"  SELECT code   FROM {env.DATABASE_RAW}.Agency JOIN {env.DATABASE_RAW}.Place ON agency.id = Place.agency_id JOIN {env.DATABASE_RAW}.Measurepoint ON Place.id = Measurepoint.place_id WHERE Measurepoint.id = {measurepoint_id};"
+            f"  SELECT code   FROM {env.DATABASE_RAW}.Agency JOIN {env.DATABASE_RAW}.Place ON Agency.id = Place.agency_id JOIN {env.DATABASE_RAW}.Measurepoint ON Place.id = Measurepoint.place_id WHERE Measurepoint.id = {measurepoint_id};"
         ).execute()[0]
     except IndexError:
         agency = None
