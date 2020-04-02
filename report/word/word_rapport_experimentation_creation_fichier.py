@@ -50,7 +50,7 @@ def word_main(campaign, agence, path_photo="Photos", path_output="output", num_c
             header = table_geo_1.rows[0].cells
             header[0].merge(header[-1])
             if agence:
-                case_header = table_geo_1.cell(0, 0).paragraphs[0].add_run(dico_geo_agency[reference]['code'] +
+                case_header = table_geo_1.cell(0, 0).paragraphs[0].add_run(dico_geo_agency[reference]['code'] if 'code' in dico_geo_agency[reference] else "00000000"  +
                                                                            " : " + dico_geo_agency[reference]['name'] + "   " + reference)
             else:
                 case_header = table_geo_1.cell(0, 0).paragraphs[0].add_run("Point " + reference[-5:] + " : " +

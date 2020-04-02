@@ -163,7 +163,7 @@ def average_temperature(measurepoint_fusion_id_list):
     dico_avg_all_tempe = {}
     dico_date = {}  # {reference: [date1, date4, date6, date7]}
     tempe = QueryScript(
-        f"SELECT reference, sensor1_min, sensor1_average, sensor1_max, sensor2_min, sensor2_average, sensor2_max, sensor3_min, sensor3_average, sensor3_max, average_temperature.measurepoint_fusion_id FROM {env.DATABASE_TREATED}.average_temperature JOIN {env.DATABASE_RAW}.Measurepoint ON average_temperature.measurepoint_fusion_id = measurepoint.id WHERE average_temperature.measurepoint_fusion_id IN {measurepoint_fusion_id_list} AND average_temperature.version=  {env.CHOSEN_VERSION()}").execute()
+        f"SELECT reference, sensor1_min, sensor1_average, sensor1_max, sensor2_min, sensor2_average, sensor2_max, sensor3_min, sensor3_average, sensor3_max, average_temperature.measurepoint_fusion_id FROM {env.DATABASE_TREATED}.average_temperature JOIN {env.DATABASE_RAW}.Measurepoint ON average_temperature.measurepoint_fusion_id = Measurepoint.id WHERE average_temperature.measurepoint_fusion_id IN {measurepoint_fusion_id_list} AND average_temperature.version=  {env.CHOSEN_VERSION()}").execute()
 
     output_date1 = QueryScript(
         f"SELECT measurepoint_id, date FROM {env.DATABASE_TREATED}.key_dates WHERE date_id = 1 and measurepoint_fusion_id IN {measurepoint_fusion_id_list} AND key_dates.version=  {env.CHOSEN_VERSION()}"
