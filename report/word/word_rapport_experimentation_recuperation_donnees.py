@@ -36,6 +36,9 @@ def data_exposure_condition(measurepoint_fusion_id):
     query = QueryScript(
         f"SELECT DISTINCT reference, measurepoint_id FROM {env.DATABASE_TREATED}.key_dates JOIN {env.DATABASE_RAW}.Measurepoint ON Measurepoint.id = key_dates.measurepoint_fusion_id WHERE measurepoint_fusion_id = {measurepoint_fusion_id} and version=  {env.CHOSEN_VERSION()}").execute()
     measurepoints = [elt[1] for elt in query]
+    for measurepoint in measurepoints:
+        if not measurepoint:
+            measurepoints.remove(measurepoint)
     if len(measurepoints) < 2:
         return query[0][0], data_exposure_condition_simple(measurepoint_fusion_id), False
     else:
@@ -45,13 +48,21 @@ def data_exposure_condition(measurepoint_fusion_id):
 def data_exposure_condition_fusion(measurepoints):
     ''' Récupération des données de conditions d'exposition dans le cas d'un measurepoint fusion, prend en entrée une liste avec les deux id des points de mesures
     et retourne un dictionnaire des données'''
-    [id_mp_1, id_mp_2] = measurepoints
-    if id_mp_1 < id_mp_2:
-        id_mp_premier = id_mp_1
-        id_mp_second = id_mp_2
-    else:
-        id_mp_premier = id_mp_2
-        id_mp_second = id_mp_1
+    try :
+        [id_mp_1, id_mp_2] = measurepoints
+    except :
+        print(measurepoints)
+    if id_mp_1 and id_mp_2:
+        if id_mp_1 < id_mp_2:
+            id_mp_premier = id_mp_1
+            id_mp_second = id_mp_2
+        else:
+            id_mp_premier = id_mp_2
+            id_mp_second = id_mp_1
+    else :
+        id_mp_premier = 0
+        id_mp_second = 0
+
     dico = {}
     days = ["J+0", "J+14", "J+N", "J+21"]
     steps_barrel = [(50, "\'R0\'"), (50, "\'R0\'"),
