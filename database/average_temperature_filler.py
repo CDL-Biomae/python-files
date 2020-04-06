@@ -1,6 +1,5 @@
 import env
 from tools import QueryScript
-import json
 import datetime
 
 def create_global_dict() :

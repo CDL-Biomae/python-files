@@ -1,5 +1,4 @@
 from . import *
-import json
 
 def run(cas, xl_path=None, date=None, comment=None):
     print("Database management started...")
