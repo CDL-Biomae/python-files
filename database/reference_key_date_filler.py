@@ -7,7 +7,7 @@ def fill_reference_date_table():
     QueryScript("DROP TABLE IF EXISTS reference_date").execute()
     reference_date_table = QueryScript(
         f"CREATE TABLE reference_date (id INT AUTO_INCREMENT PRIMARY KEY, name VARCHAR(255), step INT(11), barrel VARCHAR(255), version INT);")
-    reference_date_table.execute(True)
+    reference_date_table.execute(admin=True)
     SQL_request = f" INSERT INTO reference_date (name, step, barrel, version) VALUES (%s, %s, %s, %s)"
     values = [("Transplantation Alimentation", 50, "R0"),
               ("Recuperation Alimentation", 60, "R7"),

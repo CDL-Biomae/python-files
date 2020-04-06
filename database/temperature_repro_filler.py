@@ -8,13 +8,10 @@ def fill_temperature_repro(cas, temperatures):
         QueryScript(f'DROP TABLE IF EXISTS {env.DATABASE_TREATED}.temperature_repro').execute()
         temperature_repro_table = QueryScript(
             f"CREATE TABLE {env.DATABASE_TREATED}.temperature_repro (id INT AUTO_INCREMENT PRIMARY KEY, measurepoint_id INT(11), av_cycle_BCD1 DOUBLE, expected_C2 DOUBLE, expected_D1 DOUBLE, expected_D2 DOUBLE, av_cycle_1234 DOUBLE, expected_st3 DOUBLE, expected_st4 DOUBLE, expected_st5 DOUBLE, version INT );")
-        temperature_repro_table.execute(True)
+        temperature_repro_table.execute(admin=True)
     ## Cas 2: Mise à jour de la dernière version connue
     if cas == 2:
-        QueryScript(f'DROP TABLE IF EXISTS {env.DATABASE_TREATED}.temperature_repro').execute()
-        temperature_repro_table = QueryScript(f"CREATE TABLE {env.DATABASE_TREATED}.temperature_repro (id INT AUTO_INCREMENT PRIMARY KEY, measurepoint_id INT(11), av_cycle_BCD1 DOUBLE, expected_C2 DOUBLE, expected_D1 DOUBLE, expected_D2 DOUBLE, av_cycle_1234 DOUBLE, expected_st3 DOUBLE, expected_st4 DOUBLE, expected_st5 DOUBLE, version INT );")
-        temperature_repro_table.execute(True)
-        QueryScript(f"DELETE FROM {env.DATABASE_TREATED}.temperature_repro WHERE version = {env.LATEST_VERSION()};").execute()
+        QueryScript(f"DELETE FROM {env.DATABASE_TREATED}.temperature_repro WHERE version = {env.LATEST_VERSION()} and measurepoint_id in {tuple(temperatures['need_update']) if len(temperatures['need_update']) else '(0)'};").execute(admin=True)
 
     SQL_request = QueryScript(f" INSERT INTO {env.DATABASE_TREATED}.temperature_repro (measurepoint_id, av_cycle_BCD1, expected_C2, expected_D1, expected_D2, av_cycle_1234, expected_st3, expected_st4, expected_st5, version) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)")
     values = []
@@ -30,37 +27,38 @@ def fill_temperature_repro(cas, temperatures):
     constante_duree_femelle = int(QueryScript(
         f" SELECT value   FROM {env.DATABASE_TREATED}.r2_constant WHERE name='FEMELLES'").execute()[0])
     for elt_mp_id in liste_id:
-        elt_insert = [elt_mp_id]
-        if "sensor2lab" in temperatures["data"][elt_mp_id]:
-            liste_tempe = temperatures["data"][elt_mp_id]["sensor2lab"]
-        else :
-            liste_tempe = []
-        if len(liste_tempe) > 0:
-            # Valeurs associées à %BCD1
-            av_cycle_BCD1 = calcul_av_cycle(constante_duree_femelle,constantes['Constante %BCD1-1'], constantes['Constante %BCD1-2'],
-                                            constantes['Constante %BCD1-3'], constantes['Constante %BCD1-4'], liste_tempe)
-            expected_C2 = fct_aux_expected_percent(
-                constantes["Constante %attendu C2-1"], constantes["Constante %attendu C2-2"], av_cycle_BCD1)
-            expected_D1 = fct_aux_expected_percent(
-                constantes["Constante %attendu D1-1"], constantes["Constante %attendu D1-2"], av_cycle_BCD1)
-            expected_D2 = fct_aux_expected_percent(
-                constantes["Constante %attendu D2-1"], constantes["Constante %attendu D2-2"], av_cycle_BCD1)
-            # Valeurs associées à %1234
-            av_cycle_1234 = calcul_av_cycle(constante_duree_femelle,constantes['Constante %1234-1'], constantes['Constante %1234-2'],
-                                            constantes['Constante %1234-3'], constantes['Constante %1234-4'], liste_tempe)
-            expected_st3 = fct_aux_expected_percent(
-                constantes["Constante %attendu st3-1"], constantes["Constante %attendu st3-2"], av_cycle_1234)
-            expected_st4 = fct_aux_expected_percent(
-                constantes["Constante %attendu st4-1"], constantes["Constante %attendu st4-2"], av_cycle_1234)
-            expected_st5 = fct_aux_expected_percent(
-                constantes["Constante %attendu st5-1"], constantes["Constante %attendu st5-2"], av_cycle_1234)
+        if elt_mp_id in temperatures['need_update']:
+            elt_insert = [elt_mp_id]
+            if "sensor2lab" in temperatures["data"][elt_mp_id]:
+                liste_tempe = temperatures["data"][elt_mp_id]["sensor2lab"]
+            else :
+                liste_tempe = []
+            if len(liste_tempe) > 0:
+                # Valeurs associées à %BCD1
+                av_cycle_BCD1 = calcul_av_cycle(constante_duree_femelle,constantes['Constante %BCD1-1'], constantes['Constante %BCD1-2'],
+                                                constantes['Constante %BCD1-3'], constantes['Constante %BCD1-4'], liste_tempe)
+                expected_C2 = fct_aux_expected_percent(
+                    constantes["Constante %attendu C2-1"], constantes["Constante %attendu C2-2"], av_cycle_BCD1)
+                expected_D1 = fct_aux_expected_percent(
+                    constantes["Constante %attendu D1-1"], constantes["Constante %attendu D1-2"], av_cycle_BCD1)
+                expected_D2 = fct_aux_expected_percent(
+                    constantes["Constante %attendu D2-1"], constantes["Constante %attendu D2-2"], av_cycle_BCD1)
+                # Valeurs associées à %1234
+                av_cycle_1234 = calcul_av_cycle(constante_duree_femelle,constantes['Constante %1234-1'], constantes['Constante %1234-2'],
+                                                constantes['Constante %1234-3'], constantes['Constante %1234-4'], liste_tempe)
+                expected_st3 = fct_aux_expected_percent(
+                    constantes["Constante %attendu st3-1"], constantes["Constante %attendu st3-2"], av_cycle_1234)
+                expected_st4 = fct_aux_expected_percent(
+                    constantes["Constante %attendu st4-1"], constantes["Constante %attendu st4-2"], av_cycle_1234)
+                expected_st5 = fct_aux_expected_percent(
+                    constantes["Constante %attendu st5-1"], constantes["Constante %attendu st5-2"], av_cycle_1234)
 
-            elt_insert += [av_cycle_BCD1, expected_C2, expected_D1,
-                           expected_D2, av_cycle_1234, expected_st3, expected_st4, expected_st5]
-            values.append(tuple(elt_insert))
-
-    SQL_request.setRows(values)
-    SQL_request.executemany()
+                elt_insert += [av_cycle_BCD1, expected_C2, expected_D1,
+                            expected_D2, av_cycle_1234, expected_st3, expected_st4, expected_st5]
+                values.append(tuple(elt_insert))
+    if len(values):
+        SQL_request.setRows(values)
+        SQL_request.executemany()
 
 
 def calcul_av_cycle(constante_duree_femelle, alpha, beta, gamme, delta, liste_tempe):

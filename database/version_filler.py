@@ -1,8 +1,10 @@
 from tools import QueryScript
+from datetime import datetime
+import env
 
 def create_version_table():
     QueryScript("DROP TABLE IF EXISTS version").execute()
-    QueryScript(f"CREATE TABLE version (id INT AUTO_INCREMENT PRIMARY KEY, date VARCHAR(255), comment VARCHAR(255))").execute(True)
+    QueryScript(f"CREATE TABLE version (id INT AUTO_INCREMENT PRIMARY KEY, date VARCHAR(255), comment VARCHAR(255))").execute(admin=True)
     
 def create_new_version(date=None, comment=None):
     query = QueryScript(f" INSERT INTO version (date, comment) VALUES (%s, %s)")
@@ -10,6 +12,10 @@ def create_new_version(date=None, comment=None):
     query.setRows([(date, comment)])
     query.executemany(True)
 
+def update_version():
+    new_date = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    QueryScript(f'UPDATE {env.DATABASE_TREATED}.version SET date="{new_date}" WHERE id={env.LATEST_VERSION()}').execute(admin=True)
+    print(f'Updating version {env.LATEST_VERSION()} at {datetime.now().strftime("%Y-%m-%d %H:%M:%S")}')
 
 def run(cas, date, comment):
     ## On a 3 cas pour les requêtes SQL
@@ -20,11 +26,11 @@ def run(cas, date, comment):
     ## Cas 1: Création et remplissage de la base de données
     if cas == 1:
         create_version_table()
-        create_new_version()
+        create_new_version(date=datetime.now())
 
     ## Cas 2: Mise à jour de la dernière version connue
     if cas == 2:
-        pass  # On a rien à faire quand la version ne change pas
+        update_version()
 
     ## Cas 3: Ajout d'une nouvelle version
     if cas == 3:
