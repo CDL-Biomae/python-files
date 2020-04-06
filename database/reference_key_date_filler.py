@@ -10,7 +10,7 @@ def fill_reference_date_table():
     SQL_request = f" INSERT INTO reference_date (name, step, barrel, version) VALUES (%s, %s, %s, %s)"
     values = [("Transplantation Alimentation", 50, "R0"),
               ("Recuperation Alimentation", 60, "R7"),
-              ("Lancement Alimentation", 20, None),
+              ("Lancement reprotoxicite", 20, None),
               ("Recuperation reprotoxicite", 140, "RN"),
               ("Arret Reprotoxicite", 170, None),
               ("Lancement Chimie", 50, "C0"),
@@ -29,7 +29,9 @@ def run(cas):
 
     # Cas 1: Création et remplissage de la base de données
     if cas == 1:
+        print("--> reference_key_dates table")
         fill_reference_date_table()
+        print("--> reference_key_dates table ready")
 
     # Cas 2: Mise à jour de la dernière version connue
     if cas == 2:

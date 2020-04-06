@@ -8,14 +8,14 @@ import env
 class Reprotoxicity:
 
     @staticmethod
-    # retourne dict_nbr_days_exposition = {mp_fusion: nbrdays}
-    def number_days_exposition(dict_pack_fusion):
+    # retourne dict_nbr_days_exposition = {mp: nbrdays}
+    def number_days_exposition(dict_pack):
 
         nature = 'reproduction'
         list_mp_repro = []
-        for mp in dict_pack_fusion:
+        for mp in dict_pack:
             try:
-                dict_pack_fusion[mp][nature]
+                dict_pack[mp][nature]
             except KeyError:
                 pass
             else:
@@ -23,10 +23,10 @@ class Reprotoxicity:
 
         # Récupération des dates de début et de fin
         output_dates_debut = QueryScript(
-            f" SELECT measurepoint_fusion_id, date   FROM {env.DATABASE_TREATED}.key_dates where date_id=6 and measurepoint_fusion_id IN {tuple(list_mp_repro)} and version=  {env.LATEST_VERSION()};"
+            f" SELECT measurepoint_id, date   FROM {env.DATABASE_TREATED}.key_dates where date_id=3 and measurepoint_id IN {tuple(list_mp_repro)} and version=  {env.LATEST_VERSION()};"
         ).execute()
         output_dates_fin = QueryScript(
-            f" SELECT measurepoint_fusion_id, date   FROM {env.DATABASE_TREATED}.key_dates where date_id=4 and measurepoint_fusion_id IN {tuple(list_mp_repro)} and version=  {env.LATEST_VERSION()};"
+            f" SELECT measurepoint_id, date   FROM {env.DATABASE_TREATED}.key_dates where date_id=4 and measurepoint_id IN {tuple(list_mp_repro)} and version=  {env.LATEST_VERSION()};"
         ).execute()
 
         output_mp_debut = [x[0] for x in output_dates_debut]
@@ -39,7 +39,7 @@ class Reprotoxicity:
             dict_dates_debut_fin[mp] = [output_dates_debut[idx_debut][1], output_dates_fin[idx_fin][1]]
 
         # Initialisation du dictionnaire de sortie
-        dict_nbr_days_exposition = {mp: None for mp in dict_pack_fusion}  # {mp: nbrdays}
+        dict_nbr_days_exposition = {mp: None for mp in dict_pack}  # {mp: nbrdays}
 
         # Calcul
         for mp in list_mp_repro:
@@ -120,14 +120,14 @@ class Reprotoxicity:
         return dict_index_fecundity  # {pack_id: {'list_molting_stage': [...], 'list_index_fecundity': [...]}
 
     @staticmethod
-    # retourne dict_fecundity = {mp_fusion: {'nbr_femelles_analysées': int, 'nbr_femelles_concernées': int, 'fécondité_moyenne': float}}
-    def fecundity(dict_pack_fusion):
+    # retourne dict_fecundity = {mp: {'nbr_femelles_analysées': int, 'nbr_femelles_concernées': int, 'fécondité_moyenne': float}}
+    def fecundity(dict_pack):
         nature = 'reproduction'
         list_pack_repro = []
         list_mp_repro = []
-        for mp in dict_pack_fusion:
+        for mp in dict_pack:
             try:
-                pack_id = dict_pack_fusion[mp][nature]
+                pack_id = dict_pack[mp][nature]
             except KeyError:
                 pass
             else:
@@ -137,8 +137,8 @@ class Reprotoxicity:
         dict_index_fecundity = Reprotoxicity.index_fecundity_female(list_pack_repro)  # {pack_id: {'list_molting_stage': [...], 'list_index_fecundity': [...]}
 
         # Initialisation du dictionnaire de sortie
-        # {mp_fusion: {{'nbr_femelles_analysées': int, 'nbr_femelles_concernées': int, 'fécondité_moyenne': float}}
-        dict_fecundity = {mp_fusion: {'nbr_femelles_analysées': None, 'nbr_femelles_concernées': None, 'fécondité_moyenne': None} for mp_fusion in dict_pack_fusion.keys()}
+        # {mp: {{'nbr_femelles_analysées': int, 'nbr_femelles_concernées': int, 'fécondité_moyenne': float}}
+        dict_fecundity = {mp: {'nbr_femelles_analysées': None, 'nbr_femelles_concernées': None, 'fécondité_moyenne': None} for mp in dict_pack.keys()}
 
         for pack_id in dict_index_fecundity.keys():
             list_index_fecundity_not_clean = dict_index_fecundity[pack_id]['list_index_fecundity']
@@ -147,10 +147,10 @@ class Reprotoxicity:
             list_index_fecundity = [x for x in list_index_fecundity_not_clean if x != 0]
             list_molting_stage = [x for x in list_molting_stage_not_clean if x is not None]
 
-            mp_fusion = list_mp_repro[list_pack_repro.index(pack_id)]
+            mp = list_mp_repro[list_pack_repro.index(pack_id)]
 
             nbr_femelles_concernees = len(list_index_fecundity) - list_index_fecundity.count(0)
-            dict_fecundity[mp_fusion]['nbr_femelles_concernées'] = nbr_femelles_concernees
+            dict_fecundity[mp]['nbr_femelles_concernées'] = nbr_femelles_concernees
 
             cpt_molting_stage = Counter(list_molting_stage)
             cpt_filtre = [cpt_molting_stage.get(molting_stage) for molting_stage in ['b', 'c1', 'c2', 'd1', 'd2']]
@@ -161,27 +161,27 @@ class Reprotoxicity:
                     nbr_femelles_analysees += x
 
             if nbr_femelles_analysees == 0:
-                dict_fecundity[mp_fusion]['nbr_femelles_analysées'] = 'NA'
+                dict_fecundity[mp]['nbr_femelles_analysées'] = 'NA'
             else:
-                dict_fecundity[mp_fusion]['nbr_femelles_analysées'] = nbr_femelles_analysees
+                dict_fecundity[mp]['nbr_femelles_analysées'] = nbr_femelles_analysees
 
             if nbr_femelles_analysees > 10 and len(list_index_fecundity) != 0:
                 fecondite_moyenne = sum(list_index_fecundity)/len(list_index_fecundity)
             else:
                 fecondite_moyenne = "NA"
-            dict_fecundity[mp_fusion]['fécondité_moyenne'] = fecondite_moyenne
+            dict_fecundity[mp]['fécondité_moyenne'] = fecondite_moyenne
 
         return dict_fecundity
 
     @staticmethod
-    # retourne dict_molting = {mp_fusion: {'cycle de mue': ..%, 'cycle de mue attendu': ..%, 'nb_femelles_retard': int}}
-    def molting_cycle(dict_pack_fusion):
+    # retourne dict_molting = {mp: {'cycle de mue': ..%, 'cycle de mue attendu': ..%, 'nb_femelles_retard': int}}
+    def molting_cycle(dict_pack):
         nature = 'reproduction'
         list_pack_repro = []
         list_mp_repro = []
-        for mp in dict_pack_fusion:
+        for mp in dict_pack:
             try:
-                pack_id = dict_pack_fusion[mp][nature]
+                pack_id = dict_pack[mp][nature]
             except KeyError:
                 pass
             else:
@@ -189,7 +189,7 @@ class Reprotoxicity:
                 list_pack_repro.append(pack_id)
 
         SQL_request = f"  SELECT pack_id, molting_stage FROM {env.DATABASE_RAW}.MeasureReprotoxicity where pack_id IN {tuple(list_pack_repro)};"
-        SQL_request_2 = f"  SELECT measurepoint_fusion_id, expected_C2,expected_D2 FROM {env.DATABASE_TREATED}.temperature_repro where measurepoint_fusion_id IN {tuple(list_mp_repro)};"
+        SQL_request_2 = f"  SELECT measurepoint_id, expected_C2,expected_D2 FROM {env.DATABASE_TREATED}.temperature_repro where measurepoint_id IN {tuple(list_mp_repro)};"
         resultat_molting_stage =  QueryScript(SQL_request).execute()
         resultat_expected_stage =  QueryScript(SQL_request_2).execute()
 
@@ -198,21 +198,21 @@ class Reprotoxicity:
             [pack_id, molting_stage] = row
             dict_molting_stage[pack_id].append(molting_stage)
 
-        dict_expected_stage = {mp_fusion: {'expected C2': None, 'expected D2': None} for mp_fusion in list_mp_repro}
+        dict_expected_stage = {mp: {'expected C2': None, 'expected D2': None} for mp in list_mp_repro}
         for row in resultat_expected_stage:
-            [measurepoint_fusion_id, expected_C2, expected_D2] = row
-            dict_expected_stage[measurepoint_fusion_id]['expected C2'] = expected_C2
-            dict_expected_stage[measurepoint_fusion_id]['expected D2'] = expected_D2
+            [measurepoint_id, expected_C2, expected_D2] = row
+            dict_expected_stage[measurepoint_id]['expected C2'] = expected_C2
+            dict_expected_stage[measurepoint_id]['expected D2'] = expected_D2
 
         # Initialisation du dictionnaire de sortie
-        dict_molting = {mp_fusion: {'cycle de mue': None, 'cycle de mue attendu': None, 'nb_femelles_retard': None} for mp_fusion in dict_pack_fusion.keys()}
+        dict_molting = {mp: {'cycle de mue': None, 'cycle de mue attendu': None, 'nb_femelles_retard': None} for mp in dict_pack.keys()}
 
         # Remplissage du dictionnaire de sortie
-        for i, mp_fusion in enumerate(list_mp_repro):
+        for i, mp in enumerate(list_mp_repro):
             pack_id = list_pack_repro[i]
-            expected_C2 = dict_expected_stage[mp_fusion]['expected C2']
-            expected_D2 = dict_expected_stage[mp_fusion]['expected D2']
-            dict_molting[mp_fusion]['cycle de mue attendu'] = expected_C2 if (expected_C2 == 'NA' or expected_C2 is None) else round(expected_C2-expected_D2)
+            expected_C2 = dict_expected_stage[mp]['expected C2']
+            expected_D2 = dict_expected_stage[mp]['expected D2']
+            dict_molting[mp]['cycle de mue attendu'] = expected_C2 if (expected_C2 == 'NA' or expected_C2 is None) else round(expected_C2-expected_D2)
 
             list_molting_stage = dict_molting_stage[pack_id]
             cpt_molting_stage = Counter(list_molting_stage)
@@ -234,22 +234,22 @@ class Reprotoxicity:
             else:
                 molting_percent = nbr_femelles_c2_d1/nbr_femelles_analysees
 
-            dict_molting[mp_fusion]['cycle de mue'] = molting_percent if (molting_percent == 'NA' or molting_percent is None) else round(molting_percent*100)
-            dict_molting[mp_fusion]['nb_femelles_retard'] = nbr_femelles_c2_d1
+            dict_molting[mp]['cycle de mue'] = molting_percent if (molting_percent == 'NA' or molting_percent is None) else round(molting_percent*100)
+            dict_molting[mp]['nb_femelles_retard'] = nbr_femelles_c2_d1
 
-        return dict_molting  # {mp_fusion: {'cycle de mue': ..%, 'cycle de mue attendu': ..%, 'nb_femelles_retard': int}}
+        return dict_molting  # {mp: {'cycle de mue': ..%, 'cycle de mue attendu': ..%, 'nb_femelles_retard': int}}
 
     @staticmethod
     # retourne dict_surface_femelles_concernees, dict_surface_des_retards
-    # dict_surface_femelles_concernees = {mp_fusion: nbr_femelles_concernees}
+    # dict_surface_femelles_concernees = {mp: nbr_femelles_concernees}
     # dict_surface_des_retards = {pack_id: [oocyte_area_mm, ...]}
-    def number_female_concerned_area(dict_pack_fusion):
+    def number_female_concerned_area(dict_pack):
         nature = 'reproduction'
         list_pack_repro = []
         list_mp_repro = []
-        for mp in dict_pack_fusion:
+        for mp in dict_pack:
             try:
-                pack_id = dict_pack_fusion[mp][nature]
+                pack_id = dict_pack[mp][nature]
             except KeyError:
                 pass
             else:
@@ -304,15 +304,15 @@ class Reprotoxicity:
                         continue
 
         # Calcul nbr_femelles_concernées
-        dict_surface_femelles_concernees = {mp_fusion: 0 for mp_fusion in dict_pack_fusion.keys()}
+        dict_surface_femelles_concernees = {mp: 0 for mp in dict_pack.keys()}
 
-        for mp_fusion in dict_surface_femelles_concernees.keys():
-            if mp_fusion not in list_mp_repro:
+        for mp in dict_surface_femelles_concernees.keys():
+            if mp not in list_mp_repro:
                 continue
             else:
-                pack_id = dict_pack_fusion[mp_fusion]['reproduction']
+                pack_id = dict_pack[mp]['reproduction']
                 nbr_femelles_concernees = len(dict_surface_des_retards[pack_id])
-                dict_surface_femelles_concernees[mp_fusion] = nbr_femelles_concernees
+                dict_surface_femelles_concernees[mp] = nbr_femelles_concernees
 
         return dict_surface_femelles_concernees, dict_surface_des_retards
 
@@ -327,14 +327,14 @@ class Reprotoxicity:
 
     @staticmethod
     # retourne dict_conform_resultat_mue = {pack_id: 'NA', 'Retard fort', 'Retard modéré' ou 'Conforme'}
-    def conform_resultat_mue(dict_pack_fusion):
+    def conform_resultat_mue(dict_pack):
 
         nature = 'reproduction'
         list_pack_repro = []
         list_mp_repro = []
-        for mp in dict_pack_fusion:
+        for mp in dict_pack:
             try:
-                pack_id = dict_pack_fusion[mp][nature]
+                pack_id = dict_pack[mp][nature]
             except KeyError:
                 pass
             else:
@@ -367,13 +367,13 @@ class Reprotoxicity:
         ## Calcul des valeurs de test unilatéral
         # Récupération du pourcentage attendu en B/C1
         output_expected = QueryScript(
-            f"  SELECT measurepoint_fusion_id, expected_C2   FROM {env.DATABASE_TREATED}.temperature_repro WHERE measurepoint_fusion_id IN {tuple(list_mp_repro)} and version=  {env.LATEST_VERSION()};"
+            f"  SELECT measurepoint_id, expected_C2   FROM {env.DATABASE_TREATED}.temperature_repro WHERE measurepoint_id IN {tuple(list_mp_repro)} and version=  {env.LATEST_VERSION()};"
         ).execute()
         dict_expected_BC1 = {pack_id: 0 for pack_id in list_pack_repro}
 
         for row in output_expected:
-            [mp_fusion, expected_C2] = row
-            pack_id = dict_pack_fusion[mp_fusion]['reproduction']
+            [mp, expected_C2] = row
+            pack_id = dict_pack[mp]['reproduction']
             dict_expected_BC1[pack_id] = 100-expected_C2
 
         # Récupération des seuils de référence
@@ -423,13 +423,13 @@ class Reprotoxicity:
 
     @staticmethod
     # retourne dict_conform_surface_retard = {pack_id: 'NA', 'PE', 'Conforme BC1' ou 'Conforme'}
-    def conform_surface_retard(dict_pack_fusion, dict_surface_femelles_concernees, dict_surface_des_retards, dict_fecundity):
+    def conform_surface_retard(dict_pack, dict_surface_femelles_concernees, dict_surface_des_retards, dict_fecundity):
         nature = 'reproduction'
         list_pack_repro = []
         list_mp_repro = []
-        for mp in dict_pack_fusion:
+        for mp in dict_pack:
             try:
-                pack_id = dict_pack_fusion[mp][nature]
+                pack_id = dict_pack[mp][nature]
             except KeyError:
                 pass
             else:
@@ -439,8 +439,8 @@ class Reprotoxicity:
         ## Surface moyenne des retards
         dict_surface_moyenne_retards = {pack_id: None for pack_id in list_pack_repro}
         for pack_id in list_pack_repro:
-            mp_fusion = list_mp_repro[list_pack_repro.index(pack_id)]
-            nbr_analysees = dict_fecundity[mp_fusion]['nbr_femelles_analysées']
+            mp = list_mp_repro[list_pack_repro.index(pack_id)]
+            nbr_analysees = dict_fecundity[mp]['nbr_femelles_analysées']
             list_surface_retards = dict_surface_des_retards[pack_id]
             if nbr_analysees == 'NA':
                 continue
@@ -471,8 +471,8 @@ class Reprotoxicity:
         # Calcul des seuils
         dict_seuil_unilateral_5percent = {pack_id: None for pack_id in list_pack_repro}
         for pack_id in list_pack_repro:
-            mp_fusion = list_mp_repro[list_pack_repro.index(pack_id)]
-            nbr_concernees = dict_surface_femelles_concernees[mp_fusion]
+            mp = list_mp_repro[list_pack_repro.index(pack_id)]
+            nbr_concernees = dict_surface_femelles_concernees[mp]
             try:
                 seuil_5percent = moyenne_surface_refC2 - cst_surface_des_retards * SD_surface_refC2 / sqrt(nbr_concernees)
             except ZeroDivisionError:
@@ -482,14 +482,14 @@ class Reprotoxicity:
 
         ## Calcul de la conformité des surfaces des retards
         # Récupération de données
-        dict_conform_resultat_mue = Reprotoxicity.conform_resultat_mue(dict_pack_fusion)
+        dict_conform_resultat_mue = Reprotoxicity.conform_resultat_mue(dict_pack)
 
         # Initialisation du dictionnaire de sortie
         dict_conform_surface_retard = {pack_id: "NA" for pack_id in list_pack_repro}
 
         for pack_id in list_pack_repro:
-            mp_fusion = list_mp_repro[list_pack_repro.index(pack_id)]
-            nbr_analysees = dict_fecundity[mp_fusion]['nbr_femelles_analysées']
+            mp = list_mp_repro[list_pack_repro.index(pack_id)]
+            nbr_analysees = dict_fecundity[mp]['nbr_femelles_analysées']
 
             if nbr_analysees == 'NA' or nbr_analysees < 10:
                 continue
@@ -510,14 +510,14 @@ class Reprotoxicity:
         return dict_conform_surface_retard, dict_surface_moyenne_retards
 
     @staticmethod
-    # retourne dict_perturbation_endocrinienne = {mp_fusion: 'NA' ou moyenne des surfaces des retards}
-    def perturbation_endocrinienne(dict_pack_fusion, dict_surface_femelles_concernees, dict_surface_des_retards, dict_fecundity):
+    # retourne dict_perturbation_endocrinienne = {mp: 'NA' ou moyenne des surfaces des retards}
+    def perturbation_endocrinienne(dict_pack, dict_surface_femelles_concernees, dict_surface_des_retards, dict_fecundity):
         nature = 'reproduction'
         list_pack_repro = []
         list_mp_repro = []
-        for mp in dict_pack_fusion:
+        for mp in dict_pack:
             try:
-                pack_id = dict_pack_fusion[mp][nature]
+                pack_id = dict_pack[mp][nature]
             except KeyError:
                 pass
             else:
@@ -525,22 +525,22 @@ class Reprotoxicity:
                 list_pack_repro.append(pack_id)
 
         # Récupération de données
-        dict_conform_surface_retard, dict_surface_moyenne_retards = Reprotoxicity.conform_surface_retard(dict_pack_fusion, dict_surface_femelles_concernees, dict_surface_des_retards, dict_fecundity)
+        dict_conform_surface_retard, dict_surface_moyenne_retards = Reprotoxicity.conform_surface_retard(dict_pack, dict_surface_femelles_concernees, dict_surface_des_retards, dict_fecundity)
 
         # Initialisation du dictionnaire de sortie
-        dict_perturbation_endocrinienne = {mp_fusion: "NA" for mp_fusion in dict_pack_fusion.keys()}
+        dict_perturbation_endocrinienne = {mp: "NA" for mp in dict_pack.keys()}
 
-        for mp_fusion in dict_pack_fusion.keys():
-            if mp_fusion not in list_mp_repro:
+        for mp in dict_pack.keys():
+            if mp not in list_mp_repro:
                 continue
-            pack_id = dict_pack_fusion[mp_fusion]['reproduction']
+            pack_id = dict_pack[mp]['reproduction']
             conform_surface = dict_conform_surface_retard[pack_id]
             moyenne_surface = dict_surface_moyenne_retards[pack_id]
 
             if conform_surface == "Conforme":
                 continue
             else:
-                dict_perturbation_endocrinienne[mp_fusion] = moyenne_surface
+                dict_perturbation_endocrinienne[mp] = moyenne_surface
 
         return dict_perturbation_endocrinienne
 

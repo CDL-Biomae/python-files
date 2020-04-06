@@ -15,17 +15,17 @@ import env
 def conditions(measurepoint_id):
      
     measurepoints = QueryScript(
-        f" SELECT DISTINCT measurepoint_id   FROM {env.DATABASE_TREATED}.key_dates WHERE measurepoint_fusion_id = {measurepoint_id} AND version=  {env.CHOSEN_VERSION()}").execute()
+        f" SELECT DISTINCT measurepoint_id   FROM {env.DATABASE_TREATED}.key_dates WHERE measurepoint_id = {measurepoint_id} AND version=  {env.CHOSEN_VERSION()}").execute()
 
     if len(measurepoints) < 2:
         # Si jamais il n'y a qu'un seul point de mesure
         return conditions_simple(measurepoint_id)
     else:
         # Si jamais on a 2 points de mesure on est dans un cas de fusion de point de mesure
-        return conditions_fusion(measurepoints)
+        return conditions(measurepoints)
 
 
-def conditions_fusion(measurepoints):
+def conditions(measurepoints):
     [id_mp_1, id_mp_2] = measurepoints
     if id_mp_1 < id_mp_2:
         id_mp_premier = id_mp_1

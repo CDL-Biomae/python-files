@@ -9,15 +9,15 @@ class Alimentation:
     '''
 
     @staticmethod
-    def survie_alim(dict_pack_fusion):
+    def survie_alim(dict_pack):
         pack_dict = {}
-        for element in dict_pack_fusion:
+        for element in dict_pack:
             try:
-                pack_dict[dict_pack_fusion[element]['alimentation']] = element
+                pack_dict[dict_pack[element]['alimentation']] = element
             except KeyError:
                 None
         survivor_list =  QueryScript(f"  SELECT pack_id, scud_survivor, scud_quantity, replicate   FROM {env.DATABASE_RAW}.Cage WHERE pack_id IN {tuple([element for element in pack_dict])} AND scud_survivor IS NOT NULL").execute()
-        result = {element:None for element in dict_pack_fusion}
+        result = {element:None for element in dict_pack}
         pack_checked = None
         current_quantity = None
         for cage in survivor_list:
@@ -35,18 +35,18 @@ class Alimentation:
         return result
 
     @staticmethod
-    def alimentation(dict_pack_fusion):
+    def alimentation(dict_pack):
         pack_dict = {}
-        for element in dict_pack_fusion:
+        for element in dict_pack:
             try:
-                pack_dict[dict_pack_fusion[element]['alimentation']] = element
+                pack_dict[dict_pack[element]['alimentation']] = element
             except KeyError:
                 pass
-        result = {element: None for element in dict_pack_fusion}
+        result = {element: None for element in dict_pack}
 
         ################### Calcul des tailles des spécimens
         specimen_size_data =  QueryScript(f"  SELECT pack_id, individual, size_px, size_mm   FROM {env.DATABASE_RAW}.MeasureSize WHERE pack_id IN {tuple([element for element in pack_dict])}").execute()
-        specimen_size = {element:None for element in dict_pack_fusion}
+        specimen_size = {element:None for element in dict_pack}
         pack_checked = None
         ratio = None
         current_specimen_sample = []
@@ -91,7 +91,7 @@ class Alimentation:
         test_duration = QueryScript(
             f" SELECT value   FROM {env.DATABASE_TREATED}.r2_constant WHERE name='Nombre de jour du test' AND version=  {env.LATEST_VERSION()}").execute()[0]
         remaining_leaves_data =  QueryScript(f"  SELECT pack_id, replicate, value   FROM {env.DATABASE_RAW}.MeasureLeaf WHERE pack_id IN {tuple([element for element in pack_dict])}").execute()
-        remaining_leaves = {element:None for element in dict_pack_fusion}
+        remaining_leaves = {element:None for element in dict_pack}
         pack_checked = None
         for leaf in remaining_leaves_data:
             pack_checked = leaf[0]
@@ -105,8 +105,8 @@ class Alimentation:
                 remaining_leaves[pack_dict[pack_checked]]= {leaf[1]:leaf[2]}
 
         ##### Conversion pixel restants -> mm2 consommées par individu par jour
-        survivor = Alimentation.survie_alim(dict_pack_fusion)
-        eaten_leaves = {element: None for element in dict_pack_fusion}
+        survivor = Alimentation.survie_alim(dict_pack)
+        eaten_leaves = {element: None for element in dict_pack}
         for element in remaining_leaves:
             if remaining_leaves[element] and survivor[element]['replicate']:
                 replicate_raw_value = remaining_leaves[element][0]/standard_leaf_number*replicate_leaf_number if 0 in remaining_leaves[element] else None
@@ -117,14 +117,14 @@ class Alimentation:
 
 
         ##################### Calcul de l'inhibition alimentaire
-        inhibition = {element:None for element in dict_pack_fusion}
+        inhibition = {element:None for element in dict_pack}
         constant_alim = QueryScript(
             f" SELECT value   FROM {env.DATABASE_TREATED}.r2_constant WHERE name LIKE 'Constante alim%'").execute()
-        average_temperature = {element:None for element in dict_pack_fusion}
-        average_temperature_output = QueryScript(f" SELECT measurepoint_fusion_id, sensor1_average   FROM {env.DATABASE_TREATED}.average_temperature WHERE measurepoint_fusion_id IN {tuple(dict_pack_fusion)} AND version=  {env.LATEST_VERSION()}").execute()
+        average_temperature = {element:None for element in dict_pack}
+        average_temperature_output = QueryScript(f" SELECT measurepoint_id, sensor1_average   FROM {env.DATABASE_TREATED}.average_temperature WHERE measurepoint_id IN {tuple(dict_pack)} AND version=  {env.LATEST_VERSION()}").execute()
         for element in average_temperature_output:
             average_temperature[element[0]] = element[1]
-        for element in dict_pack_fusion:
+        for element in dict_pack:
             mean_size = None
             if specimen_size[element]:
 

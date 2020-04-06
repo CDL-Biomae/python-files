@@ -1,11 +1,10 @@
 env.py
-test.py
+test*
+*_old.py
+*.json
 *.xlsm
 *.xlsx
 *.docx
 *.jpg
 *.zip
 __pycache__
-kivy_venv
-kivy_env
-build

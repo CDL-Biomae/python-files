@@ -4,13 +4,13 @@ import env
 class Reproduction:
 
     @staticmethod
-    def female_survivor(dict_pack_fusion):
+    def female_survivor(dict_pack):
         nature = 'reproduction'
         list_pack_repro = []
         list_mp_repro = []
-        for mp in dict_pack_fusion:
+        for mp in dict_pack:
             try:
-                pack_id = dict_pack_fusion[mp][nature]
+                pack_id = dict_pack[mp][nature]
             except KeyError:
                 pass
             else:
@@ -32,12 +32,12 @@ class Reproduction:
                 dict_requete[pack_id]['scud_survivor_female'].append(scud_survivor_female)
 
         # Calcul du pourcentage de survie par pack
-        dict_survie_femelle = {mp_fusion: None for mp_fusion in dict_pack_fusion.keys()}
+        dict_survie_femelle = {mp: None for mp in dict_pack.keys()}
 
-        for mp_fusion in dict_survie_femelle.keys():
-            if mp_fusion not in list_mp_repro:
+        for mp in dict_survie_femelle.keys():
+            if mp not in list_mp_repro:
                 continue
-            pack_id = dict_pack_fusion[mp_fusion]['reproduction']
+            pack_id = dict_pack[mp]['reproduction']
             scud_quantity = dict_requete[pack_id]['scud_quantity']
             scud_survivor_female = dict_requete[pack_id]['scud_survivor_female']
 
@@ -45,9 +45,9 @@ class Reproduction:
                 try:
                     survie_femelle = (sum(scud_survivor_female)/len(scud_survivor_female)) / scud_quantity
                 except ZeroDivisionError:
-                    print(f"Point de mesure: {mp_fusion} --> Erreur de calcul de survie femelle, quantité de gamares dans la cage inconnu")
+                    print(f"Point de mesure: {mp} --> Erreur de calcul de survie femelle, quantité de gamares dans la cage inconnu")
                     continue
-                dict_survie_femelle[mp_fusion] = survie_femelle*100
+                dict_survie_femelle[mp] = survie_femelle*100
 
         return dict_survie_femelle
 

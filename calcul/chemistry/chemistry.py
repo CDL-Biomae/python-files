@@ -109,14 +109,14 @@ def get_unit(sandre_list):
     return result
 
 
-def result_by_packs_and_sandre(dict_pack_fusion, sandre_list=None):
+def result_by_packs_and_sandre(dict_pack, sandre_list=None):
     pack_dict = {}
-    for element in dict_pack_fusion:
+    for element in dict_pack:
         try:
-            pack_dict[dict_pack_fusion[element]['chemistry']] = element
+            pack_dict[dict_pack[element]['chemistry']] = element
         except KeyError:
             None
-    result = {element: None for element in dict_pack_fusion}
+    result = {element: None for element in dict_pack}
     if not sandre_list:
 
         sandre_list = QueryScript(

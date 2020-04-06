@@ -117,7 +117,10 @@ def run(cas, xl_path):
 
     ## Cas 1: Création et remplissage de la base de données
     if cas == 1:
+      
+        print("--> reference table")
         fill_reference_tables(1, xl_path)
+        print("--> reference table ready")
 
     ## Cas 2: Mise à jour de la dernière version connue
     if cas == 2:
@@ -125,6 +128,8 @@ def run(cas, xl_path):
 
     ## Cas 3: Ajout d'une nouvelle version
     if cas == 3:
+        print("--> reference table")
         fill_reference_tables(3, xl_path)
+        print("--> reference table ready")
 
 

@@ -7,19 +7,19 @@ class Neurotoxicity:
     Elle prend un dictionnaire de point de mesures de fusion et renvoie le même complété par les résultats.
     '''
     @staticmethod
-    def neurotoxicity(dict_pack_fusion):
+    def neurotoxicity(dict_pack):
 
         constant_AChE = QueryScript(
             f" SELECT value   FROM {env.DATABASE_TREATED}.r2_constant WHERE name LIKE 'Constante ache%' AND version=  {env.LATEST_VERSION()}").execute()
 
         pack_dict = {}
-        for element in dict_pack_fusion:
+        for element in dict_pack:
             try:
-                pack_dict[dict_pack_fusion[element]['neurology']] = element
+                pack_dict[dict_pack[element]['neurology']] = element
             except KeyError:
                 None
         output =  QueryScript(f"  SELECT pack_id, ache, weight   FROM {env.DATABASE_RAW}.Cage WHERE pack_id IN {tuple([element for element in pack_dict])}").execute()
-        result = {element:None for element in dict_pack_fusion}
+        result = {element:None for element in dict_pack}
 
         pack_checked = None
         for cage in output:
