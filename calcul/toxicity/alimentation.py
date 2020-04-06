@@ -20,17 +20,17 @@ class Alimentation:
         result = {element:None for element in dict_pack}
         pack_checked = None
         current_quantity = None
-        for cage in survivor_list:
-            if pack_checked != cage[0]:
+        for pack_id, scud_survivor, scud_quantity, replicate in survivor_list:
+            if pack_checked != pack_id:
                 if pack_checked:
                     result[pack_dict[pack_checked]]['average'] = sum([(result[pack_dict[pack_checked]]['replicate'][replicate]*2-current_quantity)/current_quantity*100 for replicate in result[pack_dict[pack_checked]]['replicate']])/len([replicate for replicate in result[pack_dict[pack_checked]]['replicate'] if replicate])
-                pack_checked = cage[0]
+                pack_checked = pack_id
                 current_quantity = None
-                if cage[2]:
-                    current_quantity = cage[2]
-                    result[pack_dict[pack_checked]] = {'replicate': {cage[3]: (cage[1]+current_quantity)/2}}
+                if scud_quantity:
+                    current_quantity = scud_quantity
+                    result[pack_dict[pack_checked]] = {'replicate': {replicate: (scud_survivor+current_quantity)/2}}
             else:
-                result[pack_dict[pack_checked]]['replicate'][cage[3]] = (cage[1]+current_quantity)/2
+                result[pack_dict[pack_checked]]['replicate'][replicate] = (scud_survivor+current_quantity)/2
 
         return result
 
@@ -51,35 +51,35 @@ class Alimentation:
         ratio = None
         current_specimen_sample = []
         is_in_mm = False
-        for size in specimen_size_data:
-            if pack_checked != size[0]:
+        for pack_id, individual, size_px, size_mm in specimen_size_data:
+            if pack_checked != pack_id:
                 if pack_checked and ratio:
                     specimen_size[pack_dict[pack_checked]] = [element*ratio for element in current_specimen_sample]
                 elif pack_checked and is_in_mm:
                     specimen_size[pack_dict[pack_checked]] = [element for element in current_specimen_sample]
-                pack_checked = size[0]
+                pack_checked = pack_id
                 ratio = None
                 is_in_mm = False
                 current_specimen_sample = []
-                if size[1] == '0' and size[2]:
-                    ratio = size[3]/size[2]
+                if individual == '0' and size_px:
+                    ratio = size_mm/size_px
                 else:
-                    if size[3] and size[3] != 0:
+                    if size_mm and size_mm != 0:
                         is_in_mm = True
-                        current_specimen_sample = [size[3]]
+                        current_specimen_sample = [size_mm]
                     else:
-                        current_specimen_sample = [size[2]]
+                        current_specimen_sample = [size_px]
 
             else:
 
-                if size[1] == '0' and size[2]:
-                    ratio = size[3]/size[2]
+                if individual == '0' and size_px:
+                    ratio = size_mm/size_px
                 else:
-                    if size[3] and size[3] != 0 and not ratio:
+                    if size_mm and size_mm != 0 and not ratio:
                         is_in_mm = True
-                        current_specimen_sample.append(size[3])
+                        current_specimen_sample.append(size_mm)
                     else:
-                        current_specimen_sample.append(size[2])
+                        current_specimen_sample.append(size_px)
         ############################################
 
         ############### Calcul des tailles feuilles ingérées
@@ -93,16 +93,16 @@ class Alimentation:
         remaining_leaves_data =  QueryScript(f"  SELECT pack_id, replicate, value   FROM {env.DATABASE_RAW}.MeasureLeaf WHERE pack_id IN {tuple([element for element in pack_dict])}").execute()
         remaining_leaves = {element:None for element in dict_pack}
         pack_checked = None
-        for leaf in remaining_leaves_data:
-            pack_checked = leaf[0]
+        for pack_id, replicate, value in remaining_leaves_data:
+            pack_checked = pack_id
             if remaining_leaves[pack_dict[pack_checked]]:
-                if leaf[1] in remaining_leaves[pack_dict[pack_checked]]:
-                    remaining_leaves[pack_dict[pack_checked]][leaf[1]] += leaf[2]
+                if replicate in remaining_leaves[pack_dict[pack_checked]]:
+                    remaining_leaves[pack_dict[pack_checked]][replicate] += value
                 else:
-                    remaining_leaves[pack_dict[pack_checked]][leaf[1]] = leaf[2]
+                    remaining_leaves[pack_dict[pack_checked]][replicate] = value
 
             else:
-                remaining_leaves[pack_dict[pack_checked]]= {leaf[1]:leaf[2]}
+                remaining_leaves[pack_dict[pack_checked]]= {replicate:value}
 
         ##### Conversion pixel restants -> mm2 consommées par individu par jour
         survivor = Alimentation.survie_alim(dict_pack)
@@ -122,22 +122,22 @@ class Alimentation:
             f" SELECT value   FROM {env.DATABASE_TREATED}.r2_constant WHERE name LIKE 'Constante alim%'").execute()
         average_temperature = {element:None for element in dict_pack}
         average_temperature_output = QueryScript(f" SELECT measurepoint_id, sensor1_average   FROM {env.DATABASE_TREATED}.average_temperature WHERE measurepoint_id IN {tuple(dict_pack)} AND version=  {env.LATEST_VERSION()}").execute()
-        for element in average_temperature_output:
-            average_temperature[element[0]] = element[1]
-        for element in dict_pack:
+        for measurepoint_id, sensor1_average in average_temperature_output:
+            average_temperature[measurepoint_id] = sensor1_average
+        for measurepoint_id in dict_pack:
             mean_size = None
-            if specimen_size[element]:
+            if specimen_size[measurepoint_id]:
 
-                mean_size = sum([specimen if specimen else 0 for specimen in specimen_size[element]])/len([specimen if specimen else 0 for specimen in specimen_size[element]])
-                if average_temperature[element]:
-                    expected_eaten_value = constant_alim[0] * average_temperature[element] + constant_alim[1] + constant_alim[2] * ( mean_size - constant_alim[3])
-                    if eaten_leaves[element]:
-                        inhibition_list = [(eaten_leaves[element][replicate] - expected_eaten_value) /expected_eaten_value if eaten_leaves[element][replicate] != None else None for replicate in eaten_leaves[element]]
+                mean_size = sum([specimen if specimen else 0 for specimen in specimen_size[measurepoint_id]])/len([specimen if specimen else 0 for specimen in specimen_size[measurepoint_id]])
+                if average_temperature[measurepoint_id]:
+                    expected_eaten_value = constant_alim[0] * average_temperature[measurepoint_id] + constant_alim[1] + constant_alim[2] * ( mean_size - constant_alim[3])
+                    if eaten_leaves[measurepoint_id]:
+                        inhibition_list = [(eaten_leaves[measurepoint_id][replicate] - expected_eaten_value) /expected_eaten_value if eaten_leaves[measurepoint_id][replicate] != None else None for replicate in eaten_leaves[measurepoint_id]]
                         sorted_inhibition_list = []
                         for replicate in inhibition_list:
                             if replicate:
                                 sorted_inhibition_list.append(replicate)
                         if len(sorted_inhibition_list):
-                            inhibition[element] = sum(sorted_inhibition_list)/len(sorted_inhibition_list)*100
+                            inhibition[measurepoint_id] = sum(sorted_inhibition_list)/len(sorted_inhibition_list)*100
 
         return inhibition

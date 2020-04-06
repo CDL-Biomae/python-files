@@ -34,10 +34,12 @@ class Reprotoxicity:
 
         dict_dates_debut_fin = {}  # {mp: [date_debut, date_fin]}
         for mp in list_mp_repro:
-            idx_debut = output_mp_debut.index(mp)
-            idx_fin = output_mp_fin.index(mp)
-            dict_dates_debut_fin[mp] = [output_dates_debut[idx_debut][1], output_dates_fin[idx_fin][1]]
-
+            try : 
+                idx_debut = output_mp_debut.index(mp)
+                idx_fin = output_mp_fin.index(mp)
+                dict_dates_debut_fin[mp] = [output_dates_debut[idx_debut][1], output_dates_fin[idx_fin][1]]
+            except ValueError:
+                dict_dates_debut_fin[mp] = [None, None]
         # Initialisation du dictionnaire de sortie
         dict_nbr_days_exposition = {mp: None for mp in dict_pack}  # {mp: nbrdays}
 

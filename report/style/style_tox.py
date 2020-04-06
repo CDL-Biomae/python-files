@@ -3,7 +3,7 @@ from openpyxl import load_workbook
 from openpyxl.utils.cell import get_column_letter
 from termcolor import colored
 from tools import QueryScript
-from database import get_dict_pack_fusion
+from database import get_dict_pack
 from calcul.toxicity.reprotoxicity import Reprotoxicity
 
 import env
@@ -237,17 +237,17 @@ def add_style_tox(tox_dataframe, filename, folder_PATH):
 
 
     # MAKE STYLE OF molting_cycle get all result of conforme or not of molting_cycle
-    pack_fusion = get_dict_pack_fusion()
-    confrm_mue  = Reprotoxicity.conform_resultat_mue(pack_fusion)
+    pack = get_dict_pack()
+    confrm_mue  = Reprotoxicity.conform_resultat_mue(pack)
 
     # get all conform surface_retard 
-    b =Reprotoxicity.number_female_concerned_area(pack_fusion)
-    c =Reprotoxicity.fecundity(pack_fusion)
+    b =Reprotoxicity.number_female_concerned_area(pack)
+    c =Reprotoxicity.fecundity(pack)
 
-    dict_conform_surface_retard = Reprotoxicity.conform_surface_retard(pack_fusion,b[0],b[1],c)[0]
+    dict_conform_surface_retard = Reprotoxicity.conform_surface_retard(pack,b[0],b[1],c)[0]
     # colorer les cycle de mue et la Perturbation endocrinienne
     for row in range(5, nb_rows+5): 
-          pack = pack_fusion.get(ws["S" + str(row)].value)
+          pack = pack.get(ws["S" + str(row)].value)
           if "reproduction" in pack:  
                 repro_pack = pack.get("reproduction")
 

@@ -4,12 +4,12 @@ from tools import QueryScript
 import env
 
 ## CREATE DATAFRAME ##
-def create_dataframe(dick_pack_fusion):
+def create_dataframe(dict_pack):
     '''
     Créé une dataframe à partir d'un référence de campagne.
     Les colonnes de la dataframe sont les sandres dont les seuils 7j sont non nuls dans r3 (table reference)
     Les colonnes vides sont supprimées
-    :param dict_pack_fusion:
+    :param dict_pack:
     :return: dataframe:
     '''
     elements_metal = QueryScript(f" SELECT sandre   FROM {env.DATABASE_TREATED}.r3 WHERE version=  {env.CHOSEN_VERSION()} AND 7j_threshold IS NOT NULL AND familly='Métaux'").execute()
@@ -23,8 +23,8 @@ def create_dataframe(dick_pack_fusion):
     
     matrix = []
 
-    data = chemistry.result_by_packs_and_sandre(dick_pack_fusion)
-    for mp in dick_pack_fusion:
+    data = chemistry.result_by_packs_and_sandre(dict_pack)
+    for mp in dict_pack:
         if data[mp]:
             matrix.append([''] + [data[mp][sandre] if data[mp][sandre] !='0.0' else 'ND' for sandre in elements_metal ]+[''] + [data[mp][sandre] if data[mp][sandre] !='0.0' else 'ND' for sandre in elements_PCB ]+[''] + [data[mp][sandre] if data[mp][sandre] !='0.0' else 'ND' for sandre in elements_HAP ]+[''] + [data[mp][sandre] if data[mp][sandre] !='0.0' else 'ND' for sandre in elements_others ] + [mp])
         else :
@@ -38,7 +38,7 @@ def create_dataframe(dick_pack_fusion):
 
     return df
 
-def create_empty_dataframe(dick_pack_fusion):
+def create_empty_dataframe(dict_pack):
     elements_metal = QueryScript(f" SELECT sandre   FROM {env.DATABASE_TREATED}.r3 WHERE version=  {env.CHOSEN_VERSION()} AND 7j_threshold IS NOT NULL AND familly='Métaux'").execute()
     elements_metal = [int(float(element)) for element in elements_metal]
     elements_PCB = QueryScript(f" SELECT sandre   FROM {env.DATABASE_TREATED}.r3 WHERE version=  {env.CHOSEN_VERSION()} AND 7j_threshold IS NOT NULL AND familly LIKE 'PCB%'").execute()
@@ -50,8 +50,8 @@ def create_empty_dataframe(dick_pack_fusion):
     
     matrix = []
 
-    data = chemistry.result_by_packs_and_sandre(dick_pack_fusion)
-    for mp in dick_pack_fusion:
+    data = chemistry.result_by_packs_and_sandre(dict_pack)
+    for mp in dict_pack:
         if data[mp]:
             matrix.append([''] + ['' for sandre in elements_metal ]+[''] + ['' for sandre in elements_PCB ]+[''] + ['' for sandre in elements_HAP ]+[''] + ['' for sandre in elements_others ] + [mp])
         else :
@@ -66,18 +66,18 @@ def create_empty_dataframe(dick_pack_fusion):
 
 
 ## MAIN FUNCTION ##
-def create_bbac_7j_dataframe(head_dataframe, dick_pack_fusion):
+def create_bbac_7j_dataframe(head_dataframe, dict_pack):
     
-    df_values = create_dataframe(dick_pack_fusion)
+    df_values = create_dataframe(dict_pack)
     head_dataframe = head_dataframe.reset_index(drop=True)
     df_concat = pd.concat([head_dataframe, df_values], axis=1)
     df_campaigns = df_concat.sort_values(['Numéro', 'Campagne'])
 
     return df_campaigns
 
-def create_bbac2_7j_dataframe(head_dataframe, dick_pack_fusion):
+def create_bbac2_7j_dataframe(head_dataframe, dict_pack):
     head_dataframe = head_dataframe.reset_index(drop=True)
-    df_values = create_empty_dataframe(dick_pack_fusion)
+    df_values = create_empty_dataframe(dict_pack)
     df_concat = pd.concat([head_dataframe, df_values], axis=1)
     df_campaigns = df_concat.sort_values(['Numéro', 'Campagne'])
 

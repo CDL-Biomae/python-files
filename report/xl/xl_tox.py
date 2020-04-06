@@ -18,14 +18,14 @@ def create_dataframe(list_mp):
     else:
         query_tuple_mp = f"({list_mp[0]})"
     output = QueryScript(
-        f" SELECT measurepoint_fusion_id, round(male_survival_7_days), round(alimentation, 1), round(neurotoxicity, 1), round(female_survivor), number_days_exposition, number_female_concerned, round(percent_inhibition_fecondite, 1), number_female_analysis, molting_cycle,number_female_concerned_area,endocrine_disruption,measurepoint_fusion_id FROM {env.DATABASE_TREATED}.toxtable WHERE version=  {env.CHOSEN_VERSION()} AND measurepoint_fusion_id IN {query_tuple_mp};"
+        f" SELECT measurepoint_id, round(male_survival_7_days), round(alimentation, 1), round(neurotoxicity, 1), round(female_survivor), number_days_exposition, number_female_concerned, round(percent_inhibition_fecondite, 1), number_female_analysis, molting_cycle,number_female_concerned_area,endocrine_disruption,measurepoint_id FROM {env.DATABASE_TREATED}.toxtable WHERE version=  {env.CHOSEN_VERSION()} AND measurepoint_id IN {query_tuple_mp};"
     ).execute()
 
     dict_output = list_to_dict(output)
 
-    for mp_fusion in list_mp:
+    for mp in list_mp:
         try:
-            data = dict_output[mp_fusion]
+            data = dict_output[mp]
         except KeyError:
             data = [None]*11
             matrix.append([''] + data[:3] + [''] + data[3:])

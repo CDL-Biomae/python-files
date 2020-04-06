@@ -1,5 +1,5 @@
 from report import *
-from database import get_dict_pack_fusion
+from database import get_dict_pack
 import pandas as pd
 from termcolor import colored
 from openpyxl import load_workbook
@@ -59,14 +59,14 @@ def write_in_existing_excel(dataframe, filename, folder_PATH, sheet, startcol=1,
     print(f"L'onglet \"{sheet}\" a été créé dans le fichier \"{filename}\"")
 
 
-def measure_points_fusion(campaign_ref):
+def measure_points(campaign_ref):
     '''
     Renvoie la liste de points de mesures (ou leur fusion s'il y en a eu) associés à une référence de campagne
     :param campaign_ref:
     :return: une liste de points de mesures
     '''
     output = QueryScript(
-        f" SELECT DISTINCT(measurepoint_fusion_id)   FROM {env.DATABASE_TREATED}.key_dates WHERE measurepoint_id IN (  SELECT id   FROM {env.DATABASE_RAW}.Measurepoint WHERE reference LIKE '{campaign_ref}%' and version=  {env.CHOSEN_VERSION()});"
+        f" SELECT DISTINCT(measurepoint_id)   FROM {env.DATABASE_TREATED}.key_dates WHERE measurepoint_id IN (  SELECT id   FROM {env.DATABASE_RAW}.Measurepoint WHERE reference LIKE '{campaign_ref}%' and version=  {env.CHOSEN_VERSION()});"
     )
     return output.execute()
 
@@ -95,26 +95,26 @@ def create_dict_mp2(list_campaigns):
 
 def create_dict_mp(list_campaigns):
     '''
-    Créé un dictionnaire avec comme clé une référence de campagne et comme valeur mesure_points_fusion(campaign_ref)
+    Créé un dictionnaire avec comme clé une référence de campagne et comme valeur mesure_points(campaign_ref)
     :param list_campaigns:
     :return: dictionnaire: {'campagne_ref': [mp, ...], ...}
     '''
     dict = {}
     for c in list_campaigns:
-        list_mp = measure_points_fusion(c)
+        list_mp = measure_points(c)
         dict[c] = list_mp
     return dict
 
 def create_general_dict(list_campaigns):
     '''
-    Créé un dictionnaire dict_pack_fusion (cf tox_table_filler dans le dossier database) à partir d'une list de
+    Créé un dictionnaire dict_pack (cf tox_table_filler dans le dossier database) à partir d'une list de
     référence de campagnes
     :param list_campaigns:
-    :return: dictionnaire de type dict_pack_fusion
+    :return: dictionnaire de type dict_pack
     '''
     result = {}
     for campaign in list_campaigns:
-        result.update(get_dict_pack_fusion(campaign))
+        result.update(get_dict_pack(campaign))
     return result
 
 ## MAIN FUNCTION ##
@@ -147,12 +147,12 @@ def excel_main(list_campaigns, folder_PATH = "output"):
     write_in_existing_excel(stations_dataframe, filename, folder_PATH, 'Stations')
     add_style_stations(stations_dataframe, filename, folder_PATH)
 
-    # ## CREATION DE L'ONGLET CAMPAGNES ##
+    # # ## CREATION DE L'ONGLET CAMPAGNES ##
 
-    print('\n[!] Création de l\'onglet \"Campagnes\"...')
-    campagnes_dataframe = create_campagnes_dataframe(head_dataframe, list_campaigns, dict_mp)
-    write_in_existing_excel(campagnes_dataframe, filename, folder_PATH, 'Campagnes')
-    add_style_campagnes(campagnes_dataframe, filename, folder_PATH)
+    # print('\n[!] Création de l\'onglet \"Campagnes\"...')
+    # campagnes_dataframe = create_campagnes_dataframe(head_dataframe, list_campaigns, dict_mp)
+    # write_in_existing_excel(campagnes_dataframe, filename, folder_PATH, 'Campagnes')
+    # add_style_campagnes(campagnes_dataframe, filename, folder_PATH)
 
     # ## CREATION DE L'ONGLET SURVIE ##
 

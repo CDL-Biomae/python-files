@@ -24,7 +24,7 @@ def measure_points(campaign_ref):
     :return: list_mp: Liste de points de mesures
     '''
     output = QueryScript(
-        f"SELECT DISTINCT(measurepoint_fusion_id) FROM {env.DATABASE_TREATED}.key_dates WHERE measurepoint_id IN (SELECT id FROM {env.DATABASE_RAW}.Measurepoint WHERE reference LIKE '{campaign_ref}%') and version=  {env.CHOSEN_VERSION()};"
+        f"SELECT DISTINCT(measurepoint_id) FROM {env.DATABASE_TREATED}.key_dates WHERE measurepoint_id IN (SELECT id FROM {env.DATABASE_RAW}.Measurepoint WHERE reference LIKE '{campaign_ref}%') and version=  {env.CHOSEN_VERSION()};"
     ).execute()
     if len(output) == 0:
         raise NameError('\n\n     /!\\ La référence de campagne demandée n\'existe pas dans la base de donnée /!\\')
