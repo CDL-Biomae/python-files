@@ -64,7 +64,9 @@ class QueryScript() :
         output.append(ligne[0])
       else :
         output.append(list(ligne))
-    
+    if admin :
+      connection.commit()
+
     cursor.close()
     connection.close()
     
