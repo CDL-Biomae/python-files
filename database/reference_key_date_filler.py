@@ -4,11 +4,11 @@ import env
 
 def fill_reference_date_table():
     '''Fonction remplissant la table de référence des dates, celle-ci ne sert pas mais permet de "traduire" lorsque l'on fait un appel à la date key_dates '''
-    QueryScript("DROP TABLE IF EXISTS reference_date").execute()
+    QueryScript("DROP TABLE IF EXISTS reference_key_date").execute(admin=True)
     reference_date_table = QueryScript(
-        f"CREATE TABLE reference_date (id INT AUTO_INCREMENT PRIMARY KEY, name VARCHAR(255), step INT(11), barrel VARCHAR(255), version INT);")
+        f"CREATE TABLE reference_key_date (id INT AUTO_INCREMENT PRIMARY KEY, name VARCHAR(255), step INT(11), barrel VARCHAR(255), version INT);")
     reference_date_table.execute(admin=True)
-    SQL_request = f" INSERT INTO reference_date (name, step, barrel, version) VALUES (%s, %s, %s, %s)"
+    SQL_request = f" INSERT INTO reference_key_date (name, step, barrel, version) VALUES (%s, %s, %s, %s)"
     values = [("Transplantation Alimentation", 50, "R0"),
               ("Recuperation Alimentation", 60, "R7"),
               ("Lancement reprotoxicite", 20, None),
