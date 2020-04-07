@@ -93,7 +93,7 @@ class QueryScript() :
       cursor.executemany(query, self.rows)
       connection.commit()
       
-      print(cursor.rowcount, "was inserted.")
+      print(cursor.rowcount, "row(s) inserted.")
 
     except mysql.connector.Error as err:
       if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
