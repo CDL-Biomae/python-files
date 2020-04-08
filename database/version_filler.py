@@ -3,7 +3,7 @@ from datetime import datetime
 import env
 
 def create_version_table():
-    QueryScript("DROP TABLE IF EXISTS version").execute()
+    QueryScript("DROP TABLE IF EXISTS version").execute(admin=True)
     QueryScript(f"CREATE TABLE version (id INT AUTO_INCREMENT PRIMARY KEY, date VARCHAR(255), comment VARCHAR(255))").execute(admin=True)
     
 def create_new_version(date=None, comment=None):
@@ -26,7 +26,7 @@ def run(cas, date, comment):
     ## Cas 1: Création et remplissage de la base de données
     if cas == 1:
         create_version_table()
-        create_new_version(date=datetime.now())
+        create_new_version(date=datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
 
     ## Cas 2: Mise à jour de la dernière version connue
     if cas == 2:
@@ -34,4 +34,4 @@ def run(cas, date, comment):
 
     ## Cas 3: Ajout d'une nouvelle version
     if cas == 3:
-        create_new_version(date, comment)
+        create_new_version(date=datetime.now().strftime("%Y-%m-%d %H:%M:%S"), comment=comment)

@@ -6,7 +6,7 @@ def run(cas, xl_path=None, date=None, comment=None):
     reference_filler.run(cas, xl_path)
 
     reference_key_date_filler.run(cas)
-    key_date_filler.run()
+    key_date_filler.run(cas)
 
     temperatures = average_temperature_filler.run(cas)
     temperature_repro_filler.run(cas, temperatures)

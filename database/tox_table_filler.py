@@ -158,10 +158,10 @@ def run(cas):
     ## Cas 1: Création et remplissage de la base de données
     if cas == 1:
         # Création d'un table vide si elle n'existe pas
-        QueryScript(f'DROP TABLE IF EXISTS {env.DATABASE_TREATED}.toxtable').execute()
+        QueryScript(f'DROP TABLE IF EXISTS {env.DATABASE_TREATED}.toxtable').execute(admin=True)
         create_table = QueryScript(
             f"CREATE TABLE IF NOT EXISTS {env.DATABASE_TREATED}.toxtable (id INT AUTO_INCREMENT PRIMARY KEY, measurepoint_id INT, male_survival_7_days varchar(255), alimentation varchar(255), neurotoxicity varchar(255), female_survivor varchar(255), number_days_exposition varchar(255), number_female_concerned varchar(255),percent_inhibition_fecondite varchar(255),number_female_analysis varchar(255),molting_cycle varchar(255), number_female_concerned_area varchar(255), endocrine_disruption varchar(255), version int);"
-        ).execute()
+        ).execute(admin=True)
 
         fill_table = QueryScript(
             f"INSERT INTO {env.DATABASE_TREATED}.toxtable (measurepoint_id, male_survival_7_days, alimentation, neurotoxicity, female_survivor, number_days_exposition, number_female_concerned, percent_inhibition_fecondite, number_female_analysis, molting_cycle, number_female_concerned_area, endocrine_disruption, version) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s,%s, %s, %s)"
@@ -172,9 +172,6 @@ def run(cas):
     ## Cas 2: Mise à jour de la dernière version connue
     if cas == 2:
         QueryScript(f"DELETE FROM {env.DATABASE_TREATED}.toxtable WHERE version = {env.LATEST_VERSION()};").execute(admin=True)
-        QueryScript(
-            f" CREATE TABLE IF NOT EXISTS {env.DATABASE_TREATED}.toxtable (id INT AUTO_INCREMENT PRIMARY KEY, measurepoint_id INT, male_survival_7_days varchar(255), alimentation varchar(255), neurotoxicity varchar(255), female_survivor varchar(255), number_days_exposition varchar(255), number_female_concerned varchar(255),percent_inhibition_fecondite varchar(255),number_female_analysis varchar(255),molting_cycle varchar(255), number_female_concerned_area varchar(255), endocrine_disruption varchar(255), version int)"
-        ).execute()
         fill_table = QueryScript(
             f"INSERT INTO {env.DATABASE_TREATED}.toxtable (measurepoint_id, male_survival_7_days, alimentation, neurotoxicity, female_survivor, number_days_exposition, number_female_concerned, percent_inhibition_fecondite, number_female_analysis, molting_cycle, number_female_concerned_area, endocrine_disruption, version) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s,%s, %s, %s)"
         )

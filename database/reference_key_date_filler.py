@@ -40,4 +40,6 @@ def run(cas):
 
     # Cas 3: Ajout d'une nouvelle version
     if cas == 3:
-        pass  # Les références des dates clées ne change pas quand on ajoute une nouvelle version
+        print("--> reference_key_dates table")
+        fill_reference_date_table()
+        print("--> reference_key_dates table ready")

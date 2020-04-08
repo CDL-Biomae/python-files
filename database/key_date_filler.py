@@ -54,9 +54,12 @@ def intersection(liste1, liste2):
     return liste3
 
 
-def insert_key_dates():
-    QueryScript(f"DROP TABLE IF EXISTS key_dates").execute(admin=True)
-    QueryScript(f'CREATE TABLE key_dates (id INT AUTO_INCREMENT PRIMARY KEY, measurepoint_id INT, date_id INT, date DATETIME, version INT)').execute(admin=True)
+def insert_key_dates(cas):
+    if cas==1:
+        QueryScript(f"DROP TABLE IF EXISTS key_dates").execute(admin=True)
+        QueryScript(f'CREATE TABLE key_dates (id INT AUTO_INCREMENT PRIMARY KEY, measurepoint_id INT, date_id INT, date DATETIME, version INT)').execute(admin=True)
+    if cas==2:
+        QueryScript(f"DELETE FROM {env.DATABASE_TREATED}.temperature_repro WHERE version = {env.LATEST_VERSION()}").execute(admin=True)
     insertion = QueryScript(f" INSERT INTO key_dates (measurepoint_id, date_id, date, version) VALUES (%s, %s, %s, %s)")
     values = []
     global_dict = create_global_dict()
@@ -72,7 +75,7 @@ def insert_key_dates():
     insertion.setRows(values)
     insertion.executemany()    
 
-def run():
+def run(cas):
     print("--> key_dates table")
-    insert_key_dates()
+    insert_key_dates(cas)
     print("--> key_dates table ready")

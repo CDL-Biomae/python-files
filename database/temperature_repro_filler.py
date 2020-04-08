@@ -5,7 +5,7 @@ import env
 def fill_temperature_repro(cas, temperatures):
     ## Cas 1: Création et remplissage de la base de données
     if cas == 1:
-        QueryScript(f'DROP TABLE IF EXISTS {env.DATABASE_TREATED}.temperature_repro').execute()
+        QueryScript(f'DROP TABLE IF EXISTS {env.DATABASE_TREATED}.temperature_repro').execute(admin=True)
         temperature_repro_table = QueryScript(
             f"CREATE TABLE {env.DATABASE_TREATED}.temperature_repro (id INT AUTO_INCREMENT PRIMARY KEY, measurepoint_id INT(11), av_cycle_BCD1 DOUBLE, expected_C2 DOUBLE, expected_D1 DOUBLE, expected_D2 DOUBLE, av_cycle_1234 DOUBLE, expected_st3 DOUBLE, expected_st4 DOUBLE, expected_st5 DOUBLE, version INT );")
         temperature_repro_table.execute(admin=True)
