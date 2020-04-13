@@ -31,15 +31,13 @@ def create_physicochimie_dataframe(head_dataframe, measurepoint_list, campaigns_
                 for mp_id, recordedAt, conductivity,ph, oxygen in context_data:
                     if measurepoint_id==mp_id:
                         for day, J in enumerate(J_dict[place_id]):
-                            if day<5 and J_dict[place_id][J]["full_date"] and recordedAt :
-                                delta = recordedAt-J_dict[place_id][J]["full_date"] if recordedAt> J_dict[place_id][J]["full_date"] else J_dict[place_id][J]["full_date"]-recordedAt
-                                if delta.days == 0 and delta.seconds<=3600*10:
-                                    if conductivity:
-                                        temp[4+day] = conductivity
-                                    if ph:
-                                        temp[9+day] = ph
-                                    if oxygen:
-                                        temp[14+day] = oxygen
+                            if day<5 and J_dict[place_id][J]["full_date"]==recordedAt :
+                                if conductivity:
+                                    temp[4+day] = conductivity
+                                if ph:
+                                    temp[9+day] = ph
+                                if oxygen:
+                                    temp[14+day] = oxygen
             matrix.append(temp)
         global_matrix.append(matrix)
                 

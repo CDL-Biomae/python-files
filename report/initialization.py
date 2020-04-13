@@ -294,7 +294,7 @@ def initialize_lists(campaigns_dict):
             ###################################
             # Détermination du J0 et du JN
             for measurepoint_number, _ in enumerate(place_dates):
-                for index in [0,2,5]:
+                for index in [0,5]:
                     if place_dates[measurepoint_number][index]:
                         if not J0 :
                             J0 = place_dates[measurepoint_number][index]
