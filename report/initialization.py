@@ -115,7 +115,6 @@ def create_head_special_dataframe(campaigns_dict, chemistry_measurepoint_list, c
 def create_campaigns_dict(references):
     campaigns_dict = {}
     place_list = []
-    print(references[0])
     references_tuple = tuple(references) if len(references)>1  else "('"+references[0]+"')"
     data = QueryScript(f"SELECT Campaign.id, substring(Campaign.reference,-2,2), Place.id, Place.name, substring(Place.reference,-2,2), Measurepoint.id, Pack.id, Pack.nature, substring(Measurepoint.reference, -2, 2), Measurepoint.name FROM {env.DATABASE_RAW}.Place JOIN {env.DATABASE_RAW}.Campaign ON Campaign.id=Place.campaign_id JOIN {env.DATABASE_RAW}.Measurepoint ON Measurepoint.place_id=Place.id JOIN {env.DATABASE_RAW}.Pack ON Measurepoint.id=Pack.measurepoint_id WHERE Campaign.reference IN {references_tuple}").execute()
     for campaign_id, campaign_number, place_id, place_name, place_number, measurepoint_id, pack_id, pack_nature, measurepoint_number, measurepoint_name  in data :
