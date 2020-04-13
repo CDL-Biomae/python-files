@@ -1,6 +1,6 @@
 from report.xl import *
 from report.style import *
-from report.initialization import create_campaigns_dict, initialize_lists, create_head_dataframe, create_head_special_dataframe
+from report.initialization import create_campaigns_dict, initialize, create_head_dataframe, create_head_special_dataframe
 from calcul import chemistry
 import pandas as pd
 from termcolor import colored
@@ -74,10 +74,9 @@ def excel_main(list_campaigns, folder_PATH = "output"):
     filename = create_filename(list_campaigns)
     print('[+] Starting initialisation...')
     
-    campaigns_dict = create_campaigns_dict(references=list_campaigns)
-    campaigns_dict, measurepoint_list, chemistry_measurepoint_list, chemistry_pack_list, chemistry_7j_measurepoint_list, chemistry_21j_measurepoint_list, tox_measurepoint_list, agency_code_list, J_dict = initialize_lists(campaigns_dict)
+    campaigns_dict, measurepoint_list, chemistry_measurepoint_list, chemistry_pack_list, chemistry_7j_measurepoint_list, chemistry_21j_measurepoint_list, tox_measurepoint_list, agency_code_list, J_dict = initialize(list_campaigns)
     head_dataframe, head_filtered_dataframe, place_list = create_head_dataframe(campaigns_dict)
-    head_chemistry_dataframe, head_chemistry_7j_dataframe, head_chemistry_21j_dataframe, head_tox_dataframe =  create_head_special_dataframe(campaigns_dict, chemistry_measurepoint_list, chemistry_7j_measurepoint_list, chemistry_21j_measurepoint_list, tox_measurepoint_list)
+    head_chemistry_dataframe, head_chemistry_7j_dataframe, head_chemistry_21j_dataframe =  create_head_special_dataframe(campaigns_dict, chemistry_measurepoint_list, chemistry_7j_measurepoint_list, chemistry_21j_measurepoint_list, tox_measurepoint_list)
 
     # ## CREATION DE L'ONGLET VERSION ##
 

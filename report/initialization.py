@@ -38,54 +38,22 @@ def create_head_special_dataframe(campaigns_dict, chemistry_measurepoint_list, c
     list_dataframe = []
     list_dataframe_7j = []
     list_dataframe_21j = []
-    list_dataframe_tox = []
     for campaign_id in campaigns_dict:
         matrix = []
         matrix_7j = []
         matrix_21j = []
-        matrix_tox = []
         for place_id in campaigns_dict[campaign_id]["place"] :
             seperate_chemistry = []
-            seperate_tox = []
             if "duplicate" in campaigns_dict[campaign_id]["place"][place_id] :
                 if "chemistry" in campaigns_dict[campaign_id]["place"][place_id]["duplicate"] :
                     for measurepoint in campaigns_dict[campaign_id]["place"][place_id]["duplicate"]["chemistry"]:
                         if measurepoint not in seperate_chemistry:
                             seperate_chemistry.append(measurepoint)
-                if "alimentation" in campaigns_dict[campaign_id]["place"][place_id]["duplicate"] :
-                    for measurepoint in campaigns_dict[campaign_id]["place"][place_id]["duplicate"]["alimentation"]:
-                        if measurepoint not in seperate_tox:
-                            seperate_tox.append(measurepoint)
-
-                if "chemistry" in campaigns_dict[campaign_id]["place"][place_id]["duplicate"] :
-                    for measurepoint in campaigns_dict[campaign_id]["place"][place_id]["duplicate"]["chemistry"]:
-                        if measurepoint not in seperate_tox:
-                            seperate_tox.append(measurepoint)
-
-                if "neurology" in campaigns_dict[campaign_id]["place"][place_id]["duplicate"] :
-                    for measurepoint in campaigns_dict[campaign_id]["place"][place_id]["duplicate"]["neurology"]:
-                        if measurepoint not in seperate_tox:
-                            seperate_tox.append(measurepoint)
-
-                
-
 
             df_normal = None
             df_7j = None
             df_21j = None
-            df_tox = None
-            if len(seperate_tox):
-                for measurepoint_id in campaigns_dict[campaign_id]["place"][place_id]["measurepoint"]:
-                    if measurepoint_id in seperate_tox :
-                        matrix_tox.append([campaigns_dict[campaign_id]["number"], str(campaigns_dict[campaign_id]["place"][place_id]["number"])+' - '+str(campaigns_dict[campaign_id]["place"][place_id]["measurepoint"][measurepoint_id]["number"]), translate(campaigns_dict[campaign_id]["place"][place_id]["name"]), campaigns_dict[campaign_id]["place"][place_id]["agency"] if "agency" in campaigns_dict[campaign_id]["place"][place_id] else 'ND'])
-            else :
-                in_list = False
-                for measurepoint_id in campaigns_dict[campaign_id]["place"][place_id]["measurepoint"]:
-                    if measurepoint_id in tox_measurepoint_list:
-                        in_list = True
-                if in_list :
-                    matrix_tox.append([campaigns_dict[campaign_id]["number"], campaigns_dict[campaign_id]["place"][place_id]["number"], translate(campaigns_dict[campaign_id]["place"][place_id]["name"]), campaigns_dict[campaign_id]["place"][place_id]["agency"] if "agency" in campaigns_dict[campaign_id]["place"][place_id] else 'ND'])
-                
+            
             if len(seperate_chemistry):
                 for measurepoint_id in campaigns_dict[campaign_id]["place"][place_id]["measurepoint"]:
                     if measurepoint_id in seperate_chemistry :
@@ -127,10 +95,6 @@ def create_head_special_dataframe(campaigns_dict, chemistry_measurepoint_list, c
             for row in matrix_21j :
                 df_21j = pd.DataFrame([row], columns=['Campagne', 'Numéro', 'Station de mesure', 'Code Agence'])
                 list_dataframe_21j.append(df_21j)
-        if len(matrix_tox):
-            for row in matrix_tox :
-                df_tox = pd.DataFrame([row], columns=['Campagne', 'Numéro', 'Station de mesure', 'Code Agence'])
-                list_dataframe_tox.append(df_tox)
     if len(list_dataframe)>1 :
         df_concat = pd.concat(list_dataframe)
     else :
@@ -143,18 +107,15 @@ def create_head_special_dataframe(campaigns_dict, chemistry_measurepoint_list, c
         df_concat_21j = pd.concat(list_dataframe_21j)
     else :
         df_concat_21j = df_21j
-    if len(list_dataframe_tox)>1 :
-        df_concat_tox = pd.concat(list_dataframe_tox)
-    else :
-        df_concat_tox = df_tox
-    
+   
 
 
-    return df_concat, df_concat_7j, df_concat_21j, df_concat_tox
+    return df_concat, df_concat_7j, df_concat_21j
 
 def create_campaigns_dict(references):
     campaigns_dict = {}
     place_list = []
+    print(references[0])
     references_tuple = tuple(references) if len(references)>1  else "('"+references[0]+"')"
     data = QueryScript(f"SELECT Campaign.id, substring(Campaign.reference,-2,2), Place.id, Place.name, substring(Place.reference,-2,2), Measurepoint.id, Pack.id, Pack.nature, substring(Measurepoint.reference, -2, 2), Measurepoint.name FROM {env.DATABASE_RAW}.Place JOIN {env.DATABASE_RAW}.Campaign ON Campaign.id=Place.campaign_id JOIN {env.DATABASE_RAW}.Measurepoint ON Measurepoint.place_id=Place.id JOIN {env.DATABASE_RAW}.Pack ON Measurepoint.id=Pack.measurepoint_id WHERE Campaign.reference IN {references_tuple}").execute()
     for campaign_id, campaign_number, place_id, place_name, place_number, measurepoint_id, pack_id, pack_nature, measurepoint_number, measurepoint_name  in data :
@@ -193,8 +154,8 @@ def create_campaigns_dict(references):
 
     return campaigns_dict
 
-def initialize_lists(campaigns_dict):
-
+def initialize(references):
+    campaigns_dict = create_campaigns_dict(references)
     measurepoint_list = []
     chemistry_measurepoint_list = []
     chemistry_pack_list = []
@@ -264,7 +225,6 @@ def initialize_lists(campaigns_dict):
                                 if starting_date_list[second_measurepoint_checked] and starting_date_list[first_measurepoint_checked]:
                                     if abs((starting_date_list[second_measurepoint_checked]-starting_date_list[first_measurepoint_checked]).days) < 4:
                                         need_to_be_seperate= True
-                                        print(second_measurepoint_checked, first_measurepoint_checked, starting_date_list[second_measurepoint_checked], starting_date_list[first_measurepoint_checked] )
                 if "chemistry" in nature_duplicate :
                     for id_date in range(7):
                         starting_date_list = [place_dates[x][5] for x in range(number_of_measurepoints)]
@@ -289,7 +249,7 @@ def initialize_lists(campaigns_dict):
                 campaigns_dict[campaign_id]["place"].pop(place_id)
                 with open('data.json','w') as outfile :
                     json.dump(campaigns_dict, outfile)
-                return initialize_lists(campaigns_dict)
+                return initialize(campaigns_dict)
                         
             ###################################
             # Détermination du J0 et du JN
