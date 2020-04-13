@@ -153,8 +153,9 @@ def create_campaigns_dict(references):
 
     return campaigns_dict
 
-def initialize(references):
-    campaigns_dict = create_campaigns_dict(references)
+def initialize(references=None, campaigns_dict=None):
+    if not campaigns_dict:
+        campaigns_dict = create_campaigns_dict(references=references)
     measurepoint_list = []
     chemistry_measurepoint_list = []
     chemistry_pack_list = []
@@ -248,7 +249,7 @@ def initialize(references):
                 campaigns_dict[campaign_id]["place"].pop(place_id)
                 with open('data.json','w') as outfile :
                     json.dump(campaigns_dict, outfile)
-                return initialize(campaigns_dict)
+                return initialize(campaigns_dict=campaigns_dict)
                         
             ###################################
             # Détermination du J0 et du JN
