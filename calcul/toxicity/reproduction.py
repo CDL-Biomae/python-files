@@ -18,7 +18,7 @@ class Reproduction:
                 list_pack_repro.append(pack_id)
 
         output = QueryScript(
-            f"  SELECT pack_id, scud_survivor_female, scud_quantity   FROM {env.DATABASE_RAW}.Cage WHERE pack_id IN {tuple(list_pack_repro)};"
+            f"  SELECT pack_id, scud_survivor_female, scud_quantity   FROM {env.DATABASE_RAW}.Cage WHERE pack_id IN {tuple([element for element in list_pack_repro]) if len([element for element in list_pack_repro])>1 else '('+(str([element for element in list_pack_repro][0]) if len([element for element in list_pack_repro]) else '0')+')'};"
         ).execute()
 
         # Reformatage des données de la requête

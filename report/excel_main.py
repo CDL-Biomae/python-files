@@ -1,5 +1,7 @@
-from report import *
-from database import get_dict_pack
+from report.xl import *
+from report.style import *
+from report.initialization import create_campaigns_dict, initialize_lists, create_head_dataframe, create_head_special_dataframe
+from calcul import chemistry
 import pandas as pd
 from termcolor import colored
 from openpyxl import load_workbook
@@ -59,64 +61,6 @@ def write_in_existing_excel(dataframe, filename, folder_PATH, sheet, startcol=1,
     print(f"L'onglet \"{sheet}\" a été créé dans le fichier \"{filename}\"")
 
 
-def measure_points(campaign_ref):
-    '''
-    Renvoie la liste de points de mesures (ou leur fusion s'il y en a eu) associés à une référence de campagne
-    :param campaign_ref:
-    :return: une liste de points de mesures
-    '''
-    output = QueryScript(
-        f" SELECT DISTINCT(measurepoint_id)   FROM {env.DATABASE_TREATED}.key_dates WHERE measurepoint_id IN (  SELECT id   FROM {env.DATABASE_RAW}.Measurepoint WHERE reference LIKE '{campaign_ref}%' and version=  {env.CHOSEN_VERSION()});"
-    )
-    return output.execute()
-
-def all_measure_points(campaign_ref):
-    '''
-    Renvoie la liste de points de mesures associés à une référence sans prendre en compte la fusion
-    :param campaign_ref:
-    :return: une liste de points de mesures
-    '''
-    output = QueryScript(
-        f"  SELECT id   FROM {env.DATABASE_RAW}.Measurepoint WHERE reference LIKE '{campaign_ref}%';"
-    )
-    return output.execute()
-
-def create_dict_mp2(list_campaigns):
-    '''
-    Créé un dictionnaire avec comme clé une référence de campagne et comme valeur all_mesure_points(campaign_ref)
-    :param list_campaigns:
-    :return: dictionnaire: {'campagne_ref': [mp, ...], ...}
-    '''
-    dict = {}
-    for c in list_campaigns:
-        list_mp = all_measure_points(c)
-        dict[c] = list_mp
-    return dict
-
-def create_dict_mp(list_campaigns):
-    '''
-    Créé un dictionnaire avec comme clé une référence de campagne et comme valeur mesure_points(campaign_ref)
-    :param list_campaigns:
-    :return: dictionnaire: {'campagne_ref': [mp, ...], ...}
-    '''
-    dict = {}
-    for c in list_campaigns:
-        list_mp = measure_points(c)
-        dict[c] = list_mp
-    return dict
-
-def create_general_dict(list_campaigns):
-    '''
-    Créé un dictionnaire dict_pack (cf tox_table_filler dans le dossier database) à partir d'une list de
-    référence de campagnes
-    :param list_campaigns:
-    :return: dictionnaire de type dict_pack
-    '''
-    result = {}
-    for campaign in list_campaigns:
-        result.update(get_dict_pack(campaign))
-    return result
-
 ## MAIN FUNCTION ##
 
 
@@ -129,9 +73,11 @@ def excel_main(list_campaigns, folder_PATH = "output"):
     '''
     filename = create_filename(list_campaigns)
     print('[+] Starting initialisation...')
-    head_dataframe = create_head_dataframe(list_campaigns)
-    dict_mp = create_dict_mp(list_campaigns)
-
+    
+    campaigns_dict = create_campaigns_dict(references=list_campaigns)
+    campaigns_dict, measurepoint_list, chemistry_measurepoint_list, chemistry_pack_list, chemistry_7j_measurepoint_list, chemistry_21j_measurepoint_list, tox_measurepoint_list, agency_code_list, J_dict = initialize_lists(campaigns_dict)
+    head_dataframe, head_filtered_dataframe, place_list = create_head_dataframe(campaigns_dict)
+    head_chemistry_dataframe, head_chemistry_7j_dataframe, head_chemistry_21j_dataframe, head_tox_dataframe =  create_head_special_dataframe(campaigns_dict, chemistry_measurepoint_list, chemistry_7j_measurepoint_list, chemistry_21j_measurepoint_list, tox_measurepoint_list)
 
     # ## CREATION DE L'ONGLET VERSION ##
 
@@ -143,85 +89,81 @@ def excel_main(list_campaigns, folder_PATH = "output"):
     ## CREATION DE L'ONGLET STATIONS ##
 
     print('\n[!] Création de l\'onglet \"Stations\"...')
-    stations_dataframe = create_stations_dataframe(head_dataframe, list_campaigns, dict_mp)
+    stations_dataframe = create_stations_dataframe(head_filtered_dataframe, campaigns_dict, measurepoint_list, agency_code_list, place_list)
     write_in_existing_excel(stations_dataframe, filename, folder_PATH, 'Stations')
     add_style_stations(stations_dataframe, filename, folder_PATH)
 
-    # # ## CREATION DE L'ONGLET CAMPAGNES ##
+    ## CREATION DE L'ONGLET CAMPAGNES ##
 
-    # print('\n[!] Création de l\'onglet \"Campagnes\"...')
-    # campagnes_dataframe = create_campagnes_dataframe(head_dataframe, list_campaigns, dict_mp)
-    # write_in_existing_excel(campagnes_dataframe, filename, folder_PATH, 'Campagnes')
-    # add_style_campagnes(campagnes_dataframe, filename, folder_PATH)
+    print('\n[!] Création de l\'onglet \"Campagnes\"...')
+    campagnes_dataframe = create_campagnes_dataframe(head_dataframe, campaigns_dict, J_dict)
+    write_in_existing_excel(campagnes_dataframe, filename, folder_PATH, 'Campagnes')
+    add_style_campagnes(campagnes_dataframe, filename, folder_PATH)
 
-    # ## CREATION DE L'ONGLET SURVIE ##
+    ## CREATION DE L'ONGLET SURVIE ##
 
-    print('\n[!] Création de l\'onglet \"Survie\"...')
-    survie_dataframe = create_survie_dataframe(head_dataframe, list_campaigns, dict_mp)
-    write_in_existing_excel(survie_dataframe, filename, folder_PATH, 'Survie', startcol=2, startrow=2)
-    add_style_survie(survie_dataframe, filename, folder_PATH)
+    if len(chemistry_pack_list):
+        print('\n[!] Création de l\'onglet \"Survie\"...')
+        survie_dataframe = create_survie_dataframe(campaigns_dict, chemistry_measurepoint_list)
+        write_in_existing_excel(survie_dataframe, filename, folder_PATH, 'Survie', startcol=2, startrow=2)
+        add_style_survie(survie_dataframe, filename, folder_PATH)
 
-    # ## CREATION DE L'ONGLET PHYSICO-CHIMIE ##
 
-    print('\n[!] Création de l\'onglet \"Physico-chimie\"...')
-    physicochimie_dataframe = create_physicochimie_dataframe(head_dataframe, list_campaigns, dict_mp)
-    write_in_existing_excel(physicochimie_dataframe, filename, folder_PATH, 'Physico-chimie_refChimie', startrow=2)
-    write_in_existing_excel(physicochimie_dataframe, filename, folder_PATH, 'Physico-chimie_refToxicité', startrow=2)
-    add_style_physicochimie(physicochimie_dataframe, filename, folder_PATH)
-
+    ## CREATION DE L'ONGLET PHYSICO-CHIMIE ##
+    if len(measurepoint_list) :
+        print('\n[!] Création de l\'onglet \"Physico-chimie\"...')
+        physicochimie_dataframe = create_physicochimie_dataframe(head_dataframe, measurepoint_list, campaigns_dict, J_dict)
+        write_in_existing_excel(physicochimie_dataframe, filename, folder_PATH, 'Physico-chimie_refChimie', startrow=2)
+        write_in_existing_excel(physicochimie_dataframe, filename, folder_PATH, 'Physico-chimie_refToxicité', startrow=2)
+        add_style_physicochimie(physicochimie_dataframe, filename, folder_PATH)
 
     # CREATION DE L'ONGLET BBAC ##
-    # Récupération des codes t0
-    dict_general = create_general_dict(list_campaigns)
-    list_mp = [mp for mp in dict_general]
-    if len(list_mp) > 1:
-        query_tuple_mp = tuple(list_mp)
-    else:
-        query_tuple_mp = f"({list_mp[0]})"
-    t0_associated = QueryScript(f"SELECT code_t0_id, id  FROM {env.DATABASE_RAW}.Measurepoint WHERE id IN {query_tuple_mp};").execute()
-    dict_t0 = {}
-    for mp in dict_general:
-        dict_t0[mp] = dict_general[mp]
-        index = [element[1] for element in t0_associated].index(mp)
-        dict_t0[mp]['code_t0_id'] = t0_associated[index][0]
 
-    # Test pour savoir s'il y a eu de la chimie
-    chemistry_existing = False
-    for mp in dict_general:
-        if 'chemistry' in dict_general[mp]:
-            chemistry_existing = True
-            break
+
     
-    if chemistry_existing:
-        print('\n[!] Création de l\'onglet \"BBAC 7j\"...')
-        bbac_dataframe = create_bbac_7j_dataframe(head_dataframe, dict_general)
-        bbac2_dataframe = create_bbac2_7j_dataframe(head_dataframe, dict_general)
-        write_in_existing_excel(bbac_dataframe, filename, folder_PATH, 'BBAC_7j', startrow=3)
-        write_in_existing_excel(bbac2_dataframe, filename, folder_PATH, 'BBAC2_7j', startrow=3)
-        add_style_bbac_7j(bbac_dataframe, filename, folder_PATH, dict_t0)
-
-        print('\n[!] Création de l\'onglet \"BBAC 21j\"...')
-        bbac_dataframe = create_bbac_21j_dataframe(head_dataframe, dict_general)
-        bbac2_dataframe = create_bbac2_21j_dataframe(head_dataframe, dict_general)
-        write_in_existing_excel(bbac_dataframe, filename, folder_PATH, 'BBAC_21j', startrow=3)
-        write_in_existing_excel(bbac2_dataframe, filename, folder_PATH, 'BBAC2_21j', startrow=3)
-        add_style_bbac_21j(bbac_dataframe, filename, folder_PATH, dict_t0)
+    if len(chemistry_pack_list):
+        result_dict = chemistry.result(campaigns_dict, chemistry_pack_list)
+        t0_associated = QueryScript(f"SELECT code_t0_id, id  FROM {env.DATABASE_RAW}.Measurepoint WHERE id IN {tuple(chemistry_measurepoint_list)};").execute()
+        dict_t0 = {}
+        for campaign_id in campaigns_dict:
+            for place_id in campaigns_dict[campaign_id]["place"]:
+                for measurepoint_id in campaigns_dict[campaign_id]["place"][place_id]["measurepoint"]:
+                    for code_t0_id, mp_id in t0_associated:
+                        if measurepoint_id==mp_id and place_id not in dict_t0:
+                            dict_t0[measurepoint_id] = {"code_t0_id": code_t0_id}
+        if len(chemistry_7j_measurepoint_list):
+            print('\n[!] Création de l\'onglet \"BBAC 7j\"...')
+            bbac_dataframe = create_bbac_7j_dataframe(head_chemistry_7j_dataframe, result_dict, chemistry_7j_measurepoint_list)
+            bbac2_dataframe = create_bbac2_7j_dataframe(head_chemistry_7j_dataframe, result_dict, chemistry_7j_measurepoint_list)
+            write_in_existing_excel(bbac_dataframe, filename, folder_PATH, 'BBAC_7j', startrow=3)
+            write_in_existing_excel(bbac2_dataframe, filename, folder_PATH, 'BBAC2_7j', startrow=3)
+            add_style_bbac_7j(bbac_dataframe, filename, folder_PATH, dict_t0)
+        if len(chemistry_21j_measurepoint_list):
+            print('\n[!] Création de l\'onglet \"BBAC 21j\"...')
+            bbac_dataframe = create_bbac_21j_dataframe(head_chemistry_21j_dataframe, result_dict, chemistry_21j_measurepoint_list)
+            bbac2_dataframe = create_bbac2_21j_dataframe(head_chemistry_21j_dataframe, result_dict, chemistry_21j_measurepoint_list)
+            write_in_existing_excel(bbac_dataframe, filename, folder_PATH, 'BBAC_21j', startrow=3)
+            write_in_existing_excel(bbac2_dataframe, filename, folder_PATH, 'BBAC2_21j', startrow=3)
+            add_style_bbac_21j(bbac_dataframe, filename, folder_PATH, dict_t0)
 
         # CREATION DE L'ONGLET NQE ##
 
         print('\n[!] Création de l\'onglet \"NQE Biote\"...')
-        nqe_dataframe = create_nqe_dataframe(head_dataframe, dict_general)
+        nqe_dataframe = create_nqe_dataframe(head_chemistry_dataframe, result_dict, chemistry_measurepoint_list)
         write_in_existing_excel(nqe_dataframe, filename, folder_PATH, 'NQE Biote', startrow=3)
         add_style_nqe(nqe_dataframe, filename, folder_PATH, dict_t0)
     else:
         print('\n[!] Pas de chimie détectée ! ')
 
     ## CREATION DE L'ONGLET TOX ##
+    if len(tox_measurepoint_list):
+        print('\n[!] Création de l\'onglet \"Tox\"...')
+        tox_dataframe = create_tox_dataframe(campaigns_dict, tox_measurepoint_list)
+        write_in_existing_excel(tox_dataframe, filename, folder_PATH, 'Tox', startrow=3)
+        add_style_tox(tox_dataframe, filename, folder_PATH)
+    else :
+        print('\n[!] Pas de tox détectée ! ')
 
-    print('\n[!] Création de l\'onglet \"Tox\"...')
-    tox_dataframe = create_tox_dataframe(head_dataframe, list_campaigns, dict_mp)
-    write_in_existing_excel(tox_dataframe, filename, folder_PATH, 'Tox', startrow=3)
-    add_style_tox(tox_dataframe, filename, folder_PATH)
 
     print(colored('\n --> Rapport terminé', 'green'))
 

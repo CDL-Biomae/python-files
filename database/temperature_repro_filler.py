@@ -11,7 +11,8 @@ def fill_temperature_repro(cas, temperatures):
         temperature_repro_table.execute(admin=True)
     ## Cas 2: Mise à jour de la dernière version connue
     if cas == 2:
-        QueryScript(f"DELETE FROM {env.DATABASE_TREATED}.temperature_repro WHERE version = {env.LATEST_VERSION()} and measurepoint_id in {tuple(temperatures['need_update']) if len(temperatures['need_update']) else '(0)'};").execute(admin=True)
+        need_update = temperatures['need_update'] if len(temperatures['need_update']) else [0]
+        QueryScript(f"DELETE FROM {env.DATABASE_TREATED}.temperature_repro WHERE version = {env.LATEST_VERSION()} and measurepoint_id in {tuple(need_update) if len(need_update)>1 else '('+(str(need_update[0]) if len(need_update) else '0')+')'};").execute(admin=True)
 
     SQL_request = QueryScript(f" INSERT INTO {env.DATABASE_TREATED}.temperature_repro (measurepoint_id, av_cycle_BCD1, expected_C2, expected_D1, expected_D2, av_cycle_1234, expected_st3, expected_st4, expected_st5, version) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)")
     values = []

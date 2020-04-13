@@ -16,7 +16,7 @@ class Alimentation:
                 pack_dict[dict_pack[element]['alimentation']] = element
             except KeyError:
                 None
-        survivor_list =  QueryScript(f"  SELECT pack_id, scud_survivor, scud_quantity, replicate   FROM {env.DATABASE_RAW}.Cage WHERE pack_id IN {tuple([element for element in pack_dict])} AND scud_survivor IS NOT NULL").execute()
+        survivor_list =  QueryScript(f"  SELECT pack_id, scud_survivor, scud_quantity, replicate   FROM {env.DATABASE_RAW}.Cage WHERE pack_id IN {tuple([element for element in pack_dict]) if len([element for element in pack_dict])>1 else '('+(str([element for element in pack_dict][0]) if len([element for element in pack_dict]) else '0')+')'} AND scud_survivor IS NOT NULL").execute()
         result = {element:None for element in dict_pack}
         pack_checked = None
         current_quantity = None
@@ -45,7 +45,7 @@ class Alimentation:
         result = {element: None for element in dict_pack}
 
         ################### Calcul des tailles des spécimens
-        specimen_size_data =  QueryScript(f"  SELECT pack_id, individual, size_px, size_mm   FROM {env.DATABASE_RAW}.MeasureSize WHERE pack_id IN {tuple([element for element in pack_dict])}").execute()
+        specimen_size_data =  QueryScript(f"  SELECT pack_id, individual, size_px, size_mm   FROM {env.DATABASE_RAW}.MeasureSize WHERE pack_id IN {tuple([element for element in pack_dict]) if len([element for element in pack_dict])>1 else '('+(str([element for element in pack_dict][0]) if len([element for element in pack_dict]) else '0')+')'}").execute()
         specimen_size = {element:None for element in dict_pack}
         pack_checked = None
         ratio = None
@@ -90,7 +90,7 @@ class Alimentation:
             f" SELECT value   FROM {env.DATABASE_TREATED}.r2_constant WHERE name='Nombre de disques par réplicat' AND version=  {env.LATEST_VERSION()}").execute()[0]
         test_duration = QueryScript(
             f" SELECT value   FROM {env.DATABASE_TREATED}.r2_constant WHERE name='Nombre de jour du test' AND version=  {env.LATEST_VERSION()}").execute()[0]
-        remaining_leaves_data =  QueryScript(f"  SELECT pack_id, replicate, value   FROM {env.DATABASE_RAW}.MeasureLeaf WHERE pack_id IN {tuple([element for element in pack_dict])}").execute()
+        remaining_leaves_data =  QueryScript(f"  SELECT pack_id, replicate, value   FROM {env.DATABASE_RAW}.MeasureLeaf WHERE pack_id IN {tuple([element for element in pack_dict]) if len([element for element in pack_dict])>1 else '('+(str([element for element in pack_dict][0]) if len([element for element in pack_dict]) else '0')+')'}").execute()
         remaining_leaves = {element:None for element in dict_pack}
         pack_checked = None
         for pack_id, replicate, value in remaining_leaves_data:
@@ -121,7 +121,7 @@ class Alimentation:
         constant_alim = QueryScript(
             f" SELECT value   FROM {env.DATABASE_TREATED}.r2_constant WHERE name LIKE 'Constante alim%'").execute()
         average_temperature = {element:None for element in dict_pack}
-        average_temperature_output = QueryScript(f" SELECT measurepoint_id, sensor1_average   FROM {env.DATABASE_TREATED}.average_temperature WHERE measurepoint_id IN {tuple(dict_pack)} AND version=  {env.LATEST_VERSION()}").execute()
+        average_temperature_output = QueryScript(f" SELECT measurepoint_id, sensor1_average   FROM {env.DATABASE_TREATED}.average_temperature WHERE measurepoint_id IN {tuple([element for element in dict_pack]) if len([element for element in dict_pack])>1 else '('+(str([element for element in dict_pack][0]) if len([element for element in pack_dict]) else '0')+')'} AND version=  {env.LATEST_VERSION()}").execute()
         for measurepoint_id, sensor1_average in average_temperature_output:
             average_temperature[measurepoint_id] = sensor1_average
         for measurepoint_id in dict_pack:

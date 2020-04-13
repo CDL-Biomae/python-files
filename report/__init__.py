@@ -1,7 +1,7 @@
 from report.xl import *
 from report.style import *
 from .initialization import *
-from .word import *
+# from .word import *
 
 
 # /!\ A METTRE EN DERNIER /!\ #

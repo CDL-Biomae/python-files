@@ -139,8 +139,8 @@ def insert_average_temperature(cas,global_dict) :
         average_temperature_table = QueryScript("CREATE TABLE average_temperature (id INT AUTO_INCREMENT PRIMARY KEY, measurepoint_id INT(11), sensor1_average DOUBLE, sensor1_min DOUBLE, sensor1_max DOUBLE, sensor2_average DOUBLE, sensor2_min DOUBLE, sensor2_max DOUBLE, sensor3_average DOUBLE, sensor3_min DOUBLE, sensor3_max DOUBLE, sensor2_average_labo DOUBLE, version INT );")
         average_temperature_table.execute(admin=True)
     if cas==2:
-
-        QueryScript(f"DELETE FROM {env.DATABASE_TREATED}.average_temperature WHERE version = {env.LATEST_VERSION()} and measurepoint_id in {tuple(global_dict['need_update']) if len(global_dict['need_update']) else '(0)'};").execute(admin=True)
+        need_update = global_dict['need_update'] if len(global_dict['need_update']) else [0]
+        QueryScript(f"DELETE FROM {env.DATABASE_TREATED}.average_temperature WHERE version = {env.LATEST_VERSION()} and measurepoint_id in {tuple(need_update) if len(need_update)>1 else '('+(str(need_update[0]) if len(need_update) else '0')+')'};").execute(admin=True)
     insertion = QueryScript(f" INSERT INTO average_temperature (measurepoint_id, sensor1_average, sensor1_min, sensor1_max, sensor2_average, sensor2_min, sensor2_max, sensor3_average, sensor3_min, sensor3_max, sensor2_average_labo, version) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)")
     output = []
     for measurepoint_id in global_dict["data"]:

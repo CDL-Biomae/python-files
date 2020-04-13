@@ -23,8 +23,18 @@ def add_style_campagnes(campagnes_dataframe, filename, folder_PATH):
     ws.column_dimensions['F'].width = 18
     ws.column_dimensions['G'].width = 18
     ws.column_dimensions['H'].width = 18
-    ws.column_dimensions['I'].width = 10
+    ws.column_dimensions['I'].width = 18
     ws.column_dimensions['J'].width = 18
+    ws.column_dimensions['K'].width = 18
+    if ws['G2'].value=='N':
+        ws.column_dimensions['G'].width = 10
+    if ws['H2'].value=='N':
+        ws.column_dimensions['H'].width = 10
+    if ws['I2'].value=='N':
+        ws.column_dimensions['I'].width = 10
+    if ws['J2'].value=='N':
+        ws.column_dimensions['J'].width = 10
+
 
     ## HEADER STYLE ##
     header_row = '2'

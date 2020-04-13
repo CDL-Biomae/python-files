@@ -2,70 +2,59 @@ from tools import QueryScript, list_to_dict, translate
 import pandas as pd
 import env
 
-def create_dataframe(list_mp):
-    '''
-    Créé une dataframe à partir d'une liste de points de mesures
-    Les colonnes de la dataframe sont ['Type de réseau', 'Hydroécorégion', 'Masse d\'eau', 'Adresse', 'Coordonnées de référence', 'Coordonnées de référence (Lambert)', 'Coordonnées réelles']
-    Les colonnes vides sont supprimées
-    :param list_mp:
-    :return: dataframe:
-    '''
-    if len(list_mp) > 1:
-        query_tuple_mp = tuple(list_mp)
-    else:
-        query_tuple_mp = f"({list_mp[0]})"
-    output_agency = QueryScript(
-        f"  SELECT Measurepoint.id, Agency.network, Agency.hydroecoregion FROM {env.DATABASE_RAW}.Agency JOIN {env.DATABASE_RAW}.Place on Agency.id = Place.agency_id JOIN {env.DATABASE_RAW}.Measurepoint on Place.id = Measurepoint.place_id WHERE Measurepoint.id IN {query_tuple_mp};"
-    ).execute()
-    output_measurepoint = QueryScript(
-        f"  SELECT id, stream, zipcode, city, latitude, longitude, lambertY, lambertX, latitudeSpotted, longitudeSpotted   FROM {env.DATABASE_RAW}.Measurepoint WHERE id IN {query_tuple_mp};"
-    ).execute()
+def create_stations_dataframe(head_dataframe, campaigns_dict, measurepoint_list, agency_code_list, place_list):
 
-    dict_output_agency = list_to_dict(output_agency)
-    dict_output_measurepoint = list_to_dict(output_measurepoint)
-    matrix = []
-    for mp in list_mp:
-        try:
-            data_agency = dict_output_agency[mp]
-        except KeyError:
-            data_agency = ['ND']*2
-        try:
-            data_measurepoint = dict_output_measurepoint[mp]
-        except KeyError:
-            data_measurepoint = ['ND']*9
+    df_renamed = head_dataframe.rename(columns={"Numéro": "#"})
+    place_length = len(place_list)
+    campaigns_number = len(list(campaigns_dict.keys()))
+    global_matrix = []
+    agency_data = QueryScript(f"  SELECT code, network, hydroecoregion FROM {env.DATABASE_RAW}.Agency  WHERE code IN {tuple(agency_code_list) if len(agency_code_list)>1 else '('+(str(agency_code_list[0]) if len(agency_code_list) else '0')+')'};").execute()
+    measurepoint_data = QueryScript(f"  SELECT id, stream, zipcode, city, latitude, longitude, lambertY, lambertX, latitudeSpotted, longitudeSpotted   FROM {env.DATABASE_RAW}.Measurepoint WHERE id IN {tuple(measurepoint_list) if len(measurepoint_list)>1 else '('+(str(measurepoint_list[0]) if len(measurepoint_list) else '0')+')'};").execute()
+    for campaign_id in campaigns_dict:
 
-        [network, hydroecoregion, ] = [translate(x) for x in data_agency]
-        [stream, zipcode, city, latitude, longitude, lambertY, lambertX, real_latitude, real_longitude] = [translate(x) for x in data_measurepoint]
 
-        address = f"{zipcode} {city}"
-        coor_ref = f"{latitude}, {longitude}"
-        coor_ref_lambert = f"Y {lambertY}, X {lambertX}"
-        coor_real = f"{real_latitude}, {real_longitude}"
+        matrix = [[None]*7]*place_length
+        for place_id in campaigns_dict[campaign_id]["place"]:
+           
+            temp = [None]*7
+            for code, network, hydroecoregion in agency_data:
+                if "agency" in campaigns_dict[campaign_id]["place"][place_id] and code==campaigns_dict[campaign_id]["place"][place_id]["agency"]:
+                    temp[0],temp[1]=translate(network), hydroecoregion
 
-        temp = [network, hydroecoregion, stream, address, coor_ref, coor_ref_lambert, coor_real]
-        matrix.append(temp)
+            for measurepoint_id in campaigns_dict[campaign_id]["place"][place_id]["measurepoint"]:
+                for row in measurepoint_data:
+                    [mp_id, stream, zipcode, city, latitude, longitude, lambertY, lambertX, latitudeSpotted, longitudeSpotted] = [translate(x) for x in row]
+                    if mp_id==measurepoint_id:
+                        if not temp[2]:
+                            temp[2] = stream
+                        if not temp[3]:
+                            temp[3] = f"{zipcode} {city}" if zipcode and city else None
+                        if not temp[4]:
+                            temp[4] = f"{latitude}, {longitude}" if latitude and longitude else None
+                        if not temp[5]:
+                            temp[5] = f"Y {lambertY}, X {lambertX}" if lambertX and lambertY else None
+                        if not temp[6]:
+                            temp[6] = f"{latitudeSpotted}, {longitudeSpotted}" if latitudeSpotted and longitudeSpotted else None
+            matrix[place_list.index(campaigns_dict[campaign_id]["place"][place_id]["number"])] = temp
+        global_matrix.append(matrix)
 
-    df = pd.DataFrame(matrix)
-    df.columns = ['Type de réseau', 'Hydroécorégion', 'Masse d\'eau', 'Adresse', 'Coordonnées de référence', 'Coordonnées de référence (Lambert)', 'Coordonnées réelles']
-    return df
+    matrix_filled = [[None]*7]*place_length
+    if campaigns_number>1:
+        for campaign in global_matrix :
+            for place_number in range(place_length) :
+                for index, content in enumerate(campaign[place_number]):
+                    if content and not matrix_filled[place_number][index]:
+                        matrix_filled[place_number] = campaign[place_number]
+    if campaigns_number==1:
+        matrix_filled=global_matrix[0]
 
-def create_stations_dataframe(head_dataframe, list_campaigns, dict_mp):
-    '''
-    Créé une dataframe qui contient les données de l'onglet 'stations' de l'Excel
-    :param head_dataframe: cf initialization.py
-    :param list_campaigns: list des references de campagne
-    :param dict_mp: {'ref_campagne': [mp, ...], ...}
-    :return:
-    '''
-    campaign_str = list_campaigns[0]
-    list_mp = dict_mp[campaign_str]
-    nb_mp = len(list_mp)
-
-    df_head = head_dataframe.head(nb_mp)
-    df_filtered = df_head[['Numéro', 'Station de mesure', 'Code Agence']]
-    df_renamed = df_filtered.rename(columns={"Numéro": "#"})
-
-    df_values = create_dataframe(list_mp)
+    for place_number, place in enumerate(matrix_filled) :
+        for index, content in enumerate(place) :
+            if not content :
+                matrix_filled[place_number][index] = 'ND'
+   
+    df_values = pd.DataFrame(matrix_filled, columns=['Type de réseau', 'Hydroécorégion', 'Masse d\'eau', 'Adresse', 'Coordonnées de référence', 'Coordonnées de référence (Lambert)', 'Coordonnées réelles'])
+    df_values.columns = ['Type de réseau', 'Hydroécorégion', 'Masse d\'eau', 'Adresse', 'Coordonnées de référence', 'Coordonnées de référence (Lambert)', 'Coordonnées réelles']
     df_concat = pd.concat([df_renamed, df_values], axis=1)
     df_stations = df_concat.sort_values('#')
 

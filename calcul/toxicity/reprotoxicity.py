@@ -23,10 +23,10 @@ class Reprotoxicity:
 
         # Récupération des dates de début et de fin
         output_dates_debut = QueryScript(
-            f" SELECT measurepoint_id, date   FROM {env.DATABASE_TREATED}.key_dates where date_id=3 and measurepoint_id IN {tuple(list_mp_repro)} and version=  {env.LATEST_VERSION()};"
+            f" SELECT measurepoint_id, date   FROM {env.DATABASE_TREATED}.key_dates where date_id=3 and measurepoint_id IN {tuple(list_mp_repro) if len(list_mp_repro)>1 else '('+(str(list_mp_repro[0]) if len(list_mp_repro) else '0')+')'} and version=  {env.LATEST_VERSION()};"
         ).execute()
         output_dates_fin = QueryScript(
-            f" SELECT measurepoint_id, date   FROM {env.DATABASE_TREATED}.key_dates where date_id=4 and measurepoint_id IN {tuple(list_mp_repro)} and version=  {env.LATEST_VERSION()};"
+            f" SELECT measurepoint_id, date   FROM {env.DATABASE_TREATED}.key_dates where date_id=4 and measurepoint_id IN {tuple(list_mp_repro) if len(list_mp_repro)>1 else '('+(str(list_mp_repro[0]) if len(list_mp_repro) else '0')+')'} and version=  {env.LATEST_VERSION()};"
         ).execute()
 
         output_mp_debut = [x[0] for x in output_dates_debut]
@@ -62,7 +62,7 @@ class Reprotoxicity:
     @staticmethod
     # retourne dict_index_fecundity = {pack_id: {'list_molting_stage': [...], 'list_index_fecundity': [...]}
     def index_fecundity_female(list_pack_repro):
-        SQL_request = f"  SELECT pack_id, female, molting_stage, embryo_stage, specimen_size_mm, specimen_size_px, embryo_total FROM {env.DATABASE_RAW}.MeasureReprotoxicity where pack_id IN {tuple(list_pack_repro)};"
+        SQL_request = f"  SELECT pack_id, female, molting_stage, embryo_stage, specimen_size_mm, specimen_size_px, embryo_total FROM {env.DATABASE_RAW}.MeasureReprotoxicity where pack_id IN {tuple(list_pack_repro) if len(list_pack_repro)>1 else '('+(str(list_pack_repro[0]) if len(list_pack_repro) else '0')+')'};"
         output = QueryScript(SQL_request).execute()
 
         # Initialisation du dictionnaire de la requête mise en forme
@@ -190,8 +190,8 @@ class Reprotoxicity:
                 list_mp_repro.append(mp)
                 list_pack_repro.append(pack_id)
 
-        SQL_request = f"  SELECT pack_id, molting_stage FROM {env.DATABASE_RAW}.MeasureReprotoxicity where pack_id IN {tuple(list_pack_repro)};"
-        SQL_request_2 = f"  SELECT measurepoint_id, expected_C2,expected_D2 FROM {env.DATABASE_TREATED}.temperature_repro where measurepoint_id IN {tuple(list_mp_repro)};"
+        SQL_request = f"  SELECT pack_id, molting_stage FROM {env.DATABASE_RAW}.MeasureReprotoxicity where pack_id IN {tuple(list_pack_repro) if len(list_pack_repro)>1 else '('+(str(list_pack_repro[0]) if len(list_pack_repro) else '0')+')'};"
+        SQL_request_2 = f"  SELECT measurepoint_id, expected_C2,expected_D2 FROM {env.DATABASE_TREATED}.temperature_repro where measurepoint_id IN {tuple(list_mp_repro) if len(list_mp_repro)>1 else '('+(str(list_mp_repro[0]) if len(list_mp_repro) else '0')+')'};"
         resultat_molting_stage =  QueryScript(SQL_request).execute()
         resultat_expected_stage =  QueryScript(SQL_request_2).execute()
 
@@ -259,7 +259,7 @@ class Reprotoxicity:
                 list_pack_repro.append(pack_id)
 
         output = QueryScript(
-            f"  SELECT pack_id, female, molting_stage, oocyte_area_pixel, oocyte_area_mm   FROM {env.DATABASE_RAW}.MeasureReprotoxicity WHERE pack_id IN {tuple(list_pack_repro)};"
+            f"  SELECT pack_id, female, molting_stage, oocyte_area_pixel, oocyte_area_mm   FROM {env.DATABASE_RAW}.MeasureReprotoxicity WHERE pack_id IN {tuple(list_pack_repro) if len(list_pack_repro)>1 else '('+(str(list_pack_repro[0]) if len(list_pack_repro) else '0')+')'};"
         ).execute()
 
         # Reformatage des données de la requête
@@ -345,7 +345,7 @@ class Reprotoxicity:
 
         # Récupération du nombre de retard et du nombre de femelles analysées
         output_molting = QueryScript(
-            f"  SELECT pack_id, molting_stage FROM {env.DATABASE_RAW}.MeasureReprotoxicity where pack_id IN {tuple(list_pack_repro)};"
+            f"  SELECT pack_id, molting_stage FROM {env.DATABASE_RAW}.MeasureReprotoxicity where pack_id IN {tuple(list_pack_repro) if len(list_pack_repro)>1 else '('+(str(list_pack_repro[0]) if len(list_pack_repro) else '0')+')'};"
         ).execute()
 
         dict_molting_stage = {pack_id: [] for pack_id in list_pack_repro}
@@ -369,7 +369,7 @@ class Reprotoxicity:
         ## Calcul des valeurs de test unilatéral
         # Récupération du pourcentage attendu en B/C1
         output_expected = QueryScript(
-            f"  SELECT measurepoint_id, expected_C2   FROM {env.DATABASE_TREATED}.temperature_repro WHERE measurepoint_id IN {tuple(list_mp_repro)} and version=  {env.LATEST_VERSION()};"
+            f"  SELECT measurepoint_id, expected_C2   FROM {env.DATABASE_TREATED}.temperature_repro WHERE measurepoint_id IN {tuple(list_mp_repro) if len(list_mp_repro)>1 else '('+(str(list_mp_repro[0]) if len(list_mp_repro) else '0')+')'} and version=  {env.LATEST_VERSION()};"
         ).execute()
         dict_expected_BC1 = {pack_id: 0 for pack_id in list_pack_repro}
 
@@ -459,7 +459,7 @@ class Reprotoxicity:
         names = ['Constante surface des retards 1', 'Moyenne des surfaces de référence C2', 'SD des surfaces de référence C2']
 
         output_ref = QueryScript(
-            f"  SELECT name, value   FROM {env.DATABASE_TREATED}.r2_constant WHERE name IN {tuple(names)} and version= {env.LATEST_VERSION()};"
+            f"  SELECT name, value   FROM {env.DATABASE_TREATED}.r2_constant WHERE name IN {tuple(names) if len(names)>1 else '('+(str(names[0]) if len(names) else '0')+')'} and version= {env.LATEST_VERSION()};"
         ).execute()
         for row in output_ref:
             [name, value] = row

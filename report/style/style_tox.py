@@ -237,18 +237,18 @@ def add_style_tox(tox_dataframe, filename, folder_PATH):
 
 
     # MAKE STYLE OF molting_cycle get all result of conforme or not of molting_cycle
-    pack = get_dict_pack()
-    confrm_mue  = Reprotoxicity.conform_resultat_mue(pack)
+    dict_pack = get_dict_pack()
+    confrm_mue  = Reprotoxicity.conform_resultat_mue(dict_pack)
 
     # get all conform surface_retard 
-    b =Reprotoxicity.number_female_concerned_area(pack)
-    c =Reprotoxicity.fecundity(pack)
+    b =Reprotoxicity.number_female_concerned_area(dict_pack)
+    c =Reprotoxicity.fecundity(dict_pack)
 
-    dict_conform_surface_retard = Reprotoxicity.conform_surface_retard(pack,b[0],b[1],c)[0]
+    dict_conform_surface_retard = Reprotoxicity.conform_surface_retard(dict_pack,b[0],b[1],c)[0]
     # colorer les cycle de mue et la Perturbation endocrinienne
     for row in range(5, nb_rows+5): 
-          pack = pack.get(ws["S" + str(row)].value)
-          if "reproduction" in pack:  
+          pack = dict_pack.get(ws["S" + str(row)].value)
+          if pack and "reproduction" in pack:  
                 repro_pack = pack.get("reproduction")
 
                 mue=confrm_mue.get(repro_pack)
