@@ -2,7 +2,7 @@ import tkinter as tk
 from tkinter import filedialog
 from tools import QueryScript
 import env
-from report import excel_main, word_main
+from report import excel_main
 from database import fill
 from datetime import date
 
