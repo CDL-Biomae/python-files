@@ -2,7 +2,7 @@ import tkinter as tk
 from tkinter import filedialog
 from tools import QueryScript
 import env
-from report import excel_main
+from report import excel_main, word_main
 from database import fill
 from datetime import date
 
@@ -103,7 +103,7 @@ class App(tk.Tk):
                     self.output_browse_button()
                 if not self.input_folder_path.get():
                     self.input_browse_button()
-                self.num_campaign_text.set(self.campaign_input.get())
+                self.num_campaign_text.set(self.num_campaign_input.get())
                 if self.num_campaign_text.get() == "":
                     self.num_campaign_text.set("XX")
                 for campaign in self.campaign_list:

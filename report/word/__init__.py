@@ -1,2 +1,2 @@
-from .word_rapport_experimentation_recuperation_donnees import recuperation_donnee
-from .word_rapport_experimentation_creation_fichier import *
+from .word_load_data import load_data
+from .word_file import word_main

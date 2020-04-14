@@ -130,27 +130,30 @@ def excel_main(list_campaigns, folder_PATH = "output"):
                     for code_t0_id, mp_id in t0_associated:
                         if measurepoint_id==mp_id and place_id not in dict_t0:
                             dict_t0[measurepoint_id] = {"code_t0_id": code_t0_id}
-        if len(chemistry_7j_measurepoint_list):
-            print('\n[!] Création de l\'onglet \"BBAC 7j\"...')
-            bbac_dataframe = create_bbac_7j_dataframe(head_chemistry_7j_dataframe, result_dict, chemistry_7j_measurepoint_list)
-            bbac2_dataframe = create_bbac2_7j_dataframe(head_chemistry_7j_dataframe, result_dict, chemistry_7j_measurepoint_list)
-            write_in_existing_excel(bbac_dataframe, filename, folder_PATH, 'BBAC_7j', startrow=3)
-            write_in_existing_excel(bbac2_dataframe, filename, folder_PATH, 'BBAC2_7j', startrow=3)
-            add_style_bbac_7j(bbac_dataframe, filename, folder_PATH, dict_t0)
-        if len(chemistry_21j_measurepoint_list):
-            print('\n[!] Création de l\'onglet \"BBAC 21j\"...')
-            bbac_dataframe = create_bbac_21j_dataframe(head_chemistry_21j_dataframe, result_dict, chemistry_21j_measurepoint_list)
-            bbac2_dataframe = create_bbac2_21j_dataframe(head_chemistry_21j_dataframe, result_dict, chemistry_21j_measurepoint_list)
-            write_in_existing_excel(bbac_dataframe, filename, folder_PATH, 'BBAC_21j', startrow=3)
-            write_in_existing_excel(bbac2_dataframe, filename, folder_PATH, 'BBAC2_21j', startrow=3)
-            add_style_bbac_21j(bbac_dataframe, filename, folder_PATH, dict_t0)
+        if len(list(result_dict.keys())):
+            if len(chemistry_7j_measurepoint_list):
+                print('\n[!] Création de l\'onglet \"BBAC 7j\"...')
+                bbac_dataframe = create_bbac_7j_dataframe(head_chemistry_7j_dataframe, result_dict, chemistry_7j_measurepoint_list)
+                bbac2_dataframe = create_bbac2_7j_dataframe(head_chemistry_7j_dataframe, result_dict, chemistry_7j_measurepoint_list)
+                write_in_existing_excel(bbac_dataframe, filename, folder_PATH, 'BBAC_7j', startrow=3)
+                write_in_existing_excel(bbac2_dataframe, filename, folder_PATH, 'BBAC2_7j', startrow=3)
+                add_style_bbac_7j(bbac_dataframe, filename, folder_PATH, dict_t0)
+            if len(chemistry_21j_measurepoint_list):
+                print('\n[!] Création de l\'onglet \"BBAC 21j\"...')
+                bbac_dataframe = create_bbac_21j_dataframe(head_chemistry_21j_dataframe, result_dict, chemistry_21j_measurepoint_list)
+                bbac2_dataframe = create_bbac2_21j_dataframe(head_chemistry_21j_dataframe, result_dict, chemistry_21j_measurepoint_list)
+                write_in_existing_excel(bbac_dataframe, filename, folder_PATH, 'BBAC_21j', startrow=3)
+                write_in_existing_excel(bbac2_dataframe, filename, folder_PATH, 'BBAC2_21j', startrow=3)
+                add_style_bbac_21j(bbac_dataframe, filename, folder_PATH, dict_t0)
 
-        # CREATION DE L'ONGLET NQE ##
+            # CREATION DE L'ONGLET NQE ##
 
-        print('\n[!] Création de l\'onglet \"NQE Biote\"...')
-        nqe_dataframe = create_nqe_dataframe(head_chemistry_dataframe, result_dict, chemistry_measurepoint_list)
-        write_in_existing_excel(nqe_dataframe, filename, folder_PATH, 'NQE Biote', startrow=3)
-        add_style_nqe(nqe_dataframe, filename, folder_PATH, dict_t0)
+            print('\n[!] Création de l\'onglet \"NQE Biote\"...')
+            nqe_dataframe = create_nqe_dataframe(head_chemistry_dataframe, result_dict, chemistry_measurepoint_list)
+            write_in_existing_excel(nqe_dataframe, filename, folder_PATH, 'NQE Biote', startrow=3)
+            add_style_nqe(nqe_dataframe, filename, folder_PATH, dict_t0)
+        else :
+            print('\n[!] Pas de résultat chimique détecté !')
     else:
         print('\n[!] Pas de chimie détectée ! ')
 

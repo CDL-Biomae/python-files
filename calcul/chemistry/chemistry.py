@@ -43,10 +43,10 @@ def survival(pack_list):
     pack_dict = {}
     for pack_id, quantity, survivor in survival_list:
         if pack_id in pack_dict:
-            if quantity and survivor :
+            if quantity and survivor!=None :
                 pack_dict[pack_id].append(survivor/quantity)
         else :
-            if quantity and survivor :
+            if quantity and survivor!=None :
                 pack_dict[pack_id]= [survivor/quantity]
     for pack_id in pack_dict :
         pack_dict[pack_id] = str(round(sum(pack_dict[pack_id])/len(pack_dict[pack_id])*100)) + '%'
