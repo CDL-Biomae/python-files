@@ -6,6 +6,9 @@ def translate(element):
     :return: element: str utf-8
     '''
     if isinstance(element, str):
-        return element.encode('windows-1252').decode('utf-8')
+        try :
+            return element.encode('windows-1252').decode('utf-8')
+        except UnicodeDecodeError :
+            return element
     else:
         return element

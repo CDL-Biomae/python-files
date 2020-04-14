@@ -49,10 +49,9 @@ def word_main(campaign, agence, path_photo="Photos", path_output="output", num_c
         header = table_geo_1.rows[0].cells
         header[0].merge(header[-1])
         if agence:
-            case_header = table_geo_1.cell(0, 0).paragraphs[0].add_run((place_dict[place_id]["agency"] if "agency" in place_dict[place_id] else "")+" : "+ place_dict[place_id]["name"] + "   " + place_dict[place_id]["reference"] )
+            case_header = table_geo_1.cell(0, 0).paragraphs[0].add_run((place_dict[place_id]["agency"] if "agency" in place_dict[place_id] else "")+" : "+ translate(place_dict[place_id]["name"]) + "   " + place_dict[place_id]["reference"] )
         else:
-            case_header = table_geo_1.cell(0, 0).paragraphs[0].add_run("Point " + place_dict[place_id]["number"] + " : " +
-                                                                        place_dict[place_id]['name'])
+            case_header = table_geo_1.cell(0, 0).paragraphs[0].add_run("Point " + place_dict[place_id]["number"] + " : " + translate(place_dict[place_id]['name']))
         case_header.bold = True
         table_geo_1.cell(0, 0).paragraphs[0].alignment = 1
         width_table = table_geo_1.cell(0, 0).width
@@ -60,9 +59,9 @@ def word_main(campaign, agence, path_photo="Photos", path_output="output", num_c
         table_geo_1.cell(1, 0).paragraphs[0].add_run(
             'Commune :').bold = True
         table_geo_1.cell(1, 1).paragraphs[0].add_run(
-            place_dict[place_id]['city'] if 'city' in place_dict[place_id] else ''  + "    " + place_dict[place_id]['zipcode'] if 'zipcode' in place_dict[place_id] else '')
+            translate(place_dict[place_id]['city']) if 'city' in place_dict[place_id] else ''  + "    " + place_dict[place_id]['zipcode'] if 'zipcode' in place_dict[place_id] else '')
         table_geo_1.cell(1, 4).paragraphs[0].add_run(
-            place_dict[place_id]['stream'] if 'stream' in place_dict[place_id] else '')
+            translate(place_dict[place_id]['stream']) if 'stream' in place_dict[place_id] else '')
 
         table_geo_1.cell(1, 3).paragraphs[0].add_run(
             "Cours d'eau : ").bold = True
@@ -96,22 +95,19 @@ def word_main(campaign, agence, path_photo="Photos", path_output="output", num_c
             table_geo_2.cell(0, 0).paragraphs[0].add_run(
                 "Réseau de surveillance :").bold = True
             table_geo_2.cell(0, 2).paragraphs[0].add_run(
-                place_dict[place_id]['network'] if "network" in place_dict[place_id] else "ND" )
+                translate(place_dict[place_id]['network']) if "network" in place_dict[place_id] else "ND" )
 
             table_geo_2.cell(1, 0).paragraphs[0].add_run(
                 "Type d'hydroécorégion :").bold = True
             table_geo_2.cell(1, 2).paragraphs[0].add_run(
-                place_dict[place_id]['hydroecoregion'] if "hydroecoregion" in place_dict[place_id] else "ND")
+                translate(place_dict[place_id]['hydroecoregion']) if "hydroecoregion" in place_dict[place_id] else "ND")
 
             table_geo_2.cell(2, 0).paragraphs[0].add_run(
                 "Coordonnées Agence Lambert 93 :").bold = True
-            table_geo_2.cell(2, 2).paragraphs[0].add_run('Y ' +
-                                                            place_dict[place_id]['lambertYSpotted'] if "lambertYSpotted" in place_dict[place_id] else "ND")
-            table_geo_2.cell(2, 3).paragraphs[0].add_run('X ' +
-                                                            place_dict[place_id]['lambertXSpotted'] if "lambertXSpotted" in place_dict[place_id] else "ND")
+            table_geo_2.cell(2, 2).paragraphs[0].add_run('Y ' + place_dict[place_id]['lambertYSpotted'] if "lambertYSpotted" in place_dict[place_id] else "ND")
+            table_geo_2.cell(2, 3).paragraphs[0].add_run('X ' + place_dict[place_id]['lambertXSpotted'] if "lambertXSpotted" in place_dict[place_id] else "ND")
 
-            table_geo_2.cell(3, 0).paragraphs[0].add_run(
-                "Coordonnées BIOMÆ en degrés décimaux : ").bold = True
+            table_geo_2.cell(3, 0).paragraphs[0].add_run("Coordonnées BIOMÆ en degrés décimaux : ").bold = True
             longitude = place_dict[place_id]['longitudeSpotted']
             latitude = place_dict[place_id]['latitudeSpotted']
             if longitude == None:
@@ -125,10 +121,8 @@ def word_main(campaign, agence, path_photo="Photos", path_output="output", num_c
 
             table_geo_2.cell(4, 0).paragraphs[0].add_run(
                 "Coordonnées BIOMÆ Lambert 93 : ").bold = True
-            table_geo_2.cell(4, 2).paragraphs[0].add_run('Y ' +
-                                                            place_dict[place_id]['lambertYSpotted'].replace('.', ','))
-            table_geo_2.cell(4, 3).paragraphs[0].add_run('X ' +
-                                                            place_dict[place_id]['lambertXSpotted'].replace('.', ','))
+            table_geo_2.cell(4, 2).paragraphs[0].add_run('Y ' + place_dict[place_id]['lambertYSpotted'].replace('.', ','))
+            table_geo_2.cell(4, 3).paragraphs[0].add_run('X ' + place_dict[place_id]['lambertXSpotted'].replace('.', ','))
 
         else:
             table_geo_2.cell(0, 0).paragraphs[0].add_run(
@@ -172,8 +166,7 @@ def word_main(campaign, agence, path_photo="Photos", path_output="output", num_c
             table_carte.cell(2, 0).paragraphs[0].add_run().add_picture(
                 path_ressources + "/carre_blanc.jpg", width=4500000)
         table_carte.cell(2, 0).paragraphs[0].alignment = 1
-        table_carte.cell(
-            3, 0).text = "Vue satellitaire"
+        table_carte.cell(3, 0).text = "Vue satellitaire"
         table_carte.cell(3, 0).paragraphs[0].alignment = 1
 
         doc.add_page_break()
@@ -183,19 +176,17 @@ def word_main(campaign, agence, path_photo="Photos", path_output="output", num_c
         table_image.cell(1, 0).merge(table_image.cell(1, 1))
 
         if agence:
-            table_image.cell(0, 0).paragraphs[0].add_run((place_dict[place_id]['agency'] if 'agency' in place_dict[place_id] else "")+ " : " + place_dict[place_id]['name'] + "  " + place_dict[place_id]["reference"]).bold = True
+            table_image.cell(0, 0).paragraphs[0].add_run((place_dict[place_id]['agency'] if 'agency' in place_dict[place_id] else "")+ " : " + translate(place_dict[place_id]['name']) + "  " + place_dict[place_id]["reference"]).bold = True
         else:
             table_image.cell(0, 0).paragraphs[0].add_run("Point " + place_dict[place_id]["number"] + " : " +
-                                                            place_dict[place_id]['name']).bold = True
+                                                            translate(place_dict[place_id]['name'])).bold = True
         table_image.cell(0, 0).paragraphs[0].alignment = 1
         table_image.cell(
             0, 0).paragraphs[0].paragraph_format.line_spacing = font.size
 
-        table_image.cell(1, 0).paragraphs[0].add_run(
-            "Photos de la station de mesure de la qualité des eaux pour la campagne " + num_campaign + "-" + str(year)).bold = True  # Mettre que l'année, passage en argument ou autre méthode de récupération ?
+        table_image.cell(1, 0).paragraphs[0].add_run("Photos de la station de mesure de la qualité des eaux pour la campagne " + num_campaign + "-" + str(year)).bold = True  # Mettre que l'année, passage en argument ou autre méthode de récupération ?
         table_image.cell(1, 0).paragraphs[0].alignment = 1
-        table_image.cell(
-            1, 0).paragraphs[0].paragraph_format.line_spacing = font.size
+        table_image.cell(1, 0).paragraphs[0].paragraph_format.line_spacing = font.size
 
         table_image.cell(3, 0).text = "Aval de zone d’encagement"
         table_image.cell(3, 0).paragraphs[0].alignment = 1
@@ -208,13 +199,10 @@ def word_main(campaign, agence, path_photo="Photos", path_output="output", num_c
 
         for row in range(3, 8):
             if row != 4:
-                table_image.cell(
-                    row, 0).paragraphs[0].paragraph_format.line_spacing = font.size
-                table_image.cell(
-                    row, 1).paragraphs[0].paragraph_format.line_spacing = font.size
+                table_image.cell(row, 0).paragraphs[0].paragraph_format.line_spacing = font.size
+                table_image.cell(row, 1).paragraphs[0].paragraph_format.line_spacing = font.size
 
-        nom_photo = recuperation_photo(
-            place_dict[place_id]["reference"], path_photo, path_ressources)
+        nom_photo = recuperation_photo(place_dict[place_id]["reference"]+"-01", path_photo, path_ressources)
         rotation_image(nom_photo['amont'])
         rotation_image(nom_photo['aval'])
         rotation_image(nom_photo['zoom'])
@@ -229,13 +217,10 @@ def word_main(campaign, agence, path_photo="Photos", path_output="output", num_c
         table_image.cell(4, 1).paragraphs[0].add_run().add_picture(
             nom_photo['panorama'], width=3046870)
         for elt in [(2, 0), (2, 1), (4, 0), (4, 1)]:
-            table_image.cell(elt[0],
-                                elt[1]).paragraphs[0].paragraph_format.space_after = Pt(0)
-            table_image.cell(elt[0],
-                                elt[1]).paragraphs[0].paragraph_format.space_before = Pt(0)
+            table_image.cell(elt[0], elt[1]).paragraphs[0].paragraph_format.space_after = Pt(0)
+            table_image.cell(elt[0], elt[1]).paragraphs[0].paragraph_format.space_before = Pt(0)
 
-        table_image.cell(6, 0).paragraphs[0].add_run(
-            "Type de système d’exposition : ").bold = True
+        table_image.cell(6, 0).paragraphs[0].add_run("Type de système d’exposition : ").bold = True
 
         type_barrel_J0 = place_dict[place_id]["barrel_type"] if "barrel_type" in place_dict[place_id] else ""
         if (type_barrel_J0 == 'barrel'):
@@ -244,41 +229,31 @@ def word_main(campaign, agence, path_photo="Photos", path_output="output", num_c
             type_barrel_J0 = 'Caisse'
         table_image.cell(6, 1).paragraphs[0].add_run(type_barrel_J0)
         table_image.cell(7, 0).merge(table_image.cell(7, 1))
-        table_image.cell(7, 0).paragraphs[0].add_run(
-            "Paramètres physico-chimiques pour la campagne : " + num_campaign + "-" + str(year)).bold = True
+        table_image.cell(7, 0).paragraphs[0].add_run("Paramètres physico-chimiques pour la campagne : " + num_campaign + "-" + str(year)).bold = True
 
-        table_temperature = doc.add_table(
-            rows=2, cols=4, style="Table Grid")
+        table_temperature = doc.add_table(rows=2, cols=4, style="Table Grid")
         table_temperature.cell(0, 0).merge(table_temperature.cell(1, 0))
-        table_temperature.cell(0, 0).paragraphs[0].add_run(
-            "Température eau (°C) Sonde en continu").italic = True
+        table_temperature.cell(0, 0).paragraphs[0].add_run("Température eau (°C) Sonde en continu").italic = True
         table_temperature.cell(0, 0).paragraphs[0].alignment = 1
 
-        table_temperature.cell(0, 1).paragraphs[0].add_run(
-            "Minimum")  # .bold = True
+        table_temperature.cell(0, 1).paragraphs[0].add_run("Minimum")  # .bold = True
         table_temperature.cell(0, 1).paragraphs[0].alignment = 1
-        table_temperature.cell(0, 2).paragraphs[0].add_run(
-            "Moyenne")  # .bold = True
+        table_temperature.cell(0, 2).paragraphs[0].add_run("Moyenne")  # .bold = True
         table_temperature.cell(0, 2).paragraphs[0].alignment = 1
-        table_temperature.cell(0, 3).paragraphs[0].add_run(
-            "Maximum")  # .bold = True
+        table_temperature.cell(0, 3).paragraphs[0].add_run("Maximum")  # .bold = True
         table_temperature.cell(0, 3).paragraphs[0].alignment = 1
         if place_dict[place_id]["condition"]['temperature_min'] is not None:
-            table_temperature.cell(1, 1).paragraphs[0].add_run(str(round(
-                place_dict[place_id]["condition"]['temperature_min'], 1)).replace('.', ','))
+            table_temperature.cell(1, 1).paragraphs[0].add_run(str(round(place_dict[place_id]["condition"]['temperature_min'], 1)).replace('.', ','))
         table_temperature.cell(1, 1).paragraphs[0].alignment = 1
         if place_dict[place_id]["condition"]['average_temperature'] is not None:
-            table_temperature.cell(1, 2).paragraphs[0].add_run(str(round(
-                place_dict[place_id]["condition"]['average_temperature'], 1)).replace('.', ','))
+            table_temperature.cell(1, 2).paragraphs[0].add_run(str(round(place_dict[place_id]["condition"]['average_temperature'], 1)).replace('.', ','))
         table_temperature.cell(1, 2).paragraphs[0].alignment = 1
         if place_dict[place_id]["condition"]['temperature_max'] is not None:
-            table_temperature.cell(1, 3).paragraphs[0].add_run(str(round(
-                place_dict[place_id]["condition"]['temperature_max'], 1)).replace('.', ','))
+            table_temperature.cell(1, 3).paragraphs[0].add_run(str(round(place_dict[place_id]["condition"]['temperature_max'], 1)).replace('.', ','))
         table_temperature.cell(1, 3).paragraphs[0].alignment = 1
         for row in range(2):
             for col in range(4):
-                paragraph = table_temperature.cell(
-                    row, col).paragraphs[0]
+                paragraph = table_temperature.cell(row, col).paragraphs[0]
                 paragraph.paragraph_format.space_after = Pt(4)
                 paragraph.paragraph_format.space_before = Pt(4)
 
@@ -301,29 +276,21 @@ def word_main(campaign, agence, path_photo="Photos", path_output="output", num_c
                 if J == 'JN':
                     usefull_days.append(['JN','J+N', place_dict[place_id]["condition"][J]["date"] if "date" in place_dict[place_id]["condition"][J] else None,place_dict[place_id]["condition"][J]["comment"] if "comment" in place_dict[place_id]["condition"][J] else None])
 
-        table_exposure_condition = doc.add_table(
-            rows=7+chemistry, cols=1+len(usefull_days), style="Table Grid")
-        liste_entete = ["Intervention", "Date - Heure",
-                        "Température (°C)", "Conductivité (µS/cm)", "pH", "Oxygène dissous (mg/L)", "Survie Chimie (%)"]
-        liste_entete_BDD = ["date", "temperature",
-                            "conductivity", "ph", "oxygen"]
+        table_exposure_condition = doc.add_table(rows=7+chemistry, cols=1+len(usefull_days), style="Table Grid")
+        liste_entete = ["Intervention", "Date - Heure","Température (°C)", "Conductivité (µS/cm)", "pH", "Oxygène dissous (mg/L)", "Survie Chimie (%)"]
+        liste_entete_BDD = ["date", "temperature","conductivity", "ph", "oxygen"]
         for num_entete in range(6+chemistry):
-            paragraph = table_exposure_condition.cell(
-                num_entete, 0).paragraphs[0]
+            paragraph = table_exposure_condition.cell(num_entete, 0).paragraphs[0]
             paragraph.add_run(liste_entete[num_entete]).italic = True
             paragraph.alignment = 1
-            table_exposure_condition.cell(
-                num_entete, 0).width = width_table*0.3
+            table_exposure_condition.cell(num_entete, 0).width = width_table*0.3
         for num_jour in range(len(usefull_days)):
-            paragraph = table_exposure_condition.cell(
-                0, num_jour+1).paragraphs[0]
-            paragraph.add_run(
-                usefull_days[num_jour][1]).bold = True
+            paragraph = table_exposure_condition.cell(0, num_jour+1).paragraphs[0]
+            paragraph.add_run(usefull_days[num_jour][1]).bold = True
             paragraph.alignment = 1
         for num_entete in range(5):
             for num_jour in range(len(usefull_days)):
-                paragraph = table_exposure_condition.cell(
-                    num_entete+1, num_jour+1).paragraphs[0]
+                paragraph = table_exposure_condition.cell(num_entete+1, num_jour+1).paragraphs[0]
                 value = place_dict[place_id]["condition"][usefull_days[num_jour][0]][liste_entete_BDD[num_entete]] if liste_entete_BDD[num_entete] in place_dict[place_id]["condition"][usefull_days[num_jour][0]] else "ND"
                 if (liste_entete_BDD[num_entete] == "conductivity") & (value is not None):
                     paragraph.add_run(str(int(value) if value!='ND' else "ND"))
@@ -340,15 +307,11 @@ def word_main(campaign, agence, path_photo="Photos", path_output="output", num_c
             paragraph_survie.add_run((place_dict[place_id]['chemistry_survival'] if 'chemistry_survival' in place_dict[place_id] else 'ND').replace('.', ','))
             paragraph_survie.alignment = 1
 
-            table_exposure_condition.cell(7, 0).merge(
-                table_exposure_condition.cell(7, len(usefull_days)))
-            paragraph_comment = table_exposure_condition.cell(
-                7, 0).paragraphs[0]
+            table_exposure_condition.cell(7, 0).merge(table_exposure_condition.cell(7, len(usefull_days)))
+            paragraph_comment = table_exposure_condition.cell(7, 0).paragraphs[0]
         else:
-            table_exposure_condition.cell(6, 0).merge(
-                table_exposure_condition.cell(6, len(usefull_days)))
-            paragraph_comment = table_exposure_condition.cell(
-                6, 0).paragraphs[0]
+            table_exposure_condition.cell(6, 0).merge(table_exposure_condition.cell(6, len(usefull_days)))
+            paragraph_comment = table_exposure_condition.cell(6, 0).paragraphs[0]
 
         comment = ""
         for jour in usefull_days:
@@ -359,8 +322,7 @@ def word_main(campaign, agence, path_photo="Photos", path_output="output", num_c
         paragraph_comment.add_run(comment)
         for num_entete in range(7+chemistry):
             for num_jour in range(1+len(usefull_days)):
-                paragraph = table_exposure_condition.cell(
-                    num_entete, num_jour).paragraphs[0]
+                paragraph = table_exposure_condition.cell(num_entete, num_jour).paragraphs[0]
                 paragraph.paragraph_format.space_after = Pt(2)
                 paragraph.paragraph_format.space_before = Pt(2)
         print(f'Page de la référence {place_dict[place_id]["reference"]} créée')

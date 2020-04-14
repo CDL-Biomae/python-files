@@ -54,6 +54,8 @@ def load_data(reference):
                         place_dict[place_id]["condition"]["temperature_max"] = round(sensor2_max,1) if sensor2_max else round(sensor3_max,1)
             for mp_id, recordedAt,temperature, conductivity, ph, oxygen, barrel_type, comment in context_data:
                 if measurepoint_id==mp_id:
+                    if barrel_type :
+                        place_dict[place_id]["barrel_type"] = barrel_type
                     for J in J_dict[place_id]:  
                         if J!="J28" and J!="N" and J_dict[place_id][J]["full_date"] and J_dict[place_id][J]["full_date"]==recordedAt :
                             if conductivity:
@@ -66,8 +68,6 @@ def load_data(reference):
                                 place_dict[place_id]["condition"][J]["temperature"] = temperature
                             if comment :
                                 place_dict[place_id]["condition"][J]["comment"] = comment
-                            if barrel_type :
-                                place_dict[place_id]["barrel_type"] = barrel_type
 
                             place_dict[place_id]["condition"][J]["date"] = (J_dict[place_id][J]["full_date"]).strftime("%d/%m/%Y %H:%M")
                             if not year : 
