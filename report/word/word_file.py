@@ -26,14 +26,15 @@ def word_main(campaign, agence, path_photo="Photos", path_output="output", num_c
     font = style.font
     font.name = "Arial"
     font.size = Pt(10)
-    place_dict, year = load_data(
+    place_dict, year, week_start_number, week_end_number = load_data(
         campaign)
     print('Données récupérées !')
 
-
+    ## Table des matières
     doc.add_page_break()
     summary = doc.add_paragraph('Table des matières')
     summary.alignment = 1
+    summary.paragraph_format.space_after = Pt(5)
     summary.bold = True
 
     paragraph = doc.add_paragraph()
@@ -60,16 +61,149 @@ def word_main(campaign, agence, path_photo="Photos", path_output="output", num_c
     r_element.append(fldChar4)
     p_element = paragraph._p
     
+    ## Synthèse d'opération de terrain
+    doc.add_page_break()
+    synthesis_table_title = doc.add_heading("Synthèse d'opération de terrain")
+    synthesis_table_title.alignment = 1
+    synthesis_table_title.space_after = Pt(5)
+    synthesis_table = doc.add_table(rows=13, cols=2, style='Style1')
+    for row in range(13):
+        paragraph = synthesis_table.cell(row, 1).paragraphs[0]
+        paragraph.paragraph_format.space_after = Pt(10)
+        paragraph.paragraph_format.space_before = Pt(10)
+    
+    paragraph = synthesis_table.cell(0, 0).paragraphs[0]
+    paragraph.paragraph_format.space_after = Pt(10)
+    paragraph.paragraph_format.space_before = Pt(10)
+
+    synthesis_table.cell(0,1).merge(synthesis_table.cell(0,0)).paragraphs[0].add_run(f"Campagne {num_campaign} - {year}").bold = True
+    width_total = synthesis_table.cell(0,0).width
+    for cell in synthesis_table.column_cells(0):
+        cell.width = width_total*0.3
+    for cell in synthesis_table.column_cells(1):
+        cell.width = width_total
+
+    synthesis_table.cell(0,1).paragraphs[0].alignment = 1
+
+    synthesis_table.cell(1,0).paragraphs[0].add_run("Nombre de stations").bold = True
+    synthesis_table.cell(1,1).paragraphs[0].add_run(f"{len(list(place_dict.keys()))}").alignment = 1
+    
+    synthesis_table.cell(2,0).paragraphs[0].add_run("Date d'exposition \n(début/fin)").bold = True
+    synthesis_table.cell(2,1).paragraphs[0].add_run(f"Semaine {week_start_number} / Semaine {week_end_number}").alignment = 1
+    
+    synthesis_table.cell(3,0).paragraphs[0].add_run("Bioessai(s)").bold = True
+    synthesis_table.cell(3,1).paragraphs[0].add_run("Bioaccumulation selon la norme Afnor-XP-T90-721").alignment = 1
+    
+    synthesis_table.cell(4,0).merge(synthesis_table.cell(5,0).merge(synthesis_table.cell(6,0))).paragraphs[0].add_run("Domaine d'application").bold = True
+
+    not_conform_list = []
+    conductivity_not_conform_number = 0
+    temperature_not_conform_number = 0
+    ph_not_conform_number = 0
+    for place_id in place_dict:
+        if len(place_dict[place_id]["not conform"]):
+            not_conform_type_list = []
+            if agence:
+                not_conform_list.append((place_dict[place_id]["agency"] +" : " if "agency" in place_dict[place_id] else "")+ translate(place_dict[place_id]["name"]))
+            else :
+                not_conform_list.append("Point " + str(place_dict[place_id]["number"]).replace(',', '-') + " : " + translate(place_dict[place_id]['name']))
+
+            if "conductivity" in place_dict[place_id]["not conform"]:
+                not_conform_type_list.append("conductivité")
+                conductivity_not_conform_number +=1
+            if "chemistry_temperature" in place_dict[place_id]["not conform"] or "reproduction_temperature" in place_dict[place_id]["not conform"] or "alimentation_temperature" in place_dict[place_id]["not conform"]:
+                not_conform_type_list.append("température")
+                temperature_not_conform_number +=1
+            if "ph" in place_dict[place_id]["not conform"]:
+                not_conform_type_list.append("ph")
+                ph_not_conform_number +=1
+            precision = ' ('
+            for index, not_conform_type in enumerate(not_conform_type_list):
+                if index==len(not_conform_type_list)-1 and index>0 :
+                    precision+=" et " + not_conform_type + ")"
+                elif index==len(not_conform_type_list)-1 :
+                    precision+=not_conform_type + ")"
+                elif index==0 :
+                    precision+=not_conform_type
+                else :
+                    precision+=", " + not_conform_type
+            not_conform_list[-1]+=precision
+    
+    synthesis_table.cell(4,1).paragraphs[0].add_run("Conforme\n").bold = True
+    synthesis_table.cell(4,1).paragraphs[0].add_run(f"{len(list(place_dict.keys())) - len(not_conform_list)} stations sur {len(list(place_dict.keys()))} ")
+    synthesis_table.cell(5,1).paragraphs[0].add_run("Non Conforme\n").bold = True
+    not_conform_resume = "Aucune station"
+    if len(not_conform_list):
+        if len(not_conform_list) == 1:
+            not_conform_resume = "1 station (voir ci-dessous)\n"
+            if conductivity_not_conform_number:
+                not_conform_resume+="Conductivité" 
+            if temperature_not_conform_number:
+                not_conform_resume+="Température" 
+            if ph_not_conform_number:
+                not_conform_resume+="pH"
+        else :
+            not_conform_resume = f"{len(not_conform_list)} stations (voir ci-dessous)\n" 
+            if conductivity_not_conform_number:
+                not_conform_resume+=f"Conductivité({conductivity_not_conform_number})"
+            if temperature_not_conform_number:
+                not_conform_resume+=(", " if conductivity_not_conform_number else "") + f"Température({temperature_not_conform_number})"
+            if ph_not_conform_number:
+                not_conform_resume+=(", " if conductivity_not_conform_number or temperature_not_conform_number else "") + f"pH({ph_not_conform_number})"
+
+    synthesis_table.cell(5,1).paragraphs[0].add_run(not_conform_resume)
+    for not_conform_station in not_conform_list:
+        synthesis_table.cell(6,1).paragraphs[0].add_run(not_conform_station + "\n")
+    
+    not_validated_list = []
+    for place_id in place_dict:
+        if "chemistry portion validation" in place_dict[place_id] and place_dict[place_id]["chemistry portion validation"]==0 :
+            if agence:
+                not_validated_list.append((place_dict[place_id]["agency"] +" : " if "agency" in place_dict[place_id] else "")+ translate(place_dict[place_id]["name"]))
+            else :
+                not_validated_list.append("Point " + str(place_dict[place_id]["number"]).replace(',', '-') + " : " + translate(place_dict[place_id]['name']))
+
+    synthesis_table.cell(7,0).merge(synthesis_table.cell(8,0).merge(synthesis_table.cell(9,0))).paragraphs[0].add_run("Prise d’essai minimale pour la réalisation de l’intégralité des analyses chimiques*").bold = True
+    synthesis_table.cell(7,1).paragraphs[0].add_run("Atteinte\n").bold = True
+    synthesis_table.cell(7,1).paragraphs[0].add_run(f"{len(list(place_dict.keys())) - len(not_validated_list)} stations sur {len(list(place_dict.keys()))} ")
+    synthesis_table.cell(8,1).paragraphs[0].add_run("Non atteinte\n").bold = True
+    not_validate_resume = "Aucune station"
+    if len(not_validated_list):
+        if len(not_validated_list) == 1:
+            not_validate_resume = "1 station (voir ci-dessous)"
+        else :
+            not_validate_resume = f"{len(not_validated_list)} stations (voir ci-dessous)" 
+            
+    synthesis_table.cell(8,1).paragraphs[0].add_run(not_validate_resume)
+    for not_validated_station in not_validated_list:
+        synthesis_table.cell(9,1).paragraphs[0].add_run(not_validated_station + "\n")
+    synthesis_table.cell(10,0).paragraphs[0].add_run("Vandalisme/Perte").bold = True
+    synthesis_table.cell(11,0).paragraphs[0].add_run("Survie nulle \n(Bioaccumulation)").bold = True
+    null_survival = ""
+    for place_id in place_dict:
+        if "chemistry_survival" in place_dict[place_id] and place_dict[place_id]["chemistry_survival"]=="0%":
+            if null_survival=="":
+                null_survival= (place_dict[place_id]["agency"] +" : " if "agency" in place_dict[place_id] else "")+ translate(place_dict[place_id]["name"])
+            else :
+                null_survival="\n" + (place_dict[place_id]["agency"] +" : " if "agency" in place_dict[place_id] else "")+ translate(place_dict[place_id]["name"])
+    
+    synthesis_table.cell(11,1).paragraphs[0].add_run(null_survival)
+    synthesis_table.cell(12,0).paragraphs[0].add_run("Autres remarques").bold = True
+    doc.add_paragraph().add_run("*La prise d’essai est confirmée par le laboratoire d’analyses chimiques après lyophilisation de l’échantillon. En cas de non atteinte de la prise d’essai minimale, le laboratoire peut demander au client de faire certains choix de techniques d’analyses.").italic=True
+
+    ## Stations de mesure
     for place_id in place_dict:
         doc.add_page_break()
         if agence:
             title = doc.add_heading((place_dict[place_id]["agency"] +" : " if "agency" in place_dict[place_id] else "")+ translate(place_dict[place_id]["name"]) + "   " + place_dict[place_id]["reference"] )
             title.alignment = 1
             title.bold = True
+            title.space_after = Pt(5)
         else:
             title = doc.add_heading("Point " + str(place_dict[place_id]["number"]).replace(',', '-') + " : " + translate(place_dict[place_id]['name']))
             title.alignment = 1
             title.bold = True
+            title.space_after = Pt(5)
             
         table_geo_1 = doc.add_table(rows=2, cols=6)
         
