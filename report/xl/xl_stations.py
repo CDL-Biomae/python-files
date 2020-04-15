@@ -1,4 +1,4 @@
-from tools import QueryScript, list_to_dict, translate
+from tools import QueryScript, translate, convert_gps_into_lambert
 import pandas as pd
 import env
 
@@ -13,10 +13,10 @@ def create_stations_dataframe(head_dataframe, campaigns_dict, measurepoint_list,
     for campaign_id in campaigns_dict:
 
 
-        matrix = [[None]*7]*place_length
+        matrix = [[None]*8]*place_length
         for place_id in campaigns_dict[campaign_id]["place"]:
            
-            temp = [None]*7
+            temp = [None]*8
             for code, network, hydroecoregion in agency_data:
                 if "agency" in campaigns_dict[campaign_id]["place"][place_id] and code==campaigns_dict[campaign_id]["place"][place_id]["agency"]:
                     temp[0],temp[1]=translate(network), hydroecoregion
@@ -33,12 +33,15 @@ def create_stations_dataframe(head_dataframe, campaigns_dict, measurepoint_list,
                             temp[4] = f"{latitude}, {longitude}" if latitude and longitude else None
                         if not temp[5]:
                             temp[5] = f"Y {lambertY}, X {lambertX}" if lambertX and lambertY else None
-                        if not temp[6]:
-                            temp[6] = f"{latitudeSpotted}, {longitudeSpotted}" if latitudeSpotted and longitudeSpotted else None
+                        if not temp[6] and latitudeSpotted and longitudeSpotted :
+                            temp[6] = f"{latitudeSpotted}, {longitudeSpotted}"
+                            lambertXSpotted, lambertYSpotted = convert_gps_into_lambert(latitudeSpotted, longitudeSpotted)
+                            temp[7] = f"Y {round(lambertYSpotted,1)}, X {round(lambertXSpotted,1)}"
+
             matrix[place_list.index(campaigns_dict[campaign_id]["place"][place_id]["number"])] = temp
         global_matrix.append(matrix)
 
-    matrix_filled = [[None]*7]*place_length
+    matrix_filled = [[None]*8]*place_length
     if campaigns_number>1:
         for campaign in global_matrix :
             for place_number in range(place_length) :
@@ -53,8 +56,7 @@ def create_stations_dataframe(head_dataframe, campaigns_dict, measurepoint_list,
             if not content :
                 matrix_filled[place_number][index] = 'ND'
    
-    df_values = pd.DataFrame(matrix_filled, columns=['Type de réseau', 'Hydroécorégion', 'Masse d\'eau', 'Adresse', 'Coordonnées de référence', 'Coordonnées de référence (Lambert)', 'Coordonnées réelles'])
-    df_values.columns = ['Type de réseau', 'Hydroécorégion', 'Masse d\'eau', 'Adresse', 'Coordonnées de référence', 'Coordonnées de référence (Lambert)', 'Coordonnées réelles']
+    df_values = pd.DataFrame(matrix_filled, columns=['Type de réseau', 'Hydroécorégion', 'Masse d\'eau', 'Adresse', 'Coordonnées de référence', 'Coordonnées de référence (Lambert)', 'Coordonnées réelles', 'Coordonnées réelles (Lambert)'])
     df_concat = pd.concat([df_renamed, df_values], axis=1)
     df_stations = df_concat.sort_values('#')
 

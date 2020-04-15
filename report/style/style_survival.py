@@ -19,7 +19,7 @@ def add_style_survie(survie_dataframe, filename, folder_PATH):
     ws.column_dimensions['A'].width = 3
     ws.column_dimensions['B'].width = 30
     ws.column_dimensions['C'].width = 12
-    ws.column_dimensions['D'].width = 3
+    ws.column_dimensions['D'].width = 6
     ws.column_dimensions['E'].width = 45
     ws.column_dimensions['F'].width = 14
     ws.column_dimensions['G'].width = 20

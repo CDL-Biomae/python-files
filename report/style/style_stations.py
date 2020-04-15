@@ -26,6 +26,7 @@ def add_style_stations(stations_dataframe, filename, folder_PATH):
     ws.column_dimensions['I'].width = 27
     ws.column_dimensions['J'].width = 37
     ws.column_dimensions['K'].width = 25
+    ws.column_dimensions['L'].width = 37
 
     ## HEADER STYLE ##
     header_row = '2'

@@ -1,4 +1,4 @@
-from tools import QueryScript, translate
+from tools import QueryScript, translate, convert_gps_into_lambert
 from report import initialize
 from calcul import survival
 import env
@@ -11,7 +11,7 @@ def load_data(reference):
     agency_data = QueryScript(f"SELECT code, network, hydroecoregion, latitude, longitude FROM {env.DATABASE_RAW}.Agency  WHERE code IN {tuple(agency_code_list) if len(agency_code_list)>1 else '('+(str(agency_code_list[0]) if len(agency_code_list) else '0')+')'};").execute()
     context_data = QueryScript(f"SELECT measurepoint_id, recordedAt, temperature, conductivity, ph, oxygen, type, comment FROM {env.DATABASE_RAW}.MeasureExposureCondition WHERE measurepoint_id IN {tuple(measurepoint_list) if len(measurepoint_list)>1 else '('+str(measurepoint_list[0])+')'}").execute()
     temperatures_data = QueryScript(f"SELECT measurepoint_id, sensor2_min, sensor2_average, sensor2_max, sensor3_min, sensor3_average, sensor3_max   FROM {env.DATABASE_TREATED}.average_temperature WHERE version=  {env.CHOSEN_VERSION()} and measurepoint_id IN {tuple(measurepoint_list) if len(measurepoint_list)>1 else '('+str(measurepoint_list[0])+')'}").execute()
-    geographic_data = QueryScript(f"SELECT id, latitudeSpotted, longitudeSpotted, lambertXSpotted, lambertYSpotted, city, zipcode, stream, latitude, longitude FROM {env.DATABASE_RAW}.Measurepoint WHERE id IN {tuple(measurepoint_list) if len(measurepoint_list)>1 else '('+str(measurepoint_list[0])+')'}").execute()
+    geographic_data = QueryScript(f"SELECT id, latitudeSpotted, longitudeSpotted, lambertX, lambertY, city, zipcode, stream FROM {env.DATABASE_RAW}.Measurepoint WHERE id IN {tuple(measurepoint_list) if len(measurepoint_list)>1 else '('+str(measurepoint_list[0])+')'}").execute()
     place_reference_data = QueryScript(f"SELECT Place.id, Place.reference FROM {env.DATABASE_RAW}.Measurepoint JOIN {env.DATABASE_RAW}.Place ON Place.id= Measurepoint.place_id WHERE Measurepoint.id IN {tuple(measurepoint_list) if len(measurepoint_list)>1 else '('+str(measurepoint_list[0])+')'}").execute()
     chemistry_survival = survival(chemistry_pack_list)
     global_matrix = []
@@ -72,26 +72,25 @@ def load_data(reference):
                             place_dict[place_id]["condition"][J]["date"] = (J_dict[place_id][J]["full_date"]).strftime("%d/%m/%Y %H:%M")
                             if not year : 
                                 year = J_dict[place_id][J]["full_date"].year
-            for mp_id, latitudeSpotted, longitudeSpotted, lambertXSpotted, lambertYSpotted, city, zipcode, stream, latitude, longitude in geographic_data:
+            for mp_id, latitudeSpotted, longitudeSpotted, lambertX, lambertY, city, zipcode, stream in geographic_data:
                 if mp_id==measurepoint_id :
-                    if latitudeSpotted :
+                    if latitudeSpotted and longitudeSpotted :
                         place_dict[place_id]["latitudeSpotted"] = f"{latitudeSpotted}".replace(',', '.')
-                    if longitudeSpotted :
                         place_dict[place_id]["longitudeSpotted"] = f"{longitudeSpotted}".replace(',', '.')
-                    if lambertXSpotted :
-                        place_dict[place_id]["lambertXSpotted"] = f"{lambertXSpotted}".replace(',', '.')
-                    if lambertYSpotted :
-                        place_dict[place_id]["lambertYSpotted"] = f"{lambertYSpotted}".replace(',', '.')
+                        lambertXSpotted, lambertYSpotted = convert_gps_into_lambert(latitudeSpotted, longitudeSpotted)
+                        place_dict[place_id]["lambertXSpotted"] = f"{round(lambertXSpotted,1)}".replace(',', '.')
+                        place_dict[place_id]["lambertYSpotted"] = f"{round(lambertYSpotted,1)}".replace(',', '.')
+                    if lambertX and lambertY :
+                        place_dict[place_id]["lambertX"] = f"{lambertX}".replace(',', '.')
+                        place_dict[place_id]["lambertY"] = f"{lambertY}".replace(',', '.')
+
                     if city :
                         place_dict[place_id]["city"] = translate(city)
                     if zipcode :
                         place_dict[place_id]["zipcode"] = zipcode
                     if stream:
                         place_dict[place_id]["stream"] = f"{stream}".replace(',', '.')
-                    if latitude :
-                        place_dict[place_id]["latitude"] = f"{latitude}".replace(',', '.')
-                    if longitude :
-                        place_dict[place_id]["longitude"] = f"{longitude}".replace(',', '.')
+
     with open('data.json','w') as outfile :
         json.dump(place_dict, outfile)
     return place_dict, year

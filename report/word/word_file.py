@@ -31,12 +31,6 @@ def word_main(campaign, agence, path_photo="Photos", path_output="output", num_c
     print('Données récupérées !')
 
 
-    # doc.add_page_break()
-    # summary = doc.add_paragraph()
-    # summary_title = summary.add_run('Table des matières \n')
-    # summary_title.alignment = 1
-    # summary_title.bold = True
-    # summary_title.underline = True
     doc.add_page_break()
     summary = doc.add_paragraph('Table des matières')
     summary.alignment = 1
@@ -67,26 +61,18 @@ def word_main(campaign, agence, path_photo="Photos", path_output="output", num_c
     p_element = paragraph._p
     
     for place_id in place_dict:
-        # count+=1
         doc.add_page_break()
         if agence:
-            title = doc.add_heading((place_dict[place_id]["agency"] if "agency" in place_dict[place_id] else "")+" : "+ translate(place_dict[place_id]["name"]) + "   " + place_dict[place_id]["reference"] )
+            title = doc.add_heading((place_dict[place_id]["agency"] +" : " if "agency" in place_dict[place_id] else "")+ translate(place_dict[place_id]["name"]) + "   " + place_dict[place_id]["reference"] )
             title.alignment = 1
             title.bold = True
-            # case_header = table_geo_1.cell(0, 0).paragraphs[0].add_run((place_dict[place_id]["agency"] if "agency" in place_dict[place_id] else "")+" : "+ translate(place_dict[place_id]["name"]) + "   " + place_dict[place_id]["reference"] )
         else:
             title = doc.add_heading("Point " + str(place_dict[place_id]["number"]).replace(',', '-') + " : " + translate(place_dict[place_id]['name']))
             title.alignment = 1
             title.bold = True
-            # case_header = table_geo_1.cell(0, 0).paragraphs[0].add_run("Point " + str(place_dict[place_id]["number"]).replace(',', '-') + " : " + translate(place_dict[place_id]['name']))
-        # case_header.bold = True
+            
         table_geo_1 = doc.add_table(rows=2, cols=6)
-        # add_bookmark(paragraph=table_geo_1.cell(0, 0).paragraphs[0], bookmark_name=str(count))
-        # if agence :
-        #     add_link(paragraph=summary, link_to=str(count), text=(f"{translate(place_dict[place_id]['name'])}"+ '\n'), tool_tip=f"{translate(place_dict[place_id]['name'])}")
-        # else :
-        #     add_link(paragraph=summary, link_to=str(count), text=(f"Point {place_dict[place_id]['number']} : {translate(place_dict[place_id]['name'])}"+'\n'), tool_tip=f"{translate(place_dict[place_id]['name'])}")
-
+        
         table_geo_1.cell(0, 1).merge(table_geo_1.cell(0, 2))
         table_geo_1.cell(0, 4).merge(table_geo_1.cell(0, 5))
         table_geo_1.cell(1, 0).merge(table_geo_1.cell(1, 1))
@@ -153,16 +139,12 @@ def word_main(campaign, agence, path_photo="Photos", path_output="output", num_c
 
             table_geo_2.cell(2, 0).paragraphs[0].add_run(
                 "Coordonnées Agence Lambert 93 :").bold = True
-            table_geo_2.cell(2, 2).paragraphs[0].add_run('Y ' + place_dict[place_id]['lambertYSpotted'] if "lambertYSpotted" in place_dict[place_id] else "ND")
-            table_geo_2.cell(2, 3).paragraphs[0].add_run('X ' + place_dict[place_id]['lambertXSpotted'] if "lambertXSpotted" in place_dict[place_id] else "ND")
+            table_geo_2.cell(2, 2).paragraphs[0].add_run('Y ' + place_dict[place_id]['lambertY'] if "lambertY" in place_dict[place_id] else "ND")
+            table_geo_2.cell(2, 3).paragraphs[0].add_run('X ' + place_dict[place_id]['lambertX'] if "lambertX" in place_dict[place_id] else "ND")
 
             table_geo_2.cell(3, 0).paragraphs[0].add_run("Coordonnées BIOMÆ en degrés décimaux : ").bold = True
             longitude = place_dict[place_id]['longitudeSpotted']
             latitude = place_dict[place_id]['latitudeSpotted']
-            if longitude == None:
-                longitude = place_dict[place_id]['longitudeTh']
-            if latitude == None:
-                latitude = place_dict[place_id]['latitudeTh']
             table_geo_2.cell(3, 2).paragraphs[0].add_run(
                 str(longitude))
             table_geo_2.cell(3, 3).paragraphs[0].add_run(
@@ -178,10 +160,6 @@ def word_main(campaign, agence, path_photo="Photos", path_output="output", num_c
                 "Coordonnées BIOMÆ en degrés décimaux : ").bold = True
             longitude = place_dict[place_id]['longitudeSpotted']
             latitude = place_dict[place_id]['latitudeSpotted']
-            if longitude == None:
-                longitude = place_dict[place_id]['longitudeTh']
-            if latitude == None:
-                latitude = place_dict[place_id]['latitudeTh']
             table_geo_2.cell(0, 2).paragraphs[0].add_run(
                 str(place_dict[place_id]['longitudeSpotted']))
             table_geo_2.cell(0, 3).paragraphs[0].add_run(
@@ -225,7 +203,7 @@ def word_main(campaign, agence, path_photo="Photos", path_output="output", num_c
         table_image.cell(1, 0).merge(table_image.cell(1, 1))
 
         if agence:
-            table_image.cell(0, 0).paragraphs[0].add_run((place_dict[place_id]['agency'] if 'agency' in place_dict[place_id] else "")+ " : " + translate(place_dict[place_id]['name']) + "  " + place_dict[place_id]["reference"]).bold = True
+            table_image.cell(0, 0).paragraphs[0].add_run((place_dict[place_id]['agency']+ " : " if 'agency' in place_dict[place_id] else "") + translate(place_dict[place_id]['name']) + "  " + place_dict[place_id]["reference"]).bold = True
         else:
             table_image.cell(0, 0).paragraphs[0].add_run("Point " + str(place_dict[place_id]["number"]).replace(',','-') + " : " +
                                                             translate(place_dict[place_id]['name'])).bold = True
@@ -435,40 +413,3 @@ def rotation_image(path_photo):
     except (AttributeError, KeyError, IndexError):
         # cases: image don't have getexif
         pass
-
-def add_bookmark(paragraph='', bookmark_text='', bookmark_name=''):
-    run = paragraph.add_run()
-    tag = run._r
-    start = docx.oxml.shared.OxmlElement('w:bookmarkStart')
-    start.set(docx.oxml.ns.qn('w:id'), '0')
-    start.set(docx.oxml.ns.qn('w:name'), bookmark_name)
-    tag.append(start)
-
-    text = docx.oxml.OxmlElement('w:r')
-    text.text = bookmark_text
-    tag.append(text)
-
-    end = docx.oxml.shared.OxmlElement('w:bookmarkEnd')
-    end.set(docx.oxml.ns.qn('w:id'), '0')
-    end.set(docx.oxml.ns.qn('w:name'), bookmark_name)
-    tag.append(end)
-
-def add_link(paragraph, link_to, text, tool_tip=None):
-    # create hyperlink node
-    hyperlink = docx.oxml.shared.OxmlElement('w:hyperlink')
-
-    # set attribute for link to bookmark
-    hyperlink.set(docx.oxml.shared.qn('w:anchor'), link_to,)
-
-    if tool_tip is not None:
-        # set attribute for link to bookmark
-        hyperlink.set(docx.oxml.shared.qn('w:tooltip'), tool_tip,)
-
-    new_run = docx.oxml.shared.OxmlElement('w:r')
-    rPr = docx.oxml.shared.OxmlElement('w:rPr')
-    new_run.append(rPr)
-    new_run.text = text
-    hyperlink.append(new_run)
-    r = paragraph.add_run()
-    r._r.append(hyperlink)
-    r.font.name = "Calibri"
