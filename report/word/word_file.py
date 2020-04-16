@@ -100,7 +100,10 @@ def word_main(campaign, agence, path_photo="Photos", path_output="output", num_c
     conductivity_not_conform_number = 0
     temperature_not_conform_number = 0
     ph_not_conform_number = 0
+    oxygen_not_conform_number = 0
+    not_conform_explination_dict = {}
     for place_id in place_dict:
+        not_conform_explination = " "
         if len(place_dict[place_id]["not conform"]):
             not_conform_type_list = []
             if agence:
@@ -108,15 +111,71 @@ def word_main(campaign, agence, path_photo="Photos", path_output="output", num_c
             else :
                 not_conform_list.append("Point " + str(place_dict[place_id]["number"]).replace(',', '-') + " : " + translate(place_dict[place_id]['name']))
 
-            if "conductivity" in place_dict[place_id]["not conform"]:
+            if "min_conductivity_chemistry" in place_dict[place_id]["not conform"] or "max_conductivity_chemistry" in place_dict[place_id]["not conform"] or "min_conductivity_tox" in place_dict[place_id]["not conform"] or "max_conductivity_tox" in place_dict[place_id]["not conform"]:
                 not_conform_type_list.append("conductivité")
                 conductivity_not_conform_number +=1
-            if "chemistry_temperature" in place_dict[place_id]["not conform"] or "reproduction_temperature" in place_dict[place_id]["not conform"] or "alimentation_temperature" in place_dict[place_id]["not conform"]:
+                if "min_conductivity_chemistry" in place_dict[place_id]["not conform"] or "min_conductivity_tox" in place_dict[place_id]["not conform"] :
+                    if "min_conductivity_chemistry" in place_dict[place_id]["not conform"] and not "min_conductivity_tox" in place_dict[place_id]["not conform"] :
+                        not_conform_explination += f"La conductivité est inférieure aux recommandations pour l’encagement de gammares dans le cadre du biotest de chimie (min. 50 µS/cm). "
+                    if not "min_conductivity_chemistry" in place_dict[place_id]["not conform"] and "min_conductivity_tox" in place_dict[place_id]["not conform"] :
+                        not_conform_explination += f"La conductivité est inférieure aux recommandations pour l’encagement de gammares dans le cadre du biotest de reprotoxicité (min. 100 µS/cm). "
+                    if "min_conductivity_chemistry" in place_dict[place_id]["not conform"] and "min_conductivity_tox" in place_dict[place_id]["not conform"] :
+                        not_conform_explination += f"La conductivité est inférieure aux recommandations pour l’encagement de gammares dans le cadre du biotest de chimie et de reprotoxicité (min. 50 µS/cm). "
+                if "max_conductivity_chemistry" in place_dict[place_id]["not conform"] or "max_conductivity_tox" in place_dict[place_id]["not conform"] :
+                    if "max_conductivity_chemistry" in place_dict[place_id]["not conform"] and not "max_conductivity_tox" in place_dict[place_id]["not conform"] :
+                        not_conform_explination += f"La conductivité est supérieure aux recommandations pour l’encagement de gammares dans le cadre du biotest de chimie (max. 2000 µS/cm). "
+                    if not "max_conductivity_chemistry" in place_dict[place_id]["not conform"] and "max_conductivity_tox" in place_dict[place_id]["not conform"] :
+                        not_conform_explination += f"La conductivité est supérieure aux recommandations pour l’encagement de gammares dans le cadre du biotest de reprotoxicité (max. 1000 µS/cm). "
+                    if "max_conductivity_chemistry" in place_dict[place_id]["not conform"] and "max_conductivity_tox" in place_dict[place_id]["not conform"] :
+                        not_conform_explination += f"La conductivité est supérieure aux recommandations pour l’encagement de gammares dans le cadre du biotest de chimie et de reprotoxicité (min. 2000 µS/cm). "
+            if "min_temperature_chemistry" in place_dict[place_id]["not conform"] or "max_temperature_chemistry" in place_dict[place_id]["not conform"] or "min_temperature_alimentation" in place_dict[place_id]["not conform"] or "max_temperature_alimentation" in place_dict[place_id]["not conform"] or "min_temperature_reproduction" in place_dict[place_id]["not conform"] or "max_temperature_reproduction" in place_dict[place_id]["not conform"]:
                 not_conform_type_list.append("température")
                 temperature_not_conform_number +=1
-            if "ph" in place_dict[place_id]["not conform"]:
+                if "min_temperature_chemistry" in place_dict[place_id]["not conform"] or "min_temperature_alimentation" in place_dict[place_id]["not conform"]  :
+                    if "min_temperature_chemistry" in place_dict[place_id]["not conform"] and not "min_temperature_alimentation" in place_dict[place_id]["not conform"] and not "min_temperature_reproduction" in place_dict[place_id]["not conform"]  :
+                        not_conform_explination += f"La température est inférieure aux recommandations pour l’encagement de gammares dans le cadre du biotest de chimie (mesurée {round(place_dict[place_id]['condition']['chemistry_average_temperature_min'],2)} pour min. 1 °C). "
+                    if not "min_temperature_chemistry" in place_dict[place_id]["not conform"] and "min_temperature_alimentation" in place_dict[place_id]["not conform"] and not "min_temperature_reproduction" in place_dict[place_id]["not conform"]:
+                        not_conform_explination += f"La température est inférieure aux recommandations pour l’encagement de gammares dans le cadre des biotests de toxicité (mesurée {round(place_dict[place_id]['condition']['alimentation_average_temperature_min'],2)} pour min. 7 °C). "
+                    if not "min_temperature_chemistry" in place_dict[place_id]["not conform"] and not "min_temperature_alimentation" in place_dict[place_id]["not conform"] and "min_temperature_reproduction" in place_dict[place_id]["not conform"]:
+                        not_conform_explination += f"La température est inférieure aux recommandations pour l’encagement de gammares dans le cadre des biotests de toxicité (mesurée {round(place_dict[place_id]['condition']['reproduction_average_temperature_min'],2)} pour min. 7 °C). "
+                    if "min_temperature_chemistry" in place_dict[place_id]["not conform"] and "min_temperature_alimentation" in place_dict[place_id]["not conform"] and "min_temperature_reproduction" in place_dict[place_id]["not conform"] :
+                        not_conform_explination += f"La température est inférieure aux recommandations pour l’encagement de gammares dans le cadre des biotests de chimie et de toxicité (mesurée {round(place_dict[place_id]['condition']['average_temperature'],2)} pour min. 1 °C). "
+                if "max_temperature_chemistry" in place_dict[place_id]["not conform"] or "max_temperature_alimentation" in place_dict[place_id]["not conform"]  :
+                    if "max_temperature_chemistry" in place_dict[place_id]["not conform"] and not "max_temperature_alimentation" in place_dict[place_id]["not conform"] and not "max_temperature_reproduction" in place_dict[place_id]["not conform"]  :
+                        not_conform_explination += f"La température est supérieure aux recommandations pour l’encagement de gammares dans le cadre du biotest de chimie (mesurée {round(place_dict[place_id]['condition']['chemistry_average_temperature_max'],2)} pour max. 18 °C). "
+                    if not "max_temperature_chemistry" in place_dict[place_id]["not conform"] and "max_temperature_alimentation" in place_dict[place_id]["not conform"] and not "max_temperature_reproduction" in place_dict[place_id]["not conform"]:
+                        not_conform_explination += f"La température est supérieure aux recommandations pour l’encagement de gammares dans le cadre des biotests de toxicité (mesurée {round(place_dict[place_id]['condition']['alimentation_average_temperature_max'],2)} pour max. 20 °C). "
+                    if not "max_temperature_chemistry" in place_dict[place_id]["not conform"] and not "max_temperature_alimentation" in place_dict[place_id]["not conform"] and "max_temperature_reproduction" in place_dict[place_id]["not conform"]:
+                        not_conform_explination += f"La température est supérieure aux recommandations pour l’encagement de gammares dans le cadre des biotests de toxicité (mesurée {round(place_dict[place_id]['condition']['reproduction_average_temperature_max'],2)} pour max. 20 °C). "
+                    if "max_temperature_chemistry" in place_dict[place_id]["not conform"] and "max_temperature_alimentation" in place_dict[place_id]["not conform"] and "max_temperature_reproduction" in place_dict[place_id]["not conform"] :
+                        not_conform_explination += f"La température est supérieure aux recommandations pour l’encagement de gammares dans le cadre des biotests de chimie et de toxicité (mesurée {round(place_dict[place_id]['condition']['average_temperature'],2)} pour max. 20 °C). "
+            if "min_ph_chemistry" in place_dict[place_id]["not conform"] or "max_ph_chemistry" in place_dict[place_id]["not conform"] or "min_ph_tox" in place_dict[place_id]["not conform"] or "max_ph_tox" in place_dict[place_id]["not conform"]:
                 not_conform_type_list.append("ph")
                 ph_not_conform_number +=1
+                if "min_ph_chemistry" in place_dict[place_id]["not conform"] or "min_ph_tox" in place_dict[place_id]["not conform"] :
+                    if "min_ph_chemistry" in place_dict[place_id]["not conform"] and not "min_ph_tox" in place_dict[place_id]["not conform"] :
+                        not_conform_explination += f"Le pH est inférieur aux recommandations pour l’encagement de gammares dans le cadre du biotest de chimie (min. 6,3 µS/cm). "
+                    if not "min_ph_chemistry" in place_dict[place_id]["not conform"] and "min_ph_tox" in place_dict[place_id]["not conform"] :
+                        not_conform_explination += f"Le pH est inférieur aux recommandations pour l’encagement de gammares dans le cadre des biotests de toxicité (min. 6,3 µS/cm). "
+                    if "min_ph_chemistry" in place_dict[place_id]["not conform"] and "min_ph_tox" in place_dict[place_id]["not conform"] :
+                        not_conform_explination += f"Le pH est inférieur aux recommandations pour l’encagement de gammares dans le cadre des biotests de chimie et de toxicité (min. 6,3 µS/cm). "
+                if "max_ph_chemistry" in place_dict[place_id]["not conform"] or "max_ph_tox" in place_dict[place_id]["not conform"] :
+                    if "max_ph_chemistry" in place_dict[place_id]["not conform"] and not "max_ph_tox" in place_dict[place_id]["not conform"] :
+                        not_conform_explination += f"Le pH est supérieur aux recommandations pour l’encagement de gammares dans le cadre du biotest de chimie (max. 8,9 µS/cm). "
+                    if not "max_ph_chemistry" in place_dict[place_id]["not conform"] and "max_ph_tox" in place_dict[place_id]["not conform"] :
+                        not_conform_explination += f"Le pH est supérieur aux recommandations pour l’encagement de gammares dans le cadre des biotests de toxicité (max. 8,9 µS/cm). "
+                    if "max_ph_chemistry" in place_dict[place_id]["not conform"] and "max_ph_tox" in place_dict[place_id]["not conform"] :
+                        not_conform_explination += f"Le pH est supérieur aux recommandations pour l’encagement de gammares dans le cadre des biotests de chimie et de toxicité (min. 8,9 µS/cm). "
+            if "oxygen_chemistry" in place_dict[place_id]["not conform"] or "oxygen_tox" in place_dict[place_id]["not conform"]:
+                not_conform_type_list.append("oxygène")
+                oxygen_not_conform_number +=1
+                if "oxygen_chemistry" in place_dict[place_id]["not conform"] or "oxygen_tox" in place_dict[place_id]["not conform"] :
+                    if "oxygen_chemistry" in place_dict[place_id]["not conform"] and not "oxygen_tox" in place_dict[place_id]["not conform"] :
+                        not_conform_explination += f"Le taux d'oxygène est inférieur aux recommandations pour l’encagement de gammares dans le cadre du biotest de chimie (min. 5 mg/L). "
+                    if not "oxygen_chemistry" in place_dict[place_id]["not conform"] and "oxygen_tox" in place_dict[place_id]["not conform"] :
+                        not_conform_explination += f"Le taux d'oxygène est inférieur aux recommandations pour l’encagement de gammares dans le cadre des biotests de toxicité (min. 5 mg/L). "
+                    if "oxygen_chemistry" in place_dict[place_id]["not conform"] and "oxygen_tox" in place_dict[place_id]["not conform"] :
+                        not_conform_explination += f"Le taux d'oxygène est inférieur aux recommandations pour l’encagement de gammares dans le cadre des biotests de chimie et de toxicité (min. 5 mg/L). "
             precision = ' ('
             for index, not_conform_type in enumerate(not_conform_type_list):
                 if index==len(not_conform_type_list)-1 and index>0 :
@@ -128,7 +187,7 @@ def word_main(campaign, agence, path_photo="Photos", path_output="output", num_c
                 else :
                     precision+=", " + not_conform_type
             not_conform_list[-1]+=precision
-    
+        not_conform_explination_dict[place_id] = not_conform_explination
     synthesis_table.cell(4,1).paragraphs[0].add_run("Conforme\n").bold = True
     synthesis_table.cell(4,1).paragraphs[0].add_run(f"{len(list(place_dict.keys())) - len(not_conform_list)} stations sur {len(list(place_dict.keys()))} ")
     synthesis_table.cell(5,1).paragraphs[0].add_run("Non Conforme\n").bold = True
@@ -155,9 +214,13 @@ def word_main(campaign, agence, path_photo="Photos", path_output="output", num_c
     for not_conform_station in not_conform_list:
         synthesis_table.cell(6,1).paragraphs[0].add_run(not_conform_station + "\n")
     
+    vandalism_list = []
+    for place_id in place_dict:
+        if "vandalism" in place_dict[place_id]:
+           vandalism_list.append(place_id)
     not_validated_list = []
     for place_id in place_dict:
-        if "chemistry portion validation" in place_dict[place_id] and place_dict[place_id]["chemistry portion validation"]==0 :
+        if "chemistry portion validation" in place_dict[place_id] and place_dict[place_id]["chemistry portion validation"]==0 and place_id not in vandalism_list and place_dict[place_id]["chemistry_survival"]!="0%":
             if agence:
                 not_validated_list.append((place_dict[place_id]["agency"] +" : " if "agency" in place_dict[place_id] else "")+ translate(place_dict[place_id]["name"]))
             else :
@@ -178,6 +241,16 @@ def word_main(campaign, agence, path_photo="Photos", path_output="output", num_c
     for not_validated_station in not_validated_list:
         synthesis_table.cell(9,1).paragraphs[0].add_run(not_validated_station + "\n")
     synthesis_table.cell(10,0).paragraphs[0].add_run("Vandalisme/Perte").bold = True
+    for index, place_id in enumerate(vandalism_list):
+        if agence:
+            place_description = (place_dict[place_id]["agency"] +" : " if "agency" in place_dict[place_id] else "")+ translate(place_dict[place_id]["name"])
+        else :
+            place_description = "Point " + str(place_dict[place_id]["number"]).replace(',', '-') + " : " + translate(place_dict[place_id]['name'])
+        if index>0 :
+            synthesis_table.cell(10,1).paragraphs[0].add_run("\n" + place_description).bold = True
+        else :    
+            synthesis_table.cell(10,1).paragraphs[0].add_run(place_description)
+
     synthesis_table.cell(11,0).paragraphs[0].add_run("Survie nulle \n(Bioaccumulation)").bold = True
     null_survival = ""
     for place_id in place_dict:
@@ -187,7 +260,7 @@ def word_main(campaign, agence, path_photo="Photos", path_output="output", num_c
             else :
                 null_survival="\n" + (place_dict[place_id]["agency"] +" : " if "agency" in place_dict[place_id] else "")+ translate(place_dict[place_id]["name"])
     
-    synthesis_table.cell(11,1).paragraphs[0].add_run(null_survival)
+    synthesis_table.cell(11,1).paragraphs[0].add_run(null_survival if null_survival!="" else "Aucune station")
     synthesis_table.cell(12,0).paragraphs[0].add_run("Autres remarques").bold = True
     doc.add_paragraph().add_run("*La prise d’essai est confirmée par le laboratoire d’analyses chimiques après lyophilisation de l’échantillon. En cas de non atteinte de la prise d’essai minimale, le laboratoire peut demander au client de faire certains choix de techniques d’analyses.").italic=True
     ## Stations de mesure
@@ -475,16 +548,18 @@ def word_main(campaign, agence, path_photo="Photos", path_output="output", num_c
 
         comment = ""
         for jour in usefull_days:
-            if jour[3]:
+            if jour[3] and jour[3]!="":
                 comment +=("\n" if comment!="" else "") + f"{jour[0]} : "+ translate(jour[3].replace('\n',' '))
-        if comment=="":
+        comment += not_conform_explination_dict[place_id]
+        if comment==" ":
             comment = "Aucune remarque particulière"
+        paragraph_comment.add_run('Commentaires : \n').bold = True
         paragraph_comment.add_run(comment)
         for num_entete in range(7+chemistry):
             for num_jour in range(1+len(usefull_days)):
                 paragraph = table_exposure_condition.cell(num_entete, num_jour).paragraphs[0]
-                paragraph.paragraph_format.space_after = Pt(2)
-                paragraph.paragraph_format.space_before = Pt(2)
+                paragraph.paragraph_format.space_after = Pt(4)
+                paragraph.paragraph_format.space_before = Pt(4)
         print(f'Page de la référence {place_dict[place_id]["reference"] if "reference" in place_dict[place_id] else translate(place_dict[place_id]["name"])} créée')
 
 

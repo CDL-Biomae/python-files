@@ -40,6 +40,7 @@ def load_data(reference):
                     place_dict[place_id]["longitudeTh"] = longitudeTh 
         if "condition" not in place_dict[place_id]:
             place_dict[place_id]["condition"] = {"temperature_min":None, "temperature_max": None,"alimentation_average_temperature_min":None,"alimentation_average_temperature_max":None, "reproduction_average_temperature_min":None, "reproduction_average_temperature_max":None,"chemistry_average_temperature_min":None, "chemistry_average_temperature_max":None,"average_temperature":None, "J0":{}, "J7":{},"J14":{}, "J21":{}, "JN":{}}
+        place_dict[place_id]["not conform"] = []
         for measurepoint_id in place_dict[place_id]["measurepoint"]:
 
             ### Add chemistry _survival
@@ -116,7 +117,23 @@ def load_data(reference):
                             if temperature :
                                 place_dict[place_id]["condition"][J]["temperature"] = temperature
                             if comment :
-                                place_dict[place_id]["condition"][J]["comment"] = comment
+                                dissociated_comment = comment.split("\t")
+                                need_to_be_removed = []
+                                for information in dissociated_comment:
+                                    if information!="":
+                                        if len(information)>=10 and information[:10]=="Vandalisme":
+                                            place_dict[place_id]["vandalism"] = True
+                                        if information[-1]=="%" or (len(information)>3 and information[:4]=='Scan') or information[0]=='#' or (len(information)>2 and information[:3]=='RAS'):
+                                            need_to_be_removed.append(information)
+                                        else :
+                                            try :
+                                                int(information)
+                                                need_to_be_removed.append(information)
+                                            except ValueError :
+                                                pass
+                                for element in need_to_be_removed:
+                                    dissociated_comment.remove(element)
+                                place_dict[place_id]["condition"][J]["comment"] = ', '.join(dissociated_comment)
 
                             place_dict[place_id]["condition"][J]["date"] = (J_dict[place_id][J]["full_date"]).strftime("%d/%m/%Y %H:%M")
                             if not year : 
@@ -143,61 +160,87 @@ def load_data(reference):
                         place_dict[place_id]["stream"] = f"{stream}".replace(',', '.')
             
             ### Add conformity
-            place_dict[place_id]["not conform"] = []
             for parameter, min_treshold, max_threshold in conform_threshold:
                 
                 ### chemistry conformity
                 if measurepoint_id in chemistry_measurepoint_list :
                     if parameter == 'Température moyenne (chimie)' :
-                        if place_dict[place_id]["condition"]["chemistry_average_temperature_min"] and (min_treshold > place_dict[place_id]["condition"]["chemistry_average_temperature_min"] or place_dict[place_id]["condition"]["chemistry_average_temperature_max"] > max_threshold) :
-                            if not "chemistry_temperature" in place_dict[place_id]["not conform"] :
-                                place_dict[place_id]["not conform"].append("chemistry_temperature")
+                        if place_dict[place_id]["condition"]["chemistry_average_temperature_min"] and min_treshold > place_dict[place_id]["condition"]["chemistry_average_temperature_min"] :
+                            if not "min_temperature_chemistry" in place_dict[place_id]["not conform"] :
+                                place_dict[place_id]["not conform"].append("min_temperature_chemistry")
+                        if place_dict[place_id]["condition"]["chemistry_average_temperature_max"] and place_dict[place_id]["condition"]["chemistry_average_temperature_max"] > max_threshold :
+                            if not "max_temperature_chemistry" in place_dict[place_id]["not conform"] :
+                                place_dict[place_id]["not conform"].append("max_temperature_chemistry")
                     if parameter == 'Oxygène (chimie)':
                         for J in place_dict[place_id]["condition"]:
                             if J[0]=='J' and place_dict[place_id]["condition"][J] and "oxygen" in place_dict[place_id]["condition"][J]:
                                 if place_dict[place_id]["condition"][J]["oxygen"] and min_treshold > place_dict[place_id]["condition"][J]["oxygen"] :
-                                    if not "oxygen" in place_dict[place_id]["not conform"] :
-                                        place_dict[place_id]["not conform"].append("oxygen")
+                                    if not "oxygen_chemistry" in place_dict[place_id]["not conform"] :
+                                        place_dict[place_id]["not conform"].append("oxygen_chemistry")
                     if parameter == 'Conductivité (chimie)':
                         for J in place_dict[place_id]["condition"]:
                             if J[0]=='J' and place_dict[place_id]["condition"][J] and "conductivity" in place_dict[place_id]["condition"][J]:
-                                if place_dict[place_id]["condition"][J]["conductivity"] and (min_treshold > place_dict[place_id]["condition"][J]["conductivity"] or place_dict[place_id]["condition"][J]["conductivity"] > max_threshold):
-                                    if not "conductivity" in place_dict[place_id]["not conform"] :
-                                        place_dict[place_id]["not conform"].append("conductivity")
+                                if place_dict[place_id]["condition"][J]["conductivity"] :
+                                    if min_treshold > place_dict[place_id]["condition"][J]["conductivity"] :
+                                        if not "min_conductivity_chemistry" in place_dict[place_id]["not conform"] :
+                                            place_dict[place_id]["not conform"].append("min_conductivity_chemistry")
+                                    if place_dict[place_id]["condition"][J]["conductivity"] > max_threshold :
+                                        if not "max_conductivity_chemistry" in place_dict[place_id]["not conform"] :
+                                            place_dict[place_id]["not conform"].append("max_conductivity_chemistry")
                     if parameter == 'pH (chimie)':
                         for J in place_dict[place_id]["condition"]:
                             if J[0]=='J' and place_dict[place_id]["condition"][J] and "ph" in place_dict[place_id]["condition"][J]:
-                                if place_dict[place_id]["condition"][J]["ph"] and (min_treshold > place_dict[place_id]["condition"][J]["ph"] or place_dict[place_id]["condition"][J]["ph"] > max_threshold):
-                                    if not "ph" in place_dict[place_id]["not conform"] :
-                                        place_dict[place_id]["not conform"].append("ph")
+                                if place_dict[place_id]["condition"][J]["ph"] :
+                                    if min_treshold > place_dict[place_id]["condition"][J]["ph"] :
+                                        if not "min_ph_chemistry" in place_dict[place_id]["not conform"] :
+                                            place_dict[place_id]["not conform"].append("min_ph_chemistry")
+                                    if place_dict[place_id]["condition"][J]["ph"] > max_threshold:
+                                        if not "max_ph_chemistry" in place_dict[place_id]["not conform"] :
+                                            place_dict[place_id]["not conform"].append("max_ph_chemistry")
                     
                 ### toxicity conformity
                 if measurepoint_id in tox_measurepoint_list :
                     if parameter == 'Température moyenne (toxicité)':
-                        if place_dict[place_id]["condition"]["alimentation_average_temperature_min"] and (min_treshold > place_dict[place_id]["condition"]["alimentation_average_temperature_min"] or place_dict[place_id]["condition"]["alimentation_average_temperature_max"] > max_threshold) :
-                            if not "alimentation_temperature" in place_dict[place_id]["not conform"] :
-                                place_dict[place_id]["not conform"].append("alimentation_temperature")
-                        if place_dict[place_id]["condition"]["reproduction_average_temperature_min"] and (min_treshold > place_dict[place_id]["condition"]["reproduction_average_temperature_min"] or place_dict[place_id]["condition"]["reproduction_average_temperature_max"] > max_threshold) :
-                            if not "reproduction_temperature" in place_dict[place_id]["not conform"] :
-                                place_dict[place_id]["not conform"].append("reproduction_temperature")
+                        if place_dict[place_id]["condition"]["alimentation_average_temperature_min"] :
+                            if min_treshold > place_dict[place_id]["condition"]["alimentation_average_temperature_min"] :
+                                if not "min_temperature_alimentation" in place_dict[place_id]["not conform"] :
+                                    place_dict[place_id]["not conform"].append("min_temperature_alimentation")
+                            if place_dict[place_id]["condition"]["alimentation_average_temperature_max"] > max_threshold :
+                                if not "max_temperature_alimentation" in place_dict[place_id]["not conform"] :
+                                    place_dict[place_id]["not conform"].append("max_temperature_alimentation")
+                        if place_dict[place_id]["condition"]["reproduction_average_temperature_min"] :
+                            if min_treshold > place_dict[place_id]["condition"]["reproduction_average_temperature_min"] :
+                                if not "min_temperature_reproduction" in place_dict[place_id]["not conform"] :
+                                    place_dict[place_id]["not conform"].append("min_temperature_reproduction")
+                            if place_dict[place_id]["condition"]["reproduction_average_temperature_max"] > max_threshold :
+                                if not "max_temperature_reproduction" in place_dict[place_id]["not conform"] :
+                                    place_dict[place_id]["not conform"].append("max_temperature_reproduction")
                     if parameter == 'Oxygène (toxicité)':
                         for J in place_dict[place_id]["condition"]:
                             if J[0]=='J' and place_dict[place_id]["condition"][J] and "oxygen" in place_dict[place_id]["condition"][J]:
                                 if place_dict[place_id]["condition"][J]["oxygen"] and min_treshold > place_dict[place_id]["condition"][J]["oxygen"] :
-                                    if not "oxygen" in place_dict[place_id]["not conform"] :
-                                        place_dict[place_id]["not conform"].append("oxygen")
+                                    if not "oxygen_tox" in place_dict[place_id]["not conform"] :
+                                        place_dict[place_id]["not conform"].append("oxygen_tox")
                     if parameter == 'Conductivité (toxicité)':
                         for J in place_dict[place_id]["condition"]:
                             if J[0]=='J' and place_dict[place_id]["condition"][J] and "conductivity" in place_dict[place_id]["condition"][J]:
-                                if place_dict[place_id]["condition"][J]["conductivity"] and (min_treshold > place_dict[place_id]["condition"][J]["conductivity"] or place_dict[place_id]["condition"][J]["conductivity"] > max_threshold):
-                                    if not "conductivity" in place_dict[place_id]["not conform"] :
-                                        place_dict[place_id]["not conform"].append("conductivity")
+                                if place_dict[place_id]["condition"][J]["conductivity"]:
+                                    if min_treshold > place_dict[place_id]["condition"][J]["conductivity"] :
+                                        if not "min_conductivity_tox" in place_dict[place_id]["not conform"] :
+                                            place_dict[place_id]["not conform"].append("min_conductivity_tox")
+                                    if place_dict[place_id]["condition"][J]["conductivity"] > max_threshold:
+                                        if not "max_conductivity_tox" in place_dict[place_id]["not conform"] :
+                                            place_dict[place_id]["not conform"].append("max_conductivity_tox")
                     if parameter == 'pH (toxicité)':
                         for J in place_dict[place_id]["condition"]:
                             if J[0]=='J' and place_dict[place_id]["condition"][J] and "ph" in place_dict[place_id]["condition"][J]:
-                                if place_dict[place_id]["condition"][J]["ph"] and (min_treshold > place_dict[place_id]["condition"][J]["ph"] or place_dict[place_id]["condition"][J]["ph"] > max_threshold):
-                                    if not "ph" in place_dict[place_id]["not conform"] :
-                                        place_dict[place_id]["not conform"].append("ph")
+                                if place_dict[place_id]["condition"][J]["ph"]:
+                                    if min_treshold > place_dict[place_id]["condition"][J]["ph"] :
+                                        if not "min_ph_tox" in place_dict[place_id]["not conform"] :
+                                            place_dict[place_id]["not conform"].append("min_ph_tox")
+                                    if place_dict[place_id]["condition"][J]["ph"] > max_threshold:
+                                        if not "max_ph_tox" in place_dict[place_id]["not conform"] :
+                                            place_dict[place_id]["not conform"].append("max_ph_tox")
             ### Add chemistry portion validation 
             for mp_id, result in conform_chemistry_portion_test:
                 if mp_id==measurepoint_id: 
