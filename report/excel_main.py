@@ -76,7 +76,7 @@ def excel_main(list_campaigns, folder_PATH = "output"):
     
     campaigns_dict, measurepoint_list, chemistry_measurepoint_list, chemistry_pack_list, chemistry_7j_measurepoint_list, chemistry_21j_measurepoint_list, tox_measurepoint_list, agency_code_list, J_dict = initialize(list_campaigns)
     head_dataframe, head_filtered_dataframe, place_list = create_head_dataframe(campaigns_dict)
-    head_chemistry_dataframe, head_chemistry_7j_dataframe, head_chemistry_21j_dataframe =  create_head_special_dataframe(campaigns_dict, chemistry_measurepoint_list, chemistry_7j_measurepoint_list, chemistry_21j_measurepoint_list, tox_measurepoint_list)
+    head_chemistry_dataframe, head_chemistry_7j_dataframe, head_chemistry_21j_dataframe =  create_head_special_dataframe(campaigns_dict, chemistry_measurepoint_list, chemistry_7j_measurepoint_list, chemistry_21j_measurepoint_list)
 
     # ## CREATION DE L'ONGLET VERSION ##
 

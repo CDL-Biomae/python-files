@@ -190,7 +190,6 @@ def word_main(campaign, agence, path_photo="Photos", path_output="output", num_c
     synthesis_table.cell(11,1).paragraphs[0].add_run(null_survival)
     synthesis_table.cell(12,0).paragraphs[0].add_run("Autres remarques").bold = True
     doc.add_paragraph().add_run("*La prise d’essai est confirmée par le laboratoire d’analyses chimiques après lyophilisation de l’échantillon. En cas de non atteinte de la prise d’essai minimale, le laboratoire peut demander au client de faire certains choix de techniques d’analyses.").italic=True
-
     ## Stations de mesure
     for place_id in place_dict:
         doc.add_page_break()

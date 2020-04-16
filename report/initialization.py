@@ -34,7 +34,7 @@ def create_head_dataframe(campaigns_dict):
     list_dataframe_filtered.append(df_filtered)
     return df_concat_normal, df_filtered, place_done
 
-def create_head_special_dataframe(campaigns_dict, chemistry_measurepoint_list, chemistry_7j_measurepoint_list, chemistry_21j_measurepoint_list, tox_measurepoint_list):
+def create_head_special_dataframe(campaigns_dict, chemistry_measurepoint_list, chemistry_7j_measurepoint_list, chemistry_21j_measurepoint_list):
     list_dataframe = []
     list_dataframe_7j = []
     list_dataframe_21j = []
