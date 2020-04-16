@@ -10,7 +10,7 @@ class Neurotoxicity:
     def neurotoxicity(dict_pack):
 
         constant_AChE = QueryScript(
-            f" SELECT value   FROM {env.DATABASE_TREATED}.r2_constant WHERE name LIKE 'Constante ache%' AND version=  {env.LATEST_VERSION()}").execute()
+            f" SELECT value   FROM {env.DATABASE_TREATED}.r2_constant WHERE name LIKE 'Constante ache%' AND version=  {env.CHOSEN_VERSION()}").execute()
 
         pack_dict = {}
         for element in dict_pack:

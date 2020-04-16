@@ -23,10 +23,10 @@ class Reprotoxicity:
 
         # Récupération des dates de début et de fin
         output_dates_debut = QueryScript(
-            f" SELECT measurepoint_id, date   FROM {env.DATABASE_TREATED}.key_dates where date_id=3 and measurepoint_id IN {tuple(list_mp_repro) if len(list_mp_repro)>1 else '('+(str(list_mp_repro[0]) if len(list_mp_repro) else '0')+')'} and version=  {env.LATEST_VERSION()};"
+            f" SELECT measurepoint_id, date   FROM {env.DATABASE_TREATED}.key_dates where date_id=3 and measurepoint_id IN {tuple(list_mp_repro) if len(list_mp_repro)>1 else '('+(str(list_mp_repro[0]) if len(list_mp_repro) else '0')+')'} and version=  {env.CHOSEN_VERSION()};"
         ).execute()
         output_dates_fin = QueryScript(
-            f" SELECT measurepoint_id, date   FROM {env.DATABASE_TREATED}.key_dates where date_id=4 and measurepoint_id IN {tuple(list_mp_repro) if len(list_mp_repro)>1 else '('+(str(list_mp_repro[0]) if len(list_mp_repro) else '0')+')'} and version=  {env.LATEST_VERSION()};"
+            f" SELECT measurepoint_id, date   FROM {env.DATABASE_TREATED}.key_dates where date_id=4 and measurepoint_id IN {tuple(list_mp_repro) if len(list_mp_repro)>1 else '('+(str(list_mp_repro[0]) if len(list_mp_repro) else '0')+')'} and version=  {env.CHOSEN_VERSION()};"
         ).execute()
 
         output_mp_debut = [x[0] for x in output_dates_debut]
@@ -369,7 +369,7 @@ class Reprotoxicity:
         ## Calcul des valeurs de test unilatéral
         # Récupération du pourcentage attendu en B/C1
         output_expected = QueryScript(
-            f"  SELECT measurepoint_id, expected_C2   FROM {env.DATABASE_TREATED}.temperature_repro WHERE measurepoint_id IN {tuple(list_mp_repro) if len(list_mp_repro)>1 else '('+(str(list_mp_repro[0]) if len(list_mp_repro) else '0')+')'} and version=  {env.LATEST_VERSION()};"
+            f"  SELECT measurepoint_id, expected_C2   FROM {env.DATABASE_TREATED}.temperature_repro WHERE measurepoint_id IN {tuple(list_mp_repro) if len(list_mp_repro)>1 else '('+(str(list_mp_repro[0]) if len(list_mp_repro) else '0')+')'} and version=  {env.CHOSEN_VERSION()};"
         ).execute()
         dict_expected_BC1 = {pack_id: 0 for pack_id in list_pack_repro}
 
@@ -380,7 +380,7 @@ class Reprotoxicity:
 
         # Récupération des seuils de référence
         output_reference = QueryScript(
-            f"  SELECT name, value   FROM {env.DATABASE_TREATED}.r2_constant WHERE name IN ('Risque 1 Mue', 'Risque 2 Mue') and version=  {env.LATEST_VERSION()};"
+            f"  SELECT name, value   FROM {env.DATABASE_TREATED}.r2_constant WHERE name IN ('Risque 1 Mue', 'Risque 2 Mue') and version=  {env.CHOSEN_VERSION()};"
         ).execute()
         for row in output_reference:
             [name, value] = row
@@ -459,7 +459,7 @@ class Reprotoxicity:
         names = ['Constante surface des retards 1', 'Moyenne des surfaces de référence C2', 'SD des surfaces de référence C2']
 
         output_ref = QueryScript(
-            f"  SELECT name, value   FROM {env.DATABASE_TREATED}.r2_constant WHERE name IN {tuple(names) if len(names)>1 else '('+(str(names[0]) if len(names) else '0')+')'} and version= {env.LATEST_VERSION()};"
+            f"  SELECT name, value   FROM {env.DATABASE_TREATED}.r2_constant WHERE name IN {tuple(names) if len(names)>1 else '('+(str(names[0]) if len(names) else '0')+')'} and version= {env.CHOSEN_VERSION()};"
         ).execute()
         for row in output_ref:
             [name, value] = row

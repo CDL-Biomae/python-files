@@ -85,8 +85,7 @@ class QueryScript() :
         
       query = (self.__str__())
       if not admin :
-        cursor.execute(f" SELECT max(id) FROM {env.DATABASE_TREATED}.version")
-        version = tuple([element[0] for element in cursor])
+        version = tuple(env.CHOSEN_VERSION())
         new_rows = [row + version for row in self.rows]
         self.setRows(new_rows)
         

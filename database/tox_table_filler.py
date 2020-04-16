@@ -74,7 +74,7 @@ def run(cas):
 
     # Transformation de "indice de fecondité - moyenne" en "%Inhibition fecondité - Résultat attendu"
     ref_calcul = QueryScript(
-        f"SELECT value FROM {env.DATABASE_TREATED}.r2_constant WHERE name = 'indice de fertilité attendu - moyenne' AND version = {env.LATEST_VERSION()};"
+        f"SELECT value FROM {env.DATABASE_TREATED}.r2_constant WHERE name = 'indice de fertilité attendu - moyenne' AND version = {env.CHOSEN_VERSION()};"
     ).execute()[0]
     dict_percent_inhibition_fecondite = {}
     for mp in dict_fecondite_moyenne:
@@ -171,7 +171,7 @@ def run(cas):
 
     ## Cas 2: Mise à jour de la dernière version connue
     if cas == 2:
-        QueryScript(f"DELETE FROM {env.DATABASE_TREATED}.toxtable WHERE version = {env.LATEST_VERSION()};").execute(admin=True)
+        QueryScript(f"DELETE FROM {env.DATABASE_TREATED}.toxtable WHERE version = {env.CHOSEN_VERSION()};").execute(admin=True)
         fill_table = QueryScript(
             f"INSERT INTO {env.DATABASE_TREATED}.toxtable (measurepoint_id, male_survival_7_days, alimentation, neurotoxicity, female_survivor, number_days_exposition, number_female_concerned, percent_inhibition_fecondite, number_female_analysis, molting_cycle, number_female_concerned_area, endocrine_disruption, version) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s,%s, %s, %s)"
         )

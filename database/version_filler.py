@@ -14,8 +14,8 @@ def create_new_version(date=None, comment=None):
 
 def update_version():
     new_date = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-    QueryScript(f'UPDATE {env.DATABASE_TREATED}.version SET date="{new_date}" WHERE id={env.LATEST_VERSION()}').execute(admin=True)
-    print(f'Updating version {env.LATEST_VERSION()} at {datetime.now().strftime("%Y-%m-%d %H:%M:%S")}')
+    QueryScript(f'UPDATE {env.DATABASE_TREATED}.version SET date="{new_date}" WHERE id={env.CHOSEN_VERSION()}').execute(admin=True)
+    print(f'Updating version {env.CHOSEN_VERSION()} at {datetime.now().strftime("%Y-%m-%d %H:%M:%S")}')
 
 def run(cas, date, comment):
     ## On a 3 cas pour les requêtes SQL

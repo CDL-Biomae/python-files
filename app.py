@@ -175,11 +175,12 @@ class App(tk.Tk):
                 self.excel_showed.set(1)
 
 
+    def choose_version(self):
+        self.version_choice.set(self.version_choice.get())
 
-
-    def change_chosen_version(self):
+    def change_chosen_version(self, version=None):
         version_file = open("version.txt", "w")
-        version_file.write(f"CHOSEN_VERSION={self.version_choice.get()}")
+        version_file.write(f"CHOSEN_VERSION={version}")
         version_file.close()
 
 
@@ -227,6 +228,14 @@ class App(tk.Tk):
         tk.Button(master=self.frame_main, textvariable=self.other_mode, command=self.switch_mode, background="#87CEFA").grid(row=0)
         tk.Label(master=self.frame_main, text="Des nouvelles données ont\n été insérées récemment dans \n la base de données brutes ?").grid(row=1, column=0)
         tk.Button(master=self.frame_main, text="Rafraîchir la base données traitées", command=self.refresh).grid(row=1,column=1)
+        tk.Label(master=self.frame_main, text="Version à mettre à jour :").grid(row=2, column=0)
+        self.version_choice = tk.StringVar()
+        self.version_choice.set(env.LATEST_VERSION())
+        options_list = env.ALL_VERSIONS()
+        options_list.append('toutes')
+        options = tuple(options_list)
+        tk.OptionMenu(
+            self.frame_main, self.version_choice, *options).grid(row=2, column=1)
         
         self.frame_reference = tk.Frame(master=self)
         self.frame_reference_1 = tk.Frame(master=self.frame_reference)
@@ -257,7 +266,15 @@ class App(tk.Tk):
         
         
     def refresh(self):
-        fill.run(2)
+        print("Database management started...")
+        if self.version_choice.get()=='toutes':
+            for version in env.ALL_VERSIONS():
+                self.change_chosen_version(version)
+                fill.run(2)
+        else :
+            self.change_chosen_version(self.version_choice.get())
+            fill.run(2)
+        print("Database management finished")
     
     def add_new_version(self):
         fill.run(3, xl_path=self.reference_xl_path.get(), date=date.today().strftime("%d/%m/%Y"), comment=self.version_comment.get())

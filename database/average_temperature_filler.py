@@ -47,7 +47,7 @@ def create_global_dict(cas) :
             global_dict["data"][measurepoint_id] ={"key_dates":{date_id: str(date) if date else None}} 
 
     if cas==2:
-        last_update = QueryScript(f'SELECT date FROM {env.DATABASE_TREATED}.version WHERE id={env.LATEST_VERSION()}').execute()[0]
+        last_update = QueryScript(f'SELECT date FROM {env.DATABASE_TREATED}.version WHERE id={env.CHOSEN_VERSION()}').execute()[0]
         temperatures = QueryScript(f'SELECT measurepoint_id, pack_id, recordedAt, value, nature FROM {env.DATABASE_RAW}.MeasureTemperature WHERE updatedAt>="{last_update}"').execute()
         print(f'{len(temperatures)} rows loaded')
         global_dict["need_update"]=[]
@@ -140,7 +140,7 @@ def insert_average_temperature(cas,global_dict) :
         average_temperature_table.execute(admin=True)
     if cas==2:
         need_update = global_dict['need_update'] if len(global_dict['need_update']) else [0]
-        QueryScript(f"DELETE FROM {env.DATABASE_TREATED}.average_temperature WHERE version = {env.LATEST_VERSION()} and measurepoint_id in {tuple(need_update) if len(need_update)>1 else '('+(str(need_update[0]) if len(need_update) else '0')+')'};").execute(admin=True)
+        QueryScript(f"DELETE FROM {env.DATABASE_TREATED}.average_temperature WHERE version = {env.CHOSEN_VERSION()} and measurepoint_id in {tuple(need_update) if len(need_update)>1 else '('+(str(need_update[0]) if len(need_update) else '0')+')'};").execute(admin=True)
     insertion = QueryScript(f" INSERT INTO average_temperature (measurepoint_id, sensor1_average, sensor1_min, sensor1_max, sensor2_average, sensor2_min, sensor2_max, sensor3_average, sensor3_min, sensor3_max, sensor2_average_labo, version) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)")
     output = []
     for measurepoint_id in global_dict["data"]:
