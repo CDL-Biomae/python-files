@@ -22,8 +22,8 @@ def create_dataframe(result_dict, measurepoint_list):
     
     matrix = []
 
-    for measurepoint_id in result_dict:
-        if result_dict[measurepoint_id]:
+    for measurepoint_id in measurepoint_list:
+        if measurepoint_id in result_dict :
             matrix.append([''] + [result_dict[measurepoint_id][sandre] if sandre in result_dict[measurepoint_id] and  result_dict[measurepoint_id][sandre] !='0.0' else 'ND' for sandre in elements_metal ]+[''] + [result_dict[measurepoint_id][sandre] if  sandre in result_dict[measurepoint_id] and result_dict[measurepoint_id][sandre] !='0.0' else 'ND' for sandre in elements_PCB ]+[''] + [result_dict[measurepoint_id][sandre] if  sandre in result_dict[measurepoint_id] and result_dict[measurepoint_id][sandre] !='0.0' else 'ND' for sandre in elements_HAP ]+[''] + [result_dict[measurepoint_id][sandre] if  sandre in result_dict[measurepoint_id] and result_dict[measurepoint_id][sandre] !='0.0' else 'ND' for sandre in elements_others ] + [measurepoint_id])
         else :
             matrix.append([''] + ['ND' for sandre in elements_metal ]+[''] + ['ND' for sandre in elements_PCB ]+[''] + ['ND' for sandre in elements_HAP ]+[''] + ['ND' for sandre in elements_others ] + [measurepoint_id])
@@ -49,12 +49,11 @@ def create_empty_dataframe(result_dict, measurepoint_list):
     matrix = []
 
     # data = chemistry.result_by_packs_and_sandre(result_dict)
-    for measurepoint_id in result_dict:
-        if measurepoint_id in measurepoint_list:
-            if result_dict[measurepoint_id]:
-                matrix.append([''] + ['' for sandre in elements_metal ]+[''] + ['' for sandre in elements_PCB ]+[''] + ['' for sandre in elements_HAP ]+[''] + ['' for sandre in elements_others ] + [measurepoint_id])
-            else :
-                matrix.append([''] + ['ND' for sandre in elements_metal ]+[''] + ['ND' for sandre in elements_PCB ]+[''] + ['ND' for sandre in elements_HAP ]+[''] + ['ND' for sandre in elements_others ] + [measurepoint_id])
+    for measurepoint_id in measurepoint_list:
+        if measurepoint_id in result_dict:
+            matrix.append([''] + ['' for sandre in elements_metal ]+[''] + ['' for sandre in elements_PCB ]+[''] + ['' for sandre in elements_HAP ]+[''] + ['' for sandre in elements_others ] + [measurepoint_id])
+        else :
+            matrix.append([''] + ['ND' for sandre in elements_metal ]+[''] + ['ND' for sandre in elements_PCB ]+[''] + ['ND' for sandre in elements_HAP ]+[''] + ['ND' for sandre in elements_others ] + [measurepoint_id])
  
 
     df = pd.DataFrame(matrix)
@@ -68,14 +67,12 @@ def create_empty_dataframe(result_dict, measurepoint_list):
 def create_bbac_7j_dataframe(head_dataframe, result_dict, measurepoint_list):
     
     df_values = create_dataframe(result_dict, measurepoint_list)
-    head_dataframe = head_dataframe.reset_index(drop=True)
     df_concat = pd.concat([head_dataframe, df_values], axis=1)
     df_campaigns = df_concat.sort_values(['Numéro', 'Campagne'])
 
     return df_campaigns
 
 def create_bbac2_7j_dataframe(head_dataframe, result_dict, measurepoint_list):
-    head_dataframe = head_dataframe.reset_index(drop=True)
     df_values = create_empty_dataframe(result_dict, measurepoint_list)
     df_concat = pd.concat([head_dataframe, df_values], axis=1)
     df_campaigns = df_concat.sort_values(['Numéro', 'Campagne'])

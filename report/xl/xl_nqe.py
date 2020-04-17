@@ -13,9 +13,8 @@ def create_dataframe(result_dict, measurepoint_list):
     :return: dataframe:
     '''
     matrix = []
-    for measurepoint_id in result_dict:
-        if measurepoint_id in measurepoint_list:
-            if result_dict[measurepoint_id]:
+    for measurepoint_id in measurepoint_list:
+            if measurepoint_id in result_dict:
                 matrix.append([''] + [result_dict[measurepoint_id][sandre] if sandre in result_dict[measurepoint_id] and result_dict[measurepoint_id][sandre] !='0.0' else 'ND' for sandre in elements_crustacean ]+[''] + [result_dict[measurepoint_id][sandre] if sandre in result_dict[measurepoint_id] and result_dict[measurepoint_id][sandre] !='0.0' else 'ND' for sandre in elements_fish ] + [measurepoint_id])
             else :
                 matrix.append([''] + ['ND' for sandre in elements_crustacean ]+[''] + ['ND' for sandre in elements_fish ] + [measurepoint_id])
