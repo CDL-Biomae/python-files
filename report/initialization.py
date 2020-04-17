@@ -97,19 +97,23 @@ def create_head_special_dataframe(campaigns_dict, chemistry_measurepoint_list, c
                 list_dataframe_21j.append(df_21j)
     if len(list_dataframe)>1 :
         df_concat = pd.concat(list_dataframe)
+    elif len(list_dataframe)==1 :
+        df_concat = list_dataframe[0]
     else :
-        df_concat = df_normal 
+        df_concat = None
     if len(list_dataframe_7j)>1 :
         df_concat_7j = pd.concat(list_dataframe_7j)
+    elif len(list_dataframe_7j)==1 :
+        df_concat_7j = list_dataframe_7j[0] 
     else :
-        df_concat_7j = df_7j 
+        df_concat_7j = None
     if len(list_dataframe_21j)>1 :
         df_concat_21j = pd.concat(list_dataframe_21j)
+    elif len(list_dataframe_21j)==1 :
+        df_concat_21j = list_dataframe_21j[0]
     else :
-        df_concat_21j = df_21j
-   
-
-
+        df_concat_21j = None
+        
     return df_concat, df_concat_7j, df_concat_21j
 
 def create_campaigns_dict(references):

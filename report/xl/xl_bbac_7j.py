@@ -67,12 +67,14 @@ def create_empty_dataframe(result_dict, measurepoint_list):
 def create_bbac_7j_dataframe(head_dataframe, result_dict, measurepoint_list):
     
     df_values = create_dataframe(result_dict, measurepoint_list)
+    head_dataframe = head_dataframe.reset_index(drop=True)
     df_concat = pd.concat([head_dataframe, df_values], axis=1)
     df_campaigns = df_concat.sort_values(['Numéro', 'Campagne'])
 
     return df_campaigns
 
 def create_bbac2_7j_dataframe(head_dataframe, result_dict, measurepoint_list):
+    head_dataframe = head_dataframe.reset_index(drop=True)
     df_values = create_empty_dataframe(result_dict, measurepoint_list)
     df_concat = pd.concat([head_dataframe, df_values], axis=1)
     df_campaigns = df_concat.sort_values(['Numéro', 'Campagne'])
