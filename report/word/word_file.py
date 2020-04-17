@@ -118,16 +118,16 @@ def word_main(campaign, agence, path_photo="Photos", path_output="output", num_c
                     if "min_conductivity_chemistry" in place_dict[place_id]["not conform"] and not "min_conductivity_tox" in place_dict[place_id]["not conform"] :
                         not_conform_explination += f"La conductivité est inférieure aux recommandations pour l’encagement de gammares dans le cadre du biotest de chimie (min. 50 µS/cm). "
                     if not "min_conductivity_chemistry" in place_dict[place_id]["not conform"] and "min_conductivity_tox" in place_dict[place_id]["not conform"] :
-                        not_conform_explination += f"La conductivité est inférieure aux recommandations pour l’encagement de gammares dans le cadre du biotest de reprotoxicité (min. 100 µS/cm). "
+                        not_conform_explination += f"La conductivité est inférieure aux recommandations pour l’encagement de gammares dans le cadre des biotests de toxicité (min. 100 µS/cm). "
                     if "min_conductivity_chemistry" in place_dict[place_id]["not conform"] and "min_conductivity_tox" in place_dict[place_id]["not conform"] :
-                        not_conform_explination += f"La conductivité est inférieure aux recommandations pour l’encagement de gammares dans le cadre du biotest de chimie et de reprotoxicité (min. 50 µS/cm). "
+                        not_conform_explination += f"La conductivité est inférieure aux recommandations pour l’encagement de gammares dans le cadre des biotests de chimie et de toxicité (min. 50 µS/cm). "
                 if "max_conductivity_chemistry" in place_dict[place_id]["not conform"] or "max_conductivity_tox" in place_dict[place_id]["not conform"] :
                     if "max_conductivity_chemistry" in place_dict[place_id]["not conform"] and not "max_conductivity_tox" in place_dict[place_id]["not conform"] :
                         not_conform_explination += f"La conductivité est supérieure aux recommandations pour l’encagement de gammares dans le cadre du biotest de chimie (max. 2000 µS/cm). "
                     if not "max_conductivity_chemistry" in place_dict[place_id]["not conform"] and "max_conductivity_tox" in place_dict[place_id]["not conform"] :
-                        not_conform_explination += f"La conductivité est supérieure aux recommandations pour l’encagement de gammares dans le cadre du biotest de reprotoxicité (max. 1000 µS/cm). "
+                        not_conform_explination += f"La conductivité est supérieure aux recommandations pour l’encagement de gammares dans le cadre des biotests de toxicité (max. 1000 µS/cm). "
                     if "max_conductivity_chemistry" in place_dict[place_id]["not conform"] and "max_conductivity_tox" in place_dict[place_id]["not conform"] :
-                        not_conform_explination += f"La conductivité est supérieure aux recommandations pour l’encagement de gammares dans le cadre du biotest de chimie et de reprotoxicité (min. 2000 µS/cm). "
+                        not_conform_explination += f"La conductivité est supérieure aux recommandations pour l’encagement de gammares dans le cadre des biotests de chimie et de toxicité (min. 2000 µS/cm). "
             if "min_temperature_chemistry" in place_dict[place_id]["not conform"] or "max_temperature_chemistry" in place_dict[place_id]["not conform"] or "min_temperature_alimentation" in place_dict[place_id]["not conform"] or "max_temperature_alimentation" in place_dict[place_id]["not conform"] or "min_temperature_reproduction" in place_dict[place_id]["not conform"] or "max_temperature_reproduction" in place_dict[place_id]["not conform"]:
                 not_conform_type_list.append("température")
                 temperature_not_conform_number +=1
