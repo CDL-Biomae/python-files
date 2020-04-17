@@ -96,7 +96,7 @@ class App(tk.Tk):
 
         
     def main_button(self):
-        self.change_chosen_version()
+        self.change_chosen_version(self.version_choice.get())
         if len(self.campaign_list):
             if self.word_wanted.get():
                 if not self.output_folder_path.get():
