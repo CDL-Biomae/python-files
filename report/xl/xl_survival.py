@@ -3,7 +3,7 @@ from tools import QueryScript, translate
 import pandas as pd
 import env
 
-def create_survie_dataframe(campaigns_dict, chemistry_measurepoint_list):
+def create_survie_dataframe(campaigns_dict, chemistry_measurepoint_list, pack_list):
     '''
     Créé une dataframe qui contient les données de l'onglet 'survie' de l'Excel
     :param head_dataframe: cf initialization.py
@@ -14,12 +14,6 @@ def create_survie_dataframe(campaigns_dict, chemistry_measurepoint_list):
     global_matrix = []
     for campaign_id in campaigns_dict:
         matrix = []
-        pack_list = []
-        for place_id in campaigns_dict[campaign_id]["place"] :
-            for measurepoint_id in campaigns_dict[campaign_id]["place"][place_id]["measurepoint"]:
-                for pack_id in campaigns_dict[campaign_id]["place"][place_id]["measurepoint"][measurepoint_id]["pack"]:
-                    if campaigns_dict[campaign_id]["place"][place_id]["measurepoint"][measurepoint_id]["pack"][pack_id]=='chemistry':
-                        pack_list.append(pack_id)
         survival_dict = survival(pack_list)
         for place_id in campaigns_dict[campaign_id]["place"] :
             for measurepoint_id in campaigns_dict[campaign_id]["place"][place_id]["measurepoint"]:
@@ -34,9 +28,6 @@ def create_survie_dataframe(campaigns_dict, chemistry_measurepoint_list):
                                 matrix.append([campaigns_dict[campaign_id]["number"], number, translate(campaigns_dict[campaign_id]["place"][place_id]["name"]), campaigns_dict[campaign_id]["place"][place_id]["agency"] if "agency" in campaigns_dict[campaign_id]["place"][place_id] else 'ND',survival_dict[pack_id]])
                             else :
                                 matrix.append([campaigns_dict[campaign_id]["number"], number, translate(campaigns_dict[campaign_id]["place"][place_id]["name"]), campaigns_dict[campaign_id]["place"][place_id]["agency"] if "agency" in campaigns_dict[campaign_id]["place"][place_id] else 'ND','ND'])
-        # for pack in list_pack:
-        #     survie = survival(pack)
-        #     matrix.append(survie)
 
 
         global_matrix.append(matrix)

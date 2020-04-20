@@ -103,7 +103,7 @@ def excel_main(list_campaigns, folder_PATH = "output"):
 
     if len(chemistry_pack_list):
         print('\n[!] Création de l\'onglet \"Survie\"...')
-        survie_dataframe = create_survie_dataframe(campaigns_dict, chemistry_measurepoint_list)
+        survie_dataframe = create_survie_dataframe(campaigns_dict, chemistry_measurepoint_list,chemistry_pack_list)
         write_in_existing_excel(survie_dataframe, filename, folder_PATH, 'Survie', startcol=2, startrow=2)
         add_style_survie(survie_dataframe, filename, folder_PATH)
 
