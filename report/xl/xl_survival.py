@@ -18,16 +18,25 @@ def create_survie_dataframe(campaigns_dict, chemistry_measurepoint_list, pack_li
         for place_id in campaigns_dict[campaign_id]["place"] :
             for measurepoint_id in campaigns_dict[campaign_id]["place"][place_id]["measurepoint"]:
                 if measurepoint_id in chemistry_measurepoint_list:
+                    two_chemistry_pack_in_measurepoint = False
+                    measurepoint_done = False
                     for pack_id in campaigns_dict[campaign_id]["place"][place_id]["measurepoint"][measurepoint_id]["pack"]:
                         if campaigns_dict[campaign_id]["place"][place_id]["measurepoint"][measurepoint_id]["pack"][pack_id]=='chemistry':
-                            if "duplicate" in campaigns_dict[campaign_id]["place"][place_id] and "chemistry" in campaigns_dict[campaign_id]["place"][place_id]["duplicate"]:
+                            if "duplicate" in campaigns_dict[campaign_id]["place"][place_id] and "chemistry" in campaigns_dict[campaign_id]["place"][place_id]["duplicate"] and len(list(campaigns_dict[campaign_id]["place"][place_id]["duplicate"]["chemistry"].keys()))>1:
                                 number = float(str(campaigns_dict[campaign_id]["place"][place_id]["number"])+'.'+str(campaigns_dict[campaign_id]["place"][place_id]["measurepoint"][measurepoint_id]["number"]))
+                            elif "duplicate" in campaigns_dict[campaign_id]["place"][place_id] and "chemistry" in campaigns_dict[campaign_id]["place"][place_id]["duplicate"] and len(list(campaigns_dict[campaign_id]["place"][place_id]["duplicate"]["chemistry"].keys()))==1:
+                                number = campaigns_dict[campaign_id]["place"][place_id]["number"]
+                                two_chemistry_pack_in_measurepoint = True
                             else :
                                 number = campaigns_dict[campaign_id]["place"][place_id]["number"]
-                            if pack_id in survival_dict:
-                                matrix.append([campaigns_dict[campaign_id]["number"], number, translate(campaigns_dict[campaign_id]["place"][place_id]["name"]), campaigns_dict[campaign_id]["place"][place_id]["agency"] if "agency" in campaigns_dict[campaign_id]["place"][place_id] else 'ND',survival_dict[pack_id]])
+                            if two_chemistry_pack_in_measurepoint :
+                                if measurepoint_done and matrix[-1][-1]=='ND' :
+                                    matrix[-1] = [campaigns_dict[campaign_id]["number"], number, translate(campaigns_dict[campaign_id]["place"][place_id]["name"]), campaigns_dict[campaign_id]["place"][place_id]["agency"] if "agency" in campaigns_dict[campaign_id]["place"][place_id] else 'ND',survival_dict[pack_id] if pack_id in survival_dict else 'ND']
+                                elif not measurepoint_done :
+                                    measurepoint_done = True
+                                    matrix.append([campaigns_dict[campaign_id]["number"], number, translate(campaigns_dict[campaign_id]["place"][place_id]["name"]), campaigns_dict[campaign_id]["place"][place_id]["agency"] if "agency" in campaigns_dict[campaign_id]["place"][place_id] else 'ND',survival_dict[pack_id] if pack_id in survival_dict else 'ND'])
                             else :
-                                matrix.append([campaigns_dict[campaign_id]["number"], number, translate(campaigns_dict[campaign_id]["place"][place_id]["name"]), campaigns_dict[campaign_id]["place"][place_id]["agency"] if "agency" in campaigns_dict[campaign_id]["place"][place_id] else 'ND','ND'])
+                                matrix.append([campaigns_dict[campaign_id]["number"], number, translate(campaigns_dict[campaign_id]["place"][place_id]["name"]), campaigns_dict[campaign_id]["place"][place_id]["agency"] if "agency" in campaigns_dict[campaign_id]["place"][place_id] else 'ND',survival_dict[pack_id] if pack_id in survival_dict else 'ND'])
 
 
         global_matrix.append(matrix)

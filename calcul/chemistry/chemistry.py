@@ -111,58 +111,6 @@ def get_unit(sandre_list):
     return result
 
 
-# def result_by_packs_and_sandre(campaign, sandre_list=None):
-#     # pack_dict = {}
-#     # for element in dict_pack:
-#     #     try:
-#     #         pack_dict[dict_pack[element]['chemistry']] = element
-#     #     except KeyError:
-#     #         None
-#     # result = {element: None for element in dict_pack}
-
-
-#     if not sandre_list:
-
-#         sandre_list = QueryScript(
-#             f" SELECT sandre   FROM {env.DATABASE_TREATED}.r3 WHERE version=  {env.CHOSEN_VERSION()}").execute()
-#         for index, sandre in enumerate(sandre_list):
-#             try:
-#                 sandre_list[index] = float(sandre)
-#             except ValueError:
-#                 sandre_list[index] = sandre
-
-#     list_pack = [element for element in pack_dict]
-#     if len(list_pack) > 1:
-#         query_tuple_pack = tuple(list_pack)
-#     else:
-#         query_tuple_pack = f"({list_pack[0]})"
-
-#     data = QueryScript(
-#         f"SELECT pack_id, prefix, value, sandre FROM {env.DATABASE_RAW}.Analysis WHERE pack_id IN {query_tuple_pack} AND sandre IN {tuple(sandre_list)}").execute()
-#     for element in data:
-#         try:
-#             sandre = int(element[3])
-#         except ValueError:
-#             sandre = element[3]
-#         if result[pack_dict[element[0]]]:
-#             result[pack_dict[element[0]]][sandre] = element[1] + \
-#                 str(element[2]) if element[1] else str(element[2])
-#         else:
-#             result[pack_dict[element[0]]] = {
-#                 sandre: element[1] + str(element[2]) if element[1] else str(element[2])}
-
-#     for element in result:
-#         if result[element]:
-#             for sandre in sandre_list:
-#                 if not sandre in result[element]:
-#                     try:
-#                         sandre = int(sandre)
-#                     except ValueError:
-#                         sandre = sandre
-#                     result[element][sandre] = "ND"
-
-#     return result
-
 def result(campaigns_dict, pack_list):
     sandre_list = QueryScript(f" SELECT sandre   FROM {env.DATABASE_TREATED}.r3 WHERE version=  {env.CHOSEN_VERSION()}").execute()
     for index, sandre in enumerate(sandre_list):
