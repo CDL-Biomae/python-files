@@ -142,13 +142,13 @@ def load_data(reference):
             ### Add geographic data                    
             for mp_id, latitudeSpotted, longitudeSpotted, lambertX, lambertY, city, zipcode, stream in geographic_data:
                 if mp_id==measurepoint_id :
-                    if latitudeSpotted and longitudeSpotted :
+                    if latitudeSpotted and longitudeSpotted and not "latitudeSpotted" in place_dict[place_id]:
                         place_dict[place_id]["latitudeSpotted"] = f"{latitudeSpotted}".replace(',', '.')
                         place_dict[place_id]["longitudeSpotted"] = f"{longitudeSpotted}".replace(',', '.')
                         lambertXSpotted, lambertYSpotted = convert_gps_into_lambert(latitudeSpotted, longitudeSpotted)
                         place_dict[place_id]["lambertXSpotted"] = f"{round(lambertXSpotted,1)}".replace(',', '.')
                         place_dict[place_id]["lambertYSpotted"] = f"{round(lambertYSpotted,1)}".replace(',', '.')
-                    if lambertX and lambertY :
+                    if lambertX and lambertY and not "lambertX" in place_dict[place_id]:
                         place_dict[place_id]["lambertX"] = f"{lambertX}".replace(',', '.')
                         place_dict[place_id]["lambertY"] = f"{lambertY}".replace(',', '.')
 
