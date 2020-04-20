@@ -28,7 +28,7 @@ def fill_temperature_repro(cas, temperatures):
     constante_duree_femelle = int(QueryScript(
         f" SELECT value   FROM {env.DATABASE_TREATED}.r2_constant WHERE name='FEMELLES'").execute()[0])
     for elt_mp_id in liste_id:
-        if elt_mp_id in temperatures['need_update']:
+        if (cas==2 and elt_mp_id in temperatures['need_update']) or cas==1 or cas==3:
             elt_insert = [elt_mp_id]
             if "sensor2lab" in temperatures["data"][elt_mp_id]:
                 liste_tempe = temperatures["data"][elt_mp_id]["sensor2lab"]
