@@ -145,8 +145,10 @@ class MainApp(tk.Tk):
                 self.log_window = tk.Toplevel(self)
                 self.log_window.transient(self)
                 self.log_window.geometry('400x150+150+150')
-                self.log_app = LogWordApp(master=self.log_window, campaign=campaign, agency=self.agency,output_path=output_path, campaign_number=self.campaign_number)
-        
+                try :
+                    self.log_app = LogWordApp(master=self.log_window, campaign=campaign, agency=self.agency,output_path=output_path, campaign_number=self.campaign_number)
+                except Exception as err :
+                    tk.messagebox.showerror(title="Erreur", message=err)
     def lauch_excel(self):
 
         output_path = tk.filedialog.asksaveasfilename(title="Enregistrer le rapport excel",filetypes=[("Excel (*.xslx)","*.xlsx")], defaultextension=".xlsx", initialfile=f"Rapport annexe {' '.join(self.campaign_list)}")
@@ -154,8 +156,10 @@ class MainApp(tk.Tk):
         self.log_window = tk.Toplevel(self)
         self.log_window.transient(self)
         self.log_window.geometry('400x150+150+150')
-        self.log_app = LogExcelApp(master=self.log_window, campaign_list=self.campaign_list, output_path=output_path)
-
+        try :
+            self.log_app = LogExcelApp(master=self.log_window, campaign_list=self.campaign_list, output_path=output_path)
+        except Exception as err :
+            tk.messagebox.showerror(title="Erreur", message=err)
    
     def show_end(self):
         ######## Frame end
@@ -264,8 +268,10 @@ class MainApp(tk.Tk):
         self.log_window = tk.Toplevel(self)
         self.log_window.transient(self)
         self.log_window.geometry('400x150+150+150')
-        self.log_app = LogDatabaseApp(master=self.log_window, case=case, xl_path=None, date=None, comment=None)
-        
+        try :
+            self.log_app = LogDatabaseApp(master=self.log_window, case=case, xl_path=None, date=None, comment=None)
+        except Exception as err :
+            tk.messagebox.showerror(title="Erreur", message=err)
     def refresh(self):
         if self.version_choice.get()=='toutes':
             for version in env.ALL_VERSIONS():
