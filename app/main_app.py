@@ -140,7 +140,9 @@ class MainApp(tk.Tk):
                 self.complement_data.destroy()
             for campaign in self.campaign_list:
                 output_path = tk.filedialog.asksaveasfilename(title=f"Enregistrer le rapport d'expérimentation {campaign}",filetypes=[("Word (*.docx)","*.docx")], defaultextension=".docx", initialfile=f"Rapport d'expérimentation {campaign}")
-                
+                if not output_path:
+                    return None
+
                 self.change_chosen_version(self.version_choice.get())
                 self.log_window = tk.Toplevel(self)
                 self.log_window.transient(self)
@@ -153,9 +155,11 @@ class MainApp(tk.Tk):
                 except Exception as err :
                     self.log_window.destroy()
                     tk.messagebox.showerror(title="Erreur", message=err)
-    def lauch_excel(self):
+    def lauch_excel(self): 
 
         output_path = tk.filedialog.asksaveasfilename(title="Enregistrer le rapport excel",filetypes=[("Excel (*.xslx)","*.xlsx")], defaultextension=".xlsx", initialfile=f"Rapport annexe {' '.join(self.campaign_list)}")
+        if not output_path:
+            return None
         self.change_chosen_version(self.version_choice.get())
         self.log_window = tk.Toplevel(self)
         self.log_window.transient(self)
