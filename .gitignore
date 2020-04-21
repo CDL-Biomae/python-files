@@ -9,3 +9,6 @@ test*
 *.zip
 *.exe
 __pycache__
+dist
+build
+*.spec
