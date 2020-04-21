@@ -9,8 +9,8 @@ import env
 
 
 
-def add_style_nqe(nqe_dataframe, filename, folder_PATH, dict_t0):
-    PATH = f"{folder_PATH}\\{filename}"
+def add_style_nqe(nqe_dataframe, PATH, dict_t0):
+
     wb = load_workbook(PATH)
     ws = wb['NQE Biote']
     
@@ -243,5 +243,4 @@ def add_style_nqe(nqe_dataframe, filename, folder_PATH, dict_t0):
     wb.save(PATH)
     wb.close()
 
-    print(colored('[+] La mise en page de l\'onglet \"NQE\" est terminée','green'))
 

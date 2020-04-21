@@ -7,4 +7,5 @@ test*
 *.docx
 *.jpg
 *.zip
+*.exe
 __pycache__

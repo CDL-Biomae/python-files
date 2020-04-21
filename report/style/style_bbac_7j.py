@@ -7,8 +7,8 @@ from tools import QueryScript
 from termcolor import colored
 import env
 
-def add_style_bbac_7j(bbac_dataframe, filename, folder_PATH, dict_t0):
-    PATH = f"{folder_PATH}\\{filename}"
+def add_style_bbac_7j(bbac_dataframe, PATH, dict_t0):
+
     wb = load_workbook(PATH)
     ws = wb['BBAC_7j']
     ws2 = wb['BBAC2_7j']
@@ -345,5 +345,4 @@ def add_style_bbac_7j(bbac_dataframe, filename, folder_PATH, dict_t0):
     wb.save(PATH)
     wb.close()
 
-    print(colored('[+] La mise en page des onglets \"BBAC_7j\" et \"BBAC2_7j\" est terminée','green'))
 

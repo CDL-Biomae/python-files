@@ -3,8 +3,8 @@ from openpyxl import load_workbook
 from termcolor import colored
 
 
-def add_style_survie(survie_dataframe, filename, folder_PATH):
-    PATH = f"{folder_PATH}\\{filename}"
+def add_style_survie(survie_dataframe, PATH):
+
     wb = load_workbook(PATH)
     ws = wb['Survie']
 
@@ -70,4 +70,3 @@ def add_style_survie(survie_dataframe, filename, folder_PATH):
     wb.save(PATH)
     wb.close()
 
-    print(colored('[+] La mise en page de l\'onglet \"Survie\" est terminée', 'green'))

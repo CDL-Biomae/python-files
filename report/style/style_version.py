@@ -2,8 +2,8 @@ from openpyxl.styles import Font, Alignment, Border, Side
 from openpyxl import load_workbook
 from termcolor import colored
 
-def add_style_version(version_dataframe, list_campaigns, filename, folder_PATH):
-    PATH = f"{folder_PATH}\\{filename}"
+def add_style_version(version_dataframe, list_campaigns, PATH):
+
     wb = load_workbook(PATH)
     ws = wb['Version']
 
@@ -44,5 +44,3 @@ def add_style_version(version_dataframe, list_campaigns, filename, folder_PATH):
 
     wb.save(PATH)
     wb.close()
-
-    print(colored('[+] La mise en page de l\'onglet \"Version\" est terminée', 'green'))

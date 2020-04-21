@@ -4,8 +4,8 @@ from openpyxl.utils.cell import get_column_letter
 from termcolor import colored
 
 
-def add_style_campagnes(campagnes_dataframe, filename, folder_PATH):
-    PATH = f"{folder_PATH}\\{filename}"
+def add_style_campagnes(campagnes_dataframe, PATH):
+
     wb = load_workbook(PATH)
     ws = wb['Campagnes']
 
@@ -73,5 +73,4 @@ def add_style_campagnes(campagnes_dataframe, filename, folder_PATH):
     wb.save(PATH)
     wb.close()
 
-    print(colored('[+] La mise en page de l\'onglet \"Campagnes\" est terminée', 'green'))
 

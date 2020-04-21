@@ -8,8 +8,8 @@ from calcul.toxicity.reprotoxicity import Reprotoxicity
 
 import env
 
-def add_style_tox(tox_dataframe, filename, folder_PATH):
-    PATH = f"{folder_PATH}\\{filename}"
+def add_style_tox(tox_dataframe, PATH):
+
     wb = load_workbook(PATH)
     ws = wb['Tox']
 
@@ -286,4 +286,3 @@ def add_style_tox(tox_dataframe, filename, folder_PATH):
 
     wb.save(PATH)
     wb.close()
-    print(colored('[+] La mise en page de l\'onglet \"Tox\" est terminée', 'green'))

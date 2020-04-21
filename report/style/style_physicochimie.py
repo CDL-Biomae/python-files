@@ -7,8 +7,8 @@ import math
 import env
 
 
-def add_style_physicochimie(physicochimie_dataframe, filename, folder_PATH):
-    PATH = f"{folder_PATH}\\{filename}"
+def add_style_physicochimie(physicochimie_dataframe, PATH):
+
     wb = load_workbook(PATH)
     ws = wb['Physico-chimie_refChimie']
     ws2 = wb['Physico-chimie_refToxicité']
@@ -327,4 +327,3 @@ def add_style_physicochimie(physicochimie_dataframe, filename, folder_PATH):
     wb.save(PATH)
     wb.close()
 
-    print(colored('[+] La mise en page de l\'onglet \"Physico-chimie\" est terminée', 'green'))
