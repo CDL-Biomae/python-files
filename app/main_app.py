@@ -147,7 +147,11 @@ class MainApp(tk.Tk):
                 self.log_window.geometry('400x150+150+150')
                 try :
                     self.log_app = LogWordApp(master=self.log_window, campaign=campaign, agency=self.agency,output_path=output_path, campaign_number=self.campaign_number)
+                except PermissionError :
+                    self.log_window.destroy()
+                    tk.messagebox.showerror(title="Erreur", message=f"Veuillez fermer le fichier \'{output_path.split('/')[-1]}\' avant de lancer.")
                 except Exception as err :
+                    self.log_window.destroy()
                     tk.messagebox.showerror(title="Erreur", message=err)
     def lauch_excel(self):
 
@@ -158,7 +162,11 @@ class MainApp(tk.Tk):
         self.log_window.geometry('400x150+150+150')
         try :
             self.log_app = LogExcelApp(master=self.log_window, campaign_list=self.campaign_list, output_path=output_path)
+        except PermissionError :
+            self.log_window.destroy()
+            tk.messagebox.showerror(title="Erreur", message=f"Veuillez fermer le fichier \'{output_path.split('/')[-1]}\' avant de lancer.")
         except Exception as err :
+            self.log_window.destroy()
             tk.messagebox.showerror(title="Erreur", message=err)
    
     def show_end(self):
