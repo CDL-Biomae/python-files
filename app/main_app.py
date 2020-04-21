@@ -28,6 +28,7 @@ class MainApp(tk.Tk):
             self.has_to_quit = False
         except AttributeError:
             self.has_to_quit = True
+            tk.messagebox.showerror(title="Erreur", message="Impossible de se connecter à la base de données. \nCela peut venir de votre connection internet ou de votre VPN.")
 
     
     def switch_mode(self):
