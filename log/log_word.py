@@ -5,7 +5,7 @@ from report import load_data
 from tools import translate
 from docx import Document
 from docx.shared import Pt
-from docxcompose.composer import Composer
+# from docxcompose.composer import Composer
 from docx.oxml.ns import qn
 from docx.oxml import OxmlElement
 import docx
@@ -18,7 +18,6 @@ import env
 
 class LogWordApp(tk.Tk):
     def __init__(self, master=None, campaign=None,agency=None, photos_path="", campaign_number="XX", output_path=""):
-        print(campaign, photos_path, agency, campaign_number, output_path)
         self.master = master
         tk.Label(master=self.master, text="    ").grid(row=0,column=0)
         tk.Label(master=self.master,text=f"Création du rapport d'expérimentation pour {campaign}").grid(row=1,column=1, sticky="w")
@@ -361,7 +360,6 @@ class LogWordApp(tk.Tk):
         self.progressbar_element["maximum"] = length+1
 
         count=1
-        print(self.progressbar)
         self.progressbar +=1
         ## Stations de mesure
         for place_id in place_dict:
@@ -664,11 +662,9 @@ class LogWordApp(tk.Tk):
             self.progressbar += 1
             count +=1
 
-        composer = Composer(doc)
-        page_fin = Document(path_ressources + 'Page_fin.docx')
-        composer.append(page_fin)
-        composer.save(output_path)
-
+        doc.add_page_break()
+        doc.add_paragraph().add_run().add_picture(f"{path_ressources}/Page_fin.png", width=width_total)
+        doc.save(output_path)
         
 
         self.text = "Terminé"

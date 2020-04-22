@@ -126,10 +126,10 @@ class MainApp(tk.Tk):
         def kill_window(self):
             self.master.master.agency = self.agency.get()
             self.master.master.campaign_number = self.campaign_number.get()
-            self.master.master.lauch_word()
+            self.master.master.launch_word()
             self.master.destroy()
 
-    def lauch_word(self):
+    def launch_word(self):
         if not self.photos_path:
             self.complement_data = tk.Toplevel(self)
             self.complement_data.transient(self)
@@ -155,7 +155,7 @@ class MainApp(tk.Tk):
                 except Exception as err :
                     self.log_window.destroy()
                     tk.messagebox.showerror(title="Erreur", message=err)
-    def lauch_excel(self): 
+    def launch_excel(self): 
 
         output_path = tk.filedialog.asksaveasfilename(title="Enregistrer le rapport excel",filetypes=[("Excel (*.xslx)","*.xlsx")], defaultextension=".xlsx", initialfile=f"Rapport annexe {' '.join(self.campaign_list)}")
         if not output_path:
@@ -178,11 +178,11 @@ class MainApp(tk.Tk):
         self.frame_empty.destroy()
         self.frame_end = tk.Frame(master=self)
         self.launch_excel_button = tk.Button(
-            master=self.frame_end, text="Rapport annexe", fg="#FFFFFF", background="#008000", command=self.lauch_excel)
+            master=self.frame_end, text="Rapport annexe", fg="#FFFFFF", background="#008000", command=self.launch_excel)
         self.launch_excel_button.pack()
         tk.Label(master=self.frame_end, text="").pack()
         self.launch_word_button = tk.Button(
-            master=self.frame_end, text="Rapport d'expérimentation", fg="#FFFFFF", background="#0060AC", command=self.lauch_word)
+            master=self.frame_end, text="Rapport d'expérimentation", fg="#FFFFFF", background="#0060AC", command=self.launch_word)
         self.launch_word_button.pack()
         self.frame_end.pack(expand='YES')
 
