@@ -6,6 +6,7 @@ test*
 *.xlsx
 *.docx
 *.jpg
+*.png
 *.zip
 *.exe
 __pycache__
