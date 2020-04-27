@@ -20,13 +20,23 @@ DATABASE_RAW et DATABASE_TREATED sont fournis par Zabé comme étant le nom de b
 
 # Application Centrale Digital App
 
-## Onglet créateur de livrables
+## Utilisation
 
-Pour lancer l'application, écrivez dans un terminal de commande la ligne suivante :
+- Pour créer l'application en fichier .exe, il faut lancer la ligne de commande (avec le module pyinstaller normalement déjà installé grâce aux dépendances de requires.txt) :
+```
+pyinstaller --onefile -w -i icon.ico app.py
+```
+(ici icon.ico est l'icône choisie pour l'application)
+Un dossier /dist va apparaître contenant l'application. Pour son bon fonctionnement il faut placer cette application dans le dossier principal du projet. Ensuite, libre à vous de créer un raccourci sur votre bureau par exemple.
+Il est possible que l'application soit interprétée par votre antivirus comme un cheval de Troie. Ne possédant pas de certificat, le fichier n'est pas répertoriée dans les applications dites sécurisées de Windows. En effet, sa capacité à piocher dans vos fichiers word et excel pour en créer de nouveau peut être mal interprété. Pour remédier à ce problème, il faut mettre le projet entier dans l'exclusion de votre antivirus.     
+
+- Pour lancer l'application en local, écrivez dans un terminal de commande la ligne suivante :
 ```
 python app.py
 ```
-Cela peut prendre de 2sec à 30 sec en fonction de la vitesse de votre appareil.
+Cela peut prendre de 2sec à 30 sec en fonction de la vitesse de votre appareil et votre connection internet.
+
+## Onglet créateur de livrables
 
 Vous arrivez donc sur une interface qui vous permet de créer des livrables. 
 Pour ajouter une campagne dans la création de livrable, écrivez son nom du type 'AG-003-01', puis "Ajouter" cette référence (la touche Enter fonctionne aussi). Une sécurité est placée pour éviter les erreurs : si la référence précisée n'est pas dans la base de données ou a déjà été ajoutée, rien ne se passera.
@@ -53,17 +63,18 @@ L'avancée de la création des livrables est maintenant affichée dans la consol
 ## Onglet Gestionnaire de base de données
 
 Cet onglet permet de changer de mettre à jour la base de données traitées ou de changer totalement de version.
-Si vous avez connaissance d'ajout de données brutes (point de mesure, résultats divers, modifications ...) vous pouvez rafraîchir la base de données traitées avec le bouton "Rafraîchir la base de données traitées" qui gèlera l'application le temps de mettre à jour l'entièreté des données traitées. Cela va automatiquement modifier la dernière version inscrite. 
+Si vous avez connaissance d'ajout de données brutes (point de mesure, résultats divers, modifications ...) vous pouvez rafraîchir la base de données traitées avec le bouton "Rafraîchir la base de données traitées" qui gèlera l'application le temps de mettre à jour l'entièreté des données traitées. Vous avez la possibilité de choisir la version à mettre à jour entre une en particulier outoute d'un coup (cela va les mettre à jour une à une). 
 Si vous avez besoin de créer une nouvelle version, veuillez renseigner le ficher excel contenant les références de calculs et de seuils dans en cliquant sur "Choisir le fichier excel de référence". Cela va automatiquement inscrire les deux informations possibles de la version à savoir la date (celle du jour actuel) ainsi qu'un éventuel commentaire que vous voulez préciser à la nouvelle version. Il ne reste plus qu'à cliquer sur "Ajouter cette version" qui remplira dans la base de données traitées une nouvelle série de données traitées calculées à partir des références précisées ave le fichier excel. Cela peut prendre une dizaine de minutes en fonction de la vitesse de connection de vogtre appareil.
 
-Si vous voulez changer les éléments sélectionnées dans l'onglet NQE Biote, veuillez les renseigner dans /calcul/chemistry/nqe dans les dictionnaires correspondants
+Si vous voulez changer les éléments sélectionnées dans l'onglet NQE Biote, veuillez les renseigner dans /calcul/chemistry/nqe dans les dictionnaires correspondants.
 
 # Architecture des dossiers
 
-Le projet se découpe en cinq dossiers principales :
+Le projet se découpe en six dossiers principales :
 - calcul : il regroupe les différentes fonctions nécessaires au calcul des données traitées. Il est découpé en 2 dossiers principales que sont /toxicity pour les calculs et appels à la base de données brutes pour l'alimentation, la neurotoxicité et la reprotoxicité, /chemistry pour les calculs et appels à la base de données pour la chimie.
 - database : il regroupe les fonctions qui vont remplir la base de données traitées. fill.py est la fonction qui lance tout le proccessus.
 - report : il regroupe les fonctions qui créent les différents rapports excel(xl) et word, la création d'excel se décompose en /xl pour la création des données et /style pour l'ajout des couleurs et des métadonnées.
+- log : il regroupe les différentes fenêtres qui vont s'ouvrir en fonction du rapport désiré. MainApp, la fenêtre principale, appelle les différentes fenêtres secondaires.
 - tools : il regroupe les différents outils utils dans les différents fonctions du projet
 
 Deux fichiers python sont indispensables en plus des dossiers :
@@ -72,8 +83,3 @@ Deux fichiers python sont indispensables en plus des dossiers :
 
 requires.txt permet l'installation rapide des dépendances du projet
 version.txt permet de stocker la version choisie pour tout le projet
-
-# Fonctions optimisables
-
-Certaines fonctions n'ont pas pu être optimisée en regroupant les appels à la base de données (ce qui prend le plus de temps) en un seul. Cela concerne surtout le dossier database, et par exemple "tox_table_filler.py" a été optimisé. Les fonctions à optimiser sont "average_temperature_filler.py", "temperature_repro.py" et "date_filler.py".
-Pour améliorer la vitesse d'exécution, il faut regrouper les appels (INSERT et SELECT) par campagne et non plus par measurepoint.
