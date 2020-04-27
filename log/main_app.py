@@ -2,7 +2,6 @@ import tkinter as tk
 from tkinter import filedialog, messagebox
 from tools import QueryScript
 import env
-from report import excel_main, word_main
 from database import fill
 from datetime import datetime
 from time import sleep
