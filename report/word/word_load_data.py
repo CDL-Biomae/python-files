@@ -28,6 +28,10 @@ def load_data(reference):
         for place, reference in place_reference_data:
             if place_id==place :
                 place_dict[place_id]["reference"] = reference
+                place_dict[place_id]["reference_photo"] = f"{reference}-01"
+            elif int(place_id)==place :
+                number = round((place_id-int(place_id))*10)
+                place_dict[place_id]["reference_photo"] = f"{reference}-{number if number>9 else '0'+str(number) }"
         for code, network, hydroecoregion, latitudeTh, longitudeTh in agency_data :
             if "agency" in place_dict[place_id] and place_dict[place_id]["agency"]==code:
                 if network :
@@ -123,7 +127,7 @@ def load_data(reference):
                                     if information!="":
                                         if len(information)>=10 and information[:10]=="Vandalisme":
                                             place_dict[place_id]["vandalism"] = True
-                                        if information[-1]=="%" or (len(information)>3 and information[:4]=='Scan') or information[0]=='#' or (len(information)>2 and information[:3]=='RAS'):
+                                        if information[-1]=="%" or "Scan" in information or "#" in information or 'RAS' in information:
                                             need_to_be_removed.append(information)
                                         else :
                                             try :

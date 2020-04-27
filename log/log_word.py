@@ -534,7 +534,7 @@ class LogWordApp(tk.Tk):
                     table_image.cell(row, 0).paragraphs[0].paragraph_format.line_spacing = font.size
                     table_image.cell(row, 1).paragraphs[0].paragraph_format.line_spacing = font.size
 
-            nom_photo = self.recuperation_photo((place_dict[place_id]["reference"] if "reference" in place_dict[place_id] else translate(place_dict[place_id]["name"]))+"-01", photos_path, path_ressources)
+            nom_photo = self.recuperation_photo(place_dict[place_id]["reference_photo"], photos_path, path_ressources)
             self.rotation_image(nom_photo['amont'])
             self.rotation_image(nom_photo['aval'])
             self.rotation_image(nom_photo['zoom'])
