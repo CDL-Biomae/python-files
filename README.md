@@ -49,14 +49,8 @@ Pour créer un rapport d'expérimentation, il faut entrer le nom de la campagne 
 
 Dans le dossier de photo il faut qu'il y ait des dossiers nommés en fonction d'un point de mesure (ex : AG-003-01-01-01), et que dans chacun de ces dossiers il y ait 4 photos, de 4 natures différentes (amont, aval, panorama, zoom). Les photos doivent respecter la nomenclature suivant : "stepXX_PDA1_AG-003-01-01-01_Amont_5445664_65454.png". Les éléments importants sont la séparation par des Underscores (_, touche 8), que le 3e élément (ainsi séparé) soit la référence du point de mesure (ex : AG-003-01-01-01) et le 4e soit le point de vue de la photo (amont, aval, panorama, zoom). 
 
-Si on oublie de renseigner ces dossiers, lorsque l'on clique sur lancer, les fenêtres de sélection s'ouvriront, d'abord pour choisir la destination d'enregistrement, puis le dossier de photos.
-
 Par ailleurs, pour faire les cartes il faut un compte sur Mapbox, lorsque ceci est fait il faut changer la variable 'ACCESS_TOKEN_MAPBOX' dans env.py par la clef du compte. Celle-ci se trouve sur le site Mapbox.com, dans Account, il faut copier la Default public token.
 
-### Lancement
-
-Lorsque tous les informations désirées sont sélectionnées, appuyer sur le bouton "Lancer". Cela va geler l'application tant que le(s) livrable(s) ne sont pas terminés d'être créés. 
-L'avancée de la création des livrables est maintenant affichée dans la console que vous avez lancé pour allumer l'application (ainsi que les éventuelles erreurs).
 
 ## Onglet Gestionnaire de base de données
 
