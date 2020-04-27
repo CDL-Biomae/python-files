@@ -16,7 +16,7 @@ def create_edi_dataframe(campaign, place_dict, chemistry_measurepoint_list, chem
     measurepoint_data = QueryScript(f"SELECT id, city, zipcode, r0_threshold, r0_sample_taken, r0_aspect, r0_iridescence, r0_foam, r0_leafs, r0_sludge, r0_other_bodies, r0_color, r0_clearness, r0_odor, r0_shadow, r0_weather, r0_hydrological_situation, r0_scale, r0_secchi, r0_air_temperature, r0_oxygen_saturation, r21_threshold, r21_sample_taken, r21_aspect, r21_iridescence, r21_foam, r21_leafs, r21_sludge, r21_other_bodies, r21_color, r21_clearness, r21_odor, r21_shadow, r21_weather, r21_hydrological_situation, r21_scale, r21_secchi, r21_air_temperature, r21_oxygen_saturation FROM {env.DATABASE_RAW}.Measurepoint WHERE id IN {tuple(chemistry_measurepoint_list) if len(chemistry_measurepoint_list)>1 else '('+(str(chemistry_measurepoint_list[0]) if len(chemistry_measurepoint_list) else '0')+')'}").execute()
     dates_data = QueryScript(f"SELECT measurepoint_id, date_id, date FROM {env.DATABASE_TREATED}.key_dates WHERE measurepoint_id IN {tuple(chemistry_measurepoint_list) if len(chemistry_measurepoint_list)>1 else '('+(str(chemistry_measurepoint_list[0]) if len(chemistry_measurepoint_list) else '0')+')'}").execute()
     conditions_data = QueryScript(f"SELECT measurepoint_id, recordedAt, temperature, conductivity, ph, oxygen, comment FROM {env.DATABASE_RAW}.MeasureExposureCondition WHERE measurepoint_id IN {tuple(chemistry_measurepoint_list) if len(chemistry_measurepoint_list)>1 else '('+(str(chemistry_measurepoint_list[0]) if len(chemistry_measurepoint_list) else '0')+')'}").execute()
-    pack_data = QueryScript(f"SELECT id, sampling_weight, metal_tare_bottle_weight, organic_tare_bottle_weight, organic_total_weight  FROM {env.DATABASE_RAW}.Pack WHERE id IN {tuple(chemistry_pack_list) if len(chemistry_pack_list)>1 else '('+(str(chemistry_pack_list[0]) if len(chemistry_pack_list) else '0')+')'}").execute()
+    pack_data = QueryScript(f"SELECT id, sampling_weight, metal_tare_bottle_weight, organic_tare_bottle_weight, organic_total_weight, sampling_comment  FROM {env.DATABASE_RAW}.Pack WHERE id IN {tuple(chemistry_pack_list) if len(chemistry_pack_list)>1 else '('+(str(chemistry_pack_list[0]) if len(chemistry_pack_list) else '0')+')'}").execute()
     survival_dict = survival(chemistry_pack_list)
     matrix= []
     for place_id in place_dict :
@@ -104,17 +104,56 @@ def create_edi_dataframe(campaign, place_dict, chemistry_measurepoint_list, chem
                         temp[44]=conductivity
                         temp[45]=oxygen
                         if comment:
-                            temp[65]='. '.join(translate(comment).split('\n'))
+                            dissociated_comment = [information.replace("\n",", ") for information in comment.split("\t")]
+                            need_to_be_removed = []
+                            for information in dissociated_comment:
+                                if information!="":
+                                    if len(information)>=10 and information[:10]=="Vandalisme":
+                                        place_dict[place_id]["vandalism"] = True
+                                    if information[-1]=="%" or "Scan" in information or "#" in information or 'RAS' in information:
+                                        need_to_be_removed.append(information)
+                                    else :
+                                        try :
+                                            int(information)
+                                            need_to_be_removed.append(information)
+                                        except ValueError :
+                                            pass
+                            for element in need_to_be_removed:
+                                dissociated_comment.remove(element)
+                            if len(dissociated_comment):
+                                temp[65] = '. '.join([translate(information) for information in dissociated_comment]) 
             for pack_id in place_dict[place_id]["measurepoint"][measurepoint_id]["pack"]:
                 if place_dict[place_id]["measurepoint"][measurepoint_id]["pack"][pack_id]=='chemistry':
                     if pack_id in survival_dict:
                         temp[64]=survival_dict[pack_id]
-                    for pack,sampling_weight, metal_tare_bottle_weight, organic_tare_bottle_weight, organic_total_weight in pack_data:
+                    for pack,sampling_weight, metal_tare_bottle_weight, organic_tare_bottle_weight, organic_total_weight, comment in pack_data:
                         if pack==pack_id:
                             temp[66]= metal_tare_bottle_weight
                             temp[67]= sampling_weight
                             temp[68]= organic_tare_bottle_weight
                             temp[69]= organic_total_weight
+                            if comment :
+                                dissociated_comment = [information.replace("\n",", ") for information in comment.split("\t")]
+                                need_to_be_removed = []
+                                for information in dissociated_comment:
+                                    if information!="":
+                                        if len(information)>=10 and information[:10]=="Vandalisme":
+                                            place_dict[place_id]["vandalism"] = True
+                                        if information[-1]=="%" or "Scan" in information or "#" in information or 'RAS' in information:
+                                            need_to_be_removed.append(information)
+                                        else :
+                                            try :
+                                                int(information)
+                                                need_to_be_removed.append(information)
+                                            except ValueError :
+                                                pass
+                                for element in need_to_be_removed:
+                                    dissociated_comment.remove(element)
+                                if len(dissociated_comment):
+                                    if temp[65]:
+                                        temp[65] += '. '.join([translate(information) if information else '' for information in dissociated_comment]) 
+                                    else :
+                                        temp[65] = '. '.join([translate(information) if information else '' for information in dissociated_comment]) 
 
 
         matrix.append(temp)

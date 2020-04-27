@@ -175,6 +175,11 @@ def add_style_edi(edi_dataframe, PATH):
                 ws["BP"+str(row)].fill= not_validated_fill
                 ws["BO"+str(row)].font= not_validated_font
                 ws["BO"+str(row)].fill= not_validated_fill
+        if ws["BM"+str(row)].value=="0%":
+            ws["B"+str(row)].font= not_validated_font
+            ws["B"+str(row)].fill= not_validated_fill
+            ws["BM"+str(row)].font= not_validated_font
+            ws["BM"+str(row)].fill= not_validated_fill
             
     
 
