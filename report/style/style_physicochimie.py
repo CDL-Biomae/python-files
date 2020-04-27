@@ -324,6 +324,8 @@ def add_style_physicochimie(physicochimie_dataframe, PATH):
             if oxygen < min_oxygen_tox or oxygen > max_oxygen_tox:
                 cell.fill = PatternFill(patternType='solid', start_color='B20000', end_color='B20000')
 
+    ws.freeze_panes = ws["F4"]
+    ws2.freeze_panes = ws2["F4"]
     wb.save(PATH)
     wb.close()
 

@@ -239,7 +239,7 @@ def add_style_nqe(nqe_dataframe, PATH, dict_t0):
     for letter in header_columns[5:]:
         for number in range(5, nb_rows+21):
                 ws[letter + str(number)].value = str(ws[letter + str(number)].value).replace(".", ",") if ws[letter + str(number)].value else ''
-    
+    ws.freeze_panes = ws["F5"]
     wb.save(PATH)
     wb.close()
 

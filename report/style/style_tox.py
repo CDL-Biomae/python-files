@@ -283,6 +283,6 @@ def add_style_tox(tox_dataframe, PATH):
                 ws[column + str(row)].value = "NA"
                 if column == "N" or column == "P" or column == "R":
                     ws[column + str(row)].fill = body_fill_NA
-
+    ws.freeze_panes = ws["F5"]
     wb.save(PATH)
     wb.close()

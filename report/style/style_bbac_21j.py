@@ -340,6 +340,8 @@ def add_style_bbac_21j(bbac_dataframe, PATH, dict_t0):
         for number in range(5, nb_rows+21):
                 ws[letter + str(number)].value = str(ws[letter + str(number)].value).replace(".", ",") if ws[letter + str(number)].value else ''
     
+    ws.freeze_panes = ws["F5"]
+    ws2.freeze_panes = ws2["F5"]
     wb.save(PATH)
     wb.close()
 

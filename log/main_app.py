@@ -9,6 +9,7 @@ from time import sleep
 from .log_excel import LogExcelApp
 from .log_word import LogWordApp
 from .log_database import LogDatabaseApp
+from .log_excel_EDI import LogExcelEDIApp
 
 
 class MainApp(tk.Tk):
@@ -92,7 +93,7 @@ class MainApp(tk.Tk):
     
     def create_empty_space(self):
         self.frame_empty = tk.Frame(master=self)
-        for _ in range(2):
+        for _ in range(3):
             tk.Label(master=self.frame_empty, text=" \n").pack()
         self.frame_empty.pack(expand='YES')
 
@@ -172,6 +173,26 @@ class MainApp(tk.Tk):
         except Exception as err :
             self.log_window.destroy()
             tk.messagebox.showerror(title="Erreur", message=err)
+
+    def launch_edi(self): 
+
+        for campaign in self.campaign_list:
+            output_path = tk.filedialog.asksaveasfilename(title=f"Enregistrer le rapport EDI",filetypes=[("Excel (*.xlsx)","*.xlsx")], defaultextension=".xlsx", initialfile=f"Rapport EDI pour {campaign}")
+            if not output_path:
+                return None
+
+            self.change_chosen_version(self.version_choice.get())
+            self.log_window = tk.Toplevel(self)
+            self.log_window.transient(self)
+            self.log_window.geometry('400x150+150+150')
+            try :
+                self.log_app = LogExcelEDIApp(master=self.log_window, campaign=campaign,output_path=output_path)
+            except PermissionError :
+                self.log_window.destroy()
+                tk.messagebox.showerror(title="Erreur", message=f"Veuillez fermer le fichier \'{output_path.split('/')[-1]}\' avant de lancer.")
+            except Exception as err :
+                self.log_window.destroy()
+                tk.messagebox.showerror(title="Erreur", message=err)
    
     def show_end(self):
         ######## Frame end
@@ -184,6 +205,10 @@ class MainApp(tk.Tk):
         self.launch_word_button = tk.Button(
             master=self.frame_end, text="Rapport d'expérimentation", fg="#FFFFFF", background="#0060AC", command=self.launch_word)
         self.launch_word_button.pack()
+        tk.Label(master=self.frame_end, text="").pack()
+        self.launch_edi_button = tk.Button(
+            master=self.frame_end, text="Rapport EDI", fg="#FFFFFF", background="#008000", command=self.launch_edi)
+        self.launch_edi_button.pack()
         self.frame_end.pack(expand='YES')
 
 

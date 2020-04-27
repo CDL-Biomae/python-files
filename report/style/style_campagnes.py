@@ -69,7 +69,7 @@ def add_style_campagnes(campagnes_dataframe, PATH):
         cell.font = body_font
         cell.alignment = body_alignment
         cell.border = borders
-
+    ws.freeze_panes = ws["F3"]
     wb.save(PATH)
     wb.close()
 

@@ -66,7 +66,7 @@ def add_style_survie(survie_dataframe, PATH):
             cell.font = font_Arial9
         cell.alignment = alignment_center
         cell.border = medium_borders
-
+    ws.freeze_panes = ws["A4"]
     wb.save(PATH)
     wb.close()
 

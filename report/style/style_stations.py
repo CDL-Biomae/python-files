@@ -62,7 +62,7 @@ def add_style_stations(stations_dataframe, PATH):
         cell.font = body_font
         cell.alignment = body_alignment
         cell.border = borders
-
+    ws.freeze_panes = ws["E3"]
     wb.save(PATH)
     wb.close()
 
