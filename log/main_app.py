@@ -139,8 +139,8 @@ class MainApp(tk.Tk):
             if self.complement_data :
                 self.complement_data.destroy()
             for campaign in self.campaign_list:
-                output_path = tk.filedialog.asksaveasfilename(title=f"Enregistrer le rapport d'expérimentation {campaign}",filetypes=[("Word (*.docx)","*.docx")], defaultextension=".docx", initialfile=f"Rapport d'expérimentation {campaign}")
-                if not output_path:
+                self.output_path = tk.filedialog.asksaveasfilename(title=f"Enregistrer le rapport d'expérimentation {campaign}",filetypes=[("Word (*.docx)","*.docx")], defaultextension=".docx", initialfile=f"Rapport d'expérimentation {campaign}")
+                if not self.output_path:
                     return None
 
                 self.change_chosen_version(self.version_choice.get())
@@ -148,27 +148,29 @@ class MainApp(tk.Tk):
                 self.log_window.transient(self)
                 self.log_window.geometry('400x150+150+150')
                 try :
-                    self.log_app = LogWordApp(master=self.log_window, campaign=campaign, agency=self.agency,photos_path=self.photos_path, output_path=output_path, campaign_number=self.campaign_number)
+                    self.log_app = LogWordApp(master=self.log_window, campaign=campaign, agency=self.agency,photos_path=self.photos_path, output_path=self.output_path, campaign_number=self.campaign_number)
+                    self.output_path = None
                 except PermissionError :
                     self.log_window.destroy()
-                    tk.messagebox.showerror(title="Erreur", message=f"Veuillez fermer le fichier \'{output_path.split('/')[-1]}\' avant de lancer.")
+                    tk.messagebox.showerror(title="Erreur", message=f"Veuillez fermer le fichier \'{self.output_path.split('/')[-1]}\' avant de lancer.")
                 except Exception as err :
                     self.log_window.destroy()
                     tk.messagebox.showerror(title="Erreur", message=err)
     def launch_excel(self): 
 
-        output_path = tk.filedialog.asksaveasfilename(title="Enregistrer le rapport excel",filetypes=[("Excel (*.xslx)","*.xlsx")], defaultextension=".xlsx", initialfile=f"Rapport annexe {' '.join(self.campaign_list)}")
-        if not output_path:
+        self.output_path = tk.filedialog.asksaveasfilename(title="Enregistrer le rapport excel",filetypes=[("Excel (*.xslx)","*.xlsx")], defaultextension=".xlsx", initialfile=f"Rapport annexe {' '.join(self.campaign_list)}")
+        if not self.output_path:
             return None
         self.change_chosen_version(self.version_choice.get())
         self.log_window = tk.Toplevel(self)
         self.log_window.transient(self)
         self.log_window.geometry('400x150+150+150')
         try :
-            self.log_app = LogExcelApp(master=self.log_window, campaign_list=self.campaign_list, output_path=output_path)
+            self.log_app = LogExcelApp(master=self.log_window, campaign_list=self.campaign_list, output_path=self.output_path)
+            self.output_path = None
         except PermissionError :
             self.log_window.destroy()
-            tk.messagebox.showerror(title="Erreur", message=f"Veuillez fermer le fichier \'{output_path.split('/')[-1]}\' avant de lancer.")
+            tk.messagebox.showerror(title="Erreur", message=f"Veuillez fermer le fichier \'{self.output_path.split('/')[-1]}\' avant de lancer.")
         except Exception as err :
             self.log_window.destroy()
             tk.messagebox.showerror(title="Erreur", message=err)
@@ -176,8 +178,8 @@ class MainApp(tk.Tk):
     def launch_edi(self): 
 
         for campaign in self.campaign_list:
-            output_path = tk.filedialog.asksaveasfilename(title=f"Enregistrer le rapport EDI",filetypes=[("Excel (*.xlsx)","*.xlsx")], defaultextension=".xlsx", initialfile=f"Rapport EDI pour {campaign}")
-            if not output_path:
+            self.output_path = tk.filedialog.asksaveasfilename(title=f"Enregistrer le rapport EDI",filetypes=[("Excel (*.xlsx)","*.xlsx")], defaultextension=".xlsx", initialfile=f"Rapport EDI pour {campaign}")
+            if not self.output_path:
                 return None
 
             self.change_chosen_version(self.version_choice.get())
@@ -185,10 +187,11 @@ class MainApp(tk.Tk):
             self.log_window.transient(self)
             self.log_window.geometry('400x150+150+150')
             try :
-                self.log_app = LogExcelEDIApp(master=self.log_window, campaign=campaign,output_path=output_path)
+                self.log_app = LogExcelEDIApp(master=self.log_window, campaign=campaign,output_path=self.output_path)
+                self.output_path = None
             except PermissionError :
                 self.log_window.destroy()
-                tk.messagebox.showerror(title="Erreur", message=f"Veuillez fermer le fichier \'{output_path.split('/')[-1]}\' avant de lancer.")
+                tk.messagebox.showerror(title="Erreur", message=f"Veuillez fermer le fichier \'{self.output_path.split('/')[-1]}\' avant de lancer.")
             except Exception as err :
                 self.log_window.destroy()
                 tk.messagebox.showerror(title="Erreur", message=err)
