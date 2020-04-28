@@ -28,8 +28,13 @@ def create_edi_dataframe(campaign, place_dict, chemistry_measurepoint_list, chem
         if "agency" in place_dict[place_id]:
             temp[1] = place_dict[place_id]["agency"]
         if "number" in place_dict[place_id]:
-            number = place_dict[place_id]["number"] 
-            temp[8] = f"{campaign}-{'0'+str(number) if number<10 else number }" 
+            number = place_dict[place_id]["number"]
+            if int(number)!= number :  
+                number_place = int(number)
+                number_measurepoint = round((number - int(number))*10)
+                temp[8] = f"{campaign}-{'0'+str(number_place) if number_place<10 else number_place }-{'0'+str(number_measurepoint) if number_measurepoint<10 else number_measurepoint }" 
+            else :
+                temp[8] = f"{campaign}-{'0'+str(number) if number<10 else number }" 
         for measurepoint_id in place_dict[place_id]["measurepoint"]:
             for mp_id, date_id, date in dates_data:
                 if mp_id==measurepoint_id:
