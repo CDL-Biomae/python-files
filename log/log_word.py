@@ -74,8 +74,9 @@ class LogWordApp(tk.Tk):
         else:
             for elt in filenames:
                 l_nom = elt.split("_")
-                type_photo = l_nom[3].lower()
-                dico_nom[type_photo] = prefixe + "/" + elt
+                if len(l_nom)>3:
+                    type_photo = l_nom[3].lower()
+                    dico_nom[type_photo] = prefixe + "/" + elt
 
             for typ in list_type:
                 try:
