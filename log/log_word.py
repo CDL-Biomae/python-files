@@ -365,7 +365,7 @@ class LogWordApp(tk.Tk):
         for place_id in place_dict:
             self.text = f"Création de la page {count}/{length}"
             doc.add_page_break()
-            if agence:
+            if agence and "reference" in place_dict[place_id]:
                 title = doc.add_heading((place_dict[place_id]["agency"] +" : " if "agency" in place_dict[place_id] else "")+ translate(place_dict[place_id]["name"]) + "   " + place_dict[place_id]["reference"] )
                 title.alignment = 1
                 title.bold = True
@@ -507,7 +507,7 @@ class LogWordApp(tk.Tk):
             table_image.cell(0, 0).merge(table_image.cell(0, 1))
             table_image.cell(1, 0).merge(table_image.cell(1, 1))
 
-            if agence:
+            if agence and place_dict[place_id]:
                 table_image.cell(0, 0).paragraphs[0].add_run((place_dict[place_id]['agency']+ " : " if 'agency' in place_dict[place_id] else "") + translate(place_dict[place_id]['name']) + "  " + place_dict[place_id]["reference"]).bold = True
             else:
                 table_image.cell(0, 0).paragraphs[0].add_run("Point " + str(place_dict[place_id]["number"]).replace(',','-') + " : " +
