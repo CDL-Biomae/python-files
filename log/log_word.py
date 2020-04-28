@@ -246,18 +246,18 @@ class LogWordApp(tk.Tk):
                     ph_not_conform_number +=1
                     if "min_ph_chemistry" in place_dict[place_id]["not conform"] or "min_ph_tox" in place_dict[place_id]["not conform"] :
                         if "min_ph_chemistry" in place_dict[place_id]["not conform"] and not "min_ph_tox" in place_dict[place_id]["not conform"] :
-                            not_conform_explination += f"Le pH est inférieur aux recommandations pour l’encagement de gammares dans le cadre du biotest de chimie (min. 6,3 µS/cm). "
+                            not_conform_explination += f"Le pH est inférieur aux recommandations pour l’encagement de gammares dans le cadre du biotest de chimie (min. 6,3). "
                         if not "min_ph_chemistry" in place_dict[place_id]["not conform"] and "min_ph_tox" in place_dict[place_id]["not conform"] :
-                            not_conform_explination += f"Le pH est inférieur aux recommandations pour l’encagement de gammares dans le cadre des biotests de toxicité (min. 6,3 µS/cm). "
+                            not_conform_explination += f"Le pH est inférieur aux recommandations pour l’encagement de gammares dans le cadre des biotests de toxicité (min. 6,3). "
                         if "min_ph_chemistry" in place_dict[place_id]["not conform"] and "min_ph_tox" in place_dict[place_id]["not conform"] :
-                            not_conform_explination += f"Le pH est inférieur aux recommandations pour l’encagement de gammares dans le cadre des biotests de chimie et de toxicité (min. 6,3 µS/cm). "
+                            not_conform_explination += f"Le pH est inférieur aux recommandations pour l’encagement de gammares dans le cadre des biotests de chimie et de toxicité (min. 6,3). "
                     if "max_ph_chemistry" in place_dict[place_id]["not conform"] or "max_ph_tox" in place_dict[place_id]["not conform"] :
                         if "max_ph_chemistry" in place_dict[place_id]["not conform"] and not "max_ph_tox" in place_dict[place_id]["not conform"] :
-                            not_conform_explination += f"Le pH est supérieur aux recommandations pour l’encagement de gammares dans le cadre du biotest de chimie (max. 8,9 µS/cm). "
+                            not_conform_explination += f"Le pH est supérieur aux recommandations pour l’encagement de gammares dans le cadre du biotest de chimie (max. 8,9). "
                         if not "max_ph_chemistry" in place_dict[place_id]["not conform"] and "max_ph_tox" in place_dict[place_id]["not conform"] :
-                            not_conform_explination += f"Le pH est supérieur aux recommandations pour l’encagement de gammares dans le cadre des biotests de toxicité (max. 8,9 µS/cm). "
+                            not_conform_explination += f"Le pH est supérieur aux recommandations pour l’encagement de gammares dans le cadre des biotests de toxicité (max. 8,9). "
                         if "max_ph_chemistry" in place_dict[place_id]["not conform"] and "max_ph_tox" in place_dict[place_id]["not conform"] :
-                            not_conform_explination += f"Le pH est supérieur aux recommandations pour l’encagement de gammares dans le cadre des biotests de chimie et de toxicité (min. 8,9 µS/cm). "
+                            not_conform_explination += f"Le pH est supérieur aux recommandations pour l’encagement de gammares dans le cadre des biotests de chimie et de toxicité (min. 8,9). "
                 if "oxygen_chemistry" in place_dict[place_id]["not conform"] or "oxygen_tox" in place_dict[place_id]["not conform"]:
                     not_conform_type_list.append("oxygène")
                     oxygen_not_conform_number +=1
