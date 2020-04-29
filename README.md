@@ -10,7 +10,7 @@ Il est parfois nécessaire de placer l'application dans une exclusion de votre a
 Il faut par ailleurs un VPN (et une connection internet) pour que l'application obtienne les droits d'aller sur la base de données. Pour cela, télécharger Wireguard sur leur site https://www.wireguard.com/install/, puis lancer leur application, ajoutez un tunnel en important un fichier .conf qui est considéré comme libre (renseignez vous auprès des autres utilisateurs du VPN de Zabé pour connaître les configurations disponibles restantes).
 ![Bouton en bas à gauche de Wireguard](./add-tunnel.png)
 
-Maintenant, il ne vous reste plus qu'à rentrer dans le dossier /Générateur de rapport, puis dans le dossier /python-files où vous trouverez l'application sous le nom Générateur de rapport.exe. Ouvrez là en double cliquant dessus.
+Maintenant, il ne vous reste plus qu'à rentrer dans le dossier /Générateur de rapport, où vous trouverez l'application sous le nom Générateur de rapport.exe. Ouvrez là en double cliquant dessus.
 (vous pouvez aussi créer un raccourci en cliquant droit sur l'application, Créer un raccourci, et copier coller ce raccourci où vous le souhaitez, le bureau par exemple)
 
 ## Utilisation
@@ -57,7 +57,7 @@ Pour avoir le dossier sur cela deux choix possibles :
 - l'avoir sur une clé et le copier coller
 - cloner le projet de github. Pour cela, il faut télécharger git sur son appareil et lancer dans une invite de commande :
 ```
-git clone https://github.com/CDL-Biomae/python-files
+git clone https://github.com/CDL-Biomae/report-generator
 ```
 Cela va créer le dossier là où l'invite de commande a été lancé. Ensuite il faut placer le fichier env.py qui ne peut se transmettre par github mais entre particulier (clé USB, mail ...). 
 Dans ce même fichier ajouter les coordonnées de la base de données telle que vous le souhaitez pour vous connectez (les variables commençant par DATABASE).
