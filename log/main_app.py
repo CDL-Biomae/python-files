@@ -150,6 +150,8 @@ class MainApp(tk.Tk):
                 try :
                     self.log_app = LogWordApp(master=self.log_window, campaign=campaign, agency=self.agency,photos_path=self.photos_path, output_path=self.output_path, campaign_number=self.campaign_number)
                     self.output_path = None
+                    self.photos_path = None
+                    self.campaign_number = None
                 except PermissionError :
                     self.log_window.destroy()
                     tk.messagebox.showerror(title="Erreur", message=f"Veuillez fermer le fichier \'{self.output_path.split('/')[-1]}\' avant de lancer.")
