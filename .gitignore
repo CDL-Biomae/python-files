@@ -7,6 +7,7 @@ test*
 *.docx
 *.jpg
 *.png
+!add-tunnel.png
 *.zip
 *.exe
 __pycache__
