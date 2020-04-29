@@ -49,7 +49,7 @@ Les étapes nécessaires sont :
 - Avoir le fichier env.py
 - Télécharger les dépendances
 - Avoir le VPN de Zabé (Wiregard)
-- Avoir la page de garde(word), la page de fin (png) ainsi que le carre_blanc.png dans le dossier Ressources (uniquement pour la création de rapport d'expérimentation)
+- Avoir la page de garde (word), la page de fin (png) ainsi que le carre_blanc.png dans le dossier Ressources (uniquement pour la création de rapport d'expérimentation)
 
 Pour avoir l'application , il est nécessaire d'avoir python sur son ordinateur.
 Vous pouvez télécharger python via leur site https://www.python.org/downloads/. Lors de l'installation, assurez vous d'avoir la case 'Add to PATH' (Ajouter au PATH) cochée.
