@@ -3,7 +3,10 @@
 ## Installation
 
 Pour une utilisation simple de l'application, il faut obtenir le setup, soit par mail soit par clé.
-En double cliquant dessus, vous allez voir apparaître une fenêtre d'installation qui vous demande de choisir où vous voulez stocker l'application. Il est parfois nécessaire de placer l'application dans une exclusion de votre antivirus (cela dépend de votre antivirus) pour éviter qu'il ne supprime l'application en pensant que c'est un virus. 
+En double cliquant dessus, vous allez voir apparaître une fenêtre d'installation qui vous demande de choisir où vous voulez stocker l'application. 
+
+Il est parfois nécessaire de placer l'application dans une exclusion de votre antivirus (cela dépend de votre antivirus) pour éviter qu'il ne supprime l'application en pensant que c'est un virus.
+
 Il faut par ailleurs un VPN (et une connection internet) pour que l'application obtienne les droits d'aller sur la base de données. Pour cela, télécharger Wireguard sur leur site https://www.wireguard.com/install/, puis lancer leur application, ajoutez un tunnel en important un fichier .conf qui est considéré comme libre (renseignez vous auprès des autres utilisateurs du VPN de Zabé pour connaître les configurations disponibles restantes).
 ![Bouton en bas à gauche de Wireguard](./add-tunnel.png)
 
