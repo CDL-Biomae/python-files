@@ -3,7 +3,7 @@ import xlrd
 from tools import QueryScript
 
 
-def fill_reference_tables(cas, xl_path):
+def fill_reference_tables(cas, xl_path="reference_clean.xlsx"):
     # To open Workbook
     wb = xlrd.open_workbook(xl_path)
 
@@ -38,7 +38,7 @@ def fill_reference_tables(cas, xl_path):
       r2_constant_table.execute(admin=True)
     SQL_request = QueryScript(f" INSERT INTO r2_constant (nature, name, value, version) VALUES (%s, %s, %s, %s)")
     values = []
-    index=1
+    index=0
     current_nature = ''
     is_readable =True
     while is_readable:
@@ -93,12 +93,12 @@ def fill_reference_tables(cas, xl_path):
       r3_table.execute(admin=True)
     SQL_request = QueryScript(f" INSERT INTO r3 (unit, sandre, parameter, NQE, 7j_threshold, 7j_graduate_25, 7j_graduate_50, 7j_graduate_75, 21j_threshold, 21j_graduate_25, 21j_graduate_50, 21j_graduate_75, case_number, familly, maximum, freq_quanti, version) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)")
     values = []
-    index=0
+    index=1
     is_readable=True
     while is_readable :
       try:
         if(sheet.cell_value(index,1)):
-          values.append((sheet.cell_value(index,0),sheet.cell_value(index,1),sheet.cell_value(index,2),sheet.cell_value(index,3),float(sheet.cell_value(index,4)) if isinstance(sheet.cell_value(index,4),float) else None,float(sheet.cell_value(index,5)) if isinstance(sheet.cell_value(index,5),float) else None, float(sheet.cell_value(index,6)) if isinstance(sheet.cell_value(index,6),float) else None,float(sheet.cell_value(index,7)) if isinstance( sheet.cell_value(index,7),float) else None,float(sheet.cell_value(index,8)) if isinstance(sheet.cell_value(index,8),float) else None,float(sheet.cell_value(index,9)) if isinstance(sheet.cell_value(index,9),float) else None,float(sheet.cell_value(index,10)) if isinstance(sheet.cell_value(index,10),float) else None,float(sheet.cell_value(index,11)) if isinstance(sheet.cell_value(index,11),float) else None, sheet.cell_value(index,12),sheet.cell_value(index,13), 0.0 if isinstance(sheet.cell_value(index,14),str) else sheet.cell_value(index,14), 0.0 if isinstance(sheet.cell_value(index,15),str) else sheet.cell_value(index,15)))
+          values.append((sheet.cell_value(index,0),int(sheet.cell_value(index,1)) if isinstance(sheet.cell_value(index,1), float) else sheet.cell_value(index,1),sheet.cell_value(index,2),sheet.cell_value(index,3),float(sheet.cell_value(index,4)) if isinstance(sheet.cell_value(index,4),float) else None,float(sheet.cell_value(index,5)) if isinstance(sheet.cell_value(index,5),float) else None, float(sheet.cell_value(index,6)) if isinstance(sheet.cell_value(index,6),float) else None,float(sheet.cell_value(index,7)) if isinstance( sheet.cell_value(index,7),float) else None,float(sheet.cell_value(index,8)) if isinstance(sheet.cell_value(index,8),float) else None,float(sheet.cell_value(index,9)) if isinstance(sheet.cell_value(index,9),float) else None,float(sheet.cell_value(index,10)) if isinstance(sheet.cell_value(index,10),float) else None,float(sheet.cell_value(index,11)) if isinstance(sheet.cell_value(index,11),float) else None, sheet.cell_value(index,12),sheet.cell_value(index,13), 0.0 if isinstance(sheet.cell_value(index,14),str) else sheet.cell_value(index,14), 0.0 if isinstance(sheet.cell_value(index,15),str) else sheet.cell_value(index,15)))
           index+=1
         else:
           index+=1
