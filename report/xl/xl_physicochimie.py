@@ -38,6 +38,12 @@ def create_physicochimie_dataframe(head_dataframe, measurepoint_list, campaigns_
                                     temp[9+day] = ph
                                 if oxygen:
                                     temp[14+day] = oxygen
+            if not temp[1]:
+                temp[1]=""
+            if not temp[2]:
+                temp[2]=""
+            if not temp[3]:
+                temp[3]=""
             matrix.append(temp)
         global_matrix.append(matrix)
                 
@@ -55,7 +61,7 @@ def create_physicochimie_dataframe(head_dataframe, measurepoint_list, campaigns_
                   'pH J0','ph J7', 'pH J14', 'pH J21', 'ph JN',
                   'Oxygène J0','Oxygène J7', 'Oxygène J14', 'Oxygène J21', 'Oxygène JN'])
     
-    df_values = df_values.dropna(how='all', axis='columns')
+    df_values = df_values.dropna(how="all", axis='columns')
     df_concat = pd.concat([head_dataframe, df_values], axis=1)
     df_physicochimie = df_concat.sort_values(['Numéro', 'Campagne'])
 
