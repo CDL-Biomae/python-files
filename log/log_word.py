@@ -34,7 +34,7 @@ class LogWordApp(tk.Tk):
         """
         Read/write the line logged in the log window
         """
-        return self.text_value.get()
+        return self.label_text.get()
 
     @text.setter
     def text(self, value):
@@ -331,7 +331,7 @@ class LogWordApp(tk.Tk):
                 vandalism_list.append(place_id)
         not_validated_list = []
         for place_id in place_dict:
-            if "chemistry portion validation" in place_dict[place_id] and place_dict[place_id]["chemistry portion validation"]==0 and place_id not in vandalism_list and place_dict[place_id]["chemistry_survival"]!="0%":
+            if not "chemistry portion validation" in place_dict[place_id] or ( "chemistry portion validation" in place_dict[place_id] and not place_dict[place_id]["chemistry portion validation"]) or ("chemistry_survival" in place_dict[place_id] and place_dict[place_id]["chemistry_survival"]=="0%"):
                 if agence:
                     not_validated_list.append((place_dict[place_id]["agency"] +" : " if "agency" in place_dict[place_id] else "")+ translate(place_dict[place_id]["name"]))
                 else :

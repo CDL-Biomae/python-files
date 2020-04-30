@@ -30,7 +30,7 @@ class LogExcelApp(tk.Tk):
         """
         Read/write the line logged in the log window
         """
-        return self.text_value.get()
+        return self.label_text.get()
 
     @text.setter
     def text(self, value):
