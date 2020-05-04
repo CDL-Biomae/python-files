@@ -209,7 +209,7 @@ class MainApp(tk.Tk):
         self.change_chosen_version(self.version_choice.get())
         self.log_window = tk.Toplevel(self)
         self.log_window.transient(self)
-        self.log_window.geometry('600x650+150+150')
+        self.log_window.geometry('600x200+150+150')
         self.log_app = LogMapApp(master=self.log_window, campaign_list=self.campaign_list)
             # except PermissionError :
             #     self.log_window.destroy()

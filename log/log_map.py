@@ -77,7 +77,15 @@ class LogMapApp(tk.Tk):
         self.t0_value_list = QueryScript(f"SELECT Analysis.prefix, Analysis.value, Analysis.sandre, Measurepoint.id FROM {env.DATABASE_RAW}.Analysis JOIN {env.DATABASE_RAW}.Pack ON Pack.id=Analysis.pack_id JOIN {env.DATABASE_RAW}.Measurepoint ON Measurepoint.id=Pack.measurepoint_id WHERE Measurepoint.id in (SELECT distinct code_t0_id FROM {env.DATABASE_RAW}.Measurepoint WHERE id IN {tuple(self.measurepoint_list) if len(self.measurepoint_list)>1 else '('+(str(self.measurepoint_list[0]) if len(self.measurepoint_list) else '0')+')'})").execute()
 
         self.text = "Choisissez une mode d'affichage"
-        tk.Button(master=self.master, text="Générer la carte", command=self.main).grid(row=5,column=1)
+        self.format = tk.StringVar()
+        self.format.set('500x500')
+        tk.Label(master=self.master, text='Format en pixel (hauteurxlongueur)').grid(row=5, column=1)
+        self.format_entry = tk.Entry(master=self.master, textvariable=self.format).grid(row=5,column=2)
+        self.zoom = tk.StringVar()
+        self.zoom.set('auto')
+        tk.Label(master=self.master, text='Zoom (0-20)').grid(row=5, column=3)
+        self.zoom_entry = tk.Entry(master=self.master, textvariable=self.zoom).grid(row=5,column=4)
+        tk.Button(master=self.master, text="Générer la carte", command=self.main).grid(row=6,column=1)
         self.image =  None
 
     def show_sandre(self, selection):
@@ -232,6 +240,8 @@ class LogMapApp(tk.Tk):
 
 
         markers = []
+        longitude_list = []
+        latitude_list = []
         for campaign_id  in self.campaigns_dict:
             for place_id in self.campaigns_dict[campaign_id]["place"]:
                 number = self.campaigns_dict[campaign_id]['place'][place_id]['number']
@@ -245,7 +255,11 @@ class LogMapApp(tk.Tk):
                         for mp_id, male_survival, alim, neuro, female_survival, fecondity in self.tox_data:
                             if mp_id==measurepoint_id:
                                 if self.biotest_chosen.get()=='Alimentation' and male_survival:
-                                    value = -alim if alim else None
+                                    if float(male_survival)<70 :
+                                        value = 0
+                                        color = '000000'
+                                    else :
+                                        value = -alim if alim else None
                                 if self.biotest_chosen.get()=='Neurotoxicité':
                                     value = -neuro if neuro else None
                                 if self.biotest_chosen.get()=='Reprotoxicité' and female_survival:
@@ -282,17 +296,47 @@ class LogMapApp(tk.Tk):
                         color = '0000FF'
 
 
-
+                longitude_list.append(float(longitude))
+                latitude_list.append(float(latitude))
                 markers.append(f"pin-s-{round(10*(number - int(number))) if number!=int(number) else number}+{color}({longitude},{latitude})")
         access_token = env.ACCESS_TOKEN_MAPBOX
-        url = f"https://api.mapbox.com/styles/v1/mapbox/streets-v11/static/{','.join(markers)}/auto/500x500?access_token={access_token}"
-        response = requests.get(url)
-        self.image = Image.open(BytesIO(response.content))
-        image = ImageTk.PhotoImage(self.image)
-        self.master.geometry = '600x600+150+150'
-        self.output_map = tk.Canvas(self.master, width=500, height=500, bg='white')
-        self.output_map.create_image(252,252,image=image)
-        self.output_map.image = image
-        self.output_map.grid(row=6, column=1, columnspan=4)
-        self.last_choice = f"{self.biotest_chosen.get()}{(' - '+ str(sandre_chosen)) if self.biotest_chosen.get() in ['NQE','Chimie(7j)','Chimie(21j)'] else ''}"
-        tk.Button(master=self.master, text="Enregistrer", command=self.save).grid(row=5, column=2)
+        view_format = 'auto'
+        try : 
+            zoom = float(self.zoom.get())
+            if zoom < 0:
+                zoom = 0
+            if zoom > 20:
+                zoom = 20
+            lon = round(sum(longitude_list)/len(longitude_list), 2)
+            lat = round(sum(latitude_list)/len(latitude_list), 2)
+            view_format = f"{lon},{lat},{zoom}"
+        except ValueError:
+            self.zoom.set('auto')
+        view_size = None
+        try :
+            height, width = self.format.get().split('x')
+            if int(width) > 1280 or int(width) < 1 or int(height) > 1280  or int(height) < 1 :
+                raise ValueError("largeur ou longueur non comprise entre 1 et 1280")
+            else :
+                view_size = f"{int(width)}x{int(height)}"
+        except :
+            tk.messagebox.showerror(title="Erreur", message="largeur ou longueur non comprise entre 1 et 1280")
+
+
+        if view_size :
+            url = f"https://api.mapbox.com/styles/v1/mapbox/streets-v11/static/{','.join(markers)}/{view_format}/{view_size}?access_token={access_token}"
+            response = requests.get(url)
+            self.image = Image.open(BytesIO(response.content))
+            image = ImageTk.PhotoImage(self.image)
+            self.master.geometry = '600x600+150+150'
+            try :
+                self.output.destroy()
+            except RecursionError:
+                pass
+            self.output = tk.Toplevel(width=int(width), height=int(height))
+            self.output_map = tk.Canvas(self.output, width=int(width), height=int(height), bg='white')
+            self.output_map.create_image(int(width)/2,int(height)/2,image=image)
+            self.output_map.image = image
+            self.output_map.grid(row=0 , column=0, columnspan=3)
+            self.last_choice = f"{self.biotest_chosen.get()}{(' - '+ str(sandre_chosen)) if self.biotest_chosen.get() in ['NQE','Chimie(7j)','Chimie(21j)'] else ''}"
+            tk.Button(master=self.output, text="Enregistrer", command=self.save).grid(row=1, column=2)
