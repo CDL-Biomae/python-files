@@ -13,6 +13,7 @@ import env
 class LogMapApp(tk.Tk):
     def __init__(self, master=None, campaign_list=[]):
         self.master = master
+        self.campaign_list = campaign_list
         tk.Label(master=self.master, text="    ").grid(row=0,column=0)
         tk.Label(master=self.master,text=f"Création de carte de résultat pour {' '.join(campaign_list)}").grid(row=1,column=1, sticky="w")
 
@@ -65,11 +66,19 @@ class LogMapApp(tk.Tk):
                                 self.campaigns_dict[campaign_id]["place"][place_id]["longitude"] = longitude
                             if latitude :
                                 self.campaigns_dict[campaign_id]["place"][place_id]["latitude"] = latitude
-                    
-
+        self.t0_associated = QueryScript(f"SELECT code_t0_id, id  FROM {env.DATABASE_RAW}.Measurepoint WHERE id IN {tuple(self.chemistry_measurepoint_list)};").execute()
+        self.dict_t0 = {}
+        for campaign_id in self.campaigns_dict:
+            for place_id in self.campaigns_dict[campaign_id]["place"]:
+                for measurepoint_id in self.campaigns_dict[campaign_id]["place"][place_id]["measurepoint"]:
+                    for code_t0_id, mp_id in self.t0_associated:
+                        if measurepoint_id==mp_id and place_id not in self.dict_t0:
+                            self.dict_t0[measurepoint_id] = {"code_t0_id": code_t0_id}
+        self.t0_value_list = QueryScript(f"SELECT Analysis.prefix, Analysis.value, Analysis.sandre, Measurepoint.id FROM {env.DATABASE_RAW}.Analysis JOIN {env.DATABASE_RAW}.Pack ON Pack.id=Analysis.pack_id JOIN {env.DATABASE_RAW}.Measurepoint ON Measurepoint.id=Pack.measurepoint_id WHERE Measurepoint.id in (SELECT distinct code_t0_id FROM {env.DATABASE_RAW}.Measurepoint WHERE id IN {tuple(self.measurepoint_list) if len(self.measurepoint_list)>1 else '('+(str(self.measurepoint_list[0]) if len(self.measurepoint_list) else '0')+')'})").execute()
 
         self.text = "Choisissez une mode d'affichage"
         tk.Button(master=self.master, text="Générer la carte", command=self.main).grid(row=5,column=1)
+        self.image =  None
 
     def show_sandre(self, selection):
         
@@ -101,6 +110,11 @@ class LogMapApp(tk.Tk):
         else :
             self.sandre_selection_label = tk.Label(master=self.frame_selection, text='').grid(row=0,column=0)
             self.sandre_selection_menu = tk.Label(self.frame_selection, text='').grid(row=0,column=1)
+
+    def save(self):
+        self.output_path = tk.filedialog.asksaveasfilename(title=f"Enregistrer l'image",filetypes=[("PNG (*.png)","*.png")], defaultextension=".png", initialfile=f"Carte des résultats {' '.join(self.campaign_list)} - {self.last_choice}")
+        if self.output_path :
+            self.image.save(self.output_path, "PNG")
 
     def select_sandre(self, selection):
         self.sandre_selected.set(selection)
@@ -248,7 +262,13 @@ class LogMapApp(tk.Tk):
                                 value=-1
                             else :
                                 value = self.result_dict[measurepoint_id][sandre_chosen]
-                if value:
+                            t0_found = False 
+                            for prefix, t0_value, sandre, mp_id in self.t0_value_list :
+                                if sandre_chosen == int(sandre) and mp_id==self.dict_t0[measurepoint_id]["code_t0_id"]:
+                                    if not t0_value or (isinstance(t0_value,float) and t0_value>float(threshold_list[0])):
+                                        value=0
+                                    t0_found=True
+                if value and ((self.biotest_chosen.get() in ["NQE","Chimie(7j)","Chimie(21j)"] and t0_found) or self.biotest_chosen.get() in ['Alimentation', 'Neurotoxicité','Reprotoxicité']):
                     value=float(value)
                     if threshold_list[0] and value>float(threshold_list[0]):
                         if threshold_list[1] and value>float(threshold_list[1]):
@@ -270,11 +290,12 @@ class LogMapApp(tk.Tk):
         access_token = env.ACCESS_TOKEN_MAPBOX
         url = f"https://api.mapbox.com/styles/v1/mapbox/streets-v11/static/{','.join(markers)}/auto/500x500?access_token={access_token}"
         response = requests.get(url)
-        image = ImageTk.PhotoImage(Image.open(BytesIO(response.content)))
-        # image.save("test.gif", "GIF")
+        self.image = Image.open(BytesIO(response.content))
+        image = ImageTk.PhotoImage(self.image)
         self.master.geometry = '600x600+150+150'
         self.output_map = tk.Canvas(self.master, width=500, height=500, bg='white')
         self.output_map.create_image(252,252,image=image)
         self.output_map.image = image
         self.output_map.grid(row=6, column=1, columnspan=4)
-        self.text="Yes"
+        self.last_choice = f"{self.biotest_chosen.get()}{(' - '+ str(sandre_chosen)) if self.biotest_chosen.get() in ['NQE','Chimie(7j)','Chimie(21j)'] else ''}"
+        tk.Button(master=self.master, text="Enregistrer", command=self.save).grid(row=5, column=2)
