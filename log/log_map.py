@@ -5,7 +5,7 @@ from tools import QueryScript
 from report.initialization import initialize
 from io import BytesIO
 from PIL import Image, ImageTk
-from calcul import chemistry, elements_crustacean, elements_fish
+from calcul import chemistry, elements_crustacean
 import requests
 import os 
 import env
@@ -91,9 +91,6 @@ class LogMapApp(tk.Tk):
             if self.biotest_chosen.get() == 'NQE':
                 for parameter, sandre, nqe, threshold_7j, graduate_7j_25, graduate_7j_50, graduate_7j_75, threshold_21j, graduate_21j_25, graduate_21j_50, graduate_21j_75 in self.threshold_chemistry:
                     for element in elements_crustacean:
-                        if sandre==str(element) :
-                            self.sandre_able.append([sandre,f"{sandre} : {parameter}"])
-                    for element in elements_fish:
                         if sandre==str(element) :
                             self.sandre_able.append([sandre,f"{sandre} : {parameter}"])
             if self.biotest_chosen.get() == 'Chimie(7j)':
@@ -265,7 +262,7 @@ class LogMapApp(tk.Tk):
                             t0_found = False 
                             for prefix, t0_value, sandre, mp_id in self.t0_value_list :
                                 if sandre_chosen == int(sandre) and mp_id==self.dict_t0[measurepoint_id]["code_t0_id"]:
-                                    if not t0_value or (isinstance(t0_value,float) and t0_value>float(threshold_list[0])):
+                                    if not t0_value or (isinstance(t0_value,float) and threshold_list[0] and t0_value>float(threshold_list[0])):
                                         value=0
                                     t0_found=True
                 if value and ((self.biotest_chosen.get() in ["NQE","Chimie(7j)","Chimie(21j)"] and t0_found) or self.biotest_chosen.get() in ['Alimentation', 'Neurotoxicité','Reprotoxicité']):
