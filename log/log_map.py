@@ -85,7 +85,11 @@ class LogMapApp(tk.Tk):
         self.zoom.set('auto')
         tk.Label(master=self.master, text='Zoom (0-20)').grid(row=5, column=3)
         self.zoom_entry = tk.Entry(master=self.master, textvariable=self.zoom).grid(row=5,column=4)
-        tk.Button(master=self.master, text="Générer la carte", command=self.main).grid(row=6,column=1)
+        tk.Label(master=self.master, text='Fond de carte').grid(row=6, column=1)
+        self.background = tk.StringVar()
+        self.background.set("Rues")
+        self.bakcground_menu = tk.OptionMenu(self.master, self.background, *["Rues","Extérieur","Satellite","Satellite avec rues"] ).grid(row=6,column=2)
+        tk.Button(master=self.master, text="Générer la carte", command=self.main).grid(row=7,column=1)
         self.image =  None
 
     def show_sandre(self, selection):
@@ -324,7 +328,16 @@ class LogMapApp(tk.Tk):
 
 
         if view_size :
-            url = f"https://api.mapbox.com/styles/v1/mapbox/streets-v11/static/{','.join(markers)}/{view_format}/{view_size}?access_token={access_token}"
+            background = None
+            if self.background.get() == "Rues" :
+                background = "streets-v11"
+            if self.background.get() == "Extérieur" :
+                background = "outdoors-v11"
+            if self.background.get() == "Satellite" :
+                background = "satellite-v9"
+            if self.background.get() == "Satellite avec rues" :
+                background = "satellite-streets-v11"
+            url = f"https://api.mapbox.com/styles/v1/mapbox/{background}/static/{','.join(markers)}/{view_format}/{view_size}?access_token={access_token}"
             response = requests.get(url)
             self.image = Image.open(BytesIO(response.content))
             image = ImageTk.PhotoImage(self.image)
