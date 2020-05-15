@@ -468,8 +468,8 @@ class LogWordApp(tk.Tk):
                 table_geo_2.cell(2, 3).paragraphs[0].add_run('X ' + place_dict[place_id]['lambertX'] if "lambertX" in place_dict[place_id] else "ND")
 
                 table_geo_2.cell(3, 0).paragraphs[0].add_run("Coordonnées BIOMÆ en degrés décimaux : ").bold = True
-                longitude = place_dict[place_id]['longitudeSpotted']
-                latitude = place_dict[place_id]['latitudeSpotted']
+                longitude = place_dict[place_id]['longitudeSpotted'] if 'longitudeSpotted' in place_dict[place_id] else 0
+                latitude = place_dict[place_id]['latitudeSpotted'] if 'latitudeSpotted' in place_dict[place_id] else 0
                 table_geo_2.cell(3, 2).paragraphs[0].add_run(
                     str(longitude))
                 table_geo_2.cell(3, 3).paragraphs[0].add_run(
@@ -491,8 +491,8 @@ class LogWordApp(tk.Tk):
                     str(place_dict[place_id]['latitudeSpotted']))
 
             table_carte = doc.add_table(rows=4, cols=1)
-            lon = str(place_dict[place_id]['longitudeSpotted'])
-            lat = str(place_dict[place_id]['latitudeSpotted'])
+            lon = str(place_dict[place_id]['longitudeSpotted'] if 'longitudeSpotted' in place_dict[place_id] else 0)
+            lat = str(place_dict[place_id]['latitudeSpotted'] if 'latitudeSpotted' in place_dict[place_id] else 0)
             if (lon != "None") & (lat != "None"):
                 access_token = env.ACCESS_TOKEN_MAPBOX
                 # layer = '{"id":"water","source":{"url":"mapbox://mapbox.mapbox-streets-v8","type":"vector"},"source-layer":"water","type":"fill","paint":{"fill-color":"%2300ffff"}}'
@@ -528,7 +528,7 @@ class LogWordApp(tk.Tk):
             table_image.cell(1, 0).merge(table_image.cell(1, 1))
 
             if agence and place_dict[place_id]:
-                table_image.cell(0, 0).paragraphs[0].add_run((place_dict[place_id]['agency']+ " : " if 'agency' in place_dict[place_id] else "") + translate(place_dict[place_id]['name']) + "  " + place_dict[place_id]["reference"]).bold = True
+                table_image.cell(0, 0).paragraphs[0].add_run((place_dict[place_id]['agency']+ " : " if 'agency' in place_dict[place_id] else "") + translate(place_dict[place_id]['name']) + ("  " + place_dict[place_id]["reference"]) if "reference" in place_dict[place_id] else '').bold = True
             else:
                 table_image.cell(0, 0).paragraphs[0].add_run("Point " + str(place_dict[place_id]["number"]).replace(',','-') + " : " +
                                                                 translate(place_dict[place_id]['name'])).bold = True
