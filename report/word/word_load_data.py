@@ -121,11 +121,11 @@ def load_data(reference):
                             if temperature :
                                 place_dict[place_id]["condition"][J]["temperature"] = temperature
                             if comment :
-                                dissociated_comment = [information.replace("\n",", ") for information in comment.split("\t")]
+                                dissociated_comment = [translate(information).replace("\n",", ") for information in comment.split("\t")]
                                 need_to_be_removed = []
                                 for information in dissociated_comment:
                                     if information!="":
-                                        if len(information)>=10 and information[:10]=="Vandalisme":
+                                        if (len(information)>=10 and information[:10]=="Vandalisme") or (len(information)>=23 and information[:23]=='Système non récupérable'):
                                             place_dict[place_id]["vandalism"] = True
                                         if information[-1]=="%" or "Scan" in information or "#" in information or 'RAS' in information:
                                             need_to_be_removed.append(information)
