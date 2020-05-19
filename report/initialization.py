@@ -269,13 +269,15 @@ def initialize(references=None, campaigns_dict=None):
             ###################################
 
             for measurepoint_number, _ in enumerate(place_dates):
+                if place_dates[measurepoint_number][6] and (place_dates[measurepoint_number][6]-J0).days>17 and (place_dates[measurepoint_number][6]-J0).days<24:
+                    J21 = place_dates[measurepoint_number][6]
                 for date_id, date in enumerate(place_dates[measurepoint_number]):
                     if date and date_id!=4 :
                         if (date-J0).days>3 and (date-J0).days<10 :
                             J7 = date
                         elif (date-J0).days>10 and (date-J0).days<17 :
                             J14 = date
-                        elif (date-J0).days>17 and (date-J0).days<24 :
+                        elif (date-J0).days>17 and (date-J0).days<24 and not J21:
                             J21 = date
                         elif (date-J0).days>24 :
                             J28 = date
