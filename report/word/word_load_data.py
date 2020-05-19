@@ -125,7 +125,7 @@ def load_data(reference):
                                 need_to_be_removed = []
                                 for information in dissociated_comment:
                                     if information!="":
-                                        if (len(information)>=10 and information[:10]=="Vandalisme") or (len(information)>=23 and information[:23]=='Système non récupérable'):
+                                        if (len(information)>=10 and information[:10]=="Vandalisme") or (len(information)>=23 and information[:23]=='Système non récupérable') or (len(information)>=16 and information[:16]=='Perte du système') :
                                             place_dict[place_id]["vandalism"] = True
                                         if information[-1]=="%" or "Scan" in information or "#" in information or 'RAS' in information:
                                             need_to_be_removed.append(information)
