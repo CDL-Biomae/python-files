@@ -9,7 +9,7 @@ def load_data(reference):
     campaigns_dict, measurepoint_list, chemistry_measurepoint_list, chemistry_pack_list, _, _, tox_measurepoint_list, agency_code_list, J_dict = initialize([reference])
 
     agency_data = QueryScript(f"SELECT code, network, hydroecoregion, latitude, longitude FROM {env.DATABASE_RAW}.Agency  WHERE code IN {tuple(agency_code_list) if len(agency_code_list)>1 else '('+(str(agency_code_list[0]) if len(agency_code_list) else '0')+')'};").execute()
-    context_data = QueryScript(f"SELECT measurepoint_id, recordedAt, temperature, conductivity, ph, oxygen, type, comment FROM {env.DATABASE_RAW}.MeasureExposureCondition WHERE measurepoint_id IN {tuple(measurepoint_list) if len(measurepoint_list)>1 else '('+str(measurepoint_list[0])+')'}").execute()
+    context_data = QueryScript(f"SELECT measurepoint_id, recordedAt, temperature, conductivity, ph, oxygen, type, comment, step, barrel FROM {env.DATABASE_RAW}.MeasureExposureCondition WHERE measurepoint_id IN {tuple(measurepoint_list) if len(measurepoint_list)>1 else '('+str(measurepoint_list[0])+')'}").execute()
     temperatures_data = QueryScript(f"SELECT measurepoint_id, sensor1_min, sensor1_average, sensor1_max, sensor2_min, sensor2_average, sensor2_max, sensor3_min, sensor3_average, sensor3_max   FROM {env.DATABASE_TREATED}.average_temperature WHERE version=  {env.CHOSEN_VERSION()} and measurepoint_id IN {tuple(measurepoint_list) if len(measurepoint_list)>1 else '('+str(measurepoint_list[0])+')'}").execute()
     geographic_data = QueryScript(f"SELECT id, latitudeSpotted, longitudeSpotted, lambertX, lambertY, city, zipcode, stream FROM {env.DATABASE_RAW}.Measurepoint WHERE id IN {tuple(measurepoint_list) if len(measurepoint_list)>1 else '('+str(measurepoint_list[0])+')'}").execute()
     place_reference_data = QueryScript(f"SELECT Place.id, Place.reference FROM {env.DATABASE_RAW}.Measurepoint JOIN {env.DATABASE_RAW}.Place ON Place.id= Measurepoint.place_id WHERE Measurepoint.id IN {tuple(measurepoint_list) if len(measurepoint_list)>1 else '('+str(measurepoint_list[0])+')'}").execute()
@@ -98,12 +98,16 @@ def load_data(reference):
                         place_dict[place_id]["condition"]["average_temperature"] = round(sensor3_average,1)
 
             ### Add context data
-            for mp_id, recordedAt,temperature, conductivity, ph, oxygen, barrel_type, comment in context_data:
-                if measurepoint_id==mp_id:
+            for mp_id, recordedAt,temperature, conductivity, ph, oxygen, barrel_type, comment, step, barrel in context_data:
+                not_good_one = False
+                if step==50 :
+                    if barrel!="R0":
+                        not_good_one = True
+                if measurepoint_id==mp_id and not not_good_one:
                     if barrel_type :
                         place_dict[place_id]["barrel_type"] = barrel_type
                     for J in J_dict[place_id]:  
-                        if J!="J28" and J!="N" and J_dict[place_id][J]["full_date"] and J_dict[place_id][J]["full_date"]==recordedAt :
+                        if J!="J28" and J!="N" and J_dict[place_id][J]["full_date"] and J_dict[place_id][J]["full_date"]==recordedAt:
                             if not week_start_number:
                                 week_start_number = J_dict[place_id][J]["full_date"].isocalendar()[1]
                             elif J_dict[place_id][J]["full_date"].isocalendar()[1] < week_start_number:
