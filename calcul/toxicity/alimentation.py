@@ -80,6 +80,10 @@ class Alimentation:
                         current_specimen_sample.append(size_mm)
                     else:
                         current_specimen_sample.append(size_px)
+        if pack_checked and ratio:
+            specimen_size[pack_dict[pack_checked]] = [element*ratio for element in current_specimen_sample]
+        elif pack_checked and is_in_mm:
+            specimen_size[pack_dict[pack_checked]] = [element for element in current_specimen_sample]
         ############################################
 
         ############### Calcul des tailles feuilles ingérées
@@ -119,7 +123,7 @@ class Alimentation:
         ##################### Calcul de l'inhibition alimentaire
         inhibition = {element:None for element in dict_pack}
         constant_alim = QueryScript(
-            f" SELECT value   FROM {env.DATABASE_TREATED}.r2_constant WHERE name LIKE 'Constante alim%'").execute()
+            f" SELECT value   FROM {env.DATABASE_TREATED}.r2_constant WHERE name LIKE 'Constante alim%' AND version={env.CHOSEN_VERSION()}").execute()
         average_temperature = {element:None for element in dict_pack}
         average_temperature_output = QueryScript(f" SELECT measurepoint_id, sensor1_average   FROM {env.DATABASE_TREATED}.average_temperature WHERE measurepoint_id IN {tuple([element for element in dict_pack]) if len([element for element in dict_pack])>1 else '('+(str([element for element in dict_pack][0]) if len([element for element in pack_dict]) else '0')+')'} AND version=  {env.CHOSEN_VERSION()}").execute()
         for measurepoint_id, sensor1_average in average_temperature_output:
