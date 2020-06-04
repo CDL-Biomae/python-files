@@ -8,3 +8,4 @@ from .xl_tox import *
 from .xl_bbac_7j import *
 from .xl_bbac_21j import *
 from .xl_edi import *
+from .xl_calcul_tox import *

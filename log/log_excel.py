@@ -21,7 +21,7 @@ class LogExcelApp(tk.Tk):
         self.progressbar_element = ttk.Progressbar(master=self.master,orient="horizontal",length=350,mode="determinate")
         self.progressbar_element.grid(row=2,column=1, sticky="w")
         self.progressbar_element["value"]=0
-        self.progressbar_element["maximum"]=12
+        self.progressbar_element["maximum"]=13
         self.quit_window = False
         self.main(campaign_list, output_path)
     
@@ -88,7 +88,7 @@ class LogExcelApp(tk.Tk):
 
     def main(self, campaign_list, output_path):
         self.text = "Chargement des données..."
-        campaigns_dict, measurepoint_list, chemistry_measurepoint_list, chemistry_pack_list, chemistry_7j_measurepoint_list, chemistry_21j_measurepoint_list, tox_measurepoint_list, agency_code_list, J_dict = initialize(campaign_list)
+        campaigns_dict, measurepoint_list, chemistry_measurepoint_list, chemistry_pack_list, chemistry_7j_measurepoint_list, chemistry_21j_measurepoint_list, tox_measurepoint_list, tox_pack_list, agency_code_list, J_dict = initialize(campaign_list)
         head_dataframe, head_filtered_dataframe, place_list = create_head_dataframe(campaigns_dict)
         head_chemistry_dataframe, head_chemistry_7j_dataframe, head_chemistry_21j_dataframe =  create_head_special_dataframe(campaigns_dict, chemistry_measurepoint_list, chemistry_7j_measurepoint_list, chemistry_21j_measurepoint_list)
 
@@ -173,7 +173,12 @@ class LogExcelApp(tk.Tk):
             tox_dataframe = create_tox_dataframe(campaigns_dict, tox_measurepoint_list)
             self.write_in_existing_excel(tox_dataframe, output_path, 'Tox', startrow=3)
             add_style_tox(tox_dataframe, output_path)
-        
+
+            self.text = "Création de l'onglet Calcul Tox..."
+            calcul_tox_dataframe = create_calcul_tox_dataframe(campaign_list,campaigns_dict, J_dict, tox_measurepoint_list, tox_pack_list)
+            self.write_in_existing_excel(calcul_tox_dataframe, output_path, 'Calcul tox', 0,0)
+            add_style_calcul_tox(calcul_tox_dataframe, output_path)
+
         self.progressbar = self.progressbar_element["maximum"]
 
         self.text = "Terminé"

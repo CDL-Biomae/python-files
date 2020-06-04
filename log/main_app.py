@@ -1,4 +1,5 @@
 import tkinter as tk
+import webbrowser
 from tkinter import filedialog, messagebox
 from tools import QueryScript
 import env
@@ -9,7 +10,6 @@ from .log_excel import LogExcelApp
 from .log_word import LogWordApp
 from .log_database import LogDatabaseApp
 from .log_excel_EDI import LogExcelEDIApp
-from .log_map import LogMapApp
 
 
 class MainApp(tk.Tk):
@@ -198,26 +198,7 @@ class MainApp(tk.Tk):
             except Exception as err :
                 self.log_window.destroy()
                 tk.messagebox.showerror(title="Erreur", message=err)
-
-    def launch_map(self): 
-
-        # for campaign in self.campaign_list:
-        #     self.output_path = tk.filedialog.asksaveasfilename(title=f"Enregistrer le rapport EDI",filetypes=[("Excel (*.xlsx)","*.xlsx")], defaultextension=".xlsx", initialfile=f"Rapport EDI pour {campaign}")
-        #     if not self.output_path:
-        #         return None
-
-        self.change_chosen_version(self.version_choice.get())
-        self.log_window = tk.Toplevel(self)
-        self.log_window.transient(self)
-        self.log_window.geometry('600x200+150+150')
-        self.log_app = LogMapApp(master=self.log_window, campaign_list=self.campaign_list)
-            # except PermissionError :
-            #     self.log_window.destroy()
-            #     tk.messagebox.showerror(title="Erreur", message=f"Veuillez fermer le fichier \'{self.output_path.split('/')[-1]}\' avant de lancer.")
-            # except Exception as err :
-            #     self.log_window.destroy()
-            #     tk.messagebox.showerror(title="Erreur", message=err)
-   
+ 
     def show_end(self):
         ######## Frame end
         self.frame_empty.destroy()
@@ -233,10 +214,6 @@ class MainApp(tk.Tk):
         self.launch_edi_button = tk.Button(
             master=self.frame_end, text="Rapport EDI", fg="#FFFFFF", background="#008000", command=self.launch_edi)
         self.launch_edi_button.pack()
-        tk.Label(master=self.frame_end, text="").pack()
-        self.launch_map_button = tk.Button(
-            master=self.frame_end, text="Visualisation de résultat",command=self.launch_map)
-        self.launch_map_button.pack()
         self.frame_end.pack(expand='YES')
 
 
@@ -263,10 +240,11 @@ class MainApp(tk.Tk):
             self.reset_input()
 
     def reset_campaign(self):
-        self.campaign_list = []
-        self.campaign_input_text.set("")
-        self.frame_end.destroy()
-        self.create_empty_space()
+        if len(self.campaign_list) :
+            self.campaign_list = [] 
+            self.campaign_input_text.set("")
+            self.frame_end.destroy()
+            self.create_empty_space()
 
     def enter(self,event):
         self.add_campaign()

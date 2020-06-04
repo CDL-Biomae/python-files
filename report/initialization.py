@@ -152,8 +152,6 @@ def create_campaigns_dict(references):
             for place in campaigns_dict[campaign]["place"]:
                 if place==place_id:
                     campaigns_dict[campaign]["place"][place]["agency"] = agency_code
-    with open('data.json','w') as outfile :
-        json.dump(campaigns_dict, outfile)
 
     return campaigns_dict
 
@@ -163,6 +161,7 @@ def initialize(references=None, campaigns_dict=None):
     measurepoint_list = []
     chemistry_measurepoint_list = []
     chemistry_pack_list = []
+    tox_pack_list = []
     tox_measurepoint_list = []
     agency_code_list = []
     for campaign_id in campaigns_dict:
@@ -175,6 +174,8 @@ def initialize(references=None, campaigns_dict=None):
                         if measurepoint_id not in chemistry_measurepoint_list:
                             chemistry_measurepoint_list.append(measurepoint_id)
                     else :
+                        if pack_id not in tox_pack_list :
+                            tox_pack_list.append(int(pack_id))
                         if measurepoint_id not in tox_measurepoint_list:
                             tox_measurepoint_list.append(measurepoint_id) 
                 if measurepoint_id not in measurepoint_list:
@@ -292,6 +293,9 @@ def initialize(references=None, campaigns_dict=None):
             J_dict[place_id]["J28"]["truncated_date"] = J28
             if JN and J0 :
                 J_dict[place_id]["N"] = (datetime.datetime.strptime(JN, '%d/%m/%Y')-datetime.datetime.strptime(J0, '%d/%m/%Y')).days
-                       
-    return campaigns_dict, measurepoint_list, chemistry_measurepoint_list, chemistry_pack_list, chemistry_7j_measurepoint_list, chemistry_21j_measurepoint_list, tox_measurepoint_list, agency_code_list, J_dict
+
+    with open('data.json','w') as outfile :
+        json.dump(campaigns_dict, outfile)      
+
+    return campaigns_dict, measurepoint_list, chemistry_measurepoint_list, chemistry_pack_list, chemistry_7j_measurepoint_list, chemistry_21j_measurepoint_list, tox_measurepoint_list, tox_pack_list, agency_code_list, J_dict
 
