@@ -454,6 +454,7 @@ def add_result(matrix, place_or_seperated_measurepoint, cage_data, remaining_lea
 
         size_px_individual_list = [None] * 20
         size_mm_individual_list = [None] * 20
+        size_list = []
         ratio = None
 
         ### Size 
@@ -465,11 +466,16 @@ def add_result(matrix, place_or_seperated_measurepoint, cage_data, remaining_lea
                 elif size_px and individual!=0 :
                     size_px_individual_list[individual-1] = size_px
                 if size_mm and individual!=0 :
-                    size_mm_individual_list[individual-1] = size_px
+                    size_mm_individual_list[individual-1] = size_mm
+                    size_list.append(size_mm)
 
         if ratio : 
             for index, size in enumerate(size_px_individual_list) : 
-                size_mm_individual_list[index] = size*ratio
+                if size :
+                    size_mm_individual_list[index] = size*ratio
+                    size_list.append(size*ratio)
+
+                
         not_None_individual_size = 0
         individual_size_sum = 0
         for individual_size in size_mm_individual_list:
@@ -480,11 +486,11 @@ def add_result(matrix, place_or_seperated_measurepoint, cage_data, remaining_lea
         
         if not_None_individual_size:
             new_matrix[18].append(individual_size_average)
-            new_matrix[19].append(min(size_mm_individual_list))
-            new_matrix[20].append(max(size_mm_individual_list))
-            if standard_deviation(size_mm_individual_list) :
-                new_matrix[21].append(standard_deviation(size_mm_individual_list))
-                new_matrix[22].append(standard_deviation(size_mm_individual_list)/individual_size_average)
+            new_matrix[19].append(min(size_list))
+            new_matrix[20].append(max(size_list))
+            if standard_deviation(size_list) :
+                new_matrix[21].append(standard_deviation(size_list))
+                new_matrix[22].append(standard_deviation(size_list)/individual_size_average)
             for index, size in enumerate(size_mm_individual_list):
                 new_matrix[23+index].append(size)
             if ratio:
@@ -630,10 +636,10 @@ def add_result(matrix, place_or_seperated_measurepoint, cage_data, remaining_lea
                     if specimen_size_mm and specimen_size_mm!="0" :
                         female_size_list[female] = specimen_size_mm
                         new_matrix[213+female].append(specimen_size_mm)
-                        if (molting_stage == 'c2' or molting_stage == 'd1') :
+                        if (molting_stage == 'c2' or molting_stage == 'd1') and oocyte_left!=None and oocyte_right!=None:
                             new_matrix[116+female].append((oocyte_left+oocyte_right)/specimen_size_mm)
                             fertility_list.append((oocyte_left+oocyte_right)/specimen_size_mm)
-                    elif size_ratio and specimen_size_px and (oocyte_left+oocyte_right) :
+                    elif size_ratio and specimen_size_px and oocyte_left!=None and oocyte_right!=None :
                         female_size_list[female] = specimen_size_px*size_ratio
                         new_matrix[213+female].append(specimen_size_px*size_ratio)
                         if (molting_stage == 'c2' or molting_stage == 'd1') :
