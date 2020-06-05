@@ -39,7 +39,7 @@ Si vous avez besoin de créer une nouvelle version, veuillez renseigner le fiche
 
 Si vous voulez changer les éléments sélectionnées dans l'onglet NQE Biote, veuillez les renseigner dans /calcul/chemistry/nqe dans les dictionnaires correspondants.
 
-/!\/!\/!\ ATTENTION : il est primordial d'attendre une dizaine de minutes après un import de données pour éviter tout délais du BO qui pourrait rendre invisible à une mise à jour les nouvelles données.
+/!\ /!\ /!\ ATTENTION : il est primordial d'attendre une dizaine de minutes après un import de données pour éviter tout délais du BO qui pourrait rendre invisible à une mise à jour les nouvelles données. Pour faire une mise à jour à partir d'une date précise, veuillez modifier manuellement la date de la version à mettre à jour (une date antérieure à l'import).
 
 
 # Utilisation avancée (pour mise à jour ou débugage)
