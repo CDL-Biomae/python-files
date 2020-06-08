@@ -228,7 +228,7 @@ def initialize(references=None, campaigns_dict=None):
                         for first_measurepoint_checked,_ in enumerate(starting_date_list):
                             for second_measurepoint_checked in range(first_measurepoint_checked+1, len(starting_date_list)):
                                 if starting_date_list[second_measurepoint_checked] and starting_date_list[first_measurepoint_checked]:
-                                    if abs((starting_date_list[second_measurepoint_checked]-starting_date_list[first_measurepoint_checked]).days) < 4:
+                                    if abs((starting_date_list[second_measurepoint_checked]-starting_date_list[first_measurepoint_checked]).days) < 4 or abs((starting_date_list[second_measurepoint_checked]-starting_date_list[first_measurepoint_checked]).days) > 26:
                                         need_to_be_seperate= True
                 if "chemistry" in nature_duplicate :
                     for id_date in range(7):
@@ -236,7 +236,7 @@ def initialize(references=None, campaigns_dict=None):
                         for first_measurepoint_checked,_ in enumerate(starting_date_list):
                             for second_measurepoint_checked in range(first_measurepoint_checked+1, len(starting_date_list)):
                                 if starting_date_list[second_measurepoint_checked] and starting_date_list[first_measurepoint_checked]:
-                                    if abs((starting_date_list[second_measurepoint_checked]-starting_date_list[first_measurepoint_checked]).days) < 4:
+                                    if abs((starting_date_list[second_measurepoint_checked]-starting_date_list[first_measurepoint_checked]).days) < 4 or abs((starting_date_list[second_measurepoint_checked]-starting_date_list[first_measurepoint_checked]).days) > 26:
                                         need_to_be_seperate= True
                 if "reproduction" in nature_duplicate :
                     for id_date in range(7):
@@ -244,7 +244,7 @@ def initialize(references=None, campaigns_dict=None):
                         for first_measurepoint_checked,_ in enumerate(starting_date_list):
                             for second_measurepoint_checked in range(first_measurepoint_checked+1, len(starting_date_list)):
                                 if starting_date_list[second_measurepoint_checked] and starting_date_list[first_measurepoint_checked]:
-                                    if abs((starting_date_list[second_measurepoint_checked]-starting_date_list[first_measurepoint_checked]).days) < 4:
+                                    if abs((starting_date_list[second_measurepoint_checked]-starting_date_list[first_measurepoint_checked]).days) < 4 or abs((starting_date_list[second_measurepoint_checked]-starting_date_list[first_measurepoint_checked]).days) > 26:
                                         need_to_be_seperate= True
             if need_to_be_seperate:
                 for measurepoint_id in campaigns_dict[campaign_id]["place"][place_id]["measurepoint"] :
