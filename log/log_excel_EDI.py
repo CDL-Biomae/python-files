@@ -69,7 +69,7 @@ class LogExcelEDIApp(tk.Tk):
 
     def main(self, campaign, output_path):
         self.text = "Chargement des données..."
-        campaigns_dict, measurepoint_list, chemistry_measurepoint_list, chemistry_pack_list, chemistry_7j_measurepoint_list, chemistry_21j_measurepoint_list, _, _, _ = initialize([campaign])
+        campaigns_dict, measurepoint_list, chemistry_measurepoint_list, chemistry_pack_list, chemistry_7j_measurepoint_list, chemistry_21j_measurepoint_list, _, _, _, _ = initialize([campaign])
         self.progressbar +=1
         place_dict = None
         for campaign_id in campaigns_dict:
