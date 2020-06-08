@@ -28,9 +28,11 @@ def add_style_calcul_tox(calcul_tox_dataframe, PATH):
     yellow = PatternFill(fill_type='solid', start_color='FFFF00', end_color='FFFF00')
     green = PatternFill(fill_type='solid', start_color='8FBC8F', end_color='8FBC8F')
     blue = PatternFill(fill_type='solid', start_color='BDDAEF', end_color='BDDAEF')
+    red = PatternFill(fill_type='solid', start_color='FF0000', end_color='FF0000')
 
     bold = Font(size=12, name='Calibri', bold=True)
     italic = Font(size=9, name='Calibri',italic=True)
+    white = Font(size=11, name='Calibri', color="FFFFFF")
 
     for row in range(1,nb_rows) :
         row = str(row)
@@ -66,6 +68,13 @@ def add_style_calcul_tox(calcul_tox_dataframe, PATH):
         for letter in header_columns :
             if ws[letter+row].value in ["OK","NON"]:
                 ws[letter+row].fill = yellow
+        if ws["A"+row].value == "Nombre de femelles analysées" :
+            for letter in header_columns :
+                if ws[letter+row].value and ws[letter+row].value>15 :
+                    ws[letter+row].fill = red
+                    ws[letter+row].font = white
+
+
 
         
 
