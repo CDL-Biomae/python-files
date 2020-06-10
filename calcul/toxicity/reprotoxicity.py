@@ -80,7 +80,7 @@ class Reprotoxicity:
             if int(female) == 0:  # Valeur étalon
                 try:
                     px_to_mm = specimen_size_mm/specimen_size_px
-                except TypeError:
+                except (TypeError, ZeroDivisionError):
                     pack_errors.append(pack_id)
                     continue
                 dict_result[pack_id]['px_to_mm'] = px_to_mm
