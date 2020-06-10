@@ -6,7 +6,7 @@ import json
 import datetime
 
 def load_data(reference):
-    campaigns_dict, measurepoint_list, chemistry_measurepoint_list, chemistry_pack_list, _, _, tox_measurepoint_list, agency_code_list, J_dict = initialize([reference])
+    campaigns_dict, measurepoint_list, chemistry_measurepoint_list, chemistry_pack_list, _, _, tox_measurepoint_list, _, agency_code_list, J_dict = initialize([reference])
 
     agency_data = QueryScript(f"SELECT code, network, hydroecoregion, latitude, longitude FROM {env.DATABASE_RAW}.Agency  WHERE code IN {tuple(agency_code_list) if len(agency_code_list)>1 else '('+(str(agency_code_list[0]) if len(agency_code_list) else '0')+')'};").execute()
     context_data = QueryScript(f"SELECT measurepoint_id, recordedAt, temperature, conductivity, ph, oxygen, type, comment, step, barrel FROM {env.DATABASE_RAW}.MeasureExposureCondition WHERE measurepoint_id IN {tuple(measurepoint_list) if len(measurepoint_list)>1 else '('+str(measurepoint_list[0])+')'}").execute()
