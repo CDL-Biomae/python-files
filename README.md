@@ -97,7 +97,7 @@ Cela peut prendre de 2sec à 30 sec en fonction de la vitesse de votre appareil 
 
 Le projet se découpe en six dossiers principales :
 - calcul : il regroupe les différentes fonctions nécessaires au calcul des données traitées. Il est découpé en 2 dossiers principales que sont /toxicity pour les calculs et appels à la base de données brutes pour l'alimentation, la neurotoxicité et la reprotoxicité, /chemistry pour les calculs et appels à la base de données pour la chimie.
-- database : il regroupe les fonctions qui vont remplir la base de données traitées. fill.py est la fonction qui lance tout le proccessus.
+- database : il regroupe les fonctions qui vont remplir la base de données traitées.
 - report : il regroupe les fonctions qui créent les différents rapports excel(xl) et word, la création d'excel se décompose en /xl pour la création des données et /style pour l'ajout des couleurs et des métadonnées.
 - log : il regroupe les différentes fenêtres qui vont s'ouvrir en fonction du rapport désiré. MainApp, la fenêtre principale, appelle les différentes fenêtres secondaires.
 - tools : il regroupe les différents outils utils dans les différents fonctions du projet
