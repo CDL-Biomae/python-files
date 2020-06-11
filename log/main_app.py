@@ -3,7 +3,6 @@ import webbrowser
 from tkinter import filedialog, messagebox
 from tools import QueryScript
 import env
-from database import fill
 from datetime import datetime
 from time import sleep
 from .log_excel import LogExcelApp

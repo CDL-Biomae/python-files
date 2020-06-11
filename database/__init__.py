@@ -5,4 +5,3 @@ from .average_temperature_filler import *
 from .temperature_repro_filler import *
 from .tox_table_filler import *
 from .version_filler import *
-from .fill import *
