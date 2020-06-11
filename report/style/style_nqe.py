@@ -6,6 +6,7 @@ from calcul import chemistry, elements_crustacean, elements_fish
 from termcolor import colored
 from tools import QueryScript
 import env
+import re
 
 
 
@@ -26,6 +27,12 @@ def add_style_nqe(nqe_dataframe, PATH, dict_t0):
         for number in range(1, nb_rows+7):
             ws[letter+str(number)].border = borders
     
+    t0_threshold_list = QueryScript(f" SELECT sandre, concentration_t0_max FROM {env.DATABASE_TREATED}.r3 WHERE version=  {env.CHOSEN_VERSION()}").execute()
+    t0_threshold = {}
+    for sandre, concentration in t0_threshold_list :
+        if concentration :
+            t0_threshold[sandre] = concentration
+
     ## UNIT 
     [unit_crustacean, sandre_crustacean, NQE_crustacean] = chemistry.get_unit_NQE(elements_crustacean.keys()) 
     parameter_crustacean = [elements_crustacean[element] for element in elements_crustacean]
@@ -157,6 +164,11 @@ def add_style_nqe(nqe_dataframe, PATH, dict_t0):
                      right=Side(border_style='thin', color='000000'),
                      top=Side(border_style='thin', color='000000'),
                      bottom=Side(border_style='thin', color='000000'))
+    t0_not_valid = Border(left=Side(border_style='medium', color='FF0000'),
+                     right=Side(border_style='medium', color='FF0000'),
+                     top=Side(border_style='medium', color='FF0000'),
+                     bottom=Side(border_style='medium', color='FF0000'))
+
     body_alignment = Alignment(horizontal='center', vertical='center')
     
     for index, t0 in enumerate(t0_mp):
@@ -176,8 +188,11 @@ def add_style_nqe(nqe_dataframe, PATH, dict_t0):
             sandre = ws[letter +'3'].value
             if t0 in dict_t0_result and str(sandre) in dict_t0_result[t0]:
                 ws[letter+str(nb_rows+5+index)].value = dict_t0_result[t0][str(sandre)]
+                if str(sandre) in t0_threshold and str(dict_t0_result[t0][str(sandre)])[0]!='<' and float(dict_t0_result[t0][str(sandre)]) > t0_threshold[str(sandre)] :
+                    ws[letter+str(nb_rows+5+index)].border = t0_not_valid
+                else :
+                    ws[letter+str(nb_rows+5+index)].border = t0_border
                 ws[letter+str(nb_rows+5+index)].font = t0_font
-                ws[letter+str(nb_rows+5+index)].border = t0_border
                 ws[letter+str(nb_rows+5+index)].alignment = body_alignment
                 
             elif sandre != None :
@@ -218,7 +233,6 @@ def add_style_nqe(nqe_dataframe, PATH, dict_t0):
             cell.font = body_font
             if value!=None :
                 cell.alignment = body_alignment
-                cell.border = borders
                 if (value!="ND" and value!='0.0' and threshold!='') and ((value!='' and value[0]=='<') or float(value)<threshold):
                     cell.fill = body_fill_ok
                 elif (value!="ND" and value!='0.0' and threshold!='' and float(value)>=threshold):
@@ -228,12 +242,16 @@ def add_style_nqe(nqe_dataframe, PATH, dict_t0):
             if ws[header_columns[-1] + str(index+5)].value:
                 index_t0_associated = t0_mp.index(dict_t0[ws[header_columns[-1] + str(index+5)].value]['code_t0_id'])
                 for column in header_columns[5:]:
-                    t0_ok = True if ws[column + str(5+nb_rows+index_t0_associated)].fill == body_fill_ok else False 
+                    t0_ok = True if ws[column + str(5+nb_rows+index_t0_associated)].border != t0_not_valid else False 
                     if not t0_ok and (ws[column + str(5+nb_rows+index_t0_associated)].value!= None and ws[column + str(5+nb_rows+index_t0_associated)].value!= ''):
-                        ws[column + str(5+index)].fill = body_fill_nd
+                        ws[column + str(5+index)].border = t0_not_valid
                         ws[column + str(5+index)].font = body_font
+                    else :
+                        ws[column + str(5+index)].border = borders
+                        ws[column + str(5+index)].font = body_font
+
         except ValueError :
-            None
+            pass
     ws.delete_cols(len(header_columns)+1,1)
     
     for letter in header_columns[5:]:
