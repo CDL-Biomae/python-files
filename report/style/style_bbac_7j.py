@@ -259,20 +259,20 @@ def add_style_bbac_7j(bbac_dataframe, PATH, dict_t0):
 
     for column in body_columns:
         sandre_checked = ws[column+'3'].value
-        threshold_21j=''
+        threshold_7j=''
         if sandre_checked!='' and sandre_checked!=None:
             try :
                 index = sandre_metal.index(sandre_checked)
-                threshold_21j = threshold_metal[index][0]
-                threshold_21j_25 = threshold_metal[index][1]
-                threshold_21j_50 = threshold_metal[index][2]
-                threshold_21j_75 = threshold_metal[index][3]
+                threshold_7j = threshold_metal[index][0]
+                threshold_7j_25 = threshold_metal[index][1]
+                threshold_7j_50 = threshold_metal[index][2]
+                threshold_7j_75 = threshold_metal[index][3]
             except :
                 index = sandre_organic.index(sandre_checked)
-                threshold_21j = threshold_organic[index][0]
-                threshold_21j_25 = threshold_organic[index][1]
-                threshold_21j_50 = threshold_organic[index][2]
-                threshold_21j_75 = threshold_organic[index][3]
+                threshold_7j = threshold_organic[index][0]
+                threshold_7j_25 = threshold_organic[index][1]
+                threshold_7j_50 = threshold_organic[index][2]
+                threshold_7j_75 = threshold_organic[index][3]
         for row in body_rows:
             cell = ws[column+row]
             cell2 = ws2[column+row]
@@ -284,20 +284,20 @@ def add_style_bbac_7j(bbac_dataframe, PATH, dict_t0):
                 cell.border = borders
                 cell2.alignment = body_alignment
                 cell2.border = borders
-                if (value!="ND" and value!='0.0' and threshold_21j!='') and ((value!='' and value[0]=='<') or float(value)<threshold_21j):
+                if (value!="ND" and value!='0.0' and threshold_7j!='') and ((value!='' and value[0]=='<') or float(value)<threshold_7j):
                     cell.fill = body_fill_ok
                     cell2.fill = body_fill_ok
                     cell2.value = 0
-                elif (value!="ND" and value!='0.0' and threshold_21j!='' and float(value)>=threshold_21j):
-                    if threshold_21j_25==None:
+                elif (value!="ND" and value!='0.0' and threshold_7j!='' and float(value)>=threshold_7j):
+                    if threshold_7j_25==None:
                         cell.fill = body_fill_not_ok_75
                         cell.font = body_font_white
                         cell2.fill = body_fill_not_ok_75
                         cell2.value = 4
                         cell2.font = body_font_white
-                    elif float(value)>=threshold_21j_25 :
-                        if float(value)>=threshold_21j_50:
-                            if float(value)>=threshold_21j_75:
+                    elif float(value)>=threshold_7j_25 :
+                        if float(value)>=threshold_7j_50:
+                            if float(value)>=threshold_7j_75:
                                 cell.fill = body_fill_not_ok_75
                                 cell.font = body_font_white
                                 cell2.value = 4
