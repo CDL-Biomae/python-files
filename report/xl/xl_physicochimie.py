@@ -33,7 +33,7 @@ def create_physicochimie_dataframe(head_dataframe, measurepoint_list, campaigns_
                         elif not temp[3] and (sensor2_max or sensor3_max) :
                             temp[3] = round(sensor2_max,1) if sensor2_max else round(sensor3_max,1)
                         elif not sensor2_max and not sensor3_max and sensor1_max :
-                            temp[1] = round(sensor1_max,1)
+                            temp[3] = round(sensor1_max,1)
                 for mp_id, recordedAt, conductivity,ph, oxygen in context_data:
                     if measurepoint_id==mp_id:
                         for day, J in enumerate(J_dict[place_id]):
