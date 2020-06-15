@@ -363,8 +363,8 @@ def fill_empty(matrix, count) :
 
 
 def get_tox_data(measurepoint_list, pack_list) :
-    pack_tuple = tuple(pack_list) if len(pack_list)>1  else "('"+pack_list[0]+"')"
-    measurepoint_tuple = tuple(measurepoint_list) if len(measurepoint_list)>1  else "('"+measurepoint_list[0]+"')"
+    pack_tuple = tuple(pack_list) if len(pack_list)>1  else "('"+str(pack_list[0])+"')"
+    measurepoint_tuple = tuple(measurepoint_list) if len(measurepoint_list)>1  else "('"+str(measurepoint_list[0])+"')"
     
     cage_data = QueryScript(f"SELECT pack_id, replicate, scud_quantity, scud_survivor, weight, ache, nature FROM {env.DATABASE_RAW}.Cage WHERE pack_id IN  {pack_tuple}").execute()
     remaining_leaves_data =  QueryScript(f"SELECT pack_id, replicate, value   FROM {env.DATABASE_RAW}.MeasureLeaf WHERE pack_id IN {pack_tuple}").execute()
