@@ -43,7 +43,7 @@ def load_data(reference):
                 if longitudeTh :
                     place_dict[place_id]["longitudeTh"] = longitudeTh 
         if "condition" not in place_dict[place_id]:
-            place_dict[place_id]["condition"] = {"temperature_min":None, "temperature_max": None,"alimentation_average_temperature_min":None,"alimentation_average_temperature_max":None, "reproduction_average_temperature_min":None, "reproduction_average_temperature_max":None,"chemistry_average_temperature_min":None, "chemistry_average_temperature_max":None,"average_temperature":None, "J0":{}, "J7":{},"J14":{}, "J21":{}, "JN":{}}
+            place_dict[place_id]["condition"] = {"temperature_min":None, "temperature_max": None,"alimentation_average_temperature_min":None,"alimentation_average_temperature_max":None, "reproduction_average_temperature_min":None, "reproduction_average_temperature_max":None,"chemistry_average_temperature_min":None, "chemistry_average_temperature_max":None,"chemistry_temperature_max":None,"average_temperature":None, "J0":{}, "J7":{},"J14":{}, "J21":{}, "JN":{}}
         place_dict[place_id]["not conform"] = []
         for measurepoint_id in place_dict[place_id]["measurepoint"]:
 
@@ -84,6 +84,11 @@ def load_data(reference):
                             place_dict[place_id]["condition"]["chemistry_average_temperature_max"] = max(sensor3_average, place_dict[place_id]["condition"]["chemistry_average_temperature_max"])
                         else :
                             place_dict[place_id]["condition"]["chemistry_average_temperature_max"] = sensor3_average
+                    if sensor3_max:
+                        if place_dict[place_id]["condition"]["chemistry_temperature_max"]:
+                            place_dict[place_id]["condition"]["chemistry_temperature_max"] = max(sensor3_max, place_dict[place_id]["condition"]["chemistry_temperature_max"])
+                        else :
+                            place_dict[place_id]["condition"]["chemistry_temperature_max"] = sensor3_max
                     if sensor1_min or sensor2_min or sensor3_min:
                         last_value, sensor1_min, sensor2_min, sensor3_min = [element if element!=None else 100 for element in [place_dict[place_id]["condition"]["temperature_min"], sensor1_min, sensor2_min, sensor3_min]]
                         place_dict[place_id]["condition"]["temperature_min"] = round(min(last_value, sensor1_min, sensor2_min, sensor3_min),1)
@@ -175,9 +180,12 @@ def load_data(reference):
                 if measurepoint_id in chemistry_measurepoint_list :
                     if parameter == 'Température moyenne (chimie)' :
                         if place_dict[place_id]["condition"]["chemistry_average_temperature_min"] and min_treshold > place_dict[place_id]["condition"]["chemistry_average_temperature_min"] :
-                            if not "min_temperature_chemistry" in place_dict[place_id]["not conform"] :
-                                place_dict[place_id]["not conform"].append("min_temperature_chemistry")
+                            if not "min_average_temperature_chemistry" in place_dict[place_id]["not conform"] :
+                                place_dict[place_id]["not conform"].append("min_average_temperature_chemistry")
                         if place_dict[place_id]["condition"]["chemistry_average_temperature_max"] and place_dict[place_id]["condition"]["chemistry_average_temperature_max"] > max_threshold :
+                            if not "max_average_temperature_chemistry" in place_dict[place_id]["not conform"] :
+                                place_dict[place_id]["not conform"].append("max_average_temperature_chemistry")
+                        if place_dict[place_id]["condition"]["chemistry_average_temperature_max"] and place_dict[place_id]["condition"]["chemistry_temperature_max"] > 21 :
                             if not "max_temperature_chemistry" in place_dict[place_id]["not conform"] :
                                 place_dict[place_id]["not conform"].append("max_temperature_chemistry")
                     if parameter == 'Oxygène (chimie)':
