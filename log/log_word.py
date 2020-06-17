@@ -419,7 +419,7 @@ class LogWordApp(tk.Tk):
             table_geo_1.cell(0, 0).paragraphs[0].add_run(
                 'Commune :').bold = True
             table_geo_1.cell(0, 1).paragraphs[0].add_run(
-                translate(place_dict[place_id]['city']) if 'city' in place_dict[place_id] else ''  + "    " + place_dict[place_id]['zipcode'] if 'zipcode' in place_dict[place_id] else '')
+                translate((place_dict[place_id]['city']) if 'city' in place_dict[place_id] else '')  + (("    " + place_dict[place_id]['zipcode']) if 'zipcode' in place_dict[place_id] else ''))
             table_geo_1.cell(0, 4).paragraphs[0].add_run(
                 translate(place_dict[place_id]['stream']) if 'stream' in place_dict[place_id] else '')
 
@@ -464,8 +464,8 @@ class LogWordApp(tk.Tk):
 
                 table_geo_2.cell(2, 0).paragraphs[0].add_run(
                     "Coordonnées Agence Lambert 93 :").bold = True
-                table_geo_2.cell(2, 2).paragraphs[0].add_run('Y ' + place_dict[place_id]['lambertY'] if "lambertY" in place_dict[place_id] else "ND")
-                table_geo_2.cell(2, 3).paragraphs[0].add_run('X ' + place_dict[place_id]['lambertX'] if "lambertX" in place_dict[place_id] else "ND")
+                table_geo_2.cell(2, 2).paragraphs[0].add_run('Y ' + place_dict[place_id]['lambertY'].replace(".",",") if "lambertY" in place_dict[place_id] else "ND")
+                table_geo_2.cell(2, 3).paragraphs[0].add_run('X ' + place_dict[place_id]['lambertX'].replace(".",",") if "lambertX" in place_dict[place_id] else "ND")
 
                 table_geo_2.cell(3, 0).paragraphs[0].add_run("Coordonnées BIOMÆ en degrés décimaux : ").bold = True
                 longitude = place_dict[place_id]['longitudeSpotted'] if 'longitudeSpotted' in place_dict[place_id] else 0
@@ -477,8 +477,8 @@ class LogWordApp(tk.Tk):
 
                 table_geo_2.cell(4, 0).paragraphs[0].add_run(
                     "Coordonnées BIOMÆ Lambert 93 : ").bold = True
-                table_geo_2.cell(4, 2).paragraphs[0].add_run('Y ' + place_dict[place_id]['lambertYSpotted'].replace('.', ','))
-                table_geo_2.cell(4, 3).paragraphs[0].add_run('X ' + place_dict[place_id]['lambertXSpotted'].replace('.', ','))
+                table_geo_2.cell(4, 2).paragraphs[0].add_run('Y ' + (place_dict[place_id]['lambertYSpotted'].replace('.', ',') if 'lambertYSpotted' in place_dict[place_id] else "NA"))
+                table_geo_2.cell(4, 3).paragraphs[0].add_run('X ' + (place_dict[place_id]['lambertXSpotted'].replace('.', ',')  if 'lambertXSpotted' in place_dict[place_id] else "NA"))
 
             else:
                 table_geo_2.cell(0, 0).paragraphs[0].add_run(
