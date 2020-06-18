@@ -77,6 +77,6 @@ def add_style_calcul_tox(calcul_tox_dataframe, PATH):
 
 
         
-
+    ws.freeze_panes = ws['B2']
     wb.save(PATH)
     wb.close()
