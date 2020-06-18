@@ -49,7 +49,7 @@ def load_data(reference):
 
             ### Add chemistry _survival
             for pack_id in place_dict[place_id]["measurepoint"][measurepoint_id]["pack"]:
-                if pack_id in chemistry_survival:
+                if chemistry_survival and pack_id in chemistry_survival:
                     place_dict[place_id]["chemistry_survival"] = chemistry_survival[pack_id]
             ### Add temperature data
             for mp_id, sensor1_min, sensor1_average, sensor1_max, sensor2_min, sensor2_average, sensor2_max, sensor3_min, sensor3_average, sensor3_max in temperatures_data:
