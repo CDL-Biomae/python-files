@@ -340,15 +340,17 @@ def create_calcul_tox_dataframe(campaign_list, campaign_dict, J_dict,  measurepo
                     matrix[0].append(J_dict[place_id]['J0']['truncated_date'])
                     matrix[1].append('CRE')
                     matrix[2].append('Lot ' + J_dict[place_id]['J0']['truncated_date'][-4:])
-                    matrix = add_result(matrix, campaign_dict[campaign_id]["place"][place_id]["measurepoint"][measurepoint_id], cage_data, remaining_leaves_data, specimen_size_data, average_temperature_data, female_data, temperature_repro_data, constant_dict)
+                    matrix = add_result(matrix, campaign_dict[campaign_id]["place"][place_id]["measurepoint"][measurepoint_id],measurepoint_id, cage_data, remaining_leaves_data, specimen_size_data, average_temperature_data, female_data, temperature_repro_data, constant_dict)
+                    count +=1
+                    matrix = fill_empty(matrix, count)
             else :
                 matrix[0].append(J_dict[place_id]['J0']['truncated_date'])
                 matrix[1].append('CRE')
                 matrix[2].append('Lot ' + J_dict[place_id]['J0']['truncated_date'][-4:])
                 reference_list.append([place_reference, place_id])
-                matrix = add_result(matrix, campaign_dict[campaign_id]["place"][place_id], cage_data, remaining_leaves_data, specimen_size_data, average_temperature_data, female_data, temperature_repro_data, constant_dict)
-            count += 1
-            matrix = fill_empty(matrix, count)
+                matrix = add_result(matrix, campaign_dict[campaign_id]["place"][place_id],place_id, cage_data, remaining_leaves_data, specimen_size_data, average_temperature_data, female_data, temperature_repro_data, constant_dict)
+                count += 1
+                matrix = fill_empty(matrix, count)
 
     df = pd.DataFrame(matrix, columns=list(map(lambda x : x[0], reference_list)))
     return df
@@ -384,7 +386,7 @@ def standard_deviation(liste) :
         deviation += (element - average)**2
     return (deviation/len(liste))**(0.5)
 
-def add_result(matrix, place_or_seperated_measurepoint, cage_data, remaining_leaves_data, specimen_size_data, average_temperature_data, female_data, temperature_repro_data, constant_dict):
+def add_result(matrix, place_or_seperated_measurepoint, place_or_measurepoint_id, cage_data, remaining_leaves_data, specimen_size_data, average_temperature_data, female_data, temperature_repro_data, constant_dict):
     is_place = False
     if 'measurepoint' in place_or_seperated_measurepoint :
         is_place = True
@@ -414,13 +416,13 @@ def add_result(matrix, place_or_seperated_measurepoint, cage_data, remaining_lea
     else : 
         for pack_id in place_or_seperated_measurepoint['pack'] :
             if place_or_seperated_measurepoint['pack'][pack_id] == 'alimentation':
-                alimentation_measurepoint_id = list(place_or_seperated_measurepoint.keys())[0]
+                alimentation_measurepoint_id = place_or_measurepoint_id
                 alimentation_pack_id = pack_id
             if place_or_seperated_measurepoint['pack'][pack_id] == 'neurology':
-                neurology_measurepoint_id = list(place_or_seperated_measurepoint.keys())[0]
+                neurology_measurepoint_id = place_or_measurepoint_id
                 neurology_pack_id = pack_id
             if place_or_seperated_measurepoint['pack'][pack_id] == 'reproduction':
-                reproduction_measurepoint_id = list(place_or_seperated_measurepoint.keys())[0]
+                reproduction_measurepoint_id = place_or_measurepoint_id
                 reproduction_pack_id = pack_id
     
     ############# ALIMENTATION
