@@ -261,10 +261,10 @@ class LogWordApp(tk.Tk):
                             not_conform_type_list.append("température : chimie et toxicité")
                         if "max_temperature_chemistry" in place_dict[place_id]["not conform"] and not "max_average_temperature_chemistry" in place_dict[place_id]["not conform"] and "max_temperature_alimentation" in place_dict[place_id]["not conform"] and not "max_temperature_reproduction" in place_dict[place_id]["not conform"]:
                             not_conform_explination += f"La température moyenne est supérieure aux recommandations pour l’encagement de gammares dans le cadre des biotests de toxicité (mesurée {str(round(place_dict[place_id]['condition']['alimentation_average_temperature_max'],1)).replace('.',',')} pour max. 20 °C) et la température maximale est supérieure pour l'encagement des gammares dans le cadre du biotest de chimie (mesurée {str(round(place_dict[place_id]['condition']['chemistry_temperature_max'],1)).replace('.',',')} pour max. 21 °C). "
-                            not_conform_type_list.append("température : toxicité")
+                            not_conform_type_list.append("température : chimie et toxicité")
                         if "max_temperature_chemistry" in place_dict[place_id]["not conform"] and not "max_average_temperature_chemistry" in place_dict[place_id]["not conform"] and not "max_temperature_alimentation" in place_dict[place_id]["not conform"] and "max_temperature_reproduction" in place_dict[place_id]["not conform"]:
                             not_conform_explination += f"La température moyenne est supérieure aux recommandations pour l’encagement de gammares dans le cadre des biotests de toxicité (mesurée {str(round(place_dict[place_id]['condition']['reproduction_average_temperature_max'],1)).replace('.',',')} pour max. 20 °C) et la température maximale est supérieure pour l'encagement des gammares dans le cadre du biotest de chimie (mesurée {str(round(place_dict[place_id]['condition']['chemistry_temperature_max'],1)).replace('.',',')} pour max. 21 °C). "
-                            not_conform_type_list.append("température : toxicité")
+                            not_conform_type_list.append("température : chimie et toxicité")
                         if "max_temperature_chemistry" in place_dict[place_id]["not conform"] and "max_average_temperature_chemistry" in place_dict[place_id]["not conform"] and "max_temperature_alimentation" in place_dict[place_id]["not conform"] and "max_temperature_reproduction" in place_dict[place_id]["not conform"] :
                             not_conform_explination += f"La température moyenne est supérieure aux recommandations pour l’encagement de gammares dans le cadre des biotests de chimie et de toxicité (mesurée {str(round(place_dict[place_id]['condition']['average_temperature'],1)).replace('.',',')} pour max. 20 °C) et la température maximale est supérieure pour l'encagement des gammares dans le cadre du biotest de chimie (mesurée {str(round(place_dict[place_id]['condition']['chemistry_temperature_max'],1)).replace('.',',')} pour max. 21 °C). "
                             not_conform_type_list.append("température : chimie et toxicité")
@@ -327,6 +327,8 @@ class LogWordApp(tk.Tk):
                     not_conform_resume+="Température" 
                 if ph_not_conform_number:
                     not_conform_resume+="pH"
+                if oxygen_not_conform_number:
+                    not_conform_resume+="Oxygène"
             else :
                 not_conform_resume = f"{len(not_conform_list)} stations (voir ci-dessous)\n" 
                 if conductivity_not_conform_number:
@@ -335,6 +337,8 @@ class LogWordApp(tk.Tk):
                     not_conform_resume+=(", " if conductivity_not_conform_number else "") + f"Température({temperature_not_conform_number})"
                 if ph_not_conform_number:
                     not_conform_resume+=(", " if conductivity_not_conform_number or temperature_not_conform_number else "") + f"pH({ph_not_conform_number})"
+                if oxygen_not_conform_number:
+                    not_conform_resume+=(", " if conductivity_not_conform_number or temperature_not_conform_number or ph_not_conform_number else "") + f"Oxygène({oxygen_not_conform_number})"
 
         synthesis_table.cell(5,1).paragraphs[0].add_run(not_conform_resume)
         for not_conform_station in not_conform_list:
