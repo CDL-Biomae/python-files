@@ -9,7 +9,7 @@ def create_tox_dataframe(campaigns_dict, measurepoint_list):
         matrix =[]
         for place_id in campaigns_dict[campaign_id]["place"]:
             temp = [None]*18
-            if "duplicate" in campaigns_dict[campaign_id]["place"][place_id] and not "chemistry" in campaigns_dict[campaign_id]["place"][place_id]["duplicate"]:
+            if "duplicate" in campaigns_dict[campaign_id]["place"][place_id] and ("alimentation" in campaigns_dict[campaign_id]["place"][place_id]["duplicate"] or "neurology" in campaigns_dict[campaign_id]["place"][place_id]["duplicate"] or "reproduction" in campaigns_dict[campaign_id]["place"][place_id]["duplicate"]):
                 for measurepoint_id in campaigns_dict[campaign_id]["place"][place_id]["measurepoint"]:
                     number = float(str(campaigns_dict[campaign_id]["place"][place_id]["number"])+'.'+str(campaigns_dict[campaign_id]["place"][place_id]["measurepoint"][measurepoint_id]["number"]))
                     for mp_id, male_survival_7_days, alimentation, neurotoxicity, female_survivor, number_days_exposition, number_female_concerned, percent_inhibition_fecondite, number_female_analysis, molting_cycle, number_female_concerned_area, endocrine_disruption in data :
