@@ -311,7 +311,7 @@ class MainApp(tk.Tk):
         self.log_window.transient(self)
         self.log_window.geometry('400x150+150+150')
         try :
-            self.log_app = LogDatabaseApp(master=self.log_window, case=case, xl_path=None, date=None, comment=None)
+            self.log_app = LogDatabaseApp(self.log_window, case, xl_path, date, comment)
         except Exception as err :
             tk.messagebox.showerror(title="Erreur", message=err)
     def refresh(self):
@@ -324,6 +324,7 @@ class MainApp(tk.Tk):
             self.manage_database(case=2)
     
     def add_new_version(self):
+        self.change_chosen_version(max(env.ALL_VERSIONS())+1)
         self.manage_database(case=3, xl_path=self.reference_xl_path.get(), date=datetime.now().strftime("%d/%m/%Y %H:%M:%S"), comment=self.version_comment.get())
         
 
