@@ -446,7 +446,7 @@ class Reprotoxicity:
             list_surface_retards = dict_surface_des_retards[pack_id]
             if nbr_analysees == 'NA':
                 continue
-            if nbr_analysees > 10:
+            if nbr_analysees >= 10:
                 try:
                     dict_surface_moyenne_retards[pack_id] = sum(list_surface_retards)/len(list_surface_retards)
                 except ZeroDivisionError:
