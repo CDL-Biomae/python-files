@@ -117,7 +117,7 @@ def create_calcul_tox_dataframe(campaign_list, campaign_dict, J_dict,  measurepo
     matrix.append(["Activité AChE moyenne observée (nmol/min)"])
     matrix.append(["sd observé"])
     matrix.append(["Critère de qualité"])
-    matrix.append(["Si écart type supérieur au seuil de qualité --> NON sinon OK"])
+    matrix.append(["Commentaires"])
     matrix.append(["% INHIBITION - AChE"])
     matrix.append(["% INHIBITION (AChE) - Resultat rendu"])
     matrix.append([" --> inhibition = résultat négatif"])
@@ -578,6 +578,9 @@ def add_result(matrix, place_or_seperated_measurepoint, place_or_measurepoint_id
                 inhibition = ( standard_ache_activity - ache_average ) / standard_ache_activity * 100
                 new_matrix[93].append(inhibition)
                 new_matrix[94].append(-inhibition)
+        
+        if len(ache_list) < 5 or len(weight_list) < 5 :
+            new_matrix[92].append("Moins de 5 replicats") 
 
     ######### FECONDITY
 
