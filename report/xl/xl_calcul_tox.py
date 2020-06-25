@@ -113,6 +113,11 @@ def create_calcul_tox_dataframe(campaign_list, campaign_dict, J_dict,  measurepo
     matrix.append(["Masse - Ecart type"])
     matrix.append(["Masse - coefficient de variation"])
     matrix.append(["Activité AChE attendue (nmol/mon)"])
+    matrix.append(["Activité AChE - Réplicat 1"])
+    matrix.append(["Activité AChE - Réplicat 2"])
+    matrix.append(["Activité AChE - Réplicat 3"])
+    matrix.append(["Activité AChE - Réplicat 4"])
+    matrix.append(["Activité AChE - Réplicat 5"])
     matrix.append(["Constante ache 1 x (Moyenne des masses ^ (Constante ache 2))"])
     matrix.append(["Activité AChE moyenne observée (nmol/min)"])
     matrix.append(["sd observé"])
@@ -549,12 +554,14 @@ def add_result(matrix, place_or_seperated_measurepoint, place_or_measurepoint_id
     if neurology_pack_id :
         weight_list = []
         ache_list = []
-        for pack_id, _, _, _, weight, ache, nature in cage_data :
+        for pack_id, replicate, _, _, weight, ache, nature in cage_data :
+            
             if pack_id == neurology_pack_id  and nature=='neurology':
                 if weight :
                     weight_list.append(weight)
                 if ache :
                     ache_list.append(ache)
+                    new_matrix[87+int(replicate)].append(ache)
         
         standard_ache_activity = None
         if len(weight_list) :
@@ -567,20 +574,20 @@ def add_result(matrix, place_or_seperated_measurepoint, place_or_measurepoint_id
 
         if len(ache_list) :
             ache_average = sum(ache_list)/len(ache_list)
-            new_matrix[89].append(ache_average)
-            new_matrix[90].append(standard_deviation(ache_list))
+            new_matrix[94].append(ache_average)
+            new_matrix[95].append(standard_deviation(ache_list))
             if standard_deviation(ache_list) > constant_dict["Seuil de qualité"] :
-                new_matrix[91].append("NON")
+                new_matrix[96].append("NON")
             else :
-                new_matrix[91].append("OK")
+                new_matrix[96].append("OK")
 
             if standard_ache_activity :
                 inhibition = ( standard_ache_activity - ache_average ) / standard_ache_activity * 100
-                new_matrix[93].append(inhibition)
-                new_matrix[94].append(-inhibition)
+                new_matrix[98].append(inhibition)
+                new_matrix[99].append(-inhibition)
         
         if len(ache_list) < 5 or len(weight_list) < 5 :
-            new_matrix[92].append("Moins de 5 replicats") 
+            new_matrix[97].append("Moins de 5 replicats") 
 
     ######### FECONDITY
 
@@ -611,26 +618,26 @@ def add_result(matrix, place_or_seperated_measurepoint, place_or_measurepoint_id
                 if specimen_size_px and speciment_size_mm :
                     size_ratio = speciment_size_mm/specimen_size_px
             
-        new_matrix[99].append(female_b_or_c1_count)
-        new_matrix[100].append(female_c2_or_d1_count)
-        new_matrix[101].append(female_d2_count)
-        new_matrix[102].append(female_count)
+        new_matrix[104].append(female_b_or_c1_count)
+        new_matrix[105].append(female_c2_or_d1_count)
+        new_matrix[106].append(female_d2_count)
+        new_matrix[107].append(female_count)
 
         if female_count :
-            new_matrix[103].append(female_b_or_c1_count/female_count*100)
-            new_matrix[104].append(female_c2_or_d1_count/female_count*100)
-            new_matrix[105].append(female_d2_count/female_count*100)
+            new_matrix[108].append(female_b_or_c1_count/female_count*100)
+            new_matrix[109].append(female_c2_or_d1_count/female_count*100)
+            new_matrix[110].append(female_d2_count/female_count*100)
 
         if reproduction_measurepoint_id :
             for measurepoint_id, expected_C2, expected_D2 in temperature_repro_data :
                 if measurepoint_id == reproduction_measurepoint_id and expected_C2 and expected_D2 :
-                    new_matrix[106].append(100 - expected_C2)
-                    new_matrix[107].append(expected_C2 - expected_D2)
-                    new_matrix[108].append(expected_D2)
-                    new_matrix[109].append(Reprotoxicity.binom_inv(female_count, (100 - expected_C2)/100, 0.95 ))
-                    new_matrix[110].append(Reprotoxicity.binom_inv(female_count, (100 - expected_C2)/100, 0.99 ))
+                    new_matrix[111].append(100 - expected_C2)
+                    new_matrix[112].append(expected_C2 - expected_D2)
+                    new_matrix[113].append(expected_D2)
+                    new_matrix[114].append(Reprotoxicity.binom_inv(female_count, (100 - expected_C2)/100, 0.95 ))
+                    new_matrix[115].append(Reprotoxicity.binom_inv(female_count, (100 - expected_C2)/100, 0.99 ))
                     if female_b_or_c1_count == 1 :
-                        new_matrix[111].append("1 fem !!!")
+                        new_matrix[116].append("1 fem !!!")
             
             fertility_list = []
             female_size_list = [None] * 16 
@@ -639,26 +646,26 @@ def add_result(matrix, place_or_seperated_measurepoint, place_or_measurepoint_id
                     female = int(female) if female else 0
                     if specimen_size_mm and specimen_size_mm!="0" :
                         female_size_list[female] = specimen_size_mm
-                        new_matrix[213+female].append(specimen_size_mm)
+                        new_matrix[218+female].append(specimen_size_mm)
                         if (molting_stage == 'c2' or molting_stage == 'd1') and oocyte_left!=None and oocyte_right!=None and oocyte_left+oocyte_right>0 :
-                            new_matrix[116+female].append((oocyte_left+oocyte_right)/specimen_size_mm)
+                            new_matrix[121+female].append((oocyte_left+oocyte_right)/specimen_size_mm)
                             fertility_list.append((oocyte_left+oocyte_right)/specimen_size_mm)
                     elif size_ratio and specimen_size_px :
                         female_size_list[female] = specimen_size_px*size_ratio
-                        new_matrix[213+female].append(specimen_size_px*size_ratio)
+                        new_matrix[218+female].append(specimen_size_px*size_ratio)
                         if oocyte_left!=None and oocyte_right!=None and oocyte_left+oocyte_right>0 and (molting_stage == 'c2' or molting_stage == 'd1') :
-                            new_matrix[116+female].append((oocyte_left+oocyte_right)/(specimen_size_px*size_ratio))
+                            new_matrix[121+female].append((oocyte_left+oocyte_right)/(specimen_size_px*size_ratio))
                             fertility_list.append((oocyte_left+oocyte_right)/female_size_list[female])
 
             if len(fertility_list) >= 1 and female_count>=10 :
                 fertility_average = sum(fertility_list)/len(fertility_list)
-                new_matrix[113].append(fertility_average)
-                new_matrix[114].append(len(fertility_list))
-                new_matrix[116].append((constant_dict["indice de fertilité attendu - moyenne-1"] - fertility_average)/constant_dict["indice de fertilité attendu - moyenne-1"]*100)
+                new_matrix[118].append(fertility_average)
+                new_matrix[119].append(len(fertility_list))
+                new_matrix[121].append((constant_dict["indice de fertilité attendu - moyenne-1"] - fertility_average)/constant_dict["indice de fertilité attendu - moyenne-1"]*100)
             
             else : 
-                new_matrix[113].append("NA")
-                new_matrix[114].append("<10")
+                new_matrix[118].append("NA")
+                new_matrix[119].append("<10")
 
 
             fecondity_list = []
@@ -670,8 +677,8 @@ def add_result(matrix, place_or_seperated_measurepoint, place_or_measurepoint_id
             for pack_id, female, molting_stage, oocyte_left, oocyte_right, specimen_size_px, specimen_size_mm, embryo_total, embryo_stage, _, _ in female_data :
                 if pack_id == reproduction_pack_id and embryo_stage in [2,3,4] and female!="" and int(female)<=15 :
                     female = int(female) if female else 0
-                    new_matrix[245+female].append(oocyte_left+oocyte_right)
-                    new_matrix[261+female].append(embryo_stage)
+                    new_matrix[250+female].append(oocyte_left+oocyte_right)
+                    new_matrix[266+female].append(embryo_stage)
                     embryo_stage_list.append(embryo_stage)
                     if embryo_stage in [1,2]:
                         embryo_stage_1_2_count += 1 
@@ -681,16 +688,16 @@ def add_result(matrix, place_or_seperated_measurepoint, place_or_measurepoint_id
                         embryo_stage_5_count += 1 
                     if female>0 and len(female_size_list)>female and female_size_list[female] and embryo_total :
                         fecondity_list.append(embryo_total/(female_size_list[female] - 5))
-                        new_matrix[138+female].append(embryo_total/(female_size_list[female] - 5))
+                        new_matrix[143+female].append(embryo_total/(female_size_list[female] - 5))
             if len(fecondity_list) >= 1 and female_count>=10 :
                 fecondity_average = sum(fecondity_list)/len(fecondity_list)
-                new_matrix[134].append(fecondity_average)
-                new_matrix[135].append(len(fecondity_list))
-                new_matrix[137].append((constant_dict["indice de fertilité attendu - moyenne"] - fecondity_average)/constant_dict["indice de fertilité attendu - moyenne"]*100)
-                new_matrix[138].append(-(constant_dict["indice de fertilité attendu - moyenne"] - fecondity_average)/constant_dict["indice de fertilité attendu - moyenne"]*100)
+                new_matrix[139].append(fecondity_average)
+                new_matrix[140].append(len(fecondity_list))
+                new_matrix[141].append((constant_dict["indice de fertilité attendu - moyenne"] - fecondity_average)/constant_dict["indice de fertilité attendu - moyenne"]*100)
+                new_matrix[142].append(-(constant_dict["indice de fertilité attendu - moyenne"] - fecondity_average)/constant_dict["indice de fertilité attendu - moyenne"]*100)
             else : 
-                new_matrix[134].append("NA")
-                new_matrix[135].append("<10")
+                new_matrix[139].append("NA")
+                new_matrix[140].append("<10")
 
             surface_list = []
             surface_inhibition_list = []
@@ -701,48 +708,48 @@ def add_result(matrix, place_or_seperated_measurepoint, place_or_measurepoint_id
                         if not oocyte_area_mm and oocyte_area_pixel and size_ratio :
                             oocyte_area_mm = oocyte_area_pixel
                         if oocyte_area_mm :
-                            new_matrix[229+int(female)].append(oocyte_area_mm)
+                            new_matrix[234+int(female)].append(oocyte_area_mm)
                             if molting_stage=="c1" or molting_stage=="b" :
-                                new_matrix[156+int(female)].append(oocyte_area_mm)
+                                new_matrix[161+int(female)].append(oocyte_area_mm)
                                 surface_list.append(oocyte_area_mm)
                             if molting_stage=="c2" :
-                                new_matrix[180+int(female)].append((oocyte_area_mm-constant_dict["Moyenne des surfaces de référence C2"])/constant_dict["Moyenne des surfaces de référence C2"]*(-100))
-                                new_matrix[197+int(female)].append((oocyte_area_mm-constant_dict["Moyenne des surfaces de référence C2"])/constant_dict["SD des surfaces de référence C2"])
+                                new_matrix[185+int(female)].append((oocyte_area_mm-constant_dict["Moyenne des surfaces de référence C2"])/constant_dict["Moyenne des surfaces de référence C2"]*(-100))
+                                new_matrix[202+int(female)].append((oocyte_area_mm-constant_dict["Moyenne des surfaces de référence C2"])/constant_dict["SD des surfaces de référence C2"])
                                 surface_inhibition_list.append((oocyte_area_mm-constant_dict["Moyenne des surfaces de référence C2"])/constant_dict["Moyenne des surfaces de référence C2"]*(-100))
                                 surface_reduced_list.append((oocyte_area_mm-constant_dict["Moyenne des surfaces de référence C2"])/constant_dict["SD des surfaces de référence C2"])
                             if molting_stage=="d1" :
-                                new_matrix[180+int(female)].append((oocyte_area_mm-constant_dict["Moyenne des surfaces de référence D1"])/constant_dict["Moyenne des surfaces de référence D1"]*(-100))
-                                new_matrix[197+int(female)].append((oocyte_area_mm-constant_dict["Moyenne des surfaces de référence D1"])/constant_dict["SD des surfaces de référence D1"])
+                                new_matrix[185+int(female)].append((oocyte_area_mm-constant_dict["Moyenne des surfaces de référence D1"])/constant_dict["Moyenne des surfaces de référence D1"]*(-100))
+                                new_matrix[202+int(female)].append((oocyte_area_mm-constant_dict["Moyenne des surfaces de référence D1"])/constant_dict["SD des surfaces de référence D1"])
                                 surface_inhibition_list.append((oocyte_area_mm-constant_dict["Moyenne des surfaces de référence D1"])/constant_dict["Moyenne des surfaces de référence D1"]*(-100))
                                 surface_reduced_list.append((oocyte_area_mm-constant_dict["Moyenne des surfaces de référence D1"])/constant_dict["SD des surfaces de référence D1"])
             if len(surface_list) :
-                new_matrix[172].append(sum(surface_list)/len(surface_list))
-                new_matrix[173].append(len(surface_list))
-                new_matrix[174].append(constant_dict["Moyenne des surfaces de référence C2"]-constant_dict["Constante surface des retards 1"]*constant_dict["SD des surfaces de référence C2"]/len(surface_list)**0.5)
+                new_matrix[177].append(sum(surface_list)/len(surface_list))
+                new_matrix[178].append(len(surface_list))
+                new_matrix[179].append(constant_dict["Moyenne des surfaces de référence C2"]-constant_dict["Constante surface des retards 1"]*constant_dict["SD des surfaces de référence C2"]/len(surface_list)**0.5)
                 if len(surface_inhibition_list):
-                    new_matrix[196].append(sum(surface_inhibition_list)/len(surface_inhibition_list))
-                    new_matrix[197].append(len(surface_inhibition_list))
+                    new_matrix[201].append(sum(surface_inhibition_list)/len(surface_inhibition_list))
+                    new_matrix[202].append(len(surface_inhibition_list))
                 if len(surface_reduced_list) :
                     C2D1_inhibition = sum(surface_reduced_list)/len(surface_reduced_list)
-                    new_matrix[176].append(C2D1_inhibition)
+                    new_matrix[181].append(C2D1_inhibition)
                     threshold_1 = -constant_dict["Constante 1 surface C2 D1"]/len(surface_inhibition_list)
                     threshold_2 = -constant_dict["Constante 2 surface C2 D1"]/len(surface_inhibition_list)
-                    new_matrix[177].append(threshold_1)
-                    new_matrix[178].append(threshold_2)
-                    new_matrix[179].append("Inhibition" if C2D1_inhibition<threshold_1 else "Conforme")
+                    new_matrix[182].append(threshold_1)
+                    new_matrix[183].append(threshold_2)
+                    new_matrix[184].append("Inhibition" if C2D1_inhibition<threshold_1 else "Conforme")
                     if C2D1_inhibition<threshold_1 :
-                        new_matrix[180].append("forte" if C2D1_inhibition<threshold_2  else "modéré")
+                        new_matrix[185].append("forte" if C2D1_inhibition<threshold_2  else "modéré")
                     
 
             if len(embryo_stage_list) :
-                new_matrix[277].append(embryo_stage_1_2_count)
-                new_matrix[278].append(embryo_stage_3_4_count)
-                new_matrix[279].append(embryo_stage_5_count)    
-                new_matrix[280].append(len(embryo_stage_list))
-                new_matrix[281].append(embryo_stage_1_2_count/len(embryo_stage_list)*100)
-                new_matrix[282].append(embryo_stage_3_4_count/len(embryo_stage_list)*100)
-                new_matrix[283].append(embryo_stage_5_count/len(embryo_stage_list)*100)
-                new_matrix[287].append(Reprotoxicity.binom_inv(len(embryo_stage_list),embryo_stage_1_2_count/len(embryo_stage_list) /100, 0.95 ))
-                new_matrix[288].append(Reprotoxicity.binom_inv(len(embryo_stage_list),embryo_stage_1_2_count/len(embryo_stage_list) /100, 0.99 ))
+                new_matrix[282].append(embryo_stage_1_2_count)
+                new_matrix[283].append(embryo_stage_3_4_count)
+                new_matrix[284].append(embryo_stage_5_count)    
+                new_matrix[285].append(len(embryo_stage_list))
+                new_matrix[286].append(embryo_stage_1_2_count/len(embryo_stage_list)*100)
+                new_matrix[287].append(embryo_stage_3_4_count/len(embryo_stage_list)*100)
+                new_matrix[288].append(embryo_stage_5_count/len(embryo_stage_list)*100)
+                new_matrix[292].append(Reprotoxicity.binom_inv(len(embryo_stage_list),embryo_stage_1_2_count/len(embryo_stage_list) /100, 0.95 ))
+                new_matrix[293].append(Reprotoxicity.binom_inv(len(embryo_stage_list),embryo_stage_1_2_count/len(embryo_stage_list) /100, 0.99 ))
 
     return new_matrix
