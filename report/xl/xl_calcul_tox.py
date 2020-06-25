@@ -647,7 +647,7 @@ def add_result(matrix, place_or_seperated_measurepoint, place_or_measurepoint_id
                             new_matrix[116+female].append((oocyte_left+oocyte_right)/(specimen_size_px*size_ratio))
                             fertility_list.append((oocyte_left+oocyte_right)/female_size_list[female])
 
-            if len(fertility_list) >= 10 :
+            if len(fertility_list) >= 1 and female_count>=10 :
                 fertility_average = sum(fertility_list)/len(fertility_list)
                 new_matrix[113].append(fertility_average)
                 new_matrix[114].append(len(fertility_list))
@@ -679,7 +679,7 @@ def add_result(matrix, place_or_seperated_measurepoint, place_or_measurepoint_id
                     if female>0 and len(female_size_list)>female and female_size_list[female] and embryo_total :
                         fecondity_list.append(embryo_total/(female_size_list[female] - 5))
                         new_matrix[138+female].append(embryo_total/(female_size_list[female] - 5))
-            if len(fecondity_list) >= 10 :
+            if len(fecondity_list) >= 1 and female_count>=10 :
                 fecondity_average = sum(fecondity_list)/len(fecondity_list)
                 new_matrix[134].append(fecondity_average)
                 new_matrix[135].append(len(fecondity_list))
