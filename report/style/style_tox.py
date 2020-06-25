@@ -167,52 +167,59 @@ def add_style_tox(tox_dataframe, PATH):
     # la requete qui retourne les resultats des constantes r2 selon le paramétre
     threshold_list = QueryScript(f" SELECT parameter, threshold   FROM {env.DATABASE_TREATED}.r2_threshold WHERE threshold IS NOT NULL and version=  {env.CHOSEN_VERSION()}").execute()
     for column in columns:
-            
-            threshold = None        
-            if column == 'H':
-                threshold = []
-                for element in threshold_list:
-                    if element[0] == 'alimentation':
-                        threshold.append(element[1])
-            if column == 'I':
-                threshold = []
-                for element in threshold_list:
-                    if element[0] == 'neurotoxicité AChE':
-                        threshold.append(element[1])
-            if column == 'N':
-                threshold = []
-                for element in threshold_list:
-                    if element[0] == 'reproduction':
-                        threshold.append(element[1])
-            if column == 'P':
-                threshold = []
-                for element in threshold_list:
-                    if element[0] == 'mue':
-                        threshold.append(element[1])
-            if column == 'R':
-                threshold = []
-                for element in threshold_list:
-                    if element[0] == 'perturbation endocrinienne':
-                        threshold.append(element[1])
+        
+        threshold = None        
+        if column == 'H':
+            threshold = []
+            for element in threshold_list:
+                if element[0] == 'alimentation':
+                    threshold.append(element[1])
+        if column == 'I':
+            threshold = []
+            for element in threshold_list:
+                if element[0] == 'neurotoxicité AChE':
+                    threshold.append(element[1])
+        if column == 'N':
+            threshold = []
+            for element in threshold_list:
+                if element[0] == 'reproduction':
+                    threshold.append(element[1])
+        if column == 'P':
+            threshold = []
+            for element in threshold_list:
+                if element[0] == 'mue':
+                    threshold.append(element[1])
+        if column == 'R':
+            threshold = []
+            for element in threshold_list:
+                if element[0] == 'perturbation endocrinienne':
+                    threshold.append(element[1])
 
-            if threshold:
-                value=None
-                for row in range(5, nb_rows+5):
-                    cell = ws[column+str(row)]
+        if threshold:
+            value=None
+            for row in range(5, nb_rows+5):
+                cell = ws[column+str(row)]
+                
+                if isinstance(cell.value,float) or isinstance(cell.value,int) or (isinstance(cell.value,str) and cell.value[:2] != "NA"):
+                    value = -float(cell.value)  if cell.value else None  
                     
-                    if isinstance(cell.value,float) or isinstance(cell.value,int) or (isinstance(cell.value,str) and cell.value[:2] != "NA"):
-                        value = -float(cell.value)  if cell.value else None  
-                      
-                    if cell.value != None :
-                           
-                        if value and value >= threshold[0]:
-                           
+                if cell.value != None :
+                    already_done = False
+                    if column == 'H' :                    
+                        survival_result = float(ws['G'+str(row)].value if ws['G'+str(row)].value and ws['G'+str(row)].value!='NA' else 0)
+                        if survival_result!=None and survival_result < 70 :
+                            if survival_result < 50:
+                                already_done = True
+                            else :
+                                print(survival_result)
+                                cell.fill = body_fill_NA
+                                already_done = True
+                        
+                    if  not already_done:
+                        if value and value >= threshold[0] :
                             if len(threshold) >= 1 and value >= threshold[1]:
-                                
                                 if len(threshold) >= 2 and value >= threshold[2]:
-                                   
                                     if len(threshold) >= 3 and value >= threshold[3]:
-                                        
                                         cell.fill = body_fill_not_ok_4
                                     else:
                                         cell.fill = body_fill_not_ok_3
@@ -223,9 +230,9 @@ def add_style_tox(tox_dataframe, PATH):
                         else:
                             cell.fill = body_fill_ok
 
-            if column == 'G' or column == 'H' or column == 'I' or column == 'K':
-                cell = ws[column + "4"]
-                cell.value = '%'
+        if column == 'G' or column == 'H' or column == 'I' or column == 'K':
+            cell = ws[column + "4"]
+            cell.value = '%'
 
     # pour faire les bordures des colones et ligne selon les case et les centrer
     for column in little_border_columns:
