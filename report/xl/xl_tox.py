@@ -19,8 +19,9 @@ def create_tox_dataframe(campaigns_dict, measurepoint_list):
                             temp[5], temp[6] = male_survival_7_days if male_survival_7_days else 'NA', alimentation if male_survival_7_days else None
                             if neurotoxicity != None:
                                 temp[7] = neurotoxicity if male_survival_7_days else None
-                            for index in range(9,18):
-                                temp[index] = [female_survivor, number_days_exposition if number_days_exposition!=None else "NA", number_female_concerned, percent_inhibition_fecondite if percent_inhibition_fecondite and female_survivor else "NA", number_female_analysis, molting_cycle, number_female_concerned_area, endocrine_disruption  if endocrine_disruption else "NA", measurepoint_id][index-9]
+                            if female_survivor or number_days_exposition:
+                                for index in range(9,18):
+                                    temp[index] = [female_survivor, number_days_exposition, number_female_concerned, percent_inhibition_fecondite if percent_inhibition_fecondite and female_survivor else "NA", number_female_analysis, molting_cycle, number_female_concerned_area, endocrine_disruption  if endocrine_disruption else "NA", measurepoint_id][index-9]
                     matrix.append(temp)
                     temp = [None]*18
             else :
@@ -30,12 +31,12 @@ def create_tox_dataframe(campaigns_dict, measurepoint_list):
                         if measurepoint_id==mp_id :
                             for index in range(4):
                                 temp[index] = [campaigns_dict[campaign_id]["number"], number, translate(campaigns_dict[campaign_id]["place"][place_id]["name"]), campaigns_dict[campaign_id]["place"][place_id]["agency"] if "agency" in campaigns_dict[campaign_id]["place"][place_id] else 'ND'][index]
-                            
-                            temp[5], temp[6] = male_survival_7_days if male_survival_7_days else 'NA', alimentation
+                            temp[5], temp[6] = male_survival_7_days if male_survival_7_days else 'NA', alimentation if male_survival_7_days else None
                             if neurotoxicity !=None :
-                                temp[7] = neurotoxicity
-                            for index in range(9,18):
-                                temp[index] = [female_survivor, number_days_exposition if number_days_exposition!=None else "NA", number_female_concerned, percent_inhibition_fecondite if percent_inhibition_fecondite and female_survivor else "NA" , number_female_analysis, molting_cycle, number_female_concerned_area, endocrine_disruption if endocrine_disruption else "NA", measurepoint_id][index-9]
+                                temp[7] = neurotoxicity if male_survival_7_days else None
+                            if female_survivor or number_days_exposition :
+                                for index in range(9,18):
+                                    temp[index] = [female_survivor, number_days_exposition, number_female_concerned, percent_inhibition_fecondite if percent_inhibition_fecondite and female_survivor else "NA" , number_female_analysis, molting_cycle, number_female_concerned_area, endocrine_disruption if endocrine_disruption else "NA", measurepoint_id][index-9]
                 matrix.append(temp)
         df = pd.DataFrame(matrix)
         df.columns = ['Campagne', 'Numéro', 'Station de mesure', 'Code Agence','','Survie Male - 7 jours', 'Alimentation',
