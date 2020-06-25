@@ -640,10 +640,10 @@ def add_result(matrix, place_or_seperated_measurepoint, place_or_measurepoint_id
                         if (molting_stage == 'c2' or molting_stage == 'd1') and oocyte_left!=None and oocyte_right!=None and oocyte_left+oocyte_right>0 :
                             new_matrix[116+female].append((oocyte_left+oocyte_right)/specimen_size_mm)
                             fertility_list.append((oocyte_left+oocyte_right)/specimen_size_mm)
-                    elif size_ratio and specimen_size_px and oocyte_left!=None and oocyte_right!=None and oocyte_left+oocyte_right>0:
+                    elif size_ratio and specimen_size_px :
                         female_size_list[female] = specimen_size_px*size_ratio
                         new_matrix[213+female].append(specimen_size_px*size_ratio)
-                        if (molting_stage == 'c2' or molting_stage == 'd1') :
+                        if oocyte_left!=None and oocyte_right!=None and oocyte_left+oocyte_right>0 and (molting_stage == 'c2' or molting_stage == 'd1') :
                             new_matrix[116+female].append((oocyte_left+oocyte_right)/(specimen_size_px*size_ratio))
                             fertility_list.append((oocyte_left+oocyte_right)/female_size_list[female])
 
