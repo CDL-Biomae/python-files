@@ -698,7 +698,7 @@ def add_result(matrix, place_or_seperated_measurepoint, place_or_measurepoint_id
                         if not oocyte_area_mm and oocyte_area_pixel and size_ratio :
                             oocyte_area_mm = oocyte_area_pixel
                         if oocyte_area_mm :
-                            new_matrix[230+int(female)].append(oocyte_area_mm)
+                            new_matrix[229+int(female)].append(oocyte_area_mm)
                             if molting_stage=="c1" or molting_stage=="b" :
                                 new_matrix[156+int(female)].append(oocyte_area_mm)
                                 surface_list.append(oocyte_area_mm)
