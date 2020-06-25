@@ -211,7 +211,6 @@ def add_style_tox(tox_dataframe, PATH):
                             if survival_result < 50:
                                 already_done = True
                             else :
-                                print(survival_result)
                                 cell.fill = body_fill_NA
                                 already_done = True
                         
