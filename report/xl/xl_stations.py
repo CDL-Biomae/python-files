@@ -56,7 +56,7 @@ def create_stations_dataframe(head_dataframe, campaigns_dict, measurepoint_list,
             if not content :
                 matrix_filled[place_number][index] = 'ND'
    
-    df_values = pd.DataFrame(matrix_filled, columns=['Type de réseau', 'Hydroécorégion', 'Masse d\'eau', 'Adresse', 'Coordonnées de référence', 'Coordonnées de référence (Lambert)', 'Coordonnées réelles', 'Coordonnées réelles (Lambert)'])
+    df_values = pd.DataFrame(matrix_filled, columns=['Type de réseau', 'Hydroécorégion', 'Masse d\'eau', 'Adresse', 'Coordonnées de référence', 'Coordonnées de référence (Lambert 93)', 'Coordonnées réelles', 'Coordonnées réelles (Lambert 93)'])
     df_concat = pd.concat([df_renamed, df_values], axis=1)
     df_stations = df_concat.sort_values('#')
 
