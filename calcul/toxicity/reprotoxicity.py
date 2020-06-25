@@ -167,7 +167,7 @@ class Reprotoxicity:
             else:
                 dict_fecundity[mp]['nbr_femelles_analysées'] = nbr_femelles_analysees
 
-            if nbr_femelles_analysees > 10 and len(list_index_fecundity) != 0:
+            if nbr_femelles_analysees >= 10 and len(list_index_fecundity) != 0:
                 fecondite_moyenne = sum(list_index_fecundity)/len(list_index_fecundity)
             else:
                 fecondite_moyenne = "NA"

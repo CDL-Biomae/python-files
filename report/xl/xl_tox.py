@@ -36,9 +36,9 @@ def create_tox_dataframe(campaigns_dict, measurepoint_list):
                                 temp[5], temp[6] = male_survival_7_days, alimentation
                             if neurotoxicity :
                                 temp[7] = neurotoxicity
-                            if female_survivor and number_days_exposition and number_female_concerned and percent_inhibition_fecondite and number_female_analysis and molting_cycle and number_female_concerned_area :
+                            if female_survivor and number_days_exposition and number_female_concerned and number_female_analysis and molting_cycle and number_female_concerned_area :
                                 for index in range(9,18):
-                                    temp[index] = [female_survivor, number_days_exposition, number_female_concerned, percent_inhibition_fecondite, number_female_analysis, molting_cycle, number_female_concerned_area, endocrine_disruption if endocrine_disruption else "NA", measurepoint_id][index-9]
+                                    temp[index] = [female_survivor, number_days_exposition, number_female_concerned, percent_inhibition_fecondite if percent_inhibition_fecondite else "NA" , number_female_analysis, molting_cycle, number_female_concerned_area, endocrine_disruption if endocrine_disruption else "NA", measurepoint_id][index-9]
                 matrix.append(temp)
         df = pd.DataFrame(matrix)
         df.columns = ['Campagne', 'Numéro', 'Station de mesure', 'Code Agence','','Survie Male - 7 jours', 'Alimentation',
