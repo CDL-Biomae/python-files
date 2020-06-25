@@ -220,9 +220,10 @@ class MainApp(tk.Tk):
         self.version_choice.set(self.version_choice.get())
 
     def change_chosen_version(self, version=None):
-        version_file = open("version.txt", "w")
-        version_file.write(f"CHOSEN_VERSION={version}")
-        version_file.close()
+        if version !='toutes':
+            version_file = open("version.txt", "w")
+            version_file.write(f"CHOSEN_VERSION={version}")
+            version_file.close()
 
 
     def add_campaign(self):
