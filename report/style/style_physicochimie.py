@@ -204,16 +204,22 @@ def add_style_physicochimie(physicochimie_dataframe, PATH):
     max_temp_tox = max_temp_tox if max_temp_tox is not None else math.inf
 
     avg_temp_cells = ['H' + x for x in body_rows]
+    max_temp_cells = ['I' + x for x in body_rows]
 
-    for cell_str in avg_temp_cells:
-        cell = ws[cell_str]
+    for (index,cell_str) in enumerate(avg_temp_cells):
+        avg_cell = ws[cell_str]
+        max_cell = ws[max_temp_cells[index]]
         try:
-            avg_temp = float(cell.value)
+            avg_temp = float(avg_cell.value)
+            max_temp = float(max_cell.value)
         except (ValueError, TypeError):
-            cell.fill = PatternFill(patternType='solid', start_color='A6A6A6', end_color='A6A6A6')
+            avg_cell.fill = PatternFill(patternType='solid', start_color='A6A6A6', end_color='A6A6A6')
         else:
             if avg_temp < min_temp_chimie or avg_temp > max_temp_chimie:
-                cell.fill = PatternFill(patternType='solid', start_color='B20000', end_color='B20000')
+                avg_cell.fill = PatternFill(patternType='solid', start_color='B20000', end_color='B20000')
+            if max_temp> 21 :
+                max_cell.fill = PatternFill(patternType='solid', start_color='B20000', end_color='B20000')
+
 
     for cell_str in avg_temp_cells:
         cell = ws2[cell_str]
