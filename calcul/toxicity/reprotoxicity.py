@@ -23,7 +23,7 @@ class Reprotoxicity:
 
         # Récupération des dates de début et de fin
         output_dates_debut = QueryScript(
-            f" SELECT measurepoint_id, date   FROM {env.DATABASE_TREATED}.key_dates where date_id=3 and measurepoint_id IN {tuple(list_mp_repro) if len(list_mp_repro)>1 else '('+(str(list_mp_repro[0]) if len(list_mp_repro) else '0')+')'} and version=  {env.CHOSEN_VERSION()};"
+            f" SELECT measurepoint_id, date   FROM {env.DATABASE_TREATED}.key_dates where date_id=1 and measurepoint_id IN {tuple(list_mp_repro) if len(list_mp_repro)>1 else '('+(str(list_mp_repro[0]) if len(list_mp_repro) else '0')+')'} and version=  {env.CHOSEN_VERSION()};"
         ).execute()
         output_dates_fin = QueryScript(
             f" SELECT measurepoint_id, date   FROM {env.DATABASE_TREATED}.key_dates where date_id=4 and measurepoint_id IN {tuple(list_mp_repro) if len(list_mp_repro)>1 else '('+(str(list_mp_repro[0]) if len(list_mp_repro) else '0')+')'} and version=  {env.CHOSEN_VERSION()};"
