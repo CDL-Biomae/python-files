@@ -514,7 +514,7 @@ def add_result(matrix, place_or_seperated_measurepoint, place_or_measurepoint_id
                 new_matrix[48].append(raw_value_sum)
                 for pack_id, replicate, value in remaining_leaves_data :
                     if alimentation_pack_id == pack_id :
-                        if replicate != 0 :
+                        if replicate != 0 and value:
                             new_matrix[49+replicate].append(raw_value_sum - value)
                             if len(survior_replicate_list)>=replicate and survior_replicate_list[replicate-1]:
                                 new_matrix[54+replicate].append((raw_value_sum - value)/(survior_replicate_list[replicate-1]+scud_quantity_alim)*2/constant_dict["Nombre de jour du test"])       
