@@ -3,8 +3,6 @@ from openpyxl import load_workbook
 from openpyxl.utils.cell import get_column_letter
 from termcolor import colored
 from tools import QueryScript
-from database import get_dict_pack
-from calcul.toxicity.reprotoxicity import Reprotoxicity
 
 import env
 
@@ -149,6 +147,10 @@ def add_style_tox(tox_dataframe, PATH):
         cell.font = font_small_title
         cell.border = medium_border
 
+    # Nettoyage des borders des données cachées
+
+    ws["T4"].border = Border(top=no_border,left=no_border, right=no_border, bottom=no_border)
+    ws["u4"].border = Border(top=no_border,left=no_border, right=no_border, bottom=no_border)
 
     ## STYLE VALUE DATA
     columns = [get_column_letter(col_idx) for col_idx in range(6, nb_columns+2)]
@@ -239,42 +241,30 @@ def add_style_tox(tox_dataframe, PATH):
             ws[column + str(row)].border = normal_cells_border
             ws[column + str(row)].alignment = alignment_center
 
-    
-
-
-    # MAKE STYLE OF molting_cycle get all result of conforme or not of molting_cycle
-    dict_pack = get_dict_pack()
-    confrm_mue  = Reprotoxicity.conform_resultat_mue(dict_pack)
-
-    # get all conform surface_retard 
-    b =Reprotoxicity.number_female_concerned_area(dict_pack)
-    c =Reprotoxicity.fecundity(dict_pack)
-
-    dict_conform_surface_retard = Reprotoxicity.conform_surface_retard(dict_pack,b[0],b[1],c)[0]
     # colorer les cycle de mue et la Perturbation endocrinienne
     for row in range(5, nb_rows+5): 
-          pack = dict_pack.get(ws["S" + str(row)].value)
-          if pack and "reproduction" in pack:  
-                repro_pack = pack.get("reproduction")
 
-                mue=confrm_mue.get(repro_pack)
-                surface_retard = dict_conform_surface_retard.get(repro_pack)
+        mue= ws["T" +str(row)].value
+        surface_retard = ws["U" + str(row)].value
 
-                if ws["R" + str(row)].value == "NA" or surface_retard == "Conforme BC1":
-                    ws["R" + str(row)].fill = body_fill_ok
-                else:
-                    ws["R" + str(row)].fill = body_fill_not_ok_4
+        if ws["R" + str(row)].value == "NA" or surface_retard == "Conforme BC1":
+            ws["R" + str(row)].fill = body_fill_ok
+        else:
+            ws["R" + str(row)].fill = body_fill_not_ok_4
 
-                if mue == "NA":
-                        ws["P" + str(row)].fill = body_fill_NA
-                if mue == "Conforme":
-                        ws["P" + str(row)].fill = body_fill_ok
-                if mue == "Retard modéré":
-                        ws["P" + str(row)].fill = body_fill_NA
-                if mue == "Retard fort":
-                        ws["P" + str(row)].fill = body_fill_not_ok_4
+        if mue == "NA":
+                ws["P" + str(row)].fill = body_fill_NA
+        if mue == "Conforme":
+                ws["P" + str(row)].fill = body_fill_ok
+        if mue == "Retard modéré":
+                ws["P" + str(row)].fill = body_fill_NA
+        if mue == "Retard fort":
+                ws["P" + str(row)].fill = body_fill_not_ok_4
                 
-          ws["S"+ str(row)].value = ""    
+        ws["S"+ str(row)].value = ""  
+        ws["T" +str(row)].value = ""
+        ws["U" +str(row)].value = ""
+
 
 
     #si la survie femelle est egale à 0 ou bien il y'a pas donner la coloration de la ligne sera grise

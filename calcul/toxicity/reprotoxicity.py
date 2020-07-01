@@ -403,23 +403,24 @@ class Reprotoxicity:
             dict_test_unilateral[pack_id]['test_1percent'] = test_1percent
 
         ## Calcul de la conformité des mues
-        dict_conform_resultat_mue = {pack_id: "NA" for pack_id in list_pack_repro}
+        dict_conform_resultat_mue = {mp: "NA" for mp in dict_pack.keys()}
 
         for pack_id in list_pack_repro:
+            mp = list_mp_repro[list_pack_repro.index(pack_id)]
             nbr_analysees = dict_nombre_femelles[pack_id]['nbr_analysées']
             if nbr_analysees < 10:
-                dict_conform_resultat_mue[pack_id] = "NA"
+                dict_conform_resultat_mue[mp] = "NA"
                 continue
 
             nbr_retards = dict_nombre_femelles[pack_id]['nbr_retards']
             test_5percent = dict_test_unilateral[pack_id]['test_5percent']
             test_1percent = dict_test_unilateral[pack_id]['test_1percent']
             if nbr_retards > test_5percent:
-                dict_conform_resultat_mue[pack_id] = "Retard fort"
+                dict_conform_resultat_mue[mp] = "Retard fort"
             elif nbr_retards > test_1percent:
-                dict_conform_resultat_mue[pack_id] = "Retard modéré"
+                dict_conform_resultat_mue[mp] = "Retard modéré"
             else:
-                dict_conform_resultat_mue[pack_id] = "Conforme"
+                dict_conform_resultat_mue[mp] = "Conforme"
 
         return dict_conform_resultat_mue
 
@@ -439,7 +440,7 @@ class Reprotoxicity:
                 list_pack_repro.append(pack_id)
 
         ## Surface moyenne des retards
-        dict_surface_moyenne_retards = {pack_id: None for pack_id in list_pack_repro}
+        dict_surface_moyenne_retards = {mp: None for mp in dict_pack.keys()}
         for pack_id in list_pack_repro:
             mp = list_mp_repro[list_pack_repro.index(pack_id)]
             nbr_analysees = dict_fecundity[mp]['nbr_femelles_analysées']
@@ -448,7 +449,7 @@ class Reprotoxicity:
                 continue
             if nbr_analysees >= 10:
                 try:
-                    dict_surface_moyenne_retards[pack_id] = sum(list_surface_retards)/len(list_surface_retards)
+                    dict_surface_moyenne_retards[mp] = sum(list_surface_retards)/len(list_surface_retards)
                 except ZeroDivisionError:
                     pass
 
@@ -487,7 +488,7 @@ class Reprotoxicity:
         dict_conform_resultat_mue = Reprotoxicity.conform_resultat_mue(dict_pack)
 
         # Initialisation du dictionnaire de sortie
-        dict_conform_surface_retard = {pack_id: "NA" for pack_id in list_pack_repro}
+        dict_conform_surface_retard = {mp: "NA" for mp in dict_pack.keys()}
 
         for pack_id in list_pack_repro:
             mp = list_mp_repro[list_pack_repro.index(pack_id)]
@@ -496,18 +497,18 @@ class Reprotoxicity:
             if nbr_analysees == 'NA' or nbr_analysees < 10:
                 continue
 
-            conform_mue = dict_conform_resultat_mue[pack_id]
+            conform_mue = dict_conform_resultat_mue[mp]
             if conform_mue == "Retard fort" or conform_mue == "Retard modéré":
-                surface_moyenne_retards = dict_surface_moyenne_retards[pack_id]
+                surface_moyenne_retards = dict_surface_moyenne_retards[mp]
                 seuil_5percent = dict_seuil_unilateral_5percent[pack_id]
                 if surface_moyenne_retards is None or seuil_5percent is None:
                     continue
                 if surface_moyenne_retards > seuil_5percent:
-                    dict_conform_surface_retard[pack_id] = "PE"
+                    dict_conform_surface_retard[mp] = "PE"
                 else:
-                    dict_conform_surface_retard[pack_id] = "Conforme BC1"
+                    dict_conform_surface_retard[mp] = "Conforme BC1"
             else:
-                dict_conform_surface_retard[pack_id] = "Conforme"
+                dict_conform_surface_retard[mp] = "Conforme"
 
         return dict_conform_surface_retard, dict_surface_moyenne_retards
 
@@ -535,9 +536,8 @@ class Reprotoxicity:
         for mp in dict_pack.keys():
             if mp not in list_mp_repro:
                 continue
-            pack_id = dict_pack[mp]['reproduction']
-            conform_surface = dict_conform_surface_retard[pack_id]
-            moyenne_surface = dict_surface_moyenne_retards[pack_id]
+            conform_surface = dict_conform_surface_retard[mp]
+            moyenne_surface = dict_surface_moyenne_retards[mp]
 
             if conform_surface == "Conforme":
                 continue

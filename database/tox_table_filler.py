@@ -72,6 +72,16 @@ def run(cas):
         mp: dict_fecundity[mp]["nbr_femelles_analysées"] for mp in dict_pack
     }
 
+    # Conformité 
+    conform_molting_cycle = Reprotoxicity.conform_resultat_mue(dict_pack)
+    dict_conform_molting_cycle = {
+        mp: conform_molting_cycle[mp] for mp in dict_pack
+    }
+
+    b =Reprotoxicity.number_female_concerned_area(dict_pack)
+
+    dict_conform_surface_retard = Reprotoxicity.conform_surface_retard(dict_pack,b[0],b[1],dict_fecundity)[0]
+
     # Transformation de "indice de fecondité - moyenne" en "%Inhibition fecondité - Résultat attendu"
     ref_calcul = QueryScript(
         f"SELECT value FROM {env.DATABASE_TREATED}.r2_constant WHERE name = 'indice de fertilité attendu - moyenne' AND version = {env.CHOSEN_VERSION()};"
@@ -127,8 +137,10 @@ def run(cas):
         percent_inhibition_fecondite = dict_percent_inhibition_fecondite[mp]
         number_female_analysis = dict_nombre_femelles_analysees[mp]
         molting_cycle = dict_cycle_de_mue_condense[mp]
+        molting_cycle_conform = dict_conform_molting_cycle[mp]
         number_female_concerned_area = dict_nombre_femelles_en_retard[mp]
         endocrine_disruption = dict_perturbation_endocrinienne[mp]
+        surface_retard_conformity = dict_conform_surface_retard[mp]
 
         value = (
             measurepoint_id,
@@ -141,8 +153,10 @@ def run(cas):
             percent_inhibition_fecondite,
             number_female_analysis,
             molting_cycle,
+            molting_cycle_conform,
             number_female_concerned_area,
             endocrine_disruption,
+            surface_retard_conformity
         )
 
         values.append(value)
@@ -160,11 +174,11 @@ def run(cas):
         # Création d'un table vide si elle n'existe pas
         QueryScript(f'DROP TABLE IF EXISTS {env.DATABASE_TREATED}.toxtable').execute(admin=True)
         create_table = QueryScript(
-            f"CREATE TABLE IF NOT EXISTS {env.DATABASE_TREATED}.toxtable (id INT AUTO_INCREMENT PRIMARY KEY, measurepoint_id INT, male_survival_7_days varchar(255), alimentation varchar(255), neurotoxicity varchar(255), female_survivor varchar(255), number_days_exposition varchar(255), number_female_concerned varchar(255),percent_inhibition_fecondite varchar(255),number_female_analysis varchar(255),molting_cycle varchar(255), number_female_concerned_area varchar(255), endocrine_disruption varchar(255), version int);"
+            f"CREATE TABLE IF NOT EXISTS {env.DATABASE_TREATED}.toxtable (id INT AUTO_INCREMENT PRIMARY KEY, measurepoint_id INT, male_survival_7_days varchar(255), alimentation varchar(255), neurotoxicity varchar(255), female_survivor varchar(255), number_days_exposition varchar(255), number_female_concerned varchar(255),percent_inhibition_fecondite varchar(255),number_female_analysis varchar(255),molting_cycle varchar(255), molting_cycle_conformity varchar(255),number_female_concerned_area varchar(255), endocrine_disruption varchar(255), surface_retard_conformity varchar(255), version int);"
         ).execute(admin=True)
 
         fill_table = QueryScript(
-            f"INSERT INTO {env.DATABASE_TREATED}.toxtable (measurepoint_id, male_survival_7_days, alimentation, neurotoxicity, female_survivor, number_days_exposition, number_female_concerned, percent_inhibition_fecondite, number_female_analysis, molting_cycle, number_female_concerned_area, endocrine_disruption, version) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s,%s, %s, %s)"
+            f"INSERT INTO {env.DATABASE_TREATED}.toxtable (measurepoint_id, male_survival_7_days, alimentation, neurotoxicity, female_survivor, number_days_exposition, number_female_concerned, percent_inhibition_fecondite, number_female_analysis, molting_cycle, molting_cycle_conformity, number_female_concerned_area, endocrine_disruption, surface_retard_conformity, version) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s,%s, %s, %s)"
         )
         fill_table.setRows(values)
         fill_table.executemany()
@@ -173,7 +187,7 @@ def run(cas):
     if cas == 2:
         QueryScript(f"DELETE FROM {env.DATABASE_TREATED}.toxtable WHERE version = {env.CHOSEN_VERSION()};").execute(admin=True)
         fill_table = QueryScript(
-            f"INSERT INTO {env.DATABASE_TREATED}.toxtable (measurepoint_id, male_survival_7_days, alimentation, neurotoxicity, female_survivor, number_days_exposition, number_female_concerned, percent_inhibition_fecondite, number_female_analysis, molting_cycle, number_female_concerned_area, endocrine_disruption, version) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s,%s, %s, %s)"
+            f"INSERT INTO {env.DATABASE_TREATED}.toxtable (measurepoint_id, male_survival_7_days, alimentation, neurotoxicity, female_survivor, number_days_exposition, number_female_concerned, percent_inhibition_fecondite, number_female_analysis, molting_cycle, molting_cycle_conformity, number_female_concerned_area, endocrine_disruption, surface_retard_conformity, version) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s,%s, %s, %s)"
         )
         fill_table.setRows(values)
         fill_table.executemany()
@@ -181,7 +195,7 @@ def run(cas):
     ## Cas 3: Ajout d'une nouvelle version
     if cas == 3:
         fill_table = QueryScript(
-            f"INSERT INTO {env.DATABASE_TREATED}.toxtable (measurepoint_id, male_survival_7_days, alimentation, neurotoxicity, female_survivor, number_days_exposition, number_female_concerned, percent_inhibition_fecondite, number_female_analysis, molting_cycle, number_female_concerned_area, endocrine_disruption, version) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s,%s, %s, %s)"
+            f"INSERT INTO {env.DATABASE_TREATED}.toxtable (measurepoint_id, male_survival_7_days, alimentation, neurotoxicity, female_survivor, number_days_exposition, number_female_concerned, percent_inhibition_fecondite, number_female_analysis, molting_cycle, molting_cycle_conformity, number_female_concerned_area, endocrine_disruption, surface_retard_conformity, version) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s,%s, %s, %s)"
         )
         fill_table.setRows(values)
         fill_table.executemany()
