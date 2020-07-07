@@ -251,7 +251,10 @@ def add_style_nqe(nqe_dataframe, PATH, dict_t0):
                         ws[column + str(5+index)].font = body_font
 
         except ValueError :
-            pass
+            for column in header_columns[5:]:
+                ws[column + str(5+index)].border = borders
+                ws[column + str(5+index)].font = body_font
+
     ws.delete_cols(len(header_columns)+1,1)
     
     for letter in header_columns[5:]:

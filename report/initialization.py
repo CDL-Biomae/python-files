@@ -42,17 +42,17 @@ def create_head_special_dataframe(campaigns_dict, chemistry_measurepoint_list, c
         matrix = []
         matrix_7j = []
         matrix_21j = []
+        df_normal = None
+        df_7j = None
+        df_21j = None
         for place_id in campaigns_dict[campaign_id]["place"] :
             seperate_chemistry = []
             if "duplicate" in campaigns_dict[campaign_id]["place"][place_id] :
                 if "chemistry" in campaigns_dict[campaign_id]["place"][place_id]["duplicate"] and len(list(campaigns_dict[campaign_id]["place"][place_id]["duplicate"]["chemistry"].keys()))>1:
-                    for measurepoint in campaigns_dict[campaign_id]["place"][place_id]["duplicate"]["chemistry"]:
+                    for measurepoint in campaigns_dict[campaign_id]["place"][place_id]["duplicate"]["chemistry"].values():
                         if measurepoint not in seperate_chemistry:
                             seperate_chemistry.append(measurepoint)
 
-            df_normal = None
-            df_7j = None
-            df_21j = None
             
             if len(seperate_chemistry):
                 for measurepoint_id in campaigns_dict[campaign_id]["place"][place_id]["measurepoint"]:
