@@ -6,6 +6,7 @@ import env
 from datetime import datetime
 from time import sleep
 from .log_excel import LogExcelApp
+from .log_chemistry_excel import LogChemistryExcelApp
 from .log_word import LogWordApp
 from .log_database import LogDatabaseApp
 from .log_excel_EDI import LogExcelEDIApp
@@ -82,7 +83,8 @@ class MainApp(tk.Tk):
         self.version_choice.set(env.LATEST_VERSION())
         tk.OptionMenu(
             self.frame_campaign, self.version_choice, *env.ALL_VERSIONS()).grid(row=3, column=1)
-
+        self.launch_chemistry_excel_button = tk.Button(
+            master=self.frame_campaign, text="Bilan de données chimie", fg="#FFFFFF", background="#008000", command=self.launch_chemistry_excel).grid(row=4,column=1)
         self.frame_campaign.pack(expand="YES")
         self.bind("<Return>", self.enter)
         self.create_empty_space()
@@ -169,6 +171,25 @@ class MainApp(tk.Tk):
         self.log_window.geometry('400x150+150+150')
         try :
             self.log_app = LogExcelApp(master=self.log_window, campaign_list=self.campaign_list, output_path=self.output_path)
+            self.output_path = None
+        except PermissionError :
+            self.log_window.destroy()
+            tk.messagebox.showerror(title="Erreur", message=f"Veuillez fermer le fichier \'{self.output_path.split('/')[-1]}\' avant de lancer.")
+        except Exception as err :
+            self.log_window.destroy()
+            tk.messagebox.showerror(title="Erreur", message=err)
+   
+    def launch_chemistry_excel(self): 
+
+        self.output_path = tk.filedialog.asksaveasfilename(title="Enregistrer le rapport chimie",filetypes=[("Excel (*.xslx)","*.xlsx")], defaultextension=".xlsx", initialfile=f"Données chimies")
+        if not self.output_path:
+            return None
+        self.change_chosen_version(self.version_choice.get())
+        self.log_window = tk.Toplevel(self)
+        self.log_window.transient(self)
+        self.log_window.geometry('400x150+150+150')
+        try :
+            self.log_app = LogChemistryExcelApp(master=self.log_window, campaign_list=self.campaign_list, output_path=self.output_path)
             self.output_path = None
         except PermissionError :
             self.log_window.destroy()

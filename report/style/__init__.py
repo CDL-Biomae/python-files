@@ -9,3 +9,4 @@ from .style_bbac_21j import *
 from .style_tox import *
 from .style_edi import *
 from .style_calcul_tox import *
+from .style_chemistry import *
