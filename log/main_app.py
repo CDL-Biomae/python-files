@@ -170,7 +170,7 @@ class MainApp(tk.Tk):
         self.log_window.transient(self)
         self.log_window.geometry('400x150+150+150')
         try :
-            self.log_app = LogExcelApp(master=self.log_window, campaign_list=self.campaign_list, output_path=self.output_path)
+            self.log_app = LogExcelApp(master=self.log_window, campaign_list=self.campaign_list, output_path=self.output_path, old_color=self.old_color)
             self.output_path = None
         except PermissionError :
             self.log_window.destroy()
@@ -226,6 +226,8 @@ class MainApp(tk.Tk):
         self.launch_excel_button = tk.Button(
             master=self.frame_end, text="Rapport annexe", fg="#FFFFFF", background="#008000", command=self.launch_excel)
         self.launch_excel_button.pack()
+        self.old_color = tk.IntVar()
+        tk.Checkbutton(self.frame_end, text="Anciennes couleurs", variable=self.old_color).pack()
         tk.Label(master=self.frame_end, text="").pack()
         self.launch_word_button = tk.Button(
             master=self.frame_end, text="Rapport d'expérimentation", fg="#FFFFFF", background="#0060AC", command=self.launch_word)

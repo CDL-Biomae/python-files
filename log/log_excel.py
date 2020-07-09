@@ -11,7 +11,7 @@ from openpyxl import load_workbook
 import env
 
 class LogExcelApp(tk.Tk):
-    def __init__(self, master=None, campaign_list=[], output_path=""):
+    def __init__(self, master=None, campaign_list=[], output_path="", old_color=False):
         self.master = master
         tk.Label(master=self.master, text="    ").grid(row=0,column=0)
         tk.Label(master=self.master,text=f"Création du rapport annexe pour {' '.join(campaign_list)}").grid(row=1,column=1, sticky="w")
@@ -23,7 +23,7 @@ class LogExcelApp(tk.Tk):
         self.progressbar_element["value"]=0
         self.progressbar_element["maximum"]=13
         self.quit_window = False
-        self.main(campaign_list, output_path)
+        self.main(campaign_list, output_path, old_color)
     
     @property
     def text(self):
@@ -86,7 +86,7 @@ class LogExcelApp(tk.Tk):
         writer.close()
         self.progressbar += 1
 
-    def main(self, campaign_list, output_path):
+    def main(self, campaign_list, output_path, old_color):
         self.text = "Chargement des données..."
         campaigns_dict, measurepoint_list, chemistry_measurepoint_list, chemistry_pack_list, chemistry_7j_measurepoint_list, chemistry_21j_measurepoint_list, tox_measurepoint_list, tox_pack_list, agency_code_list, J_dict = initialize(campaign_list)
         head_dataframe, head_filtered_dataframe, place_list = create_head_dataframe(campaigns_dict)
@@ -152,13 +152,13 @@ class LogExcelApp(tk.Tk):
                     bbac2_dataframe = create_bbac2_7j_dataframe(head_chemistry_7j_dataframe, result_dict, chemistry_7j_measurepoint_list)
                     self.write_in_existing_excel(bbac_dataframe, output_path, 'BBAC_7j', startrow=3)
                     self.write_in_existing_excel(bbac2_dataframe, output_path, 'BBAC2_7j', startrow=3)
-                    add_style_bbac_7j(bbac_dataframe, output_path, dict_t0)
+                    add_style_bbac_7j(bbac_dataframe, output_path, dict_t0, old_color)
                 if len(chemistry_21j_measurepoint_list):
                     bbac_dataframe = create_bbac_21j_dataframe(head_chemistry_21j_dataframe, result_dict, chemistry_21j_measurepoint_list)
                     bbac2_dataframe = create_bbac2_21j_dataframe(head_chemistry_21j_dataframe, result_dict, chemistry_21j_measurepoint_list)
                     self.write_in_existing_excel(bbac_dataframe, output_path, 'BBAC_21j', startrow=3)
                     self.write_in_existing_excel(bbac2_dataframe, output_path, 'BBAC2_21j', startrow=3)
-                    add_style_bbac_21j(bbac_dataframe, output_path, dict_t0)  
+                    add_style_bbac_21j(bbac_dataframe, output_path, dict_t0, old_color)  
 
                 # CREATION DE L'ONGLET NQE ##
                 self.text = "Création de l'onglet NQE Biote..."

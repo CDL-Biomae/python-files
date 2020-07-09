@@ -7,7 +7,7 @@ from tools import QueryScript
 from termcolor import colored
 import env
 
-def add_style_bbac_7j(bbac_dataframe, PATH, dict_t0):
+def add_style_bbac_7j(bbac_dataframe, PATH, dict_t0, old_color):
 
     wb = load_workbook(PATH)
     ws = wb['BBAC_7j']
@@ -240,12 +240,12 @@ def add_style_bbac_7j(bbac_dataframe, PATH, dict_t0):
 
     body_font = Font(size=6, name='Arial')
     body_font_white = Font(size=6, name='Arial', color='FFFFFF')
-    body_fill_ok = PatternFill(fill_type='solid', start_color='DBB7FF', end_color='DBB7FF')
-    body_fill_nd = PatternFill(fill_type='solid', start_color='A6A6A6', end_color='A6A6A6')
-    body_fill_not_ok = PatternFill(fill_type='solid', start_color='B565F7', end_color='B565F7')
-    body_fill_not_ok_25 = PatternFill(fill_type='solid', start_color='8909FF', end_color='8909FF')
-    body_fill_not_ok_50 = PatternFill(fill_type='solid', start_color='6600CC', end_color='6600CC')
-    body_fill_not_ok_75 = PatternFill(fill_type='solid', start_color='47008E', end_color='47008E')
+    body_fill_ok = PatternFill(fill_type='solid', start_color='DBB7FF' if not old_color else '027ee3', end_color='DBB7FF' if not old_color else '027ee3')
+    body_fill_nd = PatternFill(fill_type='solid', start_color='A6A6A6' , end_color='A6A6A6' )
+    body_fill_not_ok = PatternFill(fill_type='solid', start_color='B565F7' if not old_color else '69a64b', end_color='B565F7' if not old_color else '69a64b')
+    body_fill_not_ok_25 = PatternFill(fill_type='solid', start_color='8909FF' if not old_color else 'd1c452', end_color='8909FF' if not old_color else 'd1c452')
+    body_fill_not_ok_50 = PatternFill(fill_type='solid', start_color='6600CC' if not old_color else 'cc7931', end_color='6600CC' if not old_color else 'cc7931')
+    body_fill_not_ok_75 = PatternFill(fill_type='solid', start_color='47008E' if not old_color else 'ab2222', end_color='47008E' if not old_color else 'ab2222')
     body_alignment = Alignment(horizontal='center', vertical='center')
 
     for column in header_columns:
