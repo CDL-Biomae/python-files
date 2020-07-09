@@ -170,7 +170,7 @@ class MainApp(tk.Tk):
         self.log_window.transient(self)
         self.log_window.geometry('400x150+150+150')
         try :
-            self.log_app = LogExcelApp(master=self.log_window, campaign_list=self.campaign_list, output_path=self.output_path, old_color=self.old_color)
+            self.log_app = LogExcelApp(master=self.log_window, campaign_list=self.campaign_list, output_path=self.output_path, old_color=self.old_color.get())
             self.output_path = None
         except PermissionError :
             self.log_window.destroy()
