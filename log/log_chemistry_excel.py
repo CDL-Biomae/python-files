@@ -19,7 +19,7 @@ class LogChemistryExcelApp(tk.Tk):
         self.progressbar_element = ttk.Progressbar(master=self.master,orient="horizontal",length=350,mode="determinate")
         self.progressbar_element.grid(row=2,column=1, sticky="w")
         self.progressbar_element["value"]=0
-        self.progressbar_element["maximum"]=9
+        self.progressbar_element["maximum"]=11
         self.quit_window = False
         self.main(campaign_list, output_path)
     
@@ -85,10 +85,13 @@ class LogChemistryExcelApp(tk.Tk):
         self.progressbar += 1
 
     def main(self, campaign_list, output_path):
+        contract_list = [campaign.split('-')[0] for campaign in campaign_list]
         self.text = "Chargement des données..."
         context_data = QueryScript(f"SELECT measurepoint_id, recordedAt, temperature, conductivity, oxygen, pH, barrel, comment FROM {env.DATABASE_RAW}.MeasureExposureCondition").execute()
         self.progressbar +=1
-        main_data = QueryScript(f"SELECT Measurepoint.id, Pack.id, Measurepoint.reference, start_date.date, end_date.date, Place.name, Agency.code, Agency.network, Agency.hydroecoregion, average_temperature.sensor3_min, average_temperature.sensor3_average, average_temperature.sensor3_max, Pack.sampling_weight, Pack.metal_tare_bottle_weight, Pack.organic_tare_bottle_weight, Pack.organic_total_weight, Pack.sampling_quantity,T0.reference, T0.sampling_weight, T0.metal_tare_bottle_weight, T0.organic_tare_bottle_weight, T0.organic_total_weight, T0.sampling_quantity , Survival.percent FROM {env.DATABASE_RAW}.Measurepoint JOIN (SELECT Measurepoint.id, Measurepoint.reference, Pack.sampling_weight, Pack.metal_tare_bottle_weight, Pack.organic_tare_bottle_weight, Pack.organic_total_weight, Pack.sampling_quantity FROM {env.DATABASE_RAW}.Measurepoint JOIN {env.DATABASE_RAW}.Pack ON Pack.measurepoint_id=Measurepoint.id WHERE code_t0_id IS NULL) as T0 ON T0.id=Measurepoint.code_t0_id JOIN {env.DATABASE_RAW}.Pack ON Pack.measurepoint_id=Measurepoint.id JOIN (SELECT measurepoint_id, date FROM {env.DATABASE_TREATED}.key_dates WHERE key_dates.date_id=6 AND version={env.CHOSEN_VERSION()} AND date IS NOT NULL) as start_date ON start_date.measurepoint_id=Measurepoint.id JOIN (SELECT measurepoint_id, date FROM {env.DATABASE_TREATED}.key_dates WHERE key_dates.date_id=7 AND version={env.CHOSEN_VERSION()} AND date IS NOT NULL) as end_date ON end_date.measurepoint_id=Measurepoint.id JOIN {env.DATABASE_RAW}.Place ON Place.id=Measurepoint.place_id JOIN {env.DATABASE_RAW}.Agency ON Agency.id=Place.agency_id JOIN {env.DATABASE_TREATED}.average_temperature ON average_temperature.measurepoint_id=Measurepoint.id JOIN ( SELECT AVG(scud_survivor/scud_quantity*100) as percent, pack_id FROM biomae.Cage GROUP BY pack_id) as Survival ON Survival.pack_id=Pack.id WHERE Pack.nature='chemistry' AND average_temperature.version={env.CHOSEN_VERSION()} AND Measurepoint.code_t0_id IS NOT NULL;").execute()
+        main_data = QueryScript(f"SELECT distinct Place.agency_id, Measurepoint.id, Pack.id, Measurepoint.reference, start_date.date, end_date.date, Place.name, average_temperature.sensor3_min, average_temperature.sensor3_average, average_temperature.sensor3_max, Pack.sampling_weight, Pack.metal_tare_bottle_weight, Pack.organic_tare_bottle_weight, Pack.organic_total_weight, Pack.sampling_quantity,T0.reference, T0.sampling_weight, T0.metal_tare_bottle_weight, T0.organic_tare_bottle_weight, T0.organic_total_weight, T0.sampling_quantity , Survival.percent FROM {env.DATABASE_RAW}.Measurepoint JOIN (SELECT Measurepoint.id, Measurepoint.reference, Pack.sampling_weight, Pack.metal_tare_bottle_weight, Pack.organic_tare_bottle_weight, Pack.organic_total_weight, Pack.sampling_quantity FROM {env.DATABASE_RAW}.Measurepoint JOIN {env.DATABASE_RAW}.Pack ON Pack.measurepoint_id=Measurepoint.id WHERE code_t0_id IS NULL) as T0 ON T0.id=Measurepoint.code_t0_id JOIN {env.DATABASE_RAW}.Pack ON Pack.measurepoint_id=Measurepoint.id JOIN (SELECT measurepoint_id, date FROM {env.DATABASE_TREATED}.key_dates WHERE key_dates.date_id=6 AND version={env.CHOSEN_VERSION()} AND date IS NOT NULL) as start_date ON start_date.measurepoint_id=Measurepoint.id JOIN (SELECT measurepoint_id, date FROM {env.DATABASE_TREATED}.key_dates WHERE key_dates.date_id=7 AND version={env.CHOSEN_VERSION()} AND date IS NOT NULL) as end_date ON end_date.measurepoint_id=Measurepoint.id JOIN {env.DATABASE_RAW}.Place ON Place.id=Measurepoint.place_id JOIN {env.DATABASE_TREATED}.average_temperature ON average_temperature.measurepoint_id=Measurepoint.id JOIN ( SELECT AVG(scud_survivor/scud_quantity*100) as percent, pack_id FROM biomae.Cage GROUP BY pack_id) as Survival ON Survival.pack_id=Pack.id WHERE Pack.nature='chemistry' AND average_temperature.version={env.CHOSEN_VERSION()} AND Measurepoint.code_t0_id IS NOT NULL;").execute()
+        self.progressbar +=1
+        agency_data = QueryScript(f"SELECT id, code, network, hydroecoregion FROM {env.DATABASE_RAW}.Agency").execute()
         self.progressbar +=1
         
         analysis_data = QueryScript(f"SELECT pack_id, value, sandre, name FROM {env.DATABASE_RAW}.Analysis").execute()
@@ -99,7 +102,7 @@ class LogChemistryExcelApp(tk.Tk):
         self.progressbar +=1
         self.text = "Création des onglets"
 
-        chemistry_dataframe, report_dataframe = create_chemistry_dataframe(context_data, main_data, analysis_data, chemical_threshold_data, context_threshold_data)
+        chemistry_dataframe, report_dataframe = create_chemistry_dataframe(context_data, main_data, analysis_data, chemical_threshold_data, context_threshold_data, agency_data, contract_list)
         self.progressbar +=1
         self.write_in_new_excel(chemistry_dataframe, output_path, 'Data', startrow=0, startcol=0)
         self.progressbar +=1

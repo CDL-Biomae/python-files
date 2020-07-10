@@ -1,13 +1,25 @@
 from tools import translate
 import pandas as pd
 import env
-import json
 
-def create_chemistry_dataframe(context_data, main_data, analysis_data, chemical_threshold_data, context_threshold_data):
+def create_chemistry_dataframe(context_data, main_data, analysis_data, chemical_threshold_data, context_threshold_data, agency_data, contract_list=[]):
     global_matrix = []
     report_dict = {}
-    for measurepoint_id, pack_id, reference, start_date, end_date, name, agency_code, network, hydroecoregion, sensor3_min, sensor3_average, sensor3_max, sampling_weight, metal_tare_bottle_weight, organic_tare_bottle_weight, organic_total_weight, quantity,t0_reference, t0_sampling_weight, t0_metal_tare_bottle_weight, t0_organic_tare_bottle_weight, t0_organic_total_weight, t0_quantity, survival_percent in main_data:
+    for agency_id, measurepoint_id, pack_id, reference, start_date, end_date, name, sensor3_min, sensor3_average, sensor3_max, sampling_weight, metal_tare_bottle_weight, organic_tare_bottle_weight, organic_total_weight, quantity,t0_reference, t0_sampling_weight, t0_metal_tare_bottle_weight, t0_organic_tare_bottle_weight, t0_organic_total_weight, t0_quantity, survival_percent in main_data:
+        
+        current_network = None
+        current_hydroecoregion = None
+        current_agency_code = None
+        if agency_id :
+            for agency_id, code, network, hydroecoregion in agency_data :
+                if agency_id==agency_id :
+                    current_agency_code = code
+                    current_network = network
+                    current_hydroecoregion = hydroecoregion
+                    break
         contract = reference.split('-')[0]
+        if len(contract_list) and contract not in contract_list :
+            continue
         if not contract in report_dict :
             report_dict[contract] = {
                 'count':1,
@@ -47,11 +59,17 @@ def create_chemistry_dataframe(context_data, main_data, analysis_data, chemical_
                     if (not comment.find('vol')==-1 or not comment.find('Vol')==-1)  and 'Vol' not in comment_list :
                         comment_list.append('Vol')
                         vandalism = True
-                    if not comment.find('ystème non récupérable')==-1 and 'Système non récupérable' not in comment_list :
+                    if not comment.find('non récupérable')==-1 and 'Système non récupérable' not in comment_list :
                         comment_list.append('Système non récupérable')
                         vandalism = True
                     if not comment.find("ors d'eau")==-1 and "Hors d'eau" not in comment_list :
                         comment_list.append("Hors d'eau")
+                        out_of_water = True
+                    if (not comment.find("Crue")==-1 or not comment.find("crue")==-1) and "Crue" not in comment_list :
+                        comment_list.append("Crue")
+                        out_of_water = True
+                    if not comment.find("mbacle")==-1 and "Embacle" not in comment_list :
+                        comment_list.append("Embacle")
                         out_of_water = True
                 if temperature :
                     for threshold_name, _min, _max in context_threshold_data :
@@ -142,9 +160,9 @@ def create_chemistry_dataframe(context_data, main_data, analysis_data, chemical_
 
 
 
-        temp = [measurepoint_id, reference, start_date.strftime("%d/%m/%Y") if start_date else None, contract, int(reference.split('-')[1]) if reference.split('-')[1][0]=='0' else int(reference.split('-')[2]), int(reference.split('-')[2]), translate(name), agency_code, sensor3_min, sensor3_average, sensor3_max, max([temperatureJ0 if temperatureJ0 else 0, temperatureJ21 if temperatureJ21 else 0]) if temperatureJ0 or temperatureJ21 else 'NA', (str(round(survival_percent))+'%') if survival_percent and  survival_percent > 1  else 'Non analysé', ', '.join(context_exceeded_list), ', '.join(comment_list), ', '.join(metal_element),', '.join(organic_element),network, hydroecoregion, temperatureJ0, temperatureJ21, conductivityJ0, conductivityJ21, oxygenJ0, oxygenJ21, pHJ0, pHJ21, metal_tare_bottle_weight, sampling_weight, (sampling_weight-metal_tare_bottle_weight) if sampling_weight and metal_tare_bottle_weight else "NA", quantity, '', organic_tare_bottle_weight, organic_total_weight, (organic_total_weight-organic_tare_bottle_weight) if organic_tare_bottle_weight and organic_total_weight else 'NA', '', t0_reference, t0_metal_tare_bottle_weight, t0_sampling_weight, (t0_sampling_weight-t0_metal_tare_bottle_weight) if t0_metal_tare_bottle_weight and t0_sampling_weight else 'NA', t0_organic_tare_bottle_weight, t0_organic_total_weight, (t0_organic_total_weight-t0_organic_tare_bottle_weight) if t0_organic_tare_bottle_weight and t0_organic_total_weight else 'NA', t0_quantity]
+        temp = [measurepoint_id, reference, start_date.strftime("%d/%m/%Y") if start_date else None, chemistry_duration, contract, int(reference.split('-')[1]) if reference.split('-')[1][0]=='0' else int(reference.split('-')[2]), int(reference.split('-')[2]), translate(name), current_agency_code, sensor3_min, sensor3_average, sensor3_max, max([temperatureJ0 if temperatureJ0 else 0, temperatureJ21 if temperatureJ21 else 0]) if temperatureJ0 or temperatureJ21 else 'NA', (str(round(survival_percent))+'%') if survival_percent and  survival_percent > 1  else 'Non analysé', ', '.join(context_exceeded_list), ', '.join(comment_list), ', '.join(metal_element),', '.join(organic_element),current_network, current_hydroecoregion, temperatureJ0, temperatureJ21, conductivityJ0, conductivityJ21, oxygenJ0, oxygenJ21, pHJ0, pHJ21, metal_tare_bottle_weight, sampling_weight, (sampling_weight-metal_tare_bottle_weight) if sampling_weight and metal_tare_bottle_weight else "NA", quantity,(sampling_weight-metal_tare_bottle_weight)/quantity if sampling_weight and metal_tare_bottle_weight and quantity else "NA" , organic_tare_bottle_weight, organic_total_weight, (organic_total_weight-organic_tare_bottle_weight) if organic_tare_bottle_weight and organic_total_weight else 'NA', '', t0_reference, t0_metal_tare_bottle_weight, t0_sampling_weight, (t0_sampling_weight-t0_metal_tare_bottle_weight) if t0_metal_tare_bottle_weight and t0_sampling_weight else 'NA', t0_organic_tare_bottle_weight, t0_organic_total_weight, (t0_organic_total_weight-t0_organic_tare_bottle_weight) if t0_organic_tare_bottle_weight and t0_organic_total_weight else 'NA', t0_quantity]
         global_matrix.append(temp)
-    df = pd.DataFrame(global_matrix, columns=['#', 'Code BIOMÆ', 'Jour de lancement',	'Bassin', 'Contrat', 'Campagne', 'Station de mesure', 'Code Agence', 'Température min sonde (°C)', 'Température Moyenne sonde (°C)', 'Température max sonde (°C)', 'Température max ponctuelle (°C)', 'Taux de survie (exprimé en %)', "Hors domaine d'application", "Problème d'expérimentation", "Métaux (Fort à très fort)",	"Composés organiques (Fort à très fort)", 'Type de réseau',	'Hydroécorégion', 'Température T+0 - Encagement sur site', 'Température T+21 - Site > Récupération', 'Conductivité T+0 - Encagement sur site', 'Conductivité T+21 - Site > Récupération', 'Oxygène T+0 - Encagement sur site', 'Oxygène T+21 - Site > Récupération', 'pH T+0 - Encagement sur site', 'pH T+21 - Site > Récupération', 'Tare échantillon métaux (mg)','Masse totale échantillon métaux (mg)', 'Masse Fraiche métaux (mg)', "Nombre de gammares dans l'echantillon", 'Poids moyen (mg)', 'Tare échantillon organiques (mg, sans bouchon)', 'Masse totale échantillon organiques (mg, sans bouchon)', 'Masse fraiche organiques (mg)', 'Poids moyen avant expo (contrôle)', 'Libellé T0', 'Tare échantillon métaux (mg)', 'Masse totale échantillon métaux (mg)', 'Masse Fraiche métaux (mg)', 'Tare échantillon organiques (mg, sans bouchon)', 'Masse totale échantillon organiques (mg, sans bouchon)',	'Masse fraiche organiques (mg)', "Nombre de gammares dans l'echantillon métaux"])
+    df = pd.DataFrame(global_matrix, columns=['#', 'Code BIOMÆ', 'Jour de lancement', 'Durée',	'Bassin', 'Contrat', 'Campagne', 'Station de mesure', 'Code Agence', 'Température min sonde (°C)', 'Température Moyenne sonde (°C)', 'Température max sonde (°C)', 'Température max ponctuelle (°C)', 'Taux de survie (exprimé en %)', "Hors domaine d'application", "Problème d'expérimentation", "Métaux (Fort à très fort)",	"Composés organiques (Fort à très fort)", 'Type de réseau',	'Hydroécorégion', 'Température T+0 - Encagement sur site', 'Température T+21 - Site > Récupération', 'Conductivité T+0 - Encagement sur site', 'Conductivité T+21 - Site > Récupération', 'Oxygène T+0 - Encagement sur site', 'Oxygène T+21 - Site > Récupération', 'pH T+0 - Encagement sur site', 'pH T+21 - Site > Récupération', 'Tare échantillon métaux (mg)','Masse totale échantillon métaux (mg)', 'Masse Fraiche métaux (mg)', "Nombre de gammares dans l'echantillon", 'Poids moyen (mg)', 'Tare échantillon organiques (mg, sans bouchon)', 'Masse totale échantillon organiques (mg, sans bouchon)', 'Masse fraiche organiques (mg)', 'Poids moyen avant expo (contrôle)', 'Libellé T0', 'Tare échantillon métaux (mg)', 'Masse totale échantillon métaux (mg)', 'Masse Fraiche métaux (mg)', 'Tare échantillon organiques (mg, sans bouchon)', 'Masse totale échantillon organiques (mg, sans bouchon)',	'Masse fraiche organiques (mg)', "Nombre de gammares dans l'echantillon métaux"])
     
     report_dict['TOTAL'] = {
         'count':sum([report_dict[key]['count'] for key in list(report_dict.keys())]),
@@ -160,10 +178,7 @@ def create_chemistry_dataframe(context_data, main_data, analysis_data, chemical_
         'not_totally_analysed':sum([report_dict[key]['not_totally_analysed'] for key in list(report_dict.keys())]),
         'survival_null':sum([report_dict[key]['survival_null'] for key in list(report_dict.keys())])
     }
-
-    with open('data.json','w') as outfile :
-        json.dump(report_dict, outfile)
-    
+   
 
 
     report_matrix = []

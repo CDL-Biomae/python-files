@@ -3,7 +3,7 @@ import webbrowser
 from tkinter import filedialog, messagebox
 from tools import QueryScript
 import env
-from datetime import datetime
+from datetime import datetime, date
 from time import sleep
 from .log_excel import LogExcelApp
 from .log_chemistry_excel import LogChemistryExcelApp
@@ -181,7 +181,7 @@ class MainApp(tk.Tk):
    
     def launch_chemistry_excel(self): 
 
-        self.output_path = tk.filedialog.asksaveasfilename(title="Enregistrer le rapport chimie",filetypes=[("Excel (*.xslx)","*.xlsx")], defaultextension=".xlsx", initialfile=f"Données chimies")
+        self.output_path = tk.filedialog.asksaveasfilename(title="Enregistrer le rapport chimie",filetypes=[("Excel (*.xslx)","*.xlsx")], defaultextension=".xlsx", initialfile=f"Données chimies {date.today().strftime('%d-%m-%Y')}")
         if not self.output_path:
             return None
         self.change_chosen_version(self.version_choice.get())
