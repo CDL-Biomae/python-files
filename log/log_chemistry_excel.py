@@ -9,7 +9,7 @@ from tools import QueryScript
 import env
 
 class LogChemistryExcelApp(tk.Tk):
-    def __init__(self, master=None, campaign_list=[], output_path=""):
+    def __init__(self, master=None, campaign_list=[], output_path="", only_agency=False):
         self.master = master
         tk.Label(master=self.master, text="    ").grid(row=0,column=0)
         tk.Label(master=self.master,text=f"Création du bilan de données chimies {'pour' if len(campaign_list) else ''} {' '.join(campaign_list)}").grid(row=1,column=1, sticky="w")
@@ -21,7 +21,7 @@ class LogChemistryExcelApp(tk.Tk):
         self.progressbar_element["value"]=0
         self.progressbar_element["maximum"]=11
         self.quit_window = False
-        self.main(campaign_list, output_path)
+        self.main(campaign_list, output_path, only_agency)
     
     @property
     def text(self):
@@ -84,8 +84,11 @@ class LogChemistryExcelApp(tk.Tk):
         writer.close()
         self.progressbar += 1
 
-    def main(self, campaign_list, output_path):
-        contract_list = [campaign.split('-')[0] for campaign in campaign_list]
+    def main(self, campaign_list, output_path, only_agency):
+        if only_agency :
+            contract_list = ["RMC-7j","AG-7j",'SN-7j','AP-7j','RM-7j', 'LB-7j', 'TOTAL-7j', "RMC-21j","AG-21j",'SN-21j','AP-21j','RM-21j', 'LB-21j', 'TOTAL-21j']
+        else  :
+            contract_list = [campaign.split('-')[0] + '-7j' for campaign in campaign_list] + ['TOTAL-7j'] + [campaign.split('-')[0] + '-21j' for campaign in campaign_list] + ['TOTAL-21j']
         self.text = "Chargement des données..."
         context_data = QueryScript(f"SELECT measurepoint_id, recordedAt, temperature, conductivity, oxygen, pH, barrel, comment FROM {env.DATABASE_RAW}.MeasureExposureCondition").execute()
         self.progressbar +=1
