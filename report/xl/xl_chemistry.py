@@ -75,23 +75,20 @@ def create_chemistry_dataframe(context_data, main_data, analysis_data, chemical_
                 if temperature :
                     for threshold_name, _min, _max in context_threshold_data :
                         if threshold_name=='Température moyenne (chimie)':
-                            if _min > temperature and not 'Température basse' in context_exceeded_list:
-                                context_exceeded_list.append('Température basse')
+                            if _min > temperature :
                                 context_preferred_exceeded = True
-                            if _max < temperature and not 'Température haute' in context_exceeded_list :
-                                context_exceeded_list.append('Température haute')
+                            if _max < temperature :
                                 context_preferred_exceeded = True
                 if conductivity :
                     for threshold_name, _min, _max in context_threshold_data :
                         if threshold_name=='Conductivité (chimie)':
                             if 100 > conductivity and not 'Conductivité basse' in context_exceeded_list:
-                                context_exceeded_list.append('Conductivité basse')
                                 if 50 > conductivity :
+                                    context_exceeded_list.append('Conductivité basse')
                                     context_compulsory_exceeded = True
                                 else :
                                     context_preferred_exceeded = True
-                            if _max < conductivity and not 'Conductivité haute' in context_exceeded_list :
-                                context_exceeded_list.append('Conductivité haute')
+                            if _max < conductivity :
                                 context_preferred_exceeded = True
                 if pH :
                     for threshold_name, _min, _max in context_threshold_data :
@@ -105,9 +102,9 @@ def create_chemistry_dataframe(context_data, main_data, analysis_data, chemical_
                 if oxygen :
                     for threshold_name, _min, _max in context_threshold_data :
                         if threshold_name=='Oxygène (chimie)':
-                            if 7.5 > oxygen and not 'Oxygène bas' in context_exceeded_list:
-                                context_exceeded_list.append('Oxygène bas')
-                                if 5 > oxygen :
+                            if 7.5 > oxygen :
+                                if 5 > oxygen and not 'Oxygène bas' in context_exceeded_list :
+                                    context_exceeded_list.append('Oxygène bas')
                                     context_compulsory_exceeded = True
                                 else :
                                     context_preferred_exceeded = True
