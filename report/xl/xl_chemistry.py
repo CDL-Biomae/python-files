@@ -29,8 +29,8 @@ def create_chemistry_dataframe(context_data, main_data, analysis_data, chemical_
         current_hydroecoregion = None
         current_agency_code = None
         if agency_id :
-            for agency_id, code, network, hydroecoregion in agency_data :
-                if agency_id==agency_id :
+            for agency_Id, code, network, hydroecoregion in agency_data :
+                if agency_Id==agency_id :
                     current_agency_code = code
                     current_network = network
                     current_hydroecoregion = hydroecoregion
