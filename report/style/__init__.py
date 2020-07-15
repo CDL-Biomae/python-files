@@ -10,3 +10,4 @@ from .style_tox import *
 from .style_edi import *
 from .style_calcul_tox import *
 from .style_chemistry import *
+from .style_all_chemistry import *

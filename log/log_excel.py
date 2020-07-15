@@ -146,6 +146,9 @@ class LogExcelApp(tk.Tk):
                         for code_t0_id, mp_id in t0_associated:
                             if measurepoint_id==mp_id and place_id not in dict_t0:
                                 dict_t0[measurepoint_id] = {"code_t0_id": code_t0_id}
+            all_chemistry_dataframe = create_all_chemistry_dataframe(head_chemistry_dataframe, result_dict, chemistry_measurepoint_list)
+            self.write_in_existing_excel(all_chemistry_dataframe, output_path, 'Chimie', startrow=3)
+            add_style_all_chemistry(all_chemistry_dataframe, output_path, dict_t0)
             if len(list(result_dict.keys())):
                 if len(chemistry_7j_measurepoint_list):
                     bbac_dataframe = create_bbac_7j_dataframe(head_chemistry_7j_dataframe, result_dict, chemistry_7j_measurepoint_list)
