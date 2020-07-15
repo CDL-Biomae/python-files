@@ -82,7 +82,7 @@ def add_style_all_chemistry(all_chemistry_dataframe, PATH, dict_t0):
     header_font = Font(size=8, name='Arial')
     
     for letter in header_columns[4:]:
-        if (ws[letter+'5'].value !=None and ws[letter+'5'].value !='') :
+        if (ws[letter+'4'].value !=None and ws[letter+'4'].value !='') :
             
             ws.column_dimensions[letter].width=6
             ws[letter+'4'].alignment = header_alignment_rotate
@@ -162,9 +162,9 @@ def add_style_all_chemistry(all_chemistry_dataframe, PATH, dict_t0):
 
     body_font = Font(size=6, name='Arial')
     # body_font_white = Font(size=6, name='Arial', color='FFFFFF')
-    # body_fill_ok = PatternFill(fill_type='solid', start_color='DBB7FF' if not old_color else '027ee3', end_color='DBB7FF' if not old_color else '027ee3')
+    body_fill_ok = PatternFill(fill_type='solid', start_color='FFFFE0', end_color='FFFFE0')
     # body_fill_nd = PatternFill(fill_type='solid', start_color='A6A6A6' , end_color='A6A6A6' )
-    # body_fill_not_ok = PatternFill(fill_type='solid', start_color='B565F7' if not old_color else '69a64b', end_color='B565F7' if not old_color else '69a64b')
+    body_fill_not_ok = PatternFill(fill_type='solid', start_color='FFFF30', end_color='FFFF30')
     # body_fill_not_ok_25 = PatternFill(fill_type='solid', start_color='8909FF' if not old_color else 'd1c452', end_color='8909FF' if not old_color else 'd1c452')
     # body_fill_not_ok_50 = PatternFill(fill_type='solid', start_color='6600CC' if not old_color else 'cc7931', end_color='6600CC' if not old_color else 'cc7931')
     # body_fill_not_ok_75 = PatternFill(fill_type='solid', start_color='47008E' if not old_color else 'ab2222', end_color='47008E' if not old_color else 'ab2222')
@@ -197,9 +197,16 @@ def add_style_all_chemistry(all_chemistry_dataframe, PATH, dict_t0):
             cell = ws[column+row]
             value = cell.value
             cell.font = body_font
-            if value!=None :
-                cell.alignment = body_alignment
-                cell.border = borders
+            cell.border = borders
+            cell.alignment = body_alignment
+            if value and value!='' and value!='ND':
+                if isinstance(value, str) and value[0] == '<' :
+                    cell.fill = body_fill_ok
+                else :
+                    cell.fill = body_fill_not_ok
+            else :
+                ws[column+row] = 'ND'
+
                 # if (value!="ND" and value!='0.0' and threshold_7j!='') and ((value!='' and value[0]=='<') or float(value)<threshold_7j):
     #                 cell.fill = body_fill_ok
     #             elif (value!="ND" and value!='0.0' and threshold_7j!='' and float(value)>=threshold_7j):

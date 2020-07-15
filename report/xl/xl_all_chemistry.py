@@ -11,14 +11,14 @@ def create_dataframe(result_dict, measurepoint_list):
     :param result_dict:
     :return: dataframe:
     '''
-    sandre_data = QueryScript(f" SELECT distinct sandre, name  FROM {env.DATABASE_RAW}.Analysis WHERE name!='' AND sandre!=''").execute()
-
-    columns = ['']
-    for sandre, name in sandre_data :
+    sandre_data = QueryScript(f" SELECT distinct sandre  FROM {env.DATABASE_RAW}.Analysis WHERE name!='' AND sandre!=''").execute()
+    sandre_data = sorted(sandre_data)
+    columns = []
+    for sandre in sandre_data :
         try : 
             sandre_transformed = int(float(sandre))
         except ValueError :
-            sandre_transformed =  sandre
+            sandre_transformed = sandre
         columns.append(sandre_transformed)
 
     
@@ -26,13 +26,13 @@ def create_dataframe(result_dict, measurepoint_list):
 
     for measurepoint_id in measurepoint_list:
         if measurepoint_id in result_dict :
-            matrix.append([result_dict[measurepoint_id][sandre] if sandre in result_dict[measurepoint_id] and  result_dict[measurepoint_id][sandre] !='0.0' else 'ND' if not sandre=='' else ''  for sandre in columns] + [measurepoint_id])
+            matrix.append([''] + [result_dict[measurepoint_id][sandre] if sandre in result_dict[measurepoint_id] and  result_dict[measurepoint_id][sandre] !='0.0' else None  for sandre in columns] + [measurepoint_id])
         else :
-            matrix.append(['ND' if not sandre=='' else ''  for sandre in columns] + [measurepoint_id])
+            matrix.append([''] + [None  for sandre in columns] + [measurepoint_id])
  
 
     df = pd.DataFrame(matrix)
-    df.columns = columns + ['']
+    df.columns = [''] + columns + ['']
     df = df.dropna(how='all', axis='columns')
 
     return df
