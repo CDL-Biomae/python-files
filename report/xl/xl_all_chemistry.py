@@ -11,21 +11,15 @@ def create_dataframe(result_dict, measurepoint_list):
     :param result_dict:
     :return: dataframe:
     '''
-    sandre_and_family_data = QueryScript(f" SELECT sandre, familly  FROM {env.DATABASE_TREATED}.r3 WHERE version=  {env.CHOSEN_VERSION()}").execute()
-    family_dict = {}
-    for sandre, family in sandre_and_family_data :
+    sandre_data = QueryScript(f" SELECT distinct sandre, name  FROM {env.DATABASE_RAW}.Analysis WHERE name!='' AND sandre!=''").execute()
+
+    columns = ['']
+    for sandre, name in sandre_data :
         try : 
             sandre_transformed = int(float(sandre))
         except ValueError :
             sandre_transformed =  sandre
-        if family in family_dict :
-            family_dict[family].append(sandre_transformed)
-        else :
-            family_dict[family] = [sandre_transformed]
-
-    columns = ['']
-    for family in family_dict :
-        columns += family_dict[family] + ['']
+        columns.append(sandre_transformed)
 
     
     matrix = []

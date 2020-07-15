@@ -2,7 +2,7 @@ from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
 from openpyxl import load_workbook
 from openpyxl.utils.cell import get_column_letter
 import pandas as pd
-from tools import QueryScript
+from tools import QueryScript, translate
 from termcolor import colored
 import env
 
@@ -19,7 +19,7 @@ def add_style_all_chemistry(all_chemistry_dataframe, PATH, dict_t0):
                      top=Side(border_style='thin', color='FFFFFF'),
                      bottom=Side(border_style='thin', color='FFFFFF'))
      
-    elements = QueryScript(f" SELECT sandre, parameter, familly FROM {env.DATABASE_TREATED}.r3 WHERE version=  {env.CHOSEN_VERSION()}").execute()
+    elements = QueryScript(f" SELECT distinct sandre, name FROM {env.DATABASE_RAW}.Analysis WHERE name!='' AND sandre!=''").execute()
     
     for letter in [get_column_letter(col_idx) for col_idx in range(1, nb_columns+5)]:
         for number in range(1, nb_rows+21):
@@ -28,42 +28,20 @@ def add_style_all_chemistry(all_chemistry_dataframe, PATH, dict_t0):
     ## Family 
     sandre_list = [element[0] for element in elements]
     parameter_list = [element[1] for element in elements]
-    family_list = [element[2] for element in elements]
     for letter in header_columns[5:]:
         index =None
         try :
             if ws[letter + '4'].value and str(ws[letter + '4'].value) in sandre_list:
                 index = sandre_list.index(str(ws[letter + '4'].value))
             if index!=None:
-                ws[letter + '2'].value = family_list[index]
                 ws[letter + '3'].value = sandre_list[index]
-                ws[letter + '4'].value = parameter_list[index]
+                ws[letter + '4'].value = translate(parameter_list[index])
         except ValueError :
             if ws[letter + '4'].value and ws[letter + '4'].value in sandre_list:
                 index = sandre_list.index(ws[letter + '4'].value)
             if index!=None:
-                ws[letter + '2'].value = family_list[index]
                 ws[letter + '3'].value = sandre_list[index]
-                ws[letter + '4'].value = parameter_list[index]
-
-
-    ## Merge unit
-    
-    current_unit = ws['G2'].value 
-    first_letter = 'G'           
-    last_letter = 'G'           
-    index = 6
-    while index <len(header_columns): 
-        while index <len(header_columns) and ws[header_columns[index] + '2'].value == current_unit :   
-            last_letter = header_columns[index]
-            index +=1
-        ws.merge_cells(first_letter + '2:'+last_letter+'2')
-        if index<len(header_columns):
-            first_letter = last_letter = header_columns[index]
-        current_unit = ws[first_letter +'2'].value
-        index+=1
-    
-            
+                ws[letter + '4'].value = translate(parameter_list[index])
     
     ## HEADER STYLE ##
     
