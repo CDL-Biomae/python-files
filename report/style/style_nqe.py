@@ -62,24 +62,7 @@ def add_style_nqe(nqe_dataframe, PATH, dict_t0):
         if index!=None:
             ws[letter + '2'].value = unit_checked[index]
             ws[letter + '3'].value = sandre_checked[index]
-            ws[letter + '4'].value = parameter_checked[index]
-
-    ## Merge unit
-    
-    current_unit = ws['G2'].value 
-    first_letter = 'G'           
-    last_letter = 'G'           
-    index = 6
-    while index <len(header_columns): 
-        while ws[header_columns[index] + '2'].value == current_unit and index <len(header_columns):   
-            last_letter = header_columns[index]
-            index +=1
-        ws.merge_cells(first_letter + '2:'+last_letter+'2')
-        first_letter = last_letter = header_columns[index]
-        current_unit = ws[first_letter +'2'].value
-        index+=1
-    
-            
+            ws[letter + '4'].value = parameter_checked[index]           
     
     ## HEADER STYLE ##
     
@@ -111,10 +94,6 @@ def add_style_nqe(nqe_dataframe, PATH, dict_t0):
     ws['D2'].alignment = header_alignment_no_rotate
     ws['E2'].alignment = header_alignment_rotate
     
-    ws.merge_cells('B2:B4')
-    ws.merge_cells('C2:C4')
-    ws.merge_cells('D2:D4')
-    ws.merge_cells('E2:E4')
     
     
     header_font = Font(size=8, name='Arial')
@@ -243,12 +222,13 @@ def add_style_nqe(nqe_dataframe, PATH, dict_t0):
                 index_t0_associated = t0_mp.index(dict_t0[ws[header_columns[-1] + str(index+5)].value]['code_t0_id'])
                 for column in header_columns[5:]:
                     t0_ok = True if ws[column + str(5+nb_rows+index_t0_associated)].border != t0_not_valid else False 
-                    if not t0_ok and (ws[column + str(5+nb_rows+index_t0_associated)].value!= None and ws[column + str(5+nb_rows+index_t0_associated)].value!= ''):
-                        ws[column + str(5+index)].border = t0_not_valid
-                        ws[column + str(5+index)].font = body_font
-                    else :
-                        ws[column + str(5+index)].border = borders
-                        ws[column + str(5+index)].font = body_font
+                    if ws[column + str(5+nb_rows+index_t0_associated)].value!= None and ws[column + str(5+nb_rows+index_t0_associated)].value!= '':
+                        if not t0_ok :
+                            ws[column + str(5+index)].border = t0_not_valid
+                            ws[column + str(5+index)].font = body_font
+                        else :
+                            ws[column + str(5+index)].border = borders
+                            ws[column + str(5+index)].font = body_font
 
         except ValueError :
             for column in header_columns[5:]:
@@ -260,8 +240,82 @@ def add_style_nqe(nqe_dataframe, PATH, dict_t0):
     for letter in header_columns[5:]:
         for number in range(5, nb_rows+21):
                 ws[letter + str(number)].value = str(ws[letter + str(number)].value).replace(".", ",") if ws[letter + str(number)].value else ''
-    ws.freeze_panes = ws["F5"]
+    ws.freeze_panes = ws["F6"]
     wb.save(PATH)
     wb.close()
+
+    wb = load_workbook(PATH)
+    ws = wb['NQE Biote']
+
+    ## Add threshold table
+    ws.insert_rows(1)
+    ws.insert_rows(1)
+
+
+    ws["F2"].value = "Seuil NQE"
+
+    
+    ws.column_dimensions['F'].width=10
+    for letter in header_columns[5:]:
+        if ws[letter + "5"].value :
+            try :
+                index_found = sandre_crustacean.index(ws[letter + "5"].value)
+                NQE_found = NQE_crustacean[index_found]
+                ws[letter+"1"].border = borders
+                ws[letter+"2"].value = NQE_found
+                ws[letter+"2"].border = borders
+            except ValueError :
+                try :
+                    index_found = sandre_fish.index(ws[letter + "5"].value)
+                    NQE_found = NQE_fish[index_found]
+                    ws[letter+"1"].border = borders
+                    ws[letter+"2"].value = NQE_found
+                    ws[letter+"2"].border = borders
+                except ValueError :
+                    continue
+
+
+
+    ## Merge unit
+    
+    current_unit = ws['G4'].value 
+    first_letter = 'G'           
+    last_letter = 'G'           
+    index = 6
+    while index <len(header_columns): 
+        while index <len(header_columns) and ws[header_columns[index] + '4'].value == current_unit :   
+            last_letter = header_columns[index]
+            index +=1
+        ws.merge_cells(first_letter + '4:'+last_letter+'4')
+        if index<len(header_columns):
+            first_letter = last_letter = header_columns[index]
+        current_unit = ws[first_letter +'4'].value
+        index+=1
+    
+    first_letter = 'G'           
+    last_letter = 'G'           
+    index = 6
+    while index <len(header_columns)-1: 
+        while index <len(header_columns) and ws[header_columns[index] + '5'].value in elements_crustacean or ws[header_columns[index] + '5'].value in elements_fish  :   
+            last_letter = header_columns[index]
+            index +=1
+        if ws[header_columns[index-1] + '5'].value in elements_crustacean :
+            ws[first_letter+'1'].value = 'NQE Crustacé' 
+            ws.merge_cells(first_letter + '1:'+last_letter+'1')
+        elif ws[header_columns[index-1] + '5'].value in elements_fish :
+            ws[first_letter+'1'].value = 'NQE Poisson' 
+            ws.merge_cells(first_letter + '1:'+last_letter+'1')
+        if index<len(header_columns)-1:
+            index+=1
+            first_letter = last_letter = header_columns[index]
+
+    ws.merge_cells('B4:B6')
+    ws.merge_cells('C4:C6')
+    ws.merge_cells('D4:D6')
+    ws.merge_cells('E4:E6')
+
+    wb.save(PATH)
+    wb.close()
+
 
 

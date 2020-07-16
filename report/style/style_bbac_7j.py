@@ -89,15 +89,6 @@ def add_style_bbac_7j(bbac_dataframe, PATH, dict_t0, old_color):
     ws['E2'].value = 'Code agence'
     ws2['E2'].value = 'Code agence'
     
-    ws.merge_cells('B2:B4')
-    ws2.merge_cells('B2:B4')
-    ws.merge_cells('C2:C4')
-    ws2.merge_cells('C2:C4')
-    ws.merge_cells('D2:D4')
-    ws2.merge_cells('D2:D4')
-    ws.merge_cells('E2:E4')
-    ws2.merge_cells('E2:E4')
-    
     header_cells = [c+header_row for c in header_columns]
     header_font = Font(size=8, bold=True, name='Arial')
     header_alignment_rotate = Alignment(horizontal='center', vertical='bottom', text_rotation=90)
@@ -341,9 +332,76 @@ def add_style_bbac_7j(bbac_dataframe, PATH, dict_t0, old_color):
     for letter in header_columns[5:]:
         for number in range(5, nb_rows+21):
                 ws[letter + str(number)].value = str(ws[letter + str(number)].value).replace(".", ",") if ws[letter + str(number)].value else ''
-    ws.freeze_panes = ws["F5"]
+    ws.freeze_panes = ws["F8"]
     ws2.freeze_panes = ws2["F5"]
+
+    wb.save(PATH)
+    wb.close()
+    wb = load_workbook(PATH)
+    ws = wb['BBAC_7j']
+    ws2 = wb['BBAC2_7j']
+    ## Add threshold table
+    ws.insert_rows(1)
+    ws.insert_rows(1)
+    ws.insert_rows(1)
+    ws.insert_rows(1)
+
+    ws["F1"].value = "Seuil"
+    ws["F2"].value = "Seuil gradué 25%"
+    ws["F3"].value = "Seuil gradué 50%"
+    ws["F4"].value = "Seuil gradué 75%"
     
+    ws.column_dimensions['F'].width=20
+    for letter in header_columns[5:]:
+        if ws[letter + "7"].value :
+            for sandre, parameter, threshold, graduate_25, graduate_50, graduate_75 in elements_metal :
+                if str(sandre)==str(ws[letter + "7"].value) :
+                    ws[letter+"1"].value = threshold
+                    ws[letter+"1"].border = borders
+                    ws[letter+"2"].value = graduate_25
+                    ws[letter+"2"].border = borders
+                    ws[letter+"3"].value = graduate_50
+                    ws[letter+"3"].border = borders
+                    ws[letter+"4"].value = graduate_75
+                    ws[letter+"4"].border = borders
+            for sandre, parameter, threshold, graduate_25, graduate_50, graduate_75 in elements_organic :
+                if str(sandre)==str(ws[letter + "7"].value) :
+                    ws[letter+"1"].value = threshold
+                    ws[letter+"1"].border = borders
+                    ws[letter+"2"].value = graduate_25
+                    ws[letter+"2"].border = borders
+                    ws[letter+"3"].value = graduate_50
+                    ws[letter+"3"].border = borders
+                    ws[letter+"4"].value = graduate_75
+                    ws[letter+"4"].border = borders
+
+
+    ## Merge unit
+    
+    current_unit = ws['G6'].value 
+    first_letter = 'G'           
+    last_letter = 'G'           
+    index = 6
+    while index <len(header_columns): 
+        while index <len(header_columns) and ws[header_columns[index] + '6'].value == current_unit :   
+            last_letter = header_columns[index]
+            index +=1
+        ws.merge_cells(first_letter + '6:'+last_letter+'6')
+        ws2.merge_cells(first_letter + '2:'+last_letter+'2')
+        if index<len(header_columns):
+            first_letter = last_letter = header_columns[index]
+        current_unit = ws[first_letter +'6'].value
+        index+=1
+
+    ws.merge_cells('B6:B8')
+    ws2.merge_cells('B2:B4')
+    ws.merge_cells('C6:C8')
+    ws2.merge_cells('C2:C4')
+    ws.merge_cells('D6:D8')
+    ws2.merge_cells('D2:D4')
+    ws.merge_cells('E6:E8')
+    ws2.merge_cells('E2:E4')
+
     wb.save(PATH)
     wb.close()
 

@@ -30,34 +30,6 @@ def add_style_tox(tox_dataframe, PATH):
     ws.column_dimensions['D'].width = 45
     ws.column_dimensions['E'].width = 14
 
-
-    ## REFORMATAGE STATIONS HEADER ##
-    merging_cells = ['B3:B4', 'C3:C4', 'D3:D4', 'E3:E4']
-    border_cells = ['B3', 'B4', 'C3', 'C4', 'D3', 'D4', 'E3', 'E4']
-
-    merging_names = ['Campagne', 'Numéro', 'Station de mesure', 'Code Agence']
-
-    medium_border = Border(left=medium, right=medium, top=medium, bottom=medium)
-    normal_cells_border = Border(left=thin,   right=thin, top=thin, bottom=thin)
-    header_stations_font = Font(size=10, bold=True, name='Arial', color='FFFFFF')
-    header_stations_fill = PatternFill(fill_type='solid', start_color='808080', end_color='808080')
-    center_alignment = Alignment(horizontal='center', vertical='center')
-
-    # merger les cellules selon la taille de l'entete d'excel
-    for i in range(len(merging_cells)):
-        cells = merging_cells[i]
-        top_left_cell = ws[cells[0:2]]
-        name = merging_names[i]
-
-        ws.merge_cells(cells)
-        top_left_cell.value = name
-        top_left_cell.font = header_stations_font
-        top_left_cell.fill = header_stations_fill
-        top_left_cell.alignment = center_alignment
-
-    for cell in border_cells:
-        ws[cell].border = medium_border
-
     ws.row_dimensions[3].height = 45
 
     # Nettoyage Fin du tableau
@@ -68,6 +40,12 @@ def add_style_tox(tox_dataframe, PATH):
     cell = ws['F4']
     cell.border = Border(top=no_border, bottom=no_border)
     ws.column_dimensions['F'].width = 3
+
+    medium_border = Border(left=medium, right=medium, top=medium, bottom=medium)
+    normal_cells_border = Border(left=thin,   right=thin, top=thin, bottom=thin)
+    header_stations_font = Font(size=10, bold=True, name='Arial', color='FFFFFF')
+    header_stations_fill = PatternFill(fill_type='solid', start_color='808080', end_color='808080')
+    center_alignment = Alignment(horizontal='center', vertical='center')
 
     ## REFORMATAGE STATIONS DATA
     columns_stations = ['B', 'C', 'D', 'E']
@@ -167,33 +145,37 @@ def add_style_tox(tox_dataframe, PATH):
 
 
     # la requete qui retourne les resultats des constantes r2 selon le paramétre
-    threshold_list = QueryScript(f" SELECT parameter, threshold   FROM {env.DATABASE_TREATED}.r2_threshold WHERE threshold IS NOT NULL and version=  {env.CHOSEN_VERSION()}").execute()
+    threshold_data = QueryScript(f" SELECT parameter, threshold   FROM {env.DATABASE_TREATED}.r2_threshold WHERE threshold IS NOT NULL and version=  {env.CHOSEN_VERSION()}").execute()
+    threshold_list = []
     for column in columns:
         
         threshold = None        
         if column == 'H':
             threshold = []
-            for element in threshold_list:
+            for element in threshold_data:
                 if element[0] == 'alimentation':
                     threshold.append(element[1])
+            threshold_list.append(threshold)
         if column == 'I':
             threshold = []
-            for element in threshold_list:
+            for element in threshold_data:
                 if element[0] == 'neurotoxicité AChE':
                     threshold.append(element[1])
+            threshold_list.append(threshold)
         if column == 'N':
             threshold = []
-            for element in threshold_list:
+            for element in threshold_data:
                 if element[0] == 'reproduction':
                     threshold.append(element[1])
+            threshold_list.append(threshold)
         if column == 'P':
             threshold = []
-            for element in threshold_list:
+            for element in threshold_data:
                 if element[0] == 'mue':
                     threshold.append(element[1])
         if column == 'R':
             threshold = []
-            for element in threshold_list:
+            for element in threshold_data:
                 if element[0] == 'perturbation endocrinienne':
                     threshold.append(element[1])
 
@@ -279,6 +261,64 @@ def add_style_tox(tox_dataframe, PATH):
                 ws[column + str(row)].value = "NA"
                 if column == "N" or column == "P" or column == "R":
                     ws[column + str(row)].fill = body_fill_NA
-    ws.freeze_panes = ws["F5"]
+    ws.freeze_panes = ws["F8"]
+
+    wb.save(PATH)
+    wb.close()
+
+    wb = load_workbook(PATH)
+    ws = wb['Tox']
+    ## Add threshold table
+    ws.insert_rows(1)
+    ws.insert_rows(1)
+    ws.insert_rows(1)
+
+    ws["F1"].value = "Effet faible"
+    ws["F2"].value = "Effet modéré"
+    ws["F3"].value = "Effet élevé"
+    ws["F4"].value = "Effet très élevé"
+    ws.column_dimensions['F'].width=20
+    header_columns = [get_column_letter(col_idx) for col_idx in list(range(2, nb_columns + 2))]
+    for letter in header_columns[5:]:
+        index = None
+        if letter=='H':
+            index=0
+        if letter=='I':
+            index=1
+        if letter=='N':
+            index=2
+        if index!=None :
+            [threshold, graduate_25, graduate_50, graduate_75] = threshold_list[index]
+            ws[letter+"1"].value = -threshold
+            ws[letter+"1"].border = medium_border
+            ws[letter+"2"].value = -graduate_25
+            ws[letter+"2"].border = medium_border
+            ws[letter+"3"].value = -graduate_50
+            ws[letter+"3"].border = medium_border
+            ws[letter+"4"].value = -graduate_75
+            ws[letter+"4"].border = medium_border
+
+    ## REFORMATAGE STATIONS HEADER ##
+    merging_cells = ['B5:B7', 'C5:C7', 'D5:D7', 'E5:E7']
+    border_cells = ['B5', 'B7', 'C5', 'C7', 'D5', 'D7', 'E5', 'E7']
+
+    merging_names = ['Campagne', 'Numéro', 'Station de mesure', 'Code Agence']
+
+    # merger les cellules selon la taille de l'entete d'excel
+    for i in range(len(merging_cells)):
+        cells = merging_cells[i]
+        top_left_cell = ws[cells[0:2]]
+        name = merging_names[i]
+
+        ws.merge_cells(cells)
+        top_left_cell.value = name
+        top_left_cell.font = header_stations_font
+        top_left_cell.fill = header_stations_fill
+        top_left_cell.alignment = center_alignment
+
+    for cell in border_cells:
+        ws[cell].border = medium_border
+
+   
     wb.save(PATH)
     wb.close()
