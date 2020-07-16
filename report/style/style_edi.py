@@ -96,7 +96,7 @@ def add_style_edi(edi_dataframe, PATH):
         ws[letter+"1"].value = ws[letter+"3"].value
         ws[letter+"1"].fill = red   
         ws.merge_cells(letter+"1:"+letter+"3")
-    for letter in ["BO","BP","BQ","BR","BS","BT"] :
+    for letter in ["BO","BP","BQ","BR","BS","BT","BU","BV"] :
         ws[letter+"2"].font = font_head_1
         ws[letter+"2"].value = ws[letter+"3"].value
         ws[letter+"2"].fill = blue   
@@ -105,11 +105,11 @@ def add_style_edi(edi_dataframe, PATH):
     ws["BO1"].value = "Echantillonage"
     ws["BO1"].font = font_head
     ws["BO1"].fill = blue
-    ws.merge_cells("BO1:BR1")
-    ws["BS1"].value = "Après Lyophilisation"
-    ws["BS1"].font = font_head
-    ws["BS1"].fill = blue
-    ws.merge_cells("BS1:BT1")
+    ws.merge_cells("BO1:BT1")
+    ws["BU1"].value = "Après Lyophilisation"
+    ws["BU1"].font = font_head
+    ws["BU1"].fill = blue
+    ws.merge_cells("BU1:BV1")
 
     # column width
     ws.column_dimensions["A"].width = 10
@@ -128,7 +128,7 @@ def add_style_edi(edi_dataframe, PATH):
         ws.column_dimensions[letter].width = 15
         ws[letter + "3"].fill = blue
     ws.column_dimensions["BM"].width = 20
-    for letter in header_columns[65:72]:
+    for letter in header_columns[65:74]:
         ws.column_dimensions[letter].width = 30
         ws[letter + "3"].fill = blue
     # for letter in ["W","X","Y","Z","AA","AL","AM","AN","AO","AP","AQ"]:
@@ -153,28 +153,24 @@ def add_style_edi(edi_dataframe, PATH):
                 ws[letter + str(row)].fill = yellow
             if letter in ["D","M","AM"]:
                 ws[letter + str(row)].fill = red
-            if letter in ["I","O","P","AO","AP","BM","BN","BO","BP","BQ","BR","BS","BT"]:
+            if letter in ["I","O","P","AO","AP","BM","BN","BO","BP","BQ","BR","BS","BT","BU","BV"]:
                 ws[letter + str(row)].fill = blue_light
             if letter in ["Q","R","S","T","U","AQ","AR","AS","AT","AU"]:
                 ws[letter + str(row)].fill = green_light
             if index in range(21,38) or index in range(47,64):
                 ws[letter + str(row)].fill = yellow_light
-        if ws["BQ"+str(row)].value and ws["BR"+str(row)].value :
-            if ws["BR"+str(row)].value - ws["BQ"+str(row)].value < 2500:
+        if ws["BT"+str(row)].value :
+            if ws["BT"+str(row)].value < 3000:
                 ws["B"+str(row)].font= not_validated_font
                 ws["B"+str(row)].fill= not_validated_fill
-                ws["BR"+str(row)].font= not_validated_font
-                ws["BR"+str(row)].fill= not_validated_fill
+                ws["BT"+str(row)].font= not_validated_font
+                ws["BT"+str(row)].fill= not_validated_fill
+        if ws["BQ"+str(row)].value :
+            if ws["BQ"+str(row)].value < 500:
+                ws["B"+str(row)].font= not_validated_font
+                ws["B"+str(row)].fill= not_validated_fill
                 ws["BQ"+str(row)].font= not_validated_font
                 ws["BQ"+str(row)].fill= not_validated_fill
-        if ws["BO"+str(row)].value and ws["BP"+str(row)].value :
-            if ws["BP"+str(row)].value - ws["BO"+str(row)].value < 500:
-                ws["B"+str(row)].font= not_validated_font
-                ws["B"+str(row)].fill= not_validated_fill
-                ws["BP"+str(row)].font= not_validated_font
-                ws["BP"+str(row)].fill= not_validated_fill
-                ws["BO"+str(row)].font= not_validated_font
-                ws["BO"+str(row)].fill= not_validated_fill
         if ws["BM"+str(row)].value=="0%":
             ws["B"+str(row)].font= not_validated_font
             ws["B"+str(row)].fill= not_validated_fill

@@ -8,33 +8,24 @@ import env
 def create_edi_dataframe(campaign, place_dict, chemistry_measurepoint_list, chemistry_pack_list, chemistry_7j_measurepoint_list, chemistry_21j_measurepoint_list):
     '''
     Créé une dataframe à partir d'un référence de campagne.
-    Les colonnes de la dataframe sont les sandres précisés dans /calcul/chemistry/nqe
     Les colonnes vides sont supprimées
     :param place_dict:
     :return: dataframe:
     '''
-    measurepoint_data = QueryScript(f"SELECT id, city, zipcode, r0_threshold, r0_sample_taken, r0_aspect, r0_iridescence, r0_foam, r0_leafs, r0_sludge, r0_other_bodies, r0_color, r0_clearness, r0_odor, r0_shadow, r0_weather, r0_hydrological_situation, r0_scale, r0_secchi, r0_air_temperature, r0_oxygen_saturation, r21_threshold, r21_sample_taken, r21_aspect, r21_iridescence, r21_foam, r21_leafs, r21_sludge, r21_other_bodies, r21_color, r21_clearness, r21_odor, r21_shadow, r21_weather, r21_hydrological_situation, r21_scale, r21_secchi, r21_air_temperature, r21_oxygen_saturation FROM {env.DATABASE_RAW}.Measurepoint WHERE id IN {tuple(chemistry_measurepoint_list) if len(chemistry_measurepoint_list)>1 else '('+(str(chemistry_measurepoint_list[0]) if len(chemistry_measurepoint_list) else '0')+')'}").execute()
+    measurepoint_data = QueryScript(f"SELECT id, reference, name, city, zipcode, r0_threshold, r0_sample_taken, r0_aspect, r0_iridescence, r0_foam, r0_leafs, r0_sludge, r0_other_bodies, r0_color, r0_clearness, r0_odor, r0_shadow, r0_weather, r0_hydrological_situation, r0_scale, r0_secchi, r0_air_temperature, r0_oxygen_saturation, r21_threshold, r21_sample_taken, r21_aspect, r21_iridescence, r21_foam, r21_leafs, r21_sludge, r21_other_bodies, r21_color, r21_clearness, r21_odor, r21_shadow, r21_weather, r21_hydrological_situation, r21_scale, r21_secchi, r21_air_temperature, r21_oxygen_saturation FROM {env.DATABASE_RAW}.Measurepoint WHERE id IN {tuple(chemistry_measurepoint_list) if len(chemistry_measurepoint_list)>1 else '('+(str(chemistry_measurepoint_list[0]) if len(chemistry_measurepoint_list) else '0')+')'}").execute()
     dates_data = QueryScript(f"SELECT measurepoint_id, date_id, date FROM {env.DATABASE_TREATED}.key_dates WHERE measurepoint_id IN {tuple(chemistry_measurepoint_list) if len(chemistry_measurepoint_list)>1 else '('+(str(chemistry_measurepoint_list[0]) if len(chemistry_measurepoint_list) else '0')+')'}").execute()
     conditions_data = QueryScript(f"SELECT measurepoint_id, recordedAt, temperature, conductivity, ph, oxygen, comment FROM {env.DATABASE_RAW}.MeasureExposureCondition WHERE measurepoint_id IN {tuple(chemistry_measurepoint_list) if len(chemistry_measurepoint_list)>1 else '('+(str(chemistry_measurepoint_list[0]) if len(chemistry_measurepoint_list) else '0')+')'}").execute()
     pack_data = QueryScript(f"SELECT id, sampling_weight, metal_tare_bottle_weight, organic_tare_bottle_weight, organic_total_weight, sampling_comment  FROM {env.DATABASE_RAW}.Pack WHERE id IN {tuple(chemistry_pack_list) if len(chemistry_pack_list)>1 else '('+(str(chemistry_pack_list[0]) if len(chemistry_pack_list) else '0')+')'}").execute()
     survival_dict = survival(chemistry_pack_list)
     matrix= []
     for place_id in place_dict :
-        temp = [None]*72
+        temp = [None]*74
         start_time = None
         end_time = None
         temp[15] = "biomae"
         temp[41] = "biomae"
         if "agency" in place_dict[place_id]:
             temp[1] = place_dict[place_id]["agency"]
-        if "number" in place_dict[place_id]:
-            number = place_dict[place_id]["number"]
-            if int(number)!= number :  
-                number_place = int(number)
-                number_measurepoint = round((number - int(number))*10)
-                temp[8] = f"{campaign}-{'0'+str(number_place) if number_place<10 else number_place }-{'0'+str(number_measurepoint) if number_measurepoint<10 else number_measurepoint }" 
-            else :
-                temp[8] = f"{campaign}-{'0'+str(number) if number<10 else number }" 
         for measurepoint_id in place_dict[place_id]["measurepoint"]:
             for mp_id, date_id, date in dates_data:
                 if mp_id==measurepoint_id:
@@ -47,9 +38,14 @@ def create_edi_dataframe(campaign, place_dict, chemistry_measurepoint_list, chem
                         temp[40] = date.strftime("%d/%m/%Y")
             place_dict[place_id]["measurepoint"][measurepoint_id]["start_time"] = start_time
             place_dict[place_id]["measurepoint"][measurepoint_id]["end_time"] = end_time
-            if temp[40] and temp[14]:
-                temp[9] = (datetime.datetime.strptime(temp[40], '%d/%m/%Y')-datetime.datetime.strptime(temp[14], '%d/%m/%Y')).days
-            for mp_id, city, zipcode, r0_threshold, r0_sample_taken, r0_aspect, r0_iridescence, r0_foam, r0_leafs, r0_sludge, r0_other_bodies, r0_color, r0_clearness, r0_odor, r0_shadow, r0_weather, r0_hydrological_situation, r0_scale, r0_secchi, r0_air_temperature, r0_oxygen_saturation, r21_threshold, r21_sample_taken, r21_aspect, r21_iridescence, r21_foam, r21_leafs, r21_sludge, r21_other_bodies, r21_color, r21_clearness, r21_odor, r21_shadow, r21_weather, r21_hydrological_situation, r21_scale, r21_secchi, r21_air_temperature, r21_oxygen_saturation in measurepoint_data:
+            if end_time and start_time:
+                # temp[9] = (datetime.datetime.strptime(temp[40], '%d/%m/%Y')-datetime.datetime.strptime(temp[14], '%d/%m/%Y'))
+                time_delay = end_time - start_time
+                minutes =  round(time_delay.seconds%3600/60)
+                seconds = time_delay.seconds%60
+                temp[9] = (str(time_delay.days*24+round(time_delay.seconds/3600)) + ':') + (str(minutes) if minutes>9 else '0' +str(minutes)) + ':' + (str(seconds) if seconds>9 else '0' +str(seconds))
+
+            for mp_id, reference, name, city, zipcode, r0_threshold, r0_sample_taken, r0_aspect, r0_iridescence, r0_foam, r0_leafs, r0_sludge, r0_other_bodies, r0_color, r0_clearness, r0_odor, r0_shadow, r0_weather, r0_hydrological_situation, r0_scale, r0_secchi, r0_air_temperature, r0_oxygen_saturation, r21_threshold, r21_sample_taken, r21_aspect, r21_iridescence, r21_foam, r21_leafs, r21_sludge, r21_other_bodies, r21_color, r21_clearness, r21_odor, r21_shadow, r21_weather, r21_hydrological_situation, r21_scale, r21_secchi, r21_air_temperature, r21_oxygen_saturation in measurepoint_data:
                 if mp_id==measurepoint_id:
                     try :
                         int(zipcode)
@@ -58,6 +54,8 @@ def create_edi_dataframe(campaign, place_dict, chemistry_measurepoint_list, chem
                         temp[5] = translate(zipcode)
                     except TypeError:
                         pass
+                    temp[8] = reference
+                    temp[6] = translate(name)
                     temp[20] = r0_oxygen_saturation
                     temp[21] = r0_air_temperature
                     temp[22] = r0_threshold
@@ -135,8 +133,12 @@ def create_edi_dataframe(campaign, place_dict, chemistry_measurepoint_list, chem
                         if pack==pack_id:
                             temp[66]= metal_tare_bottle_weight
                             temp[67]= sampling_weight
-                            temp[68]= organic_tare_bottle_weight
-                            temp[69]= organic_total_weight
+                            if sampling_weight and metal_tare_bottle_weight :
+                                temp[68]= sampling_weight - metal_tare_bottle_weight
+                            temp[69]= organic_tare_bottle_weight
+                            temp[70]= organic_total_weight
+                            if organic_tare_bottle_weight and organic_total_weight :
+                                temp[71]= organic_total_weight - organic_tare_bottle_weight
                             if comment :
                                 dissociated_comment = [information.replace("\n",", ") for information in comment.split("\t")]
                                 need_to_be_removed = []
@@ -165,7 +167,7 @@ def create_edi_dataframe(campaign, place_dict, chemistry_measurepoint_list, chem
                     
 
     df = pd.DataFrame(matrix)
-    df.columns = ["Mois", "Code Agence  Station", "Code Plvt EDI", "N° Prélèvement", "Département", "Commune", "Lieu prel", "", "Réfèrence BIOMAE",	"Durée du prélèvement","Taux de Lyophylisation (à patir de l'Eppendorf)",	"Taux de Lyophylisation (à patir du flacon verre)", "N° Prélèvement Eau Sup Encagement", "", "Date d'encagement", "Préleveur","Température de l'Eau", "Potentiel en Hydrogène (pH)", "Conductivité à  25°C", "Oxygène dissous", "Taux de saturation en oxygène", "Température de l'air", "Seuil", "Echantillon pris","Aspect","Irisations sur l'eau", "Présence de mousse de détergents à la surface", "Présence de produits ligneux ou herbacés frais", "Boue", "Autres corps", "Couleur", "Clarté", "Odeur", "Ombre", "Conditions météorologiques pendant le prélèvement", "Situation hydrologique apparente", "Echelle", "Secchi", "N° Prélèvement Eau Sup", "",	"Date de prélèvement",	"Préleveur","Température de l'Eau", "Potentiel en Hydrogène (pH)", "Conductivité à 25°C","Oxygène dissous", "Taux de saturation en oxygène", "Température de l'air", "Seuil", "Echantillon pris","Aspect","Irisations sur l'eau", "Présence de mousse de détergents à la surface", "Présence de produits ligneux ou herbacés frais", "Boue", "Autres corps", "Couleur", "Clarté", "Odeur", "Ombre", "Conditions météorologiques pendant le prélèvement", "Situation hydrologique apparente", "Echelle", "Secchi", "Taux de survie", "Commentaires", "Tare Eppendorf en mg", "Eppendorf + Echantillon en mg", "Tare Flacon Verre en mg", "Flacon Verre + Echantillon en mg", "Eppendorf + Echantillon Lyophilisé en mg", "Flacon Verre + Echantillon Lyophilisé en mg"]
+    df.columns = ["Mois", "Code Agence  Station", "Code Plvt EDI", "N° Prélèvement", "Département", "Commune", "Lieu prel", "", "Réfèrence BIOMAE",	"Durée du prélèvement","Taux de Lyophylisation (à patir de l'Eppendorf)",	"Taux de Lyophylisation (à patir du flacon verre)", "N° Prélèvement Eau Sup Encagement", "", "Date d'encagement", "Préleveur","Température de l'Eau", "Potentiel en Hydrogène (pH)", "Conductivité à  25°C", "Oxygène dissous", "Taux de saturation en oxygène", "Température de l'air", "Seuil", "Echantillon pris","Aspect","Irisations sur l'eau", "Présence de mousse de détergents à la surface", "Présence de produits ligneux ou herbacés frais", "Boue", "Autres corps", "Couleur", "Clarté", "Odeur", "Ombre", "Conditions météorologiques pendant le prélèvement", "Situation hydrologique apparente", "Echelle", "Secchi", "N° Prélèvement Eau Sup", "",	"Date de prélèvement",	"Préleveur","Température de l'Eau", "Potentiel en Hydrogène (pH)", "Conductivité à 25°C","Oxygène dissous", "Taux de saturation en oxygène", "Température de l'air", "Seuil", "Echantillon pris","Aspect","Irisations sur l'eau", "Présence de mousse de détergents à la surface", "Présence de produits ligneux ou herbacés frais", "Boue", "Autres corps", "Couleur", "Clarté", "Odeur", "Ombre", "Conditions météorologiques pendant le prélèvement", "Situation hydrologique apparente", "Echelle", "Secchi", "Taux de survie", "Commentaires", "Tare Eppendorf en mg", "Eppendorf + Echantillon en mg", "Echantillon métaux en mg", "Tare Flacon Verre en mg", "Flacon Verre + Echantillon en mg", "Echantillon organique en mg", "Eppendorf + Echantillon Lyophilisé en mg", "Flacon Verre + Echantillon Lyophilisé en mg"]
 
     return df
 
