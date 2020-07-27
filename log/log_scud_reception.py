@@ -69,7 +69,7 @@ class LogWordReceptionApp(tk.Tk):
 
     def add_row(self, table, point, point_row) :
         [reference, pack_comment, pack_sampling_comment, J21_comment, metal_weight_valid, organic_weight_valid, date] = point
-        comment = (pack_comment if pack_comment else '') + ', ' + (pack_sampling_comment if pack_sampling_comment else '') + ', ' + (J21_comment if J21_comment else '')
+        comment = (pack_comment if pack_comment else '') + '\t ' + (pack_sampling_comment if pack_sampling_comment else '') + '\t ' + (J21_comment if J21_comment else '')
         filtered_comment = ''
         if comment!='' :
             dissociated_comment = [translate(information).replace("\n",", ") for information in comment.split("\t")]
