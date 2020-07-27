@@ -85,7 +85,7 @@ class LogChemistryExcelApp(tk.Tk):
         self.progressbar += 1
 
     def main(self, campaign_list, output_path, only_agency):
-        if only_agency :
+        if only_agency and len(campaign_list)==0:
             contract_list = ["RMC-7j","AG-7j",'SN-7j','AP-7j','RM-7j', 'LB-7j', 'TOTAL-7j', "RMC-21j","AG-21j",'SN-21j','AP-21j','RM-21j', 'LB-21j', 'TOTAL-21j']
         else  :
             contract_list = [campaign.split('-')[0] + '-7j' for campaign in campaign_list] + ['TOTAL-7j'] + [campaign.split('-')[0] + '-21j' for campaign in campaign_list] + ['TOTAL-21j']
