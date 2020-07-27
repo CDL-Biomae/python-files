@@ -68,8 +68,9 @@ class LogWordReceptionApp(tk.Tk):
             row.height = Cm(0.7)
 
     def add_row(self, table, point, point_row) :
-        [reference, pack_comment, pack_sampling_comment, J21_comment, metal_weight_valid, organic_weight_valid, date] = point
+        [reference, pack_comment, pack_sampling_comment, J21_comment, metal_weight, organic_weight, date] = point
         comment = (pack_comment if pack_comment else '') + '\t ' + (pack_sampling_comment if pack_sampling_comment else '') + '\t ' + (J21_comment if J21_comment else '')
+            
         filtered_comment = ''
         if comment!='' :
             dissociated_comment = [translate(information).replace("\n",", ") for information in comment.split("\t")]
@@ -88,6 +89,10 @@ class LogWordReceptionApp(tk.Tk):
                 dissociated_comment.remove(element)
             if len(dissociated_comment):
                 filtered_comment = ', '.join(dissociated_comment)
+        if metal_weight and metal_weight<500:
+            filtered_comment += "Métaux < 500mg"
+        if organic_weight and organic_weight<2500:
+            filtered_comment += "Orga < 2500mg"
         
         table.cell(point_row*2+1, 0).width = self.table_width 
         table.cell(point_row*2+1, 0).merge(table.cell(point_row*2+2, 0)).paragraphs[0].add_run(reference).alignment = 1
@@ -95,8 +100,8 @@ class LogWordReceptionApp(tk.Tk):
         table.cell(point_row*2+1, 1).paragraphs[0].add_run("Mét")
         table.cell(point_row*2+2, 1).paragraphs[0].add_run("Orga")
         table.cell(point_row*2+1, 2).width = self.table_width * 0.02
-        table.cell(point_row*2+1, 2).paragraphs[0].add_run(str(metal_weight_valid) if metal_weight_valid else "0")
-        table.cell(point_row*2+2, 2).paragraphs[0].add_run(str(organic_weight_valid) if organic_weight_valid else "0")
+        table.cell(point_row*2+1, 2).paragraphs[0].add_run("1" if metal_weight_valid else "0")
+        table.cell(point_row*2+2, 2).paragraphs[0].add_run("1" if organic_weight_valid else "0")
         table.cell(point_row*2+1, 3).merge(table.cell(point_row*2+2, 3))
         table.cell(point_row*2+1, 3).width = self.table_width *0.8
         table.cell(point_row*2+1, 4).width = self.table_width * 0.02
@@ -109,7 +114,7 @@ class LogWordReceptionApp(tk.Tk):
     def main(self, campaign, output_path):
         
         self.text = 'Chargement des données...'
-        data = QueryScript(f"SELECT Measurepoint.reference, Pack.comment, Pack.sampling_comment, MeasureExposureCondition.comment, Pack.sampling_weight-Pack.metal_tare_bottle_weight>300, Pack.organic_total_weight- Pack.organic_tare_bottle_weight>2500, key_dates.date FROM {env.DATABASE_RAW}.Measurepoint JOIN {env.DATABASE_RAW}.Pack ON Pack.measurepoint_id=Measurepoint.id JOIN {env.DATABASE_TREATED}.key_dates ON key_dates.measurepoint_id=Measurepoint.id JOIN {env.DATABASE_RAW}.MeasureExposureCondition ON MeasureExposureCondition.measurepoint_id=Measurepoint.id AND key_dates.date=MeasureExposureCondition.recordedAt WHERE nature = 'chemistry' AND Measurepoint.reference like '{campaign}%' AND version={env.CHOSEN_VERSION()} AND date_id=7;").execute()
+        data = QueryScript(f"SELECT Measurepoint.reference, Pack.comment, Pack.sampling_comment, MeasureExposureCondition.comment, Pack.sampling_weight-Pack.metal_tare_bottle_weight, Pack.organic_total_weight- Pack.organic_tare_bottle_weight, key_dates.date FROM {env.DATABASE_RAW}.Measurepoint JOIN {env.DATABASE_RAW}.Pack ON Pack.measurepoint_id=Measurepoint.id JOIN {env.DATABASE_TREATED}.key_dates ON key_dates.measurepoint_id=Measurepoint.id JOIN {env.DATABASE_RAW}.MeasureExposureCondition ON MeasureExposureCondition.measurepoint_id=Measurepoint.id AND key_dates.date=MeasureExposureCondition.recordedAt WHERE nature = 'chemistry' AND Measurepoint.reference like '{campaign}%' AND version={env.CHOSEN_VERSION()} AND date_id=7;").execute()
         year = data[0][-1].year
         self.progressbar += 1 
         self.text = 'Création du fichier...'
