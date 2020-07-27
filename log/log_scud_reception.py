@@ -77,7 +77,7 @@ class LogWordReceptionApp(tk.Tk):
             need_to_be_removed = []
             for information in dissociated_comment:
                 if information!="":
-                    if information[-1]=="%" or "Scan" in information or "#" in information or 'RAS' in information or 'ras' in information:
+                    if "Scan" in information or "#" in information or 'RAS' in information or 'ras' in information:
                         need_to_be_removed.append(information)
                     else :
                         try :
