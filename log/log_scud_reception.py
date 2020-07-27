@@ -100,8 +100,8 @@ class LogWordReceptionApp(tk.Tk):
         table.cell(point_row*2+1, 1).paragraphs[0].add_run("Mét")
         table.cell(point_row*2+2, 1).paragraphs[0].add_run("Orga")
         table.cell(point_row*2+1, 2).width = self.table_width * 0.02
-        table.cell(point_row*2+1, 2).paragraphs[0].add_run("1" if metal_weight_valid else "0")
-        table.cell(point_row*2+2, 2).paragraphs[0].add_run("1" if organic_weight_valid else "0")
+        table.cell(point_row*2+1, 2).paragraphs[0].add_run("1" if metal_weight else "0")
+        table.cell(point_row*2+2, 2).paragraphs[0].add_run("1" if organic_weight else "0")
         table.cell(point_row*2+1, 3).merge(table.cell(point_row*2+2, 3))
         table.cell(point_row*2+1, 3).width = self.table_width *0.8
         table.cell(point_row*2+1, 4).width = self.table_width * 0.02
