@@ -14,7 +14,7 @@ def load_data(reference):
     geographic_data = QueryScript(f"SELECT id, latitudeSpotted, longitudeSpotted, lambertX, lambertY, city, zipcode, stream FROM {env.DATABASE_RAW}.Measurepoint WHERE id IN {tuple(measurepoint_list) if len(measurepoint_list)>1 else '('+str(measurepoint_list[0])+')'}").execute()
     place_reference_data = QueryScript(f"SELECT Place.id, Place.reference FROM {env.DATABASE_RAW}.Measurepoint JOIN {env.DATABASE_RAW}.Place ON Place.id= Measurepoint.place_id WHERE Measurepoint.id IN {tuple(measurepoint_list) if len(measurepoint_list)>1 else '('+str(measurepoint_list[0])+')'}").execute()
     conform_threshold = QueryScript(f"SELECT parameter, min, max FROM {env.DATABASE_TREATED}.r1 WHERE version={env.CHOSEN_VERSION()}").execute()
-    conform_chemistry_portion_test = QueryScript(f"SELECT Measurepoint.id, (organic_total_weight-organic_tare_bottle_weight)>2500 FROM {env.DATABASE_RAW}.Pack JOIN {env.DATABASE_RAW}.Measurepoint ON Measurepoint.id=Pack.measurepoint_id WHERE Measurepoint.id IN {tuple(measurepoint_list) if len(measurepoint_list)>1 else '('+str(measurepoint_list[0])+')'} and Pack.nature='chemistry'").execute()
+    conform_chemistry_portion_test = QueryScript(f"SELECT Measurepoint.id, sampling_weight, organic_total_weight, (sampling_weight - metal_tare_bottle_weight)>500, (organic_total_weight-organic_tare_bottle_weight)>2500 FROM {env.DATABASE_RAW}.Pack JOIN {env.DATABASE_RAW}.Measurepoint ON Measurepoint.id=Pack.measurepoint_id WHERE Measurepoint.id IN {tuple(measurepoint_list) if len(measurepoint_list)>1 else '('+str(measurepoint_list[0])+')'} and Pack.nature='chemistry'").execute()
     chemistry_survival = survival(chemistry_pack_list)
     
 
@@ -259,9 +259,12 @@ def load_data(reference):
                                         if not "max_ph_tox" in place_dict[place_id]["not conform"] :
                                             place_dict[place_id]["not conform"].append("max_ph_tox")
             ### Add chemistry portion validation 
-            for mp_id, result in conform_chemistry_portion_test:
+            for mp_id, metal_weight, organic_weight,  metal_result, organic_result in conform_chemistry_portion_test:
                 if mp_id==measurepoint_id: 
-                    place_dict[place_id]["chemistry portion validation"] = result
+                    if metal_weight :
+                        place_dict[place_id]["chemistry metal portion validation"] = metal_result
+                    if organic_weight :
+                        place_dict[place_id]["chemistry organic portion validation"] = organic_result
                     
 
     with open('data.json','w') as outfile :

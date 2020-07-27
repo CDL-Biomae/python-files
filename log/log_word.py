@@ -350,11 +350,19 @@ class LogWordApp(tk.Tk):
                 vandalism_list.append(place_id)
         not_validated_list = []
         for place_id in place_dict:
-            if ("chemistry portion validation" in place_dict[place_id] and not place_dict[place_id]["chemistry portion validation"]) or ("chemistry_survival" in place_dict[place_id] and place_dict[place_id]["chemistry_survival"]=="0%"):
-                if agence:
-                    not_validated_list.append((place_dict[place_id]["agency"] +" : " if "agency" in place_dict[place_id] else "")+ translate(place_dict[place_id]["name"]))
+            if ("chemistry organic portion validation" in place_dict[place_id] and not place_dict[place_id]["chemistry organic portion validation"]) or ("chemistry metal portion validation" in place_dict[place_id] and not place_dict[place_id]["chemistry metal portion validation"]) or ("chemistry_survival" in place_dict[place_id] and place_dict[place_id]["chemistry_survival"]=="0%"):
+                chemistry_validation_precision = ''
+                if "chemistry organic portion validation" in place_dict[place_id] and place_dict[place_id]["chemistry organic portion validation"] :
+                    chemistry_validation_precision += '(Métaux)'
+                elif "chemistry metal portion validation" in place_dict[place_id] and place_dict[place_id]["chemistry organic portion validation"] :
+                    chemistry_validation_precision += '(Organiques)'
                 else :
-                    not_validated_list.append("Point " + str(place_dict[place_id]["number"]).replace(',', '-') + " : " + translate(place_dict[place_id]['name']))
+                    chemistry_validation_precision += '(Métaux & Organiques)'
+
+                if agence:
+                    not_validated_list.append((place_dict[place_id]["agency"] +" : " if "agency" in place_dict[place_id] else "")+ translate(place_dict[place_id]["name"]) + chemistry_validation_precision)
+                else :
+                    not_validated_list.append("Point " + str(place_dict[place_id]["number"]).replace(',', '-') + " : " + translate(place_dict[place_id]['name']) + chemistry_validation_precision)
 
         synthesis_table.cell(7,0).merge(synthesis_table.cell(8,0).merge(synthesis_table.cell(9,0))).paragraphs[0].add_run("Prise d’essai minimale pour la réalisation de l’intégralité des analyses chimiques*").bold = True
         synthesis_table.cell(7,1).paragraphs[0].add_run("Atteinte\n").bold = True
@@ -404,8 +412,8 @@ class LogWordApp(tk.Tk):
         for place_id in place_dict:
             self.text = f"Création de la page {count}/{length}"
             doc.add_page_break()
-            if agence and "reference" in place_dict[place_id]:
-                title = doc.add_heading((place_dict[place_id]["agency"] +" : " if "agency" in place_dict[place_id] else "")+ translate(place_dict[place_id]["name"]) + "   " + place_dict[place_id]["reference"] )
+            if agence :
+                title = doc.add_heading((place_dict[place_id]["agency"] +" : " if "agency" in place_dict[place_id] else "")+ translate(place_dict[place_id]["name"]) + ("   " + place_dict[place_id]["reference"] if "reference" in place_dict[place_id] else '' ) )
                 title.alignment = 1
                 title.bold = True
                 title.space_after = Pt(5)
