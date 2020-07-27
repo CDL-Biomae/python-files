@@ -186,9 +186,6 @@ class MainApp(tk.Tk):
     def launch_word_scud_reception(self): 
 
         self.change_chosen_version(self.version_choice.get())
-        self.log_window = tk.Toplevel(self)
-        self.log_window.transient(self)
-        self.log_window.geometry('400x150+150+150')
         try :
             for campaign in self.campaign_list:
                 self.output_path = tk.filedialog.asksaveasfilename(title=f"Enregistrer la fiche réception de gammares {campaign}",filetypes=[("Word (*.docx)","*.docx")], defaultextension=".docx", initialfile=f"Fiche de réception gammares {campaign}")
