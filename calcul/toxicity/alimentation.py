@@ -5,7 +5,7 @@ import env
 class Alimentation:
     '''
     Permet le calcul de la survie alimentation (survie_alim) et de l'inhibition alimentaire (alimentation).
-    Elles prennent toutes les deux un dictionnaire de point de mesures de fusion et renvoient le même complété par les résultats.
+    Elles prennent toutes les deux un dictionnaire de pack et renvoient le même complété par les résultats.
     '''
 
     @staticmethod
@@ -45,7 +45,18 @@ class Alimentation:
         result = {element: None for element in dict_pack}
 
         ################### Calcul des tailles des spécimens
-        specimen_size_data =  QueryScript(f"  SELECT pack_id, individual, size_px, size_mm   FROM {env.DATABASE_RAW}.MeasureSize WHERE pack_id IN {tuple([element for element in pack_dict]) if len([element for element in pack_dict])>1 else '('+(str([element for element in pack_dict][0]) if len([element for element in pack_dict]) else '0')+')'}").execute()
+        pack_tuple = tuple([element for element in pack_dict]) if len([element for element in pack_dict])>1 else '('+(str([element for element in pack_dict][0]) if len([element for element in pack_dict]) else '0')+')'
+        specimen_size_data =  QueryScript(f"  SELECT pack_id, individual, size_px, size_mm   FROM {env.DATABASE_RAW}.MeasureSize WHERE pack_id IN {pack_tuple }").execute()
+        specimen_size_t0_id = QueryScript(f"SELECT Size_t0_id.pack_id, Pack.id FROM {env.DATABASE_RAW}.Measurepoint JOIN {env.DATABASE_RAW}.Pack On Pack.measurepoint_id=Measurepoint.id JOIN (SELECT Measurepoint.id as mp_id, Pack.id as pack_id FROM {env.DATABASE_RAW}.Measurepoint JOIN {env.DATABASE_RAW}.Pack On Pack.measurepoint_id=Measurepoint.id) as Size_t0_id ON Size_t0_id.mp_id=Measurepoint.code_size_t0_id AND Pack.id IN {pack_tuple};").execute()
+        t0_id_list = [element[0] for element in specimen_size_t0_id]
+        size_t0_dict = {}
+        for t0_pack_id, pack_id in specimen_size_t0_id :
+            size_t0_dict[pack_id] = t0_pack_id
+        t0_pack_tuple = tuple(t0_id_list) if len(t0_id_list)>1  else "('"+str(t0_id_list[0])+"')"
+        specimen_size_t0_data =  QueryScript(f"  SELECT pack_id, individual, size_px, size_mm   FROM {env.DATABASE_RAW}.MeasureSize WHERE pack_id IN {t0_pack_tuple}").execute()
+        
+        ### Ancienne méthode sans code_size_t0_id
+        
         specimen_size = {element:None for element in dict_pack}
         pack_checked = None
         ratio = None
@@ -84,6 +95,49 @@ class Alimentation:
             specimen_size[pack_dict[pack_checked]] = [element*ratio for element in current_specimen_sample]
         elif pack_checked and is_in_mm:
             specimen_size[pack_dict[pack_checked]] = [element for element in current_specimen_sample]
+
+        ##### Nouvelle méthode avec code_size_t0
+
+        pack_checked = None
+        ratio = None
+        current_specimen_sample = []
+        is_in_mm = False
+        for pack_id, individual, size_px, size_mm in specimen_size_t0_data:
+            if pack_checked != pack_id:
+                if pack_checked and ratio:
+                    specimen_size[pack_dict[pack_checked]] = [element*ratio for element in current_specimen_sample]
+                elif pack_checked and is_in_mm:
+                    specimen_size[pack_dict[pack_checked]] = [element for element in current_specimen_sample]
+                pack_checked = pack_id
+                ratio = None
+                is_in_mm = False
+                current_specimen_sample = []
+                if individual == '0' and size_px:
+                    ratio = size_mm/size_px
+                else:
+                    if size_mm and size_mm != 0:
+                        is_in_mm = True
+                        current_specimen_sample = [size_mm]
+                    else:
+                        current_specimen_sample = [size_px]
+
+            else:
+
+                if individual == '0' and size_px:
+                    ratio = size_mm/size_px
+                else:
+                    if size_mm and size_mm != 0 and not ratio:
+                        is_in_mm = True
+                        current_specimen_sample.append(size_mm)
+                    else:
+                        current_specimen_sample.append(size_px)
+        if pack_checked and ratio:
+            specimen_size[pack_dict[pack_checked]] = [element*ratio for element in current_specimen_sample]
+        elif pack_checked and is_in_mm:
+            specimen_size[pack_dict[pack_checked]] = [element for element in current_specimen_sample]
+        
+        
+        
         ############################################
 
         ############### Calcul des tailles feuilles ingérées

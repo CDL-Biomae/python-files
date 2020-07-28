@@ -330,7 +330,7 @@ def create_calcul_tox_dataframe(campaign_list, campaign_dict, J_dict,  measurepo
     # matrix.append(["Intensité"])
     # matrix.append(["1 seule femelle ?"])
 
-    cage_data, remaining_leaves_data, specimen_size_data, average_temperature_data, female_data, temperature_repro_data = get_tox_data(measurepoint_list, pack_list)
+    cage_data, remaining_leaves_data, specimen_size_data, average_temperature_data, female_data, temperature_repro_data, size_t0_dict, specimen_size_t0_data = get_tox_data(measurepoint_list, pack_list)
     reference_list = [["",""]]
     campaign_reference = ""
     count = 1
@@ -345,7 +345,7 @@ def create_calcul_tox_dataframe(campaign_list, campaign_dict, J_dict,  measurepo
                     matrix[0].append(J_dict[place_id]['J0']['truncated_date'])
                     matrix[1].append('CRE')
                     matrix[2].append('Lot ' + J_dict[place_id]['J0']['truncated_date'][-4:])
-                    matrix = add_result(matrix, campaign_dict[campaign_id]["place"][place_id]["measurepoint"][measurepoint_id],measurepoint_id, cage_data, remaining_leaves_data, specimen_size_data, average_temperature_data, female_data, temperature_repro_data, constant_dict)
+                    matrix = add_result(matrix, campaign_dict[campaign_id]["place"][place_id]["measurepoint"][measurepoint_id],measurepoint_id, cage_data, remaining_leaves_data, specimen_size_data, average_temperature_data, female_data, temperature_repro_data, constant_dict, size_t0_dict, specimen_size_t0_data)
                     count +=1
                     matrix = fill_empty(matrix, count)
             else :
@@ -353,7 +353,7 @@ def create_calcul_tox_dataframe(campaign_list, campaign_dict, J_dict,  measurepo
                 matrix[1].append('CRE')
                 matrix[2].append('Lot ' + J_dict[place_id]['J0']['truncated_date'][-4:])
                 reference_list.append([place_reference, place_id])
-                matrix = add_result(matrix, campaign_dict[campaign_id]["place"][place_id],place_id, cage_data, remaining_leaves_data, specimen_size_data, average_temperature_data, female_data, temperature_repro_data, constant_dict)
+                matrix = add_result(matrix, campaign_dict[campaign_id]["place"][place_id],place_id, cage_data, remaining_leaves_data, specimen_size_data, average_temperature_data, female_data, temperature_repro_data, constant_dict, size_t0_dict, specimen_size_t0_data)
                 count += 1
                 matrix = fill_empty(matrix, count)
 
@@ -372,15 +372,21 @@ def fill_empty(matrix, count) :
 def get_tox_data(measurepoint_list, pack_list) :
     pack_tuple = tuple(pack_list) if len(pack_list)>1  else "('"+str(pack_list[0])+"')"
     measurepoint_tuple = tuple(measurepoint_list) if len(measurepoint_list)>1  else "('"+str(measurepoint_list[0])+"')"
-    
     cage_data = QueryScript(f"SELECT pack_id, replicate, scud_quantity, scud_survivor, weight, ache, nature FROM {env.DATABASE_RAW}.Cage WHERE pack_id IN  {pack_tuple}").execute()
     remaining_leaves_data =  QueryScript(f"SELECT pack_id, replicate, value   FROM {env.DATABASE_RAW}.MeasureLeaf WHERE pack_id IN {pack_tuple}").execute()
     specimen_size_data =  QueryScript(f"  SELECT pack_id, individual, size_px, size_mm   FROM {env.DATABASE_RAW}.MeasureSize WHERE pack_id IN {pack_tuple}").execute()
+    specimen_size_t0_id = QueryScript(f"SELECT Size_t0_id.pack_id, Pack.id FROM {env.DATABASE_RAW}.Measurepoint JOIN {env.DATABASE_RAW}.Pack On Pack.measurepoint_id=Measurepoint.id JOIN (SELECT Measurepoint.id as mp_id, Pack.id as pack_id FROM {env.DATABASE_RAW}.Measurepoint JOIN {env.DATABASE_RAW}.Pack On Pack.measurepoint_id=Measurepoint.id) as Size_t0_id ON Size_t0_id.mp_id=Measurepoint.code_size_t0_id AND Pack.id IN {pack_tuple};").execute()
+    t0_id_list = [element[0] for element in specimen_size_t0_id]
+    size_t0_dict = {}
+    for t0_pack_id, pack_id in specimen_size_t0_id :
+        size_t0_dict[pack_id] = t0_pack_id
+    t0_pack_tuple = tuple(t0_id_list) if len(t0_id_list)>1  else "('"+str(t0_id_list[0])+"')"
+    specimen_size_t0_data =  QueryScript(f"  SELECT pack_id, individual, size_px, size_mm   FROM {env.DATABASE_RAW}.MeasureSize WHERE pack_id IN {t0_pack_tuple}").execute()
     average_temperature_data = QueryScript(f" SELECT measurepoint_id, sensor1_average, sensor1_min, sensor1_max  FROM {env.DATABASE_TREATED}.average_temperature WHERE measurepoint_id IN {measurepoint_tuple} AND version=  {env.CHOSEN_VERSION()}").execute()
     female_data = QueryScript(f"SELECT pack_id, female, molting_stage, oocyte_left, oocyte_right, specimen_size_px, specimen_size_mm, embryo_total, embryo_stage, oocyte_area_pixel, oocyte_area_mm FROM {env.DATABASE_RAW}.MeasureReprotoxicity").execute()
     temperature_repro_data =  QueryScript(f"SELECT measurepoint_id, expected_C2, expected_D2 FROM {env.DATABASE_TREATED}.temperature_repro WHERE version={env.CHOSEN_VERSION()}").execute()
 
-    return cage_data, remaining_leaves_data, specimen_size_data, average_temperature_data, female_data, temperature_repro_data
+    return cage_data, remaining_leaves_data, specimen_size_data, average_temperature_data, female_data, temperature_repro_data, size_t0_dict, specimen_size_t0_data
 
 def standard_deviation(liste) :
     if len(liste) == 0 :
@@ -391,7 +397,7 @@ def standard_deviation(liste) :
         deviation += (element - average)**2
     return (deviation/len(liste))**(0.5)
 
-def add_result(matrix, place_or_seperated_measurepoint, place_or_measurepoint_id, cage_data, remaining_leaves_data, specimen_size_data, average_temperature_data, female_data, temperature_repro_data, constant_dict):
+def add_result(matrix, place_or_seperated_measurepoint, place_or_measurepoint_id, cage_data, remaining_leaves_data, specimen_size_data, average_temperature_data, female_data, temperature_repro_data, constant_dict, size_t0_dict, specimen_size_t0_data):
     is_place = False
     if 'measurepoint' in place_or_seperated_measurepoint :
         is_place = True
@@ -487,6 +493,34 @@ def add_result(matrix, place_or_seperated_measurepoint, place_or_measurepoint_id
                 not_None_individual_size +=1
         individual_size_average = individual_size_sum/not_None_individual_size if not_None_individual_size else None
         
+        if not not_None_individual_size:
+            if alimentation and alimentation_pack_id in size_t0_dict :
+                for pack_id, individual, size_px, size_mm in specimen_size_data:
+                    individual=int(individual)
+                    if size_t0_dict[alimentation_pack_id] and size_t0_dict[alimentation_pack_id]==pack_id:
+                        if size_px and size_mm :
+                            ratio = size_mm/size_px
+                        elif size_px and individual!=0 :
+                            size_px_individual_list[individual-1] = size_px
+                        if size_mm and individual!=0 :
+                            size_mm_individual_list[individual-1] = size_mm
+                            size_list.append(size_mm)
+
+                if ratio : 
+                    for index, size in enumerate(size_px_individual_list) : 
+                        if size :
+                            size_mm_individual_list[index] = size*ratio
+                            size_list.append(size*ratio)
+
+                        
+                not_None_individual_size = 0
+                individual_size_sum = 0
+                for individual_size in size_mm_individual_list:
+                    if individual_size : 
+                        individual_size_sum += individual_size
+                        not_None_individual_size +=1
+                individual_size_average = individual_size_sum/not_None_individual_size if not_None_individual_size else None
+                
         if not_None_individual_size:
             new_matrix[18].append(individual_size_average)
             new_matrix[19].append(min(size_list))
