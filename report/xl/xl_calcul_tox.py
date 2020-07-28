@@ -380,8 +380,12 @@ def get_tox_data(measurepoint_list, pack_list) :
     size_t0_dict = {}
     for t0_pack_id, pack_id in specimen_size_t0_id :
         size_t0_dict[pack_id] = t0_pack_id
-    t0_pack_tuple = tuple(t0_id_list) if len(t0_id_list)>1  else "('"+str(t0_id_list[0])+"')"
-    specimen_size_t0_data =  QueryScript(f"  SELECT pack_id, individual, size_px, size_mm   FROM {env.DATABASE_RAW}.MeasureSize WHERE pack_id IN {t0_pack_tuple}").execute()
+
+    if len(t0_id_list) :
+        t0_pack_tuple = tuple(t0_id_list) if len(t0_id_list)>1  else "('"+str(t0_id_list[0])+"')"
+        specimen_size_t0_data =  QueryScript(f"  SELECT pack_id, individual, size_px, size_mm   FROM {env.DATABASE_RAW}.MeasureSize WHERE pack_id IN {t0_pack_tuple}").execute()
+    else :
+        specimen_size_t0_data = []
     average_temperature_data = QueryScript(f" SELECT measurepoint_id, sensor1_average, sensor1_min, sensor1_max  FROM {env.DATABASE_TREATED}.average_temperature WHERE measurepoint_id IN {measurepoint_tuple} AND version=  {env.CHOSEN_VERSION()}").execute()
     female_data = QueryScript(f"SELECT pack_id, female, molting_stage, oocyte_left, oocyte_right, specimen_size_px, specimen_size_mm, embryo_total, embryo_stage, oocyte_area_pixel, oocyte_area_mm FROM {env.DATABASE_RAW}.MeasureReprotoxicity").execute()
     temperature_repro_data =  QueryScript(f"SELECT measurepoint_id, expected_C2, expected_D2 FROM {env.DATABASE_TREATED}.temperature_repro WHERE version={env.CHOSEN_VERSION()}").execute()
@@ -494,7 +498,7 @@ def add_result(matrix, place_or_seperated_measurepoint, place_or_measurepoint_id
         individual_size_average = individual_size_sum/not_None_individual_size if not_None_individual_size else None
         
         if not not_None_individual_size:
-            if alimentation and alimentation_pack_id in size_t0_dict :
+            if alimentation_pack_id and alimentation_pack_id in size_t0_dict :
                 for pack_id, individual, size_px, size_mm in specimen_size_data:
                     individual=int(individual)
                     if size_t0_dict[alimentation_pack_id] and size_t0_dict[alimentation_pack_id]==pack_id:
