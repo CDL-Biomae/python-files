@@ -46,8 +46,6 @@ def add_style_bbac_7j(bbac_dataframe, PATH, dict_t0, old_color):
             unit_checked = unit_metal
         elif ws[letter + '4'].value and int(ws[letter + '4'].value) in sandre_organic:
             index = sandre_organic.index(int(ws[letter + '4'].value))
-            if not index:
-               index = sandre_organic.index(ws[letter + '4'].value) 
             sandre_checked = sandre_organic
             parameter_checked = parameter_organic
             unit_checked = unit_organic
@@ -59,22 +57,7 @@ def add_style_bbac_7j(bbac_dataframe, PATH, dict_t0, old_color):
             ws[letter + '4'].value = parameter_checked[index]
             ws2[letter + '4'].value = parameter_checked[index]
 
-    ## Merge unit
-    
-    current_unit = ws['G2'].value 
-    first_letter = 'G'           
-    last_letter = 'G'           
-    index = 6
-    while index <len(header_columns): 
-        while index <len(header_columns) and ws[header_columns[index] + '2'].value == current_unit :   
-            last_letter = header_columns[index]
-            index +=1
-        ws.merge_cells(first_letter + '2:'+last_letter+'2')
-        ws2.merge_cells(first_letter + '2:'+last_letter+'2')
-        if index<len(header_columns):
-            first_letter = last_letter = header_columns[index]
-        current_unit = ws[first_letter +'2'].value
-        index+=1
+
     
             
     
@@ -146,7 +129,7 @@ def add_style_bbac_7j(bbac_dataframe, PATH, dict_t0, old_color):
             ws.column_dimensions[letter].width=2
             ws2.column_dimensions[letter].width=2
             
-    ## ADD T0
+ ## ADD T0
     
     t0_mp = []
     for mp in dict_t0:
@@ -162,15 +145,15 @@ def add_style_bbac_7j(bbac_dataframe, PATH, dict_t0, old_color):
     else:
         reference_result = []
     for reference in reference_result:
-        reference_dict.update({reference[1]: reference[0]})
-    t0_result = []
+        reference_dict.update({reference[1]:reference[0]})
+    t0_result=[]
     if len(t0_mp):
         t0_result = QueryScript(f"SELECT sandre, prefix, value, Pack.measurepoint_id, Measurepoint.reference FROM {env.DATABASE_RAW}.Analysis JOIN {env.DATABASE_RAW}.Pack ON Pack.id= Analysis.pack_id JOIN {env.DATABASE_RAW}.Measurepoint ON Pack.measurepoint_id=Measurepoint.id WHERE Pack.measurepoint_id IN {query_tuple_t0};").execute()
-    dict_t0_result = {}
+    dict_t0_result= {}
     for element in t0_result:
         if not element[3] in dict_t0_result:
-            dict_t0_result.update({element[3]: {element[0]: element[1] + str(element[2]) if element[1] else str(element[2]), 'reference': element[4]}})
-        else:
+            dict_t0_result.update({element[3]: {element[0]:element[1] + str(element[2]) if element[1] else str(element[2]), 'reference': element[4]}})
+        else :
             dict_t0_result[element[3]][element[0]] = element[1] + str(element[2]) if element[1] else str(element[2])
     
     t0_font = Font(size=6, name='Arial')
@@ -332,6 +315,7 @@ def add_style_bbac_7j(bbac_dataframe, PATH, dict_t0, old_color):
     for letter in header_columns[5:]:
         for number in range(5, nb_rows+21):
                 ws[letter + str(number)].value = str(ws[letter + str(number)].value).replace(".", ",") if ws[letter + str(number)].value else ''
+    
     ws.freeze_panes = ws["F8"]
     ws2.freeze_panes = ws2["F5"]
 
