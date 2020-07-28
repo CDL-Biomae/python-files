@@ -28,7 +28,11 @@ elements_fish = {
 code_sandre_elements = tuple(elements_crustacean.keys())
 
 def maximum_freq_quanti(code_sandre):
-     
+    '''
+    Crée un tuple composé d'une liste de fréquences quanti et une autre des maxima
+    :param code_sandre:
+    :return: ([maximum], [freq_quanti]):
+    '''
     output = QueryScript(f" SELECT maximum, freq_quanti   FROM {env.DATABASE_TREATED}.r3 WHERE sandre IN {tuple(code_sandre) if len(code_sandre)>1 else '('+(str(code_sandre[0]) if len(code_sandre) else '0')+')'} AND version=  {env.CHOSEN_VERSION()}").execute()
 
     maximum, freq_quanti = [], []

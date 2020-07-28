@@ -4,7 +4,7 @@ import env
 class Neurotoxicity:
     '''
     Permet le calcul de la neurotoxicité (neurotoxicty).
-    Elle prend un dictionnaire de point de mesures de fusion et renvoie le même complété par les résultats.
+    Elle prend un dictionnaire de pack et renvoie le même complété par les résultats.
     '''
     @staticmethod
     def neurotoxicity(dict_pack):

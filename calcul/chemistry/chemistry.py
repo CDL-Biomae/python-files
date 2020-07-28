@@ -2,38 +2,13 @@ from tools import QueryScript
 from . import elements_fish, elements_crustacean
 import env
 
-# PAS optimisé
-
-
-def lyophilisation_pourcent(pack_id):
-    output = QueryScript(
-        f"  SELECT prefix, value, unit   FROM {env.DATABASE_RAW}.Analysis WHERE sandre='/' AND pack_id={pack_id}").execute()
-    if len(output):
-        return f"{output[0][0]}{output[0][1]}{output[0][2]}"
-    else:
-        return None
-
-
-def fat(pack_id):
-    output = QueryScript(
-        f"  SELECT prefix, value, unit   FROM {env.DATABASE_RAW}.Analysis WHERE sandre=1358 AND pack_id={pack_id}").execute()
-    if len(output):
-        return f"{output[0][0] if output[0][0] else ''}{output[0][1] * 100}{output[0][2]}"
-    else:
-        return None
-
-
-def weight(pack_id):
-    output = QueryScript(
-        f"  SELECT sampling_weight, metal_tare_bottle_weight, sampling_quantity, organic_tare_bottle_weight, organic_total_weight   FROM {env.DATABASE_RAW}.Pack WHERE id={pack_id}").execute()
-    if len(output):
-        return [output[0][0]-output[0][1], (output[0][0]-output[0][1])/output[0][2], output[0][4]-output[0][3]]
-    else:
-        return None
-
-############################
 
 def survival(pack_list):
+    '''
+    Crée un dictionnaire avec comme clé le pack_id et comme valeur sa survie chimie.
+    :param pack_list:
+    :return: pack_dict:
+    '''
     if len(pack_list)==0 :
         return None
 
@@ -53,24 +28,12 @@ def survival(pack_list):
     return pack_dict
     
 
-def convert_list(list_converted):
-    for element in list_converted:
-        if isinstance(element, list):
-            try:
-                element[0] = float(element[0])
-            except:
-                element[0] = f'{element[0]}'
-        else:
-            try:
-                element = float(element)
-            except:
-                element = f'{element}'
-
-    return list_converted
-
-
 def get_unit_NQE(sandre_list):
-
+    '''
+    Crée trois listes qui sont respectivement celle des unités(µg/kg PF ou mg/kg PF), celle des code sandre et enfin celle des seuils NQE à partir d'une liste de code sandre
+    :param sandre_list:
+    :return: [[unit_list],[sandre_list],[NQE_list]]:
+    '''
     output = QueryScript(
         f" SELECT familly, sandre, NQE   FROM {env.DATABASE_TREATED}.r3 WHERE sandre IN {tuple(sandre_list) if len(sandre_list)>1 else '('+(str(sandre_list[0]) if len(sandre_list) else '0')+')'} AND version=  {env.CHOSEN_VERSION()}").execute()
     result = [[], [], []]
@@ -93,7 +56,11 @@ def get_unit_NQE(sandre_list):
 
 
 def get_unit(sandre_list):
-
+    '''
+    Crée trois listes qui sont respectivement celle des unités(µg/kg PF ou mg/kg PF) et celle des code sandre à partir d'une liste de code sandre
+    :param sandre_list:
+    :return: [[unit_list],[sandre_list]]:
+    '''
     output = QueryScript(
         f" SELECT familly, sandre   FROM {env.DATABASE_TREATED}.r3 WHERE sandre IN {tuple(sandre_list) if len(sandre_list)>1 else '('+(str(sandre_list[0]) if len(sandre_list) else '0')+')'} AND version=  {env.CHOSEN_VERSION()}").execute()
     result = [[], []]
@@ -112,6 +79,11 @@ def get_unit(sandre_list):
 
 
 def result(campaigns_dict, pack_list):
+    '''
+    Crée un dictionnaire des résultats par code sandre regroupé par point de mesure à partir du dictionnaire global de campagne et la liste des packs chimie
+    :param campaigns_dict, pack_list:
+    :return: result_dict:
+    '''
     sandre_list = QueryScript(f" SELECT sandre   FROM {env.DATABASE_TREATED}.r3 WHERE version=  {env.CHOSEN_VERSION()}").execute()
     for index, sandre in enumerate(sandre_list):
         try:
