@@ -9,16 +9,12 @@ def create_head_dataframe(campaigns_dict):
 
     list_dataframe_normal = []
     list_dataframe_filtered = []
-    place_done = []
     matrix_filtered = []
     for campaign_id in campaigns_dict:
         matrix = []
         for place_id in campaigns_dict[campaign_id]["place"] :
 
-            if campaigns_dict[campaign_id]["place"][place_id]["number"] not in place_done:
-                place_done.append(campaigns_dict[campaign_id]["place"][place_id]["number"])
-                matrix_filtered.append([campaigns_dict[campaign_id]["place"][place_id]["number"], translate(campaigns_dict[campaign_id]["place"][place_id]["name"]), campaigns_dict[campaign_id]["place"][place_id]["agency"] if "agency" in campaigns_dict[campaign_id]["place"][place_id] else 'ND'])
-
+            
             matrix.append([campaigns_dict[campaign_id]["number"], campaigns_dict[campaign_id]["place"][place_id]["number"], translate(campaigns_dict[campaign_id]["place"][place_id]["name"]), campaigns_dict[campaign_id]["place"][place_id]["agency"] if "agency" in campaigns_dict[campaign_id]["place"][place_id] else 'ND'])
         
         df_normal = pd.DataFrame(matrix)
@@ -27,12 +23,7 @@ def create_head_dataframe(campaigns_dict):
 
     df_concat_normal = pd.concat(list_dataframe_normal)
 
-
-
-    df_filtered = pd.DataFrame(matrix_filtered)
-    df_filtered.columns = ['Numéro', 'Station de mesure', 'Code Agence']
-    list_dataframe_filtered.append(df_filtered)
-    return df_concat_normal, df_filtered, place_done
+    return df_concat_normal
 
 def create_head_special_dataframe(campaigns_dict, chemistry_measurepoint_list, chemistry_7j_measurepoint_list, chemistry_21j_measurepoint_list):
     list_dataframe = []

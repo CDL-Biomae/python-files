@@ -15,7 +15,7 @@ def add_style_stations(stations_dataframe, PATH):
     borders = Border(top=medium, left=medium, right=medium, bottom=medium)
 
     ## COLUMN WIDTH ##
-    ws.column_dimensions['A'].width = 3
+    ws.column_dimensions['A'].width = 13
     ws.column_dimensions['B'].width = 3
     ws.column_dimensions['C'].width = 45
     ws.column_dimensions['D'].width = 13
@@ -31,7 +31,7 @@ def add_style_stations(stations_dataframe, PATH):
     ## HEADER STYLE ##
     header_row = '2'
     header_columns = [get_column_letter(col_idx)
-                      for col_idx in list(range(2, nb_columns + 2))]
+                      for col_idx in list(range(1, nb_columns + 1))]
     header_cells = [c+header_row for c in header_columns]
 
     header_font = Font(size=10, bold=True, name='Arial', color='FFFFFF')

@@ -89,7 +89,7 @@ class LogExcelApp(tk.Tk):
     def main(self, campaign_list, output_path, old_color):
         self.text = "Chargement des données..."
         campaigns_dict, measurepoint_list, chemistry_measurepoint_list, chemistry_pack_list, chemistry_7j_measurepoint_list, chemistry_21j_measurepoint_list, tox_measurepoint_list, tox_pack_list, agency_code_list, J_dict = initialize(campaign_list)
-        head_dataframe, head_filtered_dataframe, place_list = create_head_dataframe(campaigns_dict)
+        head_dataframe = create_head_dataframe(campaigns_dict)
         head_chemistry_dataframe, head_chemistry_7j_dataframe, head_chemistry_21j_dataframe =  create_head_special_dataframe(campaigns_dict, chemistry_measurepoint_list, chemistry_7j_measurepoint_list, chemistry_21j_measurepoint_list)
 
         ## CREATION DE L'ONGLET VERSION ##
@@ -101,8 +101,8 @@ class LogExcelApp(tk.Tk):
 
         ## CREATION DE L'ONGLET STATIONS ##
         self.text = "Création de l'onglet Station..."
-        stations_dataframe = create_stations_dataframe(head_filtered_dataframe, campaigns_dict, measurepoint_list, agency_code_list, place_list)
-        self.write_in_existing_excel(stations_dataframe, output_path, 'Stations')
+        stations_dataframe = create_stations_dataframe(head_dataframe, campaigns_dict, measurepoint_list, agency_code_list)
+        self.write_in_existing_excel(stations_dataframe, output_path, 'Stations', startcol=0)
         add_style_stations(stations_dataframe, output_path)
 
 
