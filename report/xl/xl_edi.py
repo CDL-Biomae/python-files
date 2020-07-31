@@ -95,13 +95,15 @@ def create_edi_dataframe(campaign, place_dict, chemistry_measurepoint_list, chem
                     temp[63] = r21_secchi
             for mp_id, recordedAt, temperature, conductivity, ph, oxygen, comment in conditions_data:
                 if mp_id==measurepoint_id:
-                    if recordedAt == place_dict[place_id]["measurepoint"][measurepoint_id]["start_time"]:
+                    if mp_id==2788:
+                        print(place_dict[place_id]["measurepoint"][measurepoint_id]['end_time']== recordedAt, temperature)
+                    if recordedAt == place_dict[place_id]["measurepoint"][measurepoint_id]["start_time"] and not temp[16]:
                         temp[16]=temperature
                         temp[17]=ph
                         temp[18]=conductivity
                         temp[19]=oxygen
                     
-                    if recordedAt == place_dict[place_id]["measurepoint"][measurepoint_id]["end_time"]:
+                    if recordedAt == place_dict[place_id]["measurepoint"][measurepoint_id]["end_time"] and not temp[42]:
                         temp[42]=temperature
                         temp[43]=ph
                         temp[44]=conductivity
