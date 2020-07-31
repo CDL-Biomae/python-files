@@ -108,3 +108,11 @@ Deux fichiers python sont indispensables en plus des dossiers :
 
 requires.txt permet l'installation rapide des dépendances du projet
 version.txt permet de stocker la version choisie pour tout le projet
+
+## Modifier/Ajouter des paramètres
+
+Dans la création de la base de données traitées, les tables de référence peuvent être modifier de 2 manières différentes :
+- ajout d'une nouvelle version avec un nouvel excel qui suit la nomenclature de l'excel 'reference_clean'.
+- modification/ajout d'une ligne dans une des tables de référence avec l'aide de MySQLWorkbench. En écrivant ou en modifiant manuellement une ligne dans r3, les lignes changées seront prises en compte dans la prochaine génération de rapport pour les onglets BBAC.
+
+Pour modifier les NQE séléctionnés pour le rapport annexe, vous trouverez ces éléments dans le fichier /calcul/chemistry/nqe.py. Toute modification entrainera la même dans l'onglet NQE Biote du rapport annexe. 
