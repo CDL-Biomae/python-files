@@ -178,7 +178,7 @@ class LogExcelApp(tk.Tk):
             add_style_tox(tox_dataframe, output_path)
 
             self.text = "Création de l'onglet Calcul Tox..."
-            calcul_tox_dataframe = create_calcul_tox_dataframe(campaign_list,campaigns_dict, J_dict, tox_measurepoint_list, tox_pack_list)
+            calcul_tox_dataframe = create_calcul_tox_dataframe(campaigns_dict, J_dict, tox_measurepoint_list, tox_pack_list)
             self.write_in_existing_excel(calcul_tox_dataframe, output_path, 'Calcul tox', 0,0)
             add_style_calcul_tox(calcul_tox_dataframe, output_path)
 

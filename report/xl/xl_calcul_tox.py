@@ -4,7 +4,7 @@ import env
 import datetime
 from calcul import Reprotoxicity 
 
-def create_calcul_tox_dataframe(campaign_list, campaign_dict, J_dict,  measurepoint_list, pack_list) :
+def create_calcul_tox_dataframe(campaign_dict, J_dict,  measurepoint_list, pack_list) :
 
     constant_list = QueryScript(f"SELECT name, value   FROM {env.DATABASE_TREATED}.r2_constant WHERE version={env.CHOSEN_VERSION()}").execute()
     constant_dict = {}
@@ -335,7 +335,7 @@ def create_calcul_tox_dataframe(campaign_list, campaign_dict, J_dict,  measurepo
     campaign_reference = ""
     count = 1
     for campaign_index, campaign_id in enumerate(campaign_dict):
-        campaign_reference = campaign_list[campaign_index]
+        campaign_reference = campaign_dict[campaign_id]["name"]
         for place_id in campaign_dict[campaign_id]["place"]:
             place_reference =  campaign_reference + "-" + ( "0" + str(campaign_dict[campaign_id]["place"][place_id]['number']) if campaign_dict[campaign_id]["place"][place_id]['number']<10 else str(campaign_dict[campaign_id]["place"][place_id]['number']))
             if 'duplicate' in campaign_dict[campaign_id]["place"][place_id] and ('alimentation' in campaign_dict[campaign_id]["place"][place_id]['duplicate'] or 'neurology' in campaign_dict[campaign_id]["place"][place_id]['duplicate'] or 'reproduction' in campaign_dict[campaign_id]["place"][place_id]['duplicate']):
@@ -354,6 +354,7 @@ def create_calcul_tox_dataframe(campaign_list, campaign_dict, J_dict,  measurepo
                 matrix[2].append('Lot ' + J_dict[place_id]['J0']['truncated_date'][-4:])
                 reference_list.append([place_reference, place_id])
                 matrix = add_result(matrix, campaign_dict[campaign_id]["place"][place_id],place_id, cage_data, remaining_leaves_data, specimen_size_data, average_temperature_data, female_data, temperature_repro_data, constant_dict, size_t0_dict, specimen_size_t0_data)
+                print(matrix[25], place_reference, place_id )
                 count += 1
                 matrix = fill_empty(matrix, count)
 

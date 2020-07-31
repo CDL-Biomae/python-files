@@ -111,8 +111,8 @@ def create_campaigns_dict(references):
     campaigns_dict = {}
     place_list = []
     references_tuple = tuple(references) if len(references)>1  else "('"+references[0]+"')"
-    data = QueryScript(f"SELECT Campaign.id, substring(Campaign.reference,-2,2), Place.id, Place.name, substring(Place.reference,-2,2), Measurepoint.id, Pack.id, Pack.nature, substring(Measurepoint.reference, -2, 2), Measurepoint.name FROM {env.DATABASE_RAW}.Place JOIN {env.DATABASE_RAW}.Campaign ON Campaign.id=Place.campaign_id JOIN {env.DATABASE_RAW}.Measurepoint ON Measurepoint.place_id=Place.id JOIN {env.DATABASE_RAW}.Pack ON Measurepoint.id=Pack.measurepoint_id WHERE Campaign.reference IN {references_tuple}").execute()
-    for campaign_id, campaign_number, place_id, place_name, place_number, measurepoint_id, pack_id, pack_nature, measurepoint_number, measurepoint_name  in data :
+    data = QueryScript(f"SELECT Campaign.id, Campaign.reference, substring(Campaign.reference,-2,2), Place.id, Place.name, substring(Place.reference,-2,2), Measurepoint.id, Pack.id, Pack.nature, substring(Measurepoint.reference, -2, 2), Measurepoint.name FROM {env.DATABASE_RAW}.Place JOIN {env.DATABASE_RAW}.Campaign ON Campaign.id=Place.campaign_id JOIN {env.DATABASE_RAW}.Measurepoint ON Measurepoint.place_id=Place.id JOIN {env.DATABASE_RAW}.Pack ON Measurepoint.id=Pack.measurepoint_id WHERE Campaign.reference IN {references_tuple}").execute()
+    for campaign_id, campaign_name, campaign_number, place_id, place_name, place_number, measurepoint_id, pack_id, pack_nature, measurepoint_number, measurepoint_name  in data :
         if campaign_id in campaigns_dict:
             if place_id in campaigns_dict[campaign_id]["place"]:
                 # ici on regarde s'il n'y a pas deux points de mesure au sein de la même place qui ont un type de pack identique
@@ -136,7 +136,7 @@ def create_campaigns_dict(references):
                 campaigns_dict[campaign_id]["place"][place_id] = {"name": place_name,"number":int(place_number), "measurepoint": {measurepoint_id: {"number":int(measurepoint_number),"pack" : {pack_id:pack_nature}, "name": measurepoint_name}}}
         else :
             place_list.append(place_id)
-            campaigns_dict[campaign_id] =  {"number" : int(campaign_number), "place" :{place_id : {"name": place_name,"number":int(place_number), "measurepoint": {measurepoint_id: {"number":int(measurepoint_number),"pack" : {pack_id:pack_nature}, "name": measurepoint_name}}}}}
+            campaigns_dict[campaign_id] =  {"name":campaign_name,"number" : int(campaign_number), "place" :{place_id : {"name": place_name,"number":int(place_number), "measurepoint": {measurepoint_id: {"number":int(measurepoint_number),"pack" : {pack_id:pack_nature}, "name": measurepoint_name}}}}}
     agency_data = QueryScript(f"SELECT Place.id, Agency.code FROM {env.DATABASE_RAW}.Place JOIN {env.DATABASE_RAW}.Agency ON Place.agency_id=Agency.id WHERE Place.id IN {tuple(place_list) if len(place_list)>1 else '('+(str(place_list[0]) if len(place_list) else '0')+')'}").execute()
     for place_id, agency_code in agency_data:
         for campaign in campaigns_dict:
