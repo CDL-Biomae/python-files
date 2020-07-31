@@ -228,20 +228,36 @@ def add_style_tox(tox_dataframe, PATH):
 
         mue= ws["T" +str(row)].value
         surface_retard = ws["U" + str(row)].value
+        if ws["O" + str(row)].value :
+            try :
+                value = int(ws["O" + str(row)].value)
+                if int(ws["O" + str(row)].value) >= 10 :
+                    if ws["R" + str(row)].value == "NA" or surface_retard == "Conforme BC1":
+                        ws["R" + str(row)].fill = body_fill_ok
+                    else:
+                        ws["R" + str(row)].fill = body_fill_not_ok_4
 
-        if ws["R" + str(row)].value == "NA" or surface_retard == "Conforme BC1":
-            ws["R" + str(row)].fill = body_fill_ok
-        else:
-            ws["R" + str(row)].fill = body_fill_not_ok_4
+                    if mue == "NA":
+                            ws["P" + str(row)].fill = body_fill_NA
+                    if mue == "Conforme":
+                            ws["P" + str(row)].fill = body_fill_ok
+                    if mue == "Retard modéré":
+                            ws["P" + str(row)].fill = body_fill_NA
+                    if mue == "Retard fort":
+                            ws["P" + str(row)].fill = body_fill_not_ok_4
+                else :
+                    ws["R" + str(row)].fill = body_fill_NA
+                    ws["P" + str(row)].fill = body_fill_NA
+                    ws["N" + str(row)].fill = body_fill_NA
+            except ValueError:
+                ws["R" + str(row)].fill = body_fill_NA
+                ws["P" + str(row)].fill = body_fill_NA
+                ws["N" + str(row)].fill = body_fill_NA
+        else :
+            ws["R" + str(row)].fill = body_fill_NA
+            ws["P" + str(row)].fill = body_fill_NA
+            ws["N" + str(row)].fill = body_fill_NA
 
-        if mue == "NA":
-                ws["P" + str(row)].fill = body_fill_NA
-        if mue == "Conforme":
-                ws["P" + str(row)].fill = body_fill_ok
-        if mue == "Retard modéré":
-                ws["P" + str(row)].fill = body_fill_NA
-        if mue == "Retard fort":
-                ws["P" + str(row)].fill = body_fill_not_ok_4
                 
         ws["S"+ str(row)].value = ""  
         ws["T" +str(row)].value = ""
