@@ -354,7 +354,7 @@ class LogWordApp(tk.Tk):
                 chemistry_validation_precision = ''
                 if "chemistry organic portion validation" in place_dict[place_id] and place_dict[place_id]["chemistry organic portion validation"] :
                     chemistry_validation_precision += '(Métaux)'
-                elif "chemistry metal portion validation" in place_dict[place_id] and place_dict[place_id]["chemistry organic portion validation"] :
+                elif "chemistry metal portion validation" in place_dict[place_id] and place_dict[place_id]["chemistry metal portion validation"] :
                     chemistry_validation_precision += '(Organiques)'
                 else :
                     chemistry_validation_precision += '(Métaux & Organiques)'
