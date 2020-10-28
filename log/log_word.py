@@ -10,7 +10,7 @@ from docx.oxml.ns import qn
 from docx.oxml import OxmlElement
 import docx
 import os
-from PIL import Image, ExifTags
+from pil import Image, ExifTags
 import requests
 from io import BytesIO
 import env

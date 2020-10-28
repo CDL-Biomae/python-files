@@ -11,6 +11,12 @@ def create_new_version(date=None, comment=None):
     
     query.setRows([(date, comment)])
     query.executemany(True)
+    version = env.LATEST_VERSION()
+    version_file = open("version.txt", "w")
+    version_file.write(f"CHOSEN_VERSION={version}")
+    version_file.close()
+    print(version)
+
 
 def update_version():
     new_date = datetime.now().strftime('%Y-%m-%d %H:%M:%S')

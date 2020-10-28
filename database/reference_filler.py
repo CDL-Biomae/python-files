@@ -79,7 +79,7 @@ def fill_reference_tables(cas, xl_path="reference_clean.xlsx"):
           index+=1
       except IndexError :
         is_readable=False
-
+    
     SQL_request.setRows(values)
     SQL_request.executemany()
 
@@ -98,13 +98,13 @@ def fill_reference_tables(cas, xl_path="reference_clean.xlsx"):
     while is_readable :
       try:
         if(sheet.cell_value(index,1)):
-          values.append((sheet.cell_value(index,0),int(sheet.cell_value(index,1)) if isinstance(sheet.cell_value(index,1), float) else sheet.cell_value(index,1),sheet.cell_value(index,2),sheet.cell_value(index,3),float(sheet.cell_value(index,4)) if isinstance(sheet.cell_value(index,4),float) else None,float(sheet.cell_value(index,5)) if isinstance(sheet.cell_value(index,5),float) else None, float(sheet.cell_value(index,6)) if isinstance(sheet.cell_value(index,6),float) else None,float(sheet.cell_value(index,7)) if isinstance( sheet.cell_value(index,7),float) else None,float(sheet.cell_value(index,8)) if isinstance(sheet.cell_value(index,8),float) else None,float(sheet.cell_value(index,9)) if isinstance(sheet.cell_value(index,9),float) else None,float(sheet.cell_value(index,10)) if isinstance(sheet.cell_value(index,10),float) else None,float(sheet.cell_value(index,11)) if isinstance(sheet.cell_value(index,11),float) else None, sheet.cell_value(index,12),sheet.cell_value(index,13), 0.0 if isinstance(sheet.cell_value(index,14),str) else sheet.cell_value(index,14), 0.0 if isinstance(sheet.cell_value(index,15),str) else sheet.cell_value(index,15), sheet.cell_value(index,16) if isinstance(sheet.cell_value(index,16),float) else None ))
+          values.append((sheet.cell_value(index,0),int(sheet.cell_value(index,1)) if isinstance(sheet.cell_value(index,1), float) else sheet.cell_value(index,1),sheet.cell_value(index,2),sheet.cell_value(index,3),float(sheet.cell_value(index,4)) if isinstance(sheet.cell_value(index,4),float) else None,float(sheet.cell_value(index,5)) if isinstance(sheet.cell_value(index,5),float) else None, float(sheet.cell_value(index,6)) if isinstance(sheet.cell_value(index,6),float) else None,float(sheet.cell_value(index,7)) if isinstance( sheet.cell_value(index,7),float) else None,float(sheet.cell_value(index,8)) if isinstance(sheet.cell_value(index,8),float) else None,float(sheet.cell_value(index,9)) if isinstance(sheet.cell_value(index,9),float) else None,float(sheet.cell_value(index,10)) if isinstance(sheet.cell_value(index,10),float) else None,float(sheet.cell_value(index,11)) if isinstance(sheet.cell_value(index,11),float) else None, sheet.cell_value(index,12),sheet.cell_value(index,13), 0.0 if isinstance(sheet.cell_value(index,14),str) else sheet.cell_value(index,14), 0.0 if isinstance(sheet.cell_value(index,15),str) else sheet.cell_value(index,15), sheet.cell_value(index,16) if sheet.ncols==17 and isinstance(sheet.cell_value(index,16),float) else None ))
           index+=1
         else:
           index+=1
       except IndexError:
         is_readable=False
-
+    
     SQL_request.setRows(values)
     SQL_request.executemany()
 
