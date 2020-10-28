@@ -15,7 +15,6 @@ def create_new_version(date=None, comment=None):
     version_file = open("version.txt", "w")
     version_file.write(f"CHOSEN_VERSION={version}")
     version_file.close()
-    print(version)
 
 
 def update_version():
