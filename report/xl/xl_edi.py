@@ -31,11 +31,11 @@ def create_edi_dataframe(campaign, place_dict, chemistry_measurepoint_list, chem
                 if mp_id==measurepoint_id:
                     if date_id==6 and date and not start_time:
                         start_time=date
-                        temp[14] = date.strftime("%d/%m/%Y")
+                        temp[14] = date.strftime("%d/%m/%Y %H:%M:%S")
                         temp[0] = date
                     if date_id==7 and date and not end_time:
                         end_time=date
-                        temp[40] = date.strftime("%d/%m/%Y")
+                        temp[40] = date.strftime("%d/%m/%Y %H:%M:%S")
             place_dict[place_id]["measurepoint"][measurepoint_id]["start_time"] = start_time
             place_dict[place_id]["measurepoint"][measurepoint_id]["end_time"] = end_time
             if end_time and start_time:
