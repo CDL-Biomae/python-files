@@ -2,7 +2,6 @@ from tools import QueryScript, translate, convert_gps_into_lambert
 from report import initialize
 from calcul import survival
 import env
-import json
 import datetime
 
 def load_data(reference):
@@ -267,6 +266,4 @@ def load_data(reference):
                         place_dict[place_id]["chemistry organic portion validation"] = organic_result
                     
 
-    with open('data.json','w') as outfile :
-        json.dump(place_dict, outfile)
     return place_dict, year, week_start_number, week_end_number
