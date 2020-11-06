@@ -297,7 +297,7 @@ def add_style_bbac_7j(bbac_dataframe, PATH, dict_t0, old_color):
                     cell2.value = 'nd'
     for index,mp in enumerate(dict_t0):
         try :
-            if ws[header_columns[-1] + str(index+5)].value:
+            if ws[header_columns[-1] + str(index+5)].value and ws[header_columns[-1] + str(index+5)].value in dict_t0:
                 index_t0_associated = t0_mp.index(dict_t0[ws[header_columns[-1] + str(index+5)].value]['code_t0_id'])
                 for column in header_columns[5:]:
                     t0_ok = True if ws[column + str(5+nb_rows+index_t0_associated)].fill == body_fill_ok else False 

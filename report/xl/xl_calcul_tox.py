@@ -344,14 +344,14 @@ def create_calcul_tox_dataframe(campaign_dict, J_dict,  measurepoint_list, pack_
                     reference_list.append([measurepoint_reference, measurepoint_id])   
                     matrix[0].append(J_dict[place_id]['J0']['truncated_date'])
                     matrix[1].append('CRE')
-                    matrix[2].append('Lot ' + J_dict[place_id]['J0']['truncated_date'][-4:])
+                    matrix[2].append('Lot ' + J_dict[place_id]['J0']['truncated_date'][-4:] if  J_dict[place_id]['J0']['truncated_date'] else None)
                     matrix = add_result(matrix, campaign_dict[campaign_id]["place"][place_id]["measurepoint"][measurepoint_id],measurepoint_id, cage_data, remaining_leaves_data, specimen_size_data, average_temperature_data, female_data, temperature_repro_data, constant_dict, size_t0_dict, specimen_size_t0_data)
                     count +=1
                     matrix = fill_empty(matrix, count)
             else :
                 matrix[0].append(J_dict[place_id]['J0']['truncated_date'])
-                matrix[1].append('CRE')
-                matrix[2].append('Lot ' + J_dict[place_id]['J0']['truncated_date'][-4:])
+                matrix[1].append('CRE') 
+                matrix[2].append('Lot ' + J_dict[place_id]['J0']['truncated_date'][-4:] if  J_dict[place_id]['J0']['truncated_date'] else None)
                 reference_list.append([place_reference, place_id])
                 matrix = add_result(matrix, campaign_dict[campaign_id]["place"][place_id],place_id, cage_data, remaining_leaves_data, specimen_size_data, average_temperature_data, female_data, temperature_repro_data, constant_dict, size_t0_dict, specimen_size_t0_data)
                 count += 1

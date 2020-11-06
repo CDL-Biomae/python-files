@@ -218,7 +218,7 @@ def add_style_nqe(nqe_dataframe, PATH, dict_t0):
                     cell.fill = body_fill_not_ok
     for index,mp in enumerate(dict_t0):
         try :
-            if ws[header_columns[-1] + str(index+5)].value:
+            if ws[header_columns[-1] + str(index+5)].value and ws[header_columns[-1] + str(index+5)].value in dict_t0:
                 index_t0_associated = t0_mp.index(dict_t0[ws[header_columns[-1] + str(index+5)].value]['code_t0_id'])
                 for column in header_columns[5:]:
                     t0_ok = True if ws[column + str(5+nb_rows+index_t0_associated)].border != t0_not_valid else False 
