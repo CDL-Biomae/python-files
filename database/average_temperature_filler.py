@@ -48,7 +48,8 @@ def create_global_dict(cas) :
 
     if cas==2:
         last_update = QueryScript(f'SELECT date FROM {env.DATABASE_TREATED}.version WHERE id={env.CHOSEN_VERSION()}').execute()[0]
-        temperatures = QueryScript(f'SELECT measurepoint_id, pack_id, recordedAt, value, nature FROM {env.DATABASE_RAW}.MeasureTemperature WHERE updatedAt>="{last_update}"').execute()
+        last_update_1hour_delay = last_update - datetime.timedelta(minutes=60)
+        temperatures = QueryScript(f'SELECT measurepoint_id, pack_id, recordedAt, value, nature FROM {env.DATABASE_RAW}.MeasureTemperature WHERE updatedAt>="{last_update_1hour_delay}"').execute()
         print(f'{len(temperatures)} rows loaded')
         global_dict["need_update"]=[]
         for measurepoint_id, pack_id, _,_, _ in temperatures :
