@@ -715,7 +715,7 @@ def add_result(matrix, place_or_seperated_measurepoint, place_or_measurepoint_id
             for pack_id, female, molting_stage, oocyte_left, oocyte_right, specimen_size_px, specimen_size_mm, embryo_total, embryo_stage, _, _ in female_data :
                 if pack_id == reproduction_pack_id and embryo_stage in [2,3,4] and female!="" and int(female)<=15 :
                     female = int(female) if female else 0
-                    new_matrix[250+female].append(oocyte_left+oocyte_right)
+                    new_matrix[250+female].append(oocyte_left+oocyte_right) if oocyte_left and oocyte_right else new_matrix[250+female].append(None) 
                     new_matrix[266+female].append(embryo_stage)
                     embryo_stage_list.append(embryo_stage)
                     if embryo_stage in [1,2]:
