@@ -50,7 +50,8 @@ def create_global_dict(cas) :
         last_update = QueryScript(f'SELECT date FROM {env.DATABASE_TREATED}.version WHERE id={env.CHOSEN_VERSION()}').execute()[0]
         last_update_1hour_delay = last_update - datetime.timedelta(minutes=60)
         temperatures = QueryScript(f'SELECT measurepoint_id, pack_id, recordedAt, value, nature FROM {env.DATABASE_RAW}.MeasureTemperature WHERE updatedAt>="{last_update_1hour_delay}"').execute()
-        print(f'{len(temperatures)} rows loaded')
+        conditions_updated_measurepoint_id_list = QueryScript(f'SELECT measurepoint_id FROM {env.DATABASE_RAW}.MeasureExposureCondition WHERE updatedAt>="{last_update_1hour_delay}"').execute()
+        print(f'{len(temperatures) + len(conditions_updated_measurepoint_id_list)} rows loaded')
         global_dict["need_update"]=[]
         for measurepoint_id, pack_id, _,_, _ in temperatures :
             if measurepoint_id:
@@ -61,6 +62,12 @@ def create_global_dict(cas) :
                     if row[0]==pack_id:
                         if row[1] not in global_dict["need_update"] :
                             global_dict["need_update"].append(row[1])
+
+        for measurepoint_id in conditions_updated_measurepoint_id_list :
+            if measurepoint_id:
+                if measurepoint_id not in global_dict["need_update"] :
+                    global_dict["need_update"].append(measurepoint_id)
+        
     if len(temperatures):
         current_measurepoint_id = str(temperatures[0][0]) if temperatures[0][0] else None
         current_key_dates = {}
