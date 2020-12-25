@@ -5,7 +5,6 @@ from report import load_data
 from tools import translate
 from docx import Document
 from docx.shared import Pt
-# from docxcompose.composer import Composer
 from docx.oxml.ns import qn
 from docx.oxml import OxmlElement
 import docx
