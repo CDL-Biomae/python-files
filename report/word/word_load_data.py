@@ -9,7 +9,7 @@ def load_data(reference):
 
     agency_data = QueryScript(f"SELECT code, network, hydroecoregion, latitude, longitude FROM {env.DATABASE_RAW}.Agency  WHERE code IN {tuple(agency_code_list) if len(agency_code_list)>1 else '('+(str(agency_code_list[0]) if len(agency_code_list) else '0')+')'};").execute()
     context_data = QueryScript(f"SELECT measurepoint_id, recordedAt, temperature, conductivity, ph, oxygen, type, comment, step, barrel FROM {env.DATABASE_RAW}.MeasureExposureCondition WHERE measurepoint_id IN {tuple(measurepoint_list) if len(measurepoint_list)>1 else '('+str(measurepoint_list[0])+')'}").execute()
-    temperatures_data = QueryScript(f"SELECT measurepoint_id, sensor1_min, sensor1_average, sensor1_max, sensor2_min, sensor2_average, sensor2_max, sensor3_min, sensor3_average, sensor3_max   FROM {env.DATABASE_TREATED}.average_temperature WHERE version=  {env.CHOSEN_VERSION()} and measurepoint_id IN {tuple(measurepoint_list) if len(measurepoint_list)>1 else '('+str(measurepoint_list[0])+')'}").execute()
+    temperatures_data = QueryScript(f"SELECT measurepoint_id, sensor1_min, sensor1_average, sensor1_max, sensor2_min, sensor2_average, sensor2_max, sensor3_min, sensor3_average, sensor3_max, all_sensor_average   FROM {env.DATABASE_TREATED}.average_temperature WHERE version=  {env.CHOSEN_VERSION()} and measurepoint_id IN {tuple(measurepoint_list) if len(measurepoint_list)>1 else '('+str(measurepoint_list[0])+')'}").execute()
     geographic_data = QueryScript(f"SELECT id, latitudeSpotted, longitudeSpotted, lambertX, lambertY, city, zipcode, stream FROM {env.DATABASE_RAW}.Measurepoint WHERE id IN {tuple(measurepoint_list) if len(measurepoint_list)>1 else '('+str(measurepoint_list[0])+')'}").execute()
     place_reference_data = QueryScript(f"SELECT Place.id, Place.reference FROM {env.DATABASE_RAW}.Measurepoint JOIN {env.DATABASE_RAW}.Place ON Place.id= Measurepoint.place_id WHERE Measurepoint.id IN {tuple(measurepoint_list) if len(measurepoint_list)>1 else '('+str(measurepoint_list[0])+')'}").execute()
     conform_threshold = QueryScript(f"SELECT parameter, min, max FROM {env.DATABASE_TREATED}.r1 WHERE version={env.CHOSEN_VERSION()}").execute()
@@ -51,7 +51,7 @@ def load_data(reference):
                 if chemistry_survival and pack_id in chemistry_survival:
                     place_dict[place_id]["chemistry_survival"] = chemistry_survival[pack_id]
             ### Add temperature data
-            for mp_id, sensor1_min, sensor1_average, sensor1_max, sensor2_min, sensor2_average, sensor2_max, sensor3_min, sensor3_average, sensor3_max in temperatures_data:
+            for mp_id, sensor1_min, sensor1_average, sensor1_max, sensor2_min, sensor2_average, sensor2_max, sensor3_min, sensor3_average, sensor3_max, all_sensor_average in temperatures_data:
                 if measurepoint_id==mp_id:
 
                     if sensor1_average:
@@ -94,12 +94,8 @@ def load_data(reference):
                     if sensor1_max or sensor2_max or sensor3_max:
                         last_value, sensor1_max, sensor2_max, sensor3_max = [element if element!=None else -100 for element in [place_dict[place_id]["condition"]["temperature_max"], sensor1_max, sensor2_max, sensor3_max]]
                         place_dict[place_id]["condition"]["temperature_max"] = max(last_value, sensor1_max, sensor2_max, sensor3_max)
-                    if sensor1_average and not place_dict[place_id]["condition"]["average_temperature"] :
-                        place_dict[place_id]["condition"]["average_temperature"] = round(sensor1_average,1)
-                    if sensor2_average :
-                        place_dict[place_id]["condition"]["average_temperature"] = round(sensor2_average,1)
-                    elif sensor3_average:
-                        place_dict[place_id]["condition"]["average_temperature"] = round(sensor3_average,1)
+                    if all_sensor_average and not place_dict[place_id]["condition"]["average_temperature"] :
+                        place_dict[place_id]["condition"]["average_temperature"] = round(all_sensor_average,1)
 
             ### Add context data
             for mp_id, recordedAt,temperature, conductivity, ph, oxygen, barrel_type, comment, step, barrel in context_data:
