@@ -25,12 +25,10 @@ def create_physicochimie_dataframe(head_dataframe, measurepoint_list, campaigns_
                     if measurepoint_id==mp_id:
                         for day, J in enumerate(J_dict[place_id]):
                             if day<5 and J_dict[place_id][J]["full_date"]==recordedAt :
-                                if conductivity:
-                                    temp[4+day] = conductivity
-                                if ph:
-                                    temp[9+day] = ph
-                                if oxygen:
-                                    temp[14+day] = oxygen
+                                if conductivity or ph or oxygen :
+                                    temp[4+day] = conductivity if conductivity else ""
+                                    temp[9+day] = ph if ph else ""
+                                    temp[14+day] = oxygen if oxygen else ""
             if not temp[1]:
                 temp[1]=""
             if not temp[2]:
