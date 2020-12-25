@@ -7,24 +7,16 @@ def create_global_dict(cas) :
     key_dates =  QueryScript(f'SELECT measurepoint_id, date_id, date FROM {env.DATABASE_TREATED}.key_dates').execute()
     if cas == 1 or cas == 3 :
         temperatures = QueryScript(f'SELECT measurepoint_id, pack_id, recordedAt, value, nature FROM {env.DATABASE_RAW}.MeasureTemperature WHERE recordedAt<="2017-00-00 00:00:00"').execute()
+        looked_year = 2017
         print(f'{len(temperatures)} rows loaded')
-        temperatures2=QueryScript(f'SELECT measurepoint_id, pack_id, recordedAt, value, nature FROM {env.DATABASE_RAW}.MeasureTemperature WHERE recordedAt<="2018-00-00 00:00:00" AND recordedAt>="2017-00-00 00:00:00"').execute()
-        for element in temperatures2 :
-            temperatures.append(element)
-        print(f'{len(temperatures)} rows loaded')
-        temperatures2=QueryScript(f'SELECT measurepoint_id, pack_id, recordedAt, value, nature FROM {env.DATABASE_RAW}.MeasureTemperature WHERE recordedAt<="2019-00-00 00:00:00" AND recordedAt>="2018-00-00 00:00:00"').execute()
-        for element in temperatures2 :
-            temperatures.append(element)
-        print(f'{len(temperatures)} rows loaded')
-        temperatures2=QueryScript(f'SELECT measurepoint_id, pack_id, recordedAt, value, nature FROM {env.DATABASE_RAW}.MeasureTemperature WHERE recordedAt<="2020-00-00 00:00:00" AND recordedAt>="2019-00-00 00:00:00"').execute()
-        for element in temperatures2 :
-            temperatures.append(element)
-        print(f'{len(temperatures)} rows loaded')
-        temperatures2=QueryScript(f'SELECT measurepoint_id, pack_id, recordedAt, value, nature FROM {env.DATABASE_RAW}.MeasureTemperature WHERE recordedAt<="2021-00-00 00:00:00" AND recordedAt>="2020-00-00 00:00:00"').execute()
-        for element in temperatures2 :
-            temperatures.append(element)
-        print(f'{len(temperatures)} rows loaded')
-
+        next_temperatures=QueryScript(f'SELECT measurepoint_id, pack_id, recordedAt, value, nature FROM {env.DATABASE_RAW}.MeasureTemperature WHERE recordedAt<="2018-00-00 00:00:00" AND recordedAt>="2017-00-00 00:00:00"').execute()
+        while len(next_temperatures) :
+            for element in next_temperatures :
+                temperatures.append(element)
+            print(f'{len(temperatures)} rows loaded')
+            looked_year += 1
+            next_temperatures=QueryScript(f'SELECT measurepoint_id, pack_id, recordedAt, value, nature FROM {env.DATABASE_RAW}.MeasureTemperature WHERE recordedAt<="{looked_year+1}-00-00 00:00:00" AND recordedAt>="{looked_year}-00-00 00:00:00"').execute()
+       
     global_dict = {"data":{}}
             
         
@@ -49,9 +41,8 @@ def create_global_dict(cas) :
     if cas==2:
         last_update = QueryScript(f'SELECT date FROM {env.DATABASE_TREATED}.version WHERE id={env.CHOSEN_VERSION()}').execute()[0]
         last_update_1hour_delay = last_update - datetime.timedelta(minutes=60)
-        temperatures = QueryScript(f'SELECT measurepoint_id, pack_id, recordedAt, value, nature FROM {env.DATABASE_RAW}.MeasureTemperature WHERE updatedAt>="{last_update_1hour_delay}"').execute()
-        conditions_updated_measurepoint_id_list = QueryScript(f'SELECT measurepoint_id FROM {env.DATABASE_RAW}.MeasureExposureCondition WHERE updatedAt>="{last_update_1hour_delay}"').execute()
-        print(f'{len(temperatures) + len(conditions_updated_measurepoint_id_list)} rows loaded')
+        temperatures = QueryScript(f'SELECT measurepoint_id, pack_id, recordedAt, value, nature FROM {env.DATABASE_RAW}.MeasureTemperature WHERE measurepoint_id IN (SELECT measurepoint_id FROM {env.DATABASE_RAW}.MeasureTemperature WHERE updatedAt>="{last_update_1hour_delay}") OR measurepoint_id IN (SELECT measurepoint_id FROM {env.DATABASE_RAW}.MeasureExposureCondition WHERE updatedAt>="{last_update_1hour_delay}") ;').execute()
+        print(f'{len(temperatures)} rows loaded')
         global_dict["need_update"]=[]
         for measurepoint_id, pack_id, _,_, _ in temperatures :
             if measurepoint_id:
@@ -62,11 +53,6 @@ def create_global_dict(cas) :
                     if row[0]==pack_id:
                         if row[1] not in global_dict["need_update"] :
                             global_dict["need_update"].append(row[1])
-
-        for measurepoint_id in conditions_updated_measurepoint_id_list :
-            if measurepoint_id:
-                if measurepoint_id not in global_dict["need_update"] :
-                    global_dict["need_update"].append(measurepoint_id)
         
     if len(temperatures):
         current_measurepoint_id = str(temperatures[0][0]) if temperatures[0][0] else None
@@ -131,6 +117,11 @@ def create_global_dict(cas) :
                             global_dict["data"][current_measurepoint_id][nature].append(value)
                         else :
                             global_dict["data"][current_measurepoint_id][nature] = [value]
+                        if "all" in global_dict["data"][current_measurepoint_id]:
+                            global_dict["data"][current_measurepoint_id]["all"].append(value)
+                        else :
+                            global_dict["data"][current_measurepoint_id]["all"] = [value]
+                        
                     if is_lab :
                         if "sensor2lab" in global_dict["data"][current_measurepoint_id]:
                             global_dict["data"][current_measurepoint_id]["sensor2lab"].append(value)
@@ -144,12 +135,12 @@ def create_global_dict(cas) :
 def insert_average_temperature(cas,global_dict) :
     if cas==1 :
         QueryScript(f"DROP TABLE IF EXISTS average_temperature").execute(admin=True)
-        average_temperature_table = QueryScript("CREATE TABLE average_temperature (id INT AUTO_INCREMENT PRIMARY KEY, measurepoint_id INT(11), sensor1_average DOUBLE, sensor1_min DOUBLE, sensor1_max DOUBLE, sensor2_average DOUBLE, sensor2_min DOUBLE, sensor2_max DOUBLE, sensor3_average DOUBLE, sensor3_min DOUBLE, sensor3_max DOUBLE, sensor2_average_labo DOUBLE, version INT );")
+        average_temperature_table = QueryScript("CREATE TABLE average_temperature (id INT AUTO_INCREMENT PRIMARY KEY, measurepoint_id INT(11), sensor1_average DOUBLE, sensor1_min DOUBLE, sensor1_max DOUBLE, sensor2_average DOUBLE, sensor2_min DOUBLE, sensor2_max DOUBLE, sensor3_average DOUBLE, sensor3_min DOUBLE, sensor3_max DOUBLE, sensor2_average_labo DOUBLE, all_sensor_average DOUBLE, version INT );")
         average_temperature_table.execute(admin=True)
     if cas==2:
         need_update = global_dict['need_update'] if len(global_dict['need_update']) else [0]
         QueryScript(f"DELETE FROM {env.DATABASE_TREATED}.average_temperature WHERE version = {env.CHOSEN_VERSION()} and measurepoint_id in {tuple(need_update) if len(need_update)>1 else '('+(str(need_update[0]) if len(need_update) else '0')+')'};").execute(admin=True)
-    insertion = QueryScript(f" INSERT INTO average_temperature (measurepoint_id, sensor1_average, sensor1_min, sensor1_max, sensor2_average, sensor2_min, sensor2_max, sensor3_average, sensor3_min, sensor3_max, sensor2_average_labo, version) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)")
+    insertion = QueryScript(f" INSERT INTO average_temperature (measurepoint_id, sensor1_average, sensor1_min, sensor1_max, sensor2_average, sensor2_min, sensor2_max, sensor3_average, sensor3_min, sensor3_max, sensor2_average_labo, all_sensor_average, version) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)")
     output = []
     for measurepoint_id in global_dict["data"]:
         if measurepoint_id != "None" and (cas in [1,3] or ('need_update' in global_dict and measurepoint_id in global_dict["need_update"])):
@@ -174,6 +165,10 @@ def insert_average_temperature(cas,global_dict) :
                 row+=[None]*3
             if "sensor2lab" in global_dict["data"][measurepoint_id]:
                 row.append(sum(global_dict["data"][measurepoint_id]["sensor2lab"])/len(global_dict["data"][measurepoint_id]["sensor2lab"]))
+            else :
+                row.append(None)
+            if "all" in global_dict["data"][measurepoint_id]:
+                row.append(sum(global_dict["data"][measurepoint_id]["all"])/len(global_dict["data"][measurepoint_id]["all"]))
             else :
                 row.append(None)
             output.append(tuple(row))

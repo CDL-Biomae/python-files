@@ -4,7 +4,7 @@ import env
 
 def create_physicochimie_dataframe(head_dataframe, measurepoint_list, campaigns_dict, J_dict):
     context_data = QueryScript(f"SELECT measurepoint_id, recordedAt, conductivity, ph, oxygen FROM {env.DATABASE_RAW}.MeasureExposureCondition WHERE measurepoint_id IN {tuple(measurepoint_list) if len(measurepoint_list)>1 else '('+str(measurepoint_list[0])+')'}").execute()
-    temperatures_data = QueryScript(f"SELECT measurepoint_id, sensor1_min, sensor1_average, sensor1_max, sensor2_min, sensor2_average, sensor2_max, sensor3_min, sensor3_average, sensor3_max   FROM {env.DATABASE_TREATED}.average_temperature WHERE version=  {env.CHOSEN_VERSION()} and measurepoint_id IN {tuple(measurepoint_list) if len(measurepoint_list)>1 else '('+str(measurepoint_list[0])+')'}").execute()
+    temperatures_data = QueryScript(f"SELECT measurepoint_id, sensor1_min, sensor1_max, sensor2_min, sensor2_max, sensor3_min, sensor3_max, all_sensor_average   FROM {env.DATABASE_TREATED}.average_temperature WHERE version=  {env.CHOSEN_VERSION()} and measurepoint_id IN {tuple(measurepoint_list) if len(measurepoint_list)>1 else '('+str(measurepoint_list[0])+')'}").execute()
     global_matrix = []
     
     for campaign_id in campaigns_dict:
@@ -13,16 +13,14 @@ def create_physicochimie_dataframe(head_dataframe, measurepoint_list, campaigns_
             temp = [None]*19
             temp[0] =''
             for measurepoint_id in campaigns_dict[campaign_id]["place"][place_id]["measurepoint"]:
-                for mp_id, sensor1_min, sensor1_average, sensor1_max, sensor2_min, sensor2_average, sensor2_max, sensor3_min, sensor3_average, sensor3_max in temperatures_data:
+                for mp_id, sensor1_min, sensor1_max, sensor2_min, sensor2_max, sensor3_min, sensor3_max, all_sensor_average in temperatures_data:
                     if measurepoint_id==mp_id:
                         if sensor3_min or sensor2_min or sensor1_min :
                             temp[1] = round(min(sensor1_min if sensor1_min else 50, sensor2_min if sensor2_min else 50, sensor3_min if sensor3_min else 50, temp[1] if temp[1] else 50),1)
                         if sensor3_max or sensor2_max or sensor1_max :
                             temp[3] = round(max(sensor1_max if sensor1_max else 0, sensor2_max if sensor2_max else 0, sensor3_max if sensor3_max else 0, temp[3] if temp[3] else 0),1)
-                        if sensor2_average :
-                            temp[2] = round(sensor2_average,1)
-                        elif sensor3_average:
-                            temp[2] = round(sensor3_average,1)
+                        if all_sensor_average :
+                            temp[2] = round(all_sensor_average, 1)
                 for mp_id, recordedAt, conductivity,ph, oxygen in context_data:
                     if measurepoint_id==mp_id:
                         for day, J in enumerate(J_dict[place_id]):
